@@ -5,7 +5,7 @@ import { defineConfig } from "eslint/config";
 
 
 export default defineConfig([
-  { files: ["**/*.{js,mjs,cjs,ts,mts,cts}"], plugins: { js }, extends: ["js/recommended"], rules: { "no-unused-vars": "off" }, parserOptions: { ecmaVersion: "es2022", sourceType: "module" } },
+  { files: ["**/*.{js,mjs,cjs,ts,mts,cts}"], plugins: { js }, extends: ["js/recommended", "prettier"], rules: { "no-unused-vars": "off" }, parserOptions: { ecmaVersion: "es2022", sourceType: "module" } },
   { files: ["**/*.{js,mjs,cjs,ts,mts,cts}"], languageOptions: { globals: globals.browser } },
   tseslint.configs.recommended,
 ]);
