@@ -5,7 +5,8 @@
     "type": "module",
     "scripts": {
         "prepare": "npx husky install",
-        "dev": "ts-node index.ts"
+        "dev": "ts-node index.ts",
+        "migrations": "node dist/src/db/postgres/migrations/exec.js"
     },
     "keywords": [],
     "author": "",

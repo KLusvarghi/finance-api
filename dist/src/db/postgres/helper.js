@@ -1,5 +1,5 @@
-import { Pool } from 'pg';
 import dotenv from 'dotenv';
+import { Pool } from 'pg';
 dotenv.config();
 // uma pool é uma "piscina" de conexões com o banco de dados
 // ela é usada para evitar criar uma nova conexão a cada requisição, então ao invés de criar uma nova conexão a cada requisição, sendo do mesmo client ou de diferentes clients, essa pool nos garante que as conexões serão reutilizadas e é mais eficiente
