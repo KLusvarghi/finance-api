@@ -1,6 +1,8 @@
 import express, { Request, Response } from 'express'
 import { PostgresHelper } from './src/db/postgres/helper'
 import 'dotenv/config'
+import { CreateUserController } from '@/modules/users/controllers/create-user'
+import { GetUserByIdController } from '@/modules/users/controllers/get-user-by-id'
 
 const app = express()
 const port = process.env.PORT || 3001
@@ -8,10 +10,25 @@ const port = process.env.PORT || 3001
 // por padrão, o express não suporta json, então temos que especificar aqui que toda requisição que recebe um req que contem um content-type do tipo JSON, ele adapte para receber
 app.use(express.json())
 
-app.get('/', async (req: Request, res: Response) => {
-    const results = await PostgresHelper.query('SELECT * FROM users;')
-    res.send(JSON.stringify(results))
+// cria user
+app.post('/api/users', async (request, response) => {
+  const createUserController = new CreateUserController()
+
+  const { statusCode, body } = await createUserController.execute(request)
+
+  response.status(statusCode).send(body)
 })
+
+// consulta user
+app.get('/api/users/:userId', async (request, response) => {
+  const getUserByIdController = new GetUserByIdController()
+
+  const { statusCode, body } = await getUserByIdController.execute(request)
+
+  response.status(statusCode).send(body)
+})
+
+
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`)
