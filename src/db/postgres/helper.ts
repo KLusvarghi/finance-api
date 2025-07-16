@@ -1,7 +1,5 @@
-import dotenv from 'dotenv'
+import 'dotenv/config'
 import { Pool } from 'pg'
-
-dotenv.config()
 
 // uma pool é uma "piscina" de conexões com o banco de dados
 // ela é usada para evitar criar uma nova conexão a cada requisição, então ao invés de criar uma nova conexão a cada requisição, sendo do mesmo client ou de diferentes clients, essa pool nos garante que as conexões serão reutilizadas e é mais eficiente
@@ -20,6 +18,8 @@ export const pool = new Pool({
     maxLifetimeSeconds: 60, // tempo máximo de vida da conexão
 })
 
+// essa constante é apenas um obj que tem um método que recebe a query a ser executada e os parametros
+// e utilizaremos ela quando quisermos insrir algo no banco, então, chamaremos ela nos nossos "repositories"
 export const PostgresHelper = {
     query: async (query: string, params?: any[]) => {
         const client = await pool.connect() // pegando o client
