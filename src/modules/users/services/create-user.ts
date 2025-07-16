@@ -1,15 +1,9 @@
 import { v4 as uuidv4 } from 'uuid'
 import bcrypt from 'bcrypt'
-import { PostgresCreateUserRepository } from '@/repositories/postgres/create-user'
+import { PostgresCreateUserRepository } from '@/repositories/postgres/users/create-user'
+import { CreateUserParams } from '../types'
 
-interface CreateUserParams {
-    first_name: string
-    last_name: string
-    email: string
-    password: string
-}
-
-export class CreateUserCase {
+export class CreateUserService {
     async execute(createUserParams: CreateUserParams) {
         // TODO: verificar se o e-mail já está cadastrado no banco
 
