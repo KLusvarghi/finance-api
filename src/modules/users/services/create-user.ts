@@ -4,6 +4,7 @@ import { PostgresCreateUserRepository } from '@/repositories/postgres/users/crea
 import { CreateUserParams } from '../types'
 import { PostgresGetUserByEmailRepository } from '@/repositories/postgres/users/get-user-by-email'
 import { create } from 'domain'
+import { EmailAlreadyExistsError } from '@/errors/user'
 
 export class CreateUserService {
     async execute(createUserParams: CreateUserParams) {
@@ -17,7 +18,7 @@ export class CreateUserService {
             )
 
         if (userWithProviderEmail) {
-            throw new Error('Email already exists')
+            throw new EmailAlreadyExistsError(createUserParams.email)
         }
 
         // gerar o UUID

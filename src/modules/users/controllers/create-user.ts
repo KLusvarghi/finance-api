@@ -1,6 +1,7 @@
 import { serverError, badRequest, created } from '@/shared/http/reponse'
 import { CreateUserService } from '../services/create-user'
 import isEmail from 'validator/lib/isEmail'
+import { EmailAlreadyExistsError } from '@/errors/user'
 
 export class CreateUserController {
     async execute(httpRequest: any) {
@@ -38,6 +39,9 @@ export class CreateUserController {
             // retornar a resposta para o user (status code)
             return created(createdUser)
         } catch (error) {
+          if(error instanceof EmailAlreadyExistsError) {
+                return badRequest(error.message)
+            }
             console.error(error)
             return serverError()
         }
