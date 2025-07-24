@@ -2,10 +2,23 @@ import { v4 as uuidv4 } from 'uuid'
 import bcrypt from 'bcrypt'
 import { PostgresCreateUserRepository } from '@/repositories/postgres/users/create-user'
 import { CreateUserParams } from '../types'
+import { PostgresGetUserByEmailRepository } from '@/repositories/postgres/users/get-user-by-email'
+import { create } from 'domain'
 
 export class CreateUserService {
     async execute(createUserParams: CreateUserParams) {
-        // TODO: verificar se o e-mail já está cadastrado no banco
+        // verificar se o e-mail já está cadastrado no banco
+        const postgresGetUserByEmailRepository =
+            new PostgresGetUserByEmailRepository()
+
+        const userWithProviderEmail =
+            await postgresGetUserByEmailRepository.excute(
+                createUserParams.email,
+            )
+
+        if (userWithProviderEmail) {
+            throw new Error('Email already exists')
+        }
 
         // gerar o UUID
         const userId = uuidv4()
