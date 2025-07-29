@@ -6,6 +6,7 @@ import {
     checkIfIdIsValid,
     invalidIdResponse,
     userNotFoundResponse,
+    userBadRequestResponse,
 } from '@/modules/helpers'
 
 export class GetUserByIdController {
@@ -14,18 +15,18 @@ export class GetUserByIdController {
             const userId = httpRequest.params.userId
 
             if (!userId) {
-                return badRequest('Missing param: userId')
+                return userBadRequestResponse()
             }
-            
+
             const isIdValid = checkIfIdIsValid(userId)
-            if (!isIdValid) return invalidIdResponse
+            if (!isIdValid) return invalidIdResponse()
 
 
             const getUserByIdService = new GetUserByIdService()
             const user = await getUserByIdService.execute(userId)
 
             if (!user) {
-                return userNotFoundResponse
+                return userNotFoundResponse()
             }
 
             return ok(user)

@@ -31,12 +31,12 @@ export class CreateUserController {
             const passwordIsValid = checkIfPasswordIsValid(params.password)
 
             if (!passwordIsValid) {
-                return invalidPasswordResponse
+                return invalidPasswordResponse()
             }
 
             const emailIsValid = checkIfEmailIsValid(params.email)
             if (!emailIsValid) {
-                return emailIsAlreadyInUseResponse
+                return emailIsAlreadyInUseResponse()
             }
 
             // chamar o service

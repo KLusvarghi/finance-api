@@ -13,6 +13,9 @@ export const invalidIdResponse = () =>
 export const userNotFoundResponse = () =>
   notFound('User not found.')
 
+export const userBadRequestResponse = () =>
+  notFound('Missing param: userId.')
+
 
 export const checkIfPasswordIsValid = (password: string) =>
     password.trim().length >= 6

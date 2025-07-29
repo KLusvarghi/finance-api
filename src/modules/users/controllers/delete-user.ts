@@ -4,6 +4,7 @@ import {
     invalidIdResponse,
     ok,
     serverError,
+    userBadRequestResponse,
     userNotFoundResponse,
 } from '@/modules/helpers'
 import { DeleteUserService } from '../services/delete-user'
@@ -14,7 +15,7 @@ export class DeleteUserController {
             const userId = httpRequest.params.userId
 
             if (!userId) {
-                return badRequest('Missing param: userId')
+                return userBadRequestResponse()
             }
 
             const isIdValid = checkIfIdIsValid(userId)

@@ -10,6 +10,7 @@ import {
     emailIsAlreadyInUseResponse,
     invalidIdResponse,
     invalidPasswordResponse,
+    userBadRequestResponse,
 } from '@/modules/helpers'
 
 export class UpdateUserController {
@@ -17,11 +18,11 @@ export class UpdateUserController {
         try {
             const userId = httpRequest.params.userId
 
-            if (!userId) return badRequest('Missing param: userId')
+            if (!userId) return userBadRequestResponse()
 
             const isIdValid = checkIfIdIsValid(userId)
 
-            if (!isIdValid) return invalidIdResponse
+            if (!isIdValid) return invalidIdResponse()
 
             const allowedFields = [
                 'first_name',
@@ -46,7 +47,7 @@ export class UpdateUserController {
                 const passwordIsValid = checkIfPasswordIsValid(params.password)
 
                 if (!passwordIsValid) {
-                    return invalidPasswordResponse
+                    return invalidPasswordResponse()
                 }
             }
 
@@ -54,7 +55,7 @@ export class UpdateUserController {
                 const emailIsValid = checkIfEmailIsValid(params.email)
 
                 if (!emailIsValid) {
-                    return emailIsAlreadyInUseResponse
+                    return emailIsAlreadyInUseResponse()
                 }
             }
 
