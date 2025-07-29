@@ -3,7 +3,6 @@ import bcrypt from 'bcrypt'
 import { PostgresCreateUserRepository } from '@/repositories/postgres/users/create-user'
 import { CreateUserParams } from '../types'
 import { PostgresGetUserByEmailRepository } from '@/repositories/postgres/users/get-user-by-email'
-import { create } from 'domain'
 import { EmailAlreadyExistsError } from '@/errors/user'
 
 export class CreateUserService {
