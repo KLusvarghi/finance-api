@@ -1,7 +1,12 @@
-import { serverError, badRequest, created } from '@/shared/http/reponse'
+import { serverError, badRequest, created } from '@/modules/helpers/http'
 import { CreateUserService } from '../services/create-user'
-import isEmail from 'validator/lib/isEmail'
 import { EmailAlreadyExistsError } from '@/errors/user'
+import {
+    checkIfEmailIsValid,
+    checkIfPasswordIsValid,
+    emailIsAlreadyInUseResponse,
+    invalidPasswordResponse,
+} from '@/modules/helpers/user'
 
 export class CreateUserController {
     async execute(httpRequest: any) {
@@ -16,32 +21,38 @@ export class CreateUserController {
             ]
 
             for (const field of requiredFields) {
-                if (!params[field] || params[field].trim().length === 0) {
+                if (
+                    !params[field] ||
+                    params[field].trim().length === 0
+                ) {
                     return badRequest(`Missing param: ${field}`)
                 }
             }
 
-            const passwordIsNotValid = params.password.trim().length < 6
-           
-            if (passwordIsNotValid) {
-                return badRequest('Password must be at least 6 characters')
+            const passwordIsValid = checkIfPasswordIsValid(
+                params.password,
+            )
+
+            if (!passwordIsValid) {
+                return invalidPasswordResponse
             }
 
-            const emailIsValid = isEmail(params.email)
+            const emailIsValid = checkIfEmailIsValid(params.email)
             if (!emailIsValid) {
-                return badRequest('Invalid e-mail. Please provide a valid one.')
+                return emailIsAlreadyInUseResponse
             }
 
             // chamar o service
             const createUserService = new CreateUserService()
 
             // rxecutamos nossa regra de negocio
-            const createdUser = await createUserService.execute(params)
+            const createdUser =
+                await createUserService.execute(params)
 
             // retornar a resposta para o user (status code)
             return created(createdUser)
         } catch (error) {
-          if(error instanceof EmailAlreadyExistsError) {
+            if (error instanceof EmailAlreadyExistsError) {
                 return badRequest(error.message)
             }
             console.error(error)

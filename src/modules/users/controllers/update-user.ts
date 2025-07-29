@@ -1,8 +1,14 @@
-import { badRequest, ok, serverError } from '@/shared/http/reponse'
+import { badRequest, ok, serverError } from '@/modules/helpers/http'
 import { UpdateUserService } from '../services/update-user'
-import isEmail from 'validator/lib/isEmail'
 import isUUID from 'validator/lib/isUUID'
 import { EmailAlreadyExistsError } from '@/errors/user'
+import {
+    checkIfEmailIsValid,
+    checkIfPasswordIsValid,
+    emailIsAlreadyInUseResponse,
+    invalidIdResponse,
+    invalidPasswordResponse,
+} from '@/modules/helpers/user'
 
 export class UpdateUserController {
     async execute(httpRequest: any) {
@@ -13,7 +19,7 @@ export class UpdateUserController {
 
             const isIdValid = isUUID(httpRequest.params.userId)
 
-            if (!isIdValid) return badRequest('The provider id is not valid')
+            if (!isIdValid) return invalidIdResponse
 
             const allowedFields = [
                 'first_name',
@@ -22,11 +28,11 @@ export class UpdateUserController {
                 'password',
             ]
 
-            const updateUserParams = httpRequest.body
+            const params = httpRequest.body
 
             // 1. validar se algum campo não permitido foi passado
-            const someFielsNotAllowed = Object.keys(updateUserParams).some(
-                (fiels) => !allowedFields.includes(fiels), // verifica se algum campo que recebemos com params "updateUserParams" não está presente em "allowedFields"
+            const someFielsNotAllowed = Object.keys(params).some(
+                (fiels) => !allowedFields.includes(fiels), // verifica se algum campo que recebemos com params "params" não está presente em "allowedFields"
             )
 
             if (someFielsNotAllowed) {
@@ -34,29 +40,28 @@ export class UpdateUserController {
             }
 
             // 2. se receber password, validar o tamanho da string
-            if (updateUserParams.password) {
-                const passwordIsNotValid =
-                    updateUserParams.password.trim().length < 6
+            if (params.password) {
+                const passwordIsValid = checkIfPasswordIsValid(
+                    params.password,
+                )
 
-                if (passwordIsNotValid) {
-                    return badRequest('Password must be at least 6 characters')
+                if (!passwordIsValid) {
+                    return invalidPasswordResponse
                 }
             }
 
-            if (updateUserParams.email) {
-                const emailIsValid = isEmail(updateUserParams.email)
+            if (params.email) {
+                const emailIsValid = checkIfEmailIsValid(params.email)
 
                 if (!emailIsValid) {
-                    return badRequest(
-                        'Invalid e-mail. Please provide a valid one.',
-                    )
+                    return emailIsAlreadyInUseResponse
                 }
             }
 
             const updateUserService = new UpdateUserService()
             const updatedUser = await updateUserService.execute(
                 userId,
-                updateUserParams,
+                params,
             )
 
             // após chamar o service, já retornamos o status code, porque caso, dê algo errado no service ou no repositpry, eles vão instanciar um Error, e isso fará com que caia no catch
