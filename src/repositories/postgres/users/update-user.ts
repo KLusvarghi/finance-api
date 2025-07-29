@@ -2,7 +2,7 @@ import { PostgresHelper } from '@/db/postgres/helper'
 
 export class PostgresUpdateUserRepository {
     async execute(userId: string, upadetParams: any) {
-        const updateFields: = []
+        const updateFields = []
         const updateValues = []
 
         // percorrendo o objeto
