@@ -1,12 +1,14 @@
-import { serverError, badRequest, created } from '@/modules/helpers/http'
 import { CreateUserService } from '../services/create-user'
 import { EmailAlreadyExistsError } from '@/errors/user'
 import {
+    serverError,
+    badRequest,
+    created,
     checkIfEmailIsValid,
     checkIfPasswordIsValid,
     emailIsAlreadyInUseResponse,
     invalidPasswordResponse,
-} from '@/modules/helpers/user'
+} from '@/modules/helpers'
 
 export class CreateUserController {
     async execute(httpRequest: any) {
@@ -21,17 +23,12 @@ export class CreateUserController {
             ]
 
             for (const field of requiredFields) {
-                if (
-                    !params[field] ||
-                    params[field].trim().length === 0
-                ) {
+                if (!params[field] || params[field].trim().length === 0) {
                     return badRequest(`Missing param: ${field}`)
                 }
             }
 
-            const passwordIsValid = checkIfPasswordIsValid(
-                params.password,
-            )
+            const passwordIsValid = checkIfPasswordIsValid(params.password)
 
             if (!passwordIsValid) {
                 return invalidPasswordResponse
@@ -46,8 +43,7 @@ export class CreateUserController {
             const createUserService = new CreateUserService()
 
             // rxecutamos nossa regra de negocio
-            const createdUser =
-                await createUserService.execute(params)
+            const createdUser = await createUserService.execute(params)
 
             // retornar a resposta para o user (status code)
             return created(createdUser)

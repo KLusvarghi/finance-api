@@ -1,6 +1,12 @@
-import { badRequest, serverError, notFound, ok } from '@/modules/helpers/http'
 import { GetUserByIdService } from '../services/get-user-by-id'
-import { checkIfIdIsValid, invalidIdResponse } from '@/modules/helpers/user'
+import {
+    badRequest,
+    serverError,
+    notFound,
+    ok,
+    checkIfIdIsValid,
+    invalidIdResponse,
+} from '@/modules/helpers'
 
 export class GetUserByIdController {
     async execute(httpRequest: any) {

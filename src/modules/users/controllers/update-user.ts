@@ -1,15 +1,16 @@
-import { badRequest, ok, serverError } from '@/modules/helpers/http'
 import { UpdateUserService } from '../services/update-user'
-import isUUID from 'validator/lib/isUUID'
 import { EmailAlreadyExistsError } from '@/errors/user'
 import {
+    badRequest,
+    ok,
+    serverError,
     checkIfEmailIsValid,
     checkIfIdIsValid,
     checkIfPasswordIsValid,
     emailIsAlreadyInUseResponse,
     invalidIdResponse,
     invalidPasswordResponse,
-} from '@/modules/helpers/user'
+} from '@/modules/helpers'
 
 export class UpdateUserController {
     async execute(httpRequest: any) {
@@ -42,9 +43,7 @@ export class UpdateUserController {
 
             // 2. se receber password, validar o tamanho da string
             if (params.password) {
-                const passwordIsValid = checkIfPasswordIsValid(
-                    params.password,
-                )
+                const passwordIsValid = checkIfPasswordIsValid(params.password)
 
                 if (!passwordIsValid) {
                     return invalidPasswordResponse
@@ -60,10 +59,7 @@ export class UpdateUserController {
             }
 
             const updateUserService = new UpdateUserService()
-            const updatedUser = await updateUserService.execute(
-                userId,
-                params,
-            )
+            const updatedUser = await updateUserService.execute(userId, params)
 
             // após chamar o service, já retornamos o status code, porque caso, dê algo errado no service ou no repositpry, eles vão instanciar um Error, e isso fará com que caia no catch
             return ok(updatedUser)
