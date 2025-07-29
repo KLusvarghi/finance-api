@@ -1,8 +1,11 @@
 import express from 'express'
 import 'dotenv/config'
-import { CreateUserController } from '@/modules/users/controllers/create-user'
-import { GetUserByIdController } from '@/modules/users/controllers/get-user-by-id'
-import { UpdateUserController } from '@/modules/users/controllers/update-user'
+import {
+    DeleteUserController,
+    UpdateUserController,
+    CreateUserController,
+    GetUserByIdController,
+} from '@/modules/users/controllers'
 
 const app = express()
 const port = process.env.PORT || 3001
@@ -12,30 +15,38 @@ app.use(express.json())
 
 // cria user
 app.post('/api/users', async (request, response) => {
-  const createUserController = new CreateUserController()
+    const createUserController = new CreateUserController()
 
-  const { statusCode, body } = await createUserController.execute(request)
+    const { statusCode, body } = await createUserController.execute(request)
 
-  response.status(statusCode).send(body)
+    response.status(statusCode).send(body)
 })
 
 // consulta user
 app.get('/api/users/:userId', async (request, response) => {
-  const getUserByIdController = new GetUserByIdController()
+    const getUserByIdController = new GetUserByIdController()
 
-  const { statusCode, body } = await getUserByIdController.execute(request)
+    const { statusCode, body } = await getUserByIdController.execute(request)
 
-  response.status(statusCode).send(body)
+    response.status(statusCode).send(body)
 })
 
 // udpate user
-// consulta user
 app.patch('/api/users/:userId', async (request, response) => {
-  const updateUserController = new UpdateUserController()
+    const updateUserController = new UpdateUserController()
 
-  const { statusCode, body } = await updateUserController.execute(request)
+    const { statusCode, body } = await updateUserController.execute(request)
 
-  response.status(statusCode).send(body)
+    response.status(statusCode).send(body)
+})
+
+// deletar user
+app.delete('/api/users/:userId', async (request, response) => {
+    const deleteUserController = new DeleteUserController()
+
+    const { statusCode, body } = await deleteUserController.execute(request)
+
+    response.status(statusCode).send(body)
 })
 
 app.listen(port, () => {

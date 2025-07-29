@@ -1,6 +1,6 @@
 import isEmail from 'validator/lib/isEmail'
 import isUUID from 'validator/lib/isUUID'
-import { badRequest } from './http'
+import { badRequest, notFound } from './http'
 
 export const invalidPasswordResponse = () => badRequest('Invalid password')
 
@@ -10,6 +10,8 @@ export const emailIsAlreadyInUseResponse = () =>
 export const invalidIdResponse = () =>
     badRequest('The provider id is not valid.')
 
+export const userNotFoundResponse = () =>
+  notFound('User not found.')
 
 
 export const checkIfPasswordIsValid = (password: string) =>
