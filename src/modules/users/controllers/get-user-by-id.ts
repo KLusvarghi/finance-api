@@ -1,14 +1,13 @@
 import { badRequest, serverError, notFound, ok } from '@/modules/helpers/http'
 import { GetUserByIdService } from '../services/get-user-by-id'
-import isUUID from 'validator/lib/isUUID'
-import { invalidIdResponse } from '@/modules/helpers/user'
+import { checkIfIdIsValid, invalidIdResponse } from '@/modules/helpers/user'
 
 export class GetUserByIdController {
     async execute(httpRequest: any) {
         try {
             const userId = httpRequest.params.userId
 
-            const isIdValid = isUUID(userId)
+            const isIdValid = checkIfIdIsValid(userId)
             if (!isIdValid) return invalidIdResponse
 
             if (!userId) {

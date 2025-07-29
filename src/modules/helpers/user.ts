@@ -1,4 +1,5 @@
 import isEmail from 'validator/lib/isEmail'
+import isUUID from 'validator/lib/isUUID'
 import { badRequest } from './http'
 
 export const invalidPasswordResponse = () => badRequest('Invalid password')
@@ -15,3 +16,5 @@ export const checkIfPasswordIsValid = (password: string) =>
     password.trim().length >= 6
 
 export const checkIfEmailIsValid = (email: string) => isEmail(email)
+
+export const checkIfIdIsValid = (id: string) => isUUID(id)

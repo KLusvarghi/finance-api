@@ -4,6 +4,7 @@ import isUUID from 'validator/lib/isUUID'
 import { EmailAlreadyExistsError } from '@/errors/user'
 import {
     checkIfEmailIsValid,
+    checkIfIdIsValid,
     checkIfPasswordIsValid,
     emailIsAlreadyInUseResponse,
     invalidIdResponse,
@@ -17,7 +18,7 @@ export class UpdateUserController {
 
             if (!userId) return badRequest('Missing param: userId')
 
-            const isIdValid = isUUID(httpRequest.params.userId)
+            const isIdValid = checkIfIdIsValid(userId)
 
             if (!isIdValid) return invalidIdResponse
 
