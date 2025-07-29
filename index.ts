@@ -1,8 +1,8 @@
-import express, { Request, Response } from 'express'
-import { PostgresHelper } from './src/db/postgres/helper'
+import express from 'express'
 import 'dotenv/config'
 import { CreateUserController } from '@/modules/users/controllers/create-user'
 import { GetUserByIdController } from '@/modules/users/controllers/get-user-by-id'
+import { UpdateUserController } from '@/modules/users/controllers/update-user'
 
 const app = express()
 const port = process.env.PORT || 3001
@@ -28,7 +28,15 @@ app.get('/api/users/:userId', async (request, response) => {
   response.status(statusCode).send(body)
 })
 
+// udpate user
+// consulta user
+app.patch('/api/users/:userId', async (request, response) => {
+  const updateUserController = new UpdateUserController()
 
+  const { statusCode, body } = await updateUserController.execute(request)
+
+  response.status(statusCode).send(body)
+})
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`)
