@@ -23,7 +23,8 @@ export class UpdateUserService{
               updateUserParams.email,
             )
 
-        if (userWithProviderEmail) {
+            // além de validar se o email já está em uso, validamos se o email a ser atualizado é diferente da pessoa que está atualizando, e caso sim, ele entra na condição e invalida a açao
+        if (userWithProviderEmail && userWithProviderEmail.id !== userId) {
             throw new EmailAlreadyExistsError(updateUserParams.email)
         }
     }
@@ -31,8 +32,6 @@ export class UpdateUserService{
     const user = {
       ...updateUserParams,
     }
-
-
 
     // 2. se a senha estiver sendo atualizado, criptogra-lá
 
