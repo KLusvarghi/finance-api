@@ -1,4 +1,4 @@
-import { PostgresHelper } from '@/db/postgres/helper'
+import { PostgresHelper } from '@/infra/db/postgres/helper'
 
 export class PostgresGetUserByEmailRepository {
     async excute(email: string): Promise<any> {

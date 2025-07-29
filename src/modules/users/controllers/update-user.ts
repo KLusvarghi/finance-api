@@ -1,9 +1,6 @@
 import { UpdateUserService } from '../services/update-user'
 import { EmailAlreadyExistsError } from '@/errors/user'
 import {
-    badRequest,
-    ok,
-    serverError,
     checkIfEmailIsValid,
     checkIfIdIsValid,
     checkIfPasswordIsValid,
@@ -12,6 +9,8 @@ import {
     invalidPasswordResponse,
     userBadRequestResponse,
 } from '@/modules/helpers'
+
+import { serverError, ok, badRequest } from '@/shared'
 
 export class UpdateUserController {
     async execute(httpRequest: any) {

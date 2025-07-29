@@ -1,8 +1,6 @@
+import { serverError, ok } from '@/shared'
 import { GetUserByIdService } from '../services/get-user-by-id'
 import {
-    badRequest,
-    serverError,
-    ok,
     checkIfIdIsValid,
     invalidIdResponse,
     userNotFoundResponse,
@@ -20,7 +18,6 @@ export class GetUserByIdController {
 
             const isIdValid = checkIfIdIsValid(userId)
             if (!isIdValid) return invalidIdResponse()
-
 
             const getUserByIdService = new GetUserByIdService()
             const user = await getUserByIdService.execute(userId)

@@ -1,13 +1,11 @@
 import {
-    badRequest,
     checkIfIdIsValid,
     invalidIdResponse,
-    ok,
-    serverError,
     userBadRequestResponse,
     userNotFoundResponse,
 } from '@/modules/helpers'
 import { DeleteUserService } from '../services/delete-user'
+import { serverError, ok } from '@/shared'
 
 export class DeleteUserController {
     async execute(httpRequest: any) {
