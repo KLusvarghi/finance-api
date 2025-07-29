@@ -34,7 +34,6 @@ export class UpdateUserService{
     }
 
     // 2. se a senha estiver sendo atualizado, criptogra-lá
-
     if(updateUserParams.password){
       const hashPassword = await bcrypt.hash(updateUserParams.password, 10)
       user.password = hashPassword // assim a gente adiciona ou substitui a props "password" com o valor de hashPassword
