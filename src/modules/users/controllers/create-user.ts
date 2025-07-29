@@ -34,6 +34,8 @@ export class CreateUserController {
 
             // chamar o service
             const createUserService = new CreateUserService()
+
+            // rxecutamos nossa regra de negocio
             const createdUser = await createUserService.execute(params)
 
             // retornar a resposta para o user (status code)

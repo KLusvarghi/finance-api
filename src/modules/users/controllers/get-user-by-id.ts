@@ -6,7 +6,7 @@ export class GetUserByIdController {
     async execute(httpRequest: any) {
         try {
             const isIdValid = isUUID(httpRequest.params.userId)
-            if (isIdValid) return badRequest('Invalid param: userId')
+            if (!isIdValid) return badRequest('Invalid param: userId')
 
             const userId = httpRequest.params.userId
 
