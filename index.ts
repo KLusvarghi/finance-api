@@ -5,7 +5,7 @@ import {
     UpdateUserController,
     CreateUserController,
     GetUserByIdController,
-} from '@/controllers/users'
+} from '@/controllers'
 import { PostgresGetUserByIdRepository } from '@/repositories/postgres/users/get-user-by-id'
 import { GetUserByIdService } from '@/services/users/get-user-by-id'
 import { PostgresCreateUserRepository } from '@/repositories/postgres/users/create-user'

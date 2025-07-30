@@ -3,7 +3,7 @@ import {
     invalidIdResponse,
     userBadRequestResponse,
     userNotFoundResponse,
-} from '../helpers/index'
+} from '../_helpers/index'
 
 import { serverError, ok } from '@/shared'
 

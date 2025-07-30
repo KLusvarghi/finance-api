@@ -5,7 +5,7 @@ import {
     invalidIdResponse,
     userNotFoundResponse,
     userBadRequestResponse,
-  } from '../helpers/index'
+} from '../_helpers/index'
 
 export class GetUserByIdController {
     constructor(getUserByIdService: any) {

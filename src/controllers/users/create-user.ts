@@ -4,13 +4,13 @@ import {
     checkIfPasswordIsValid,
     emailIsAlreadyInUseResponse,
     invalidPasswordResponse,
-} from '../helpers/index'
+} from '../_helpers/index'
 import { serverError, badRequest, created } from '@/shared'
 
 export class CreateUserController {
-  constructor(createUserService: any) {
-    this.createUserService = createUserService
-  }
+    constructor(createUserService: any) {
+        this.createUserService = createUserService
+    }
     async execute(httpRequest: any) {
         try {
             // validar a requisição (campos obrigatório, email e tamenho de senha)

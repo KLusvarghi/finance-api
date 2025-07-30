@@ -1,2 +1,2 @@
-export * from '../controllers/helpers/http'
+export * from '../controllers/_helpers/http'
 export * from './types'
