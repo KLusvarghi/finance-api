@@ -1,7 +1,7 @@
 import { PostgresHelper } from '@/infra/db/postgres/helper'
 
 export class PostgresGetUserByEmailRepository {
-    async excute(email: string): Promise<any> {
+    async execute(email: string): Promise<any> {
         const user = await PostgresHelper.query(
             `SELECT * FROM users WHERE email = $1`,
             [email],

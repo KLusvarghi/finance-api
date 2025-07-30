@@ -15,6 +15,6 @@
             "@/*": ["./src/*"]
         }
     },
-    "include": ["src/**/*.ts", "index.ts"],
+    "include": ["src/**/*.ts", "index.ts", "src/infra/db/postgres/migrations/exec.ts"],
     "exclude": ["node_modules", "dist"]
 }

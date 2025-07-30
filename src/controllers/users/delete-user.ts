@@ -7,8 +7,14 @@ import {
 
 import { serverError, ok } from '@/shared'
 
+interface DeleteUserService {
+    execute(userId: string): Promise<any>
+}
+
 export class DeleteUserController {
-    constructor(deletedUserService: any) {
+    private deletedUserService: DeleteUserService
+
+    constructor(deletedUserService: DeleteUserService) {
         this.deletedUserService = deletedUserService
     }
     async execute(httpRequest: any) {

@@ -6,7 +6,8 @@
     "scripts": {
         "prepare": "npx husky install",
         "start:dev": "npx tsx watch index.ts",
-        "migrations": "node dist/src/db/postgres/migrations/exec.js"
+        "build": "tsc",
+        "migrations": "npm run build && node dist/src/infra/db/postgres/migrations/exec.js"
     },
     "keywords": [],
     "author": "",

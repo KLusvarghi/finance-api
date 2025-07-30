@@ -1,5 +1,11 @@
+interface GetUserByIdRepository {
+    execute(userId: string): Promise<any>
+}
+
 export class GetUserByIdService {
-    constructor(getUserByIdRepository) {
+    private getUserByIdRepository: GetUserByIdRepository
+
+    constructor(getUserByIdRepository: GetUserByIdRepository) {
         this.getUserByIdRepository = getUserByIdRepository
     }
     async execute(userId: string) {

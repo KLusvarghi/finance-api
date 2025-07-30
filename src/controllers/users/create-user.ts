@@ -7,8 +7,14 @@ import {
 } from '../_helpers/index'
 import { serverError, badRequest, created } from '@/shared'
 
+interface CreateUserService {
+    execute(params: any): Promise<any>
+}
+
 export class CreateUserController {
-    constructor(createUserService: any) {
+    private createUserService: CreateUserService
+
+    constructor(createUserService: CreateUserService) {
         this.createUserService = createUserService
     }
     async execute(httpRequest: any) {

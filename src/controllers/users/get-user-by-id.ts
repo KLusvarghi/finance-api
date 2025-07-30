@@ -8,7 +8,9 @@ import {
 } from '../_helpers/index'
 
 export class GetUserByIdController {
-    constructor(getUserByIdService: any) {
+    private getUserByIdService: GetUserByIdService
+
+    constructor(getUserByIdService: GetUserByIdService) {
         this.getUserByIdService = getUserByIdService
     }
     async execute(httpRequest: any) {

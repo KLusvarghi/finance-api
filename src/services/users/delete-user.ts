@@ -1,5 +1,11 @@
+interface DeleteUserRepository {
+    execute(userId: string): Promise<any>
+}
+
 export class DeleteUserService {
-    constructor(deletedUserRepository: any) {
+    private deletedUserRepository: DeleteUserRepository
+
+    constructor(deletedUserRepository: DeleteUserRepository) {
         this.deletedUserRepository = deletedUserRepository
     }
     async execute(userId: string) {

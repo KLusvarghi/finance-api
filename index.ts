@@ -1,21 +1,6 @@
 import express from 'express'
 import 'dotenv/config'
 import {
-    DeleteUserController,
-    UpdateUserController,
-    CreateUserController,
-    GetUserByIdController,
-} from '@/controllers'
-import { PostgresGetUserByIdRepository } from '@/repositories/postgres/users/get-user-by-id'
-import { GetUserByIdService } from '@/services/users/get-user-by-id'
-import { PostgresCreateUserRepository } from '@/repositories/postgres/users/create-user'
-import { CreateUserService } from '@/services/users/create-user'
-import { PostgresUpdateUserRepository } from '@/repositories/postgres/users/update-user'
-import { UpdateUserService } from '@/services/users/update-user'
-import { DeleteUserService } from '@/services/users/delete-user'
-import { PostgresGetUserByEmailRepository } from '@/repositories/postgres/users/get-user-by-email'
-import { PostgresDeleteUserRepository } from '@/repositories/postgres/users/delete-user'
-import {
     makeCreateUserController,
     makeDeleteUserController,
     makeGetUserByIdController,

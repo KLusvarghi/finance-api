@@ -11,8 +11,14 @@ import {
 
 import { serverError, ok, badRequest } from '@/shared'
 
+interface UpdateUserService {
+    execute(userId: string, params: any): Promise<any>
+}
+
 export class UpdateUserController {
-    constructor(updateUserService: any) {
+    private updateUserService: UpdateUserService
+
+    constructor(updateUserService: UpdateUserService) {
         this.updateUserService = updateUserService
     }
     async execute(httpRequest: any) {

@@ -3,8 +3,22 @@ import bcrypt from 'bcrypt'
 import { CreateUserParams } from '../../controllers/_types'
 import { EmailAlreadyExistsError } from '@/errors/user'
 
+interface CreateUserRepository {
+    execute(user: any): Promise<any>
+}
+
+interface GetUserByEmailRepository {
+    execute(email: string): Promise<any>
+}
+
 export class CreateUserService {
-    constructor(createUserRepository, getUserByEmailRepository) {
+    private createUserRepository: CreateUserRepository
+    private getUserByEmailRepository: GetUserByEmailRepository
+
+    constructor(
+        createUserRepository: CreateUserRepository,
+        getUserByEmailRepository: GetUserByEmailRepository,
+    ) {
         this.createUserRepository = createUserRepository
         this.getUserByEmailRepository = getUserByEmailRepository
     }
@@ -12,7 +26,7 @@ export class CreateUserService {
         // verificar se o e-mail já está cadastrado no banco
 
         const userWithProviderEmail =
-            await this.getUserByEmailRepository.excute(createUserParams.email)
+            await this.getUserByEmailRepository.execute(createUserParams.email)
 
         if (userWithProviderEmail) {
             throw new EmailAlreadyExistsError(createUserParams.email)

@@ -2,8 +2,8 @@ import { PostgresHelper } from '@/infra/db/postgres/helper'
 
 export class PostgresUpdateUserRepository {
     async execute(userId: string, upadetParams: any) {
-        const updateFields = []
-        const updateValues = []
+        const updateFields: string[] = []
+        const updateValues: any[] = []
 
         // percorrendo o objeto
         Object.keys(upadetParams).forEach((key, index) => {

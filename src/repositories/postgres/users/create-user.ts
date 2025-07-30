@@ -12,7 +12,7 @@ export class PostgresCreateUserRepository {
     // como nomenclatura, podemos usar execute, handle ou até create
     async execute(createUserParams: CreateUserParams) {
         const result = await PostgresHelper.query(
-            'INSERT INTO users (id, first_name, last_name, email, password) VALUES ($1, $2, $3, $4, $5)',
+            'INSERT INTO users (id, first_name, last_name, email, password) VALUES ($1, $2, $3, $4, $5) RETURNING *',
             [
                 createUserParams.id,
                 createUserParams.first_name,

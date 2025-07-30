@@ -20,7 +20,7 @@ const execMigrations = async () => {
 
     try {
         // eu preciso especificar o diretorio atual que estou executando e depois o path do aql da migration
-        const filePath = path.join(__dirname, './01-init.sql')
+        const filePath = path.join(__dirname, './02-correct-column-name.sql')
         // pegando todo o escript dentro do arquivo .sql
         // sendo essencial colocar o encoding para que não gere erros
         const script = fs.readFileSync(filePath, 'utf-8')
