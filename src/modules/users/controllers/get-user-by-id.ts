@@ -8,6 +8,9 @@ import {
 } from '@/modules/helpers'
 
 export class GetUserByIdController {
+    constructor(getUserByIdService: any) {
+        this.getUserByIdService = getUserByIdService
+    }
     async execute(httpRequest: any) {
         try {
             const userId = httpRequest.params.userId
@@ -19,8 +22,7 @@ export class GetUserByIdController {
             const isIdValid = checkIfIdIsValid(userId)
             if (!isIdValid) return invalidIdResponse()
 
-            const getUserByIdService = new GetUserByIdService()
-            const user = await getUserByIdService.execute(userId)
+            const user = await this.getUserByIdService.execute(userId)
 
             if (!user) {
                 return userNotFoundResponse()

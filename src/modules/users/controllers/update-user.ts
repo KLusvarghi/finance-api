@@ -1,4 +1,3 @@
-import { UpdateUserService } from '../services/update-user'
 import { EmailAlreadyExistsError } from '@/errors/user'
 import {
     checkIfEmailIsValid,
@@ -13,6 +12,9 @@ import {
 import { serverError, ok, badRequest } from '@/shared'
 
 export class UpdateUserController {
+    constructor(updateUserService: any) {
+        this.updateUserService = updateUserService
+    }
     async execute(httpRequest: any) {
         try {
             const userId = httpRequest.params.userId
@@ -58,8 +60,10 @@ export class UpdateUserController {
                 }
             }
 
-            const updateUserService = new UpdateUserService()
-            const updatedUser = await updateUserService.execute(userId, params)
+            const updatedUser = await this.updateUserService.execute(
+                userId,
+                params,
+            )
 
             // após chamar o service, já retornamos o status code, porque caso, dê algo errado no service ou no repositpry, eles vão instanciar um Error, e isso fará com que caia no catch
             return ok(updatedUser)

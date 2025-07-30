@@ -1,20 +1,18 @@
 import { v4 as uuidv4 } from 'uuid'
 import bcrypt from 'bcrypt'
-import { PostgresCreateUserRepository } from '@/repositories/postgres/users/create-user'
 import { CreateUserParams } from '../types'
-import { PostgresGetUserByEmailRepository } from '@/repositories/postgres/users/get-user-by-email'
 import { EmailAlreadyExistsError } from '@/errors/user'
 
 export class CreateUserService {
+    constructor(createUserRepository, getUserByEmailRepository) {
+        this.createUserRepository = createUserRepository
+        this.getUserByEmailRepository = getUserByEmailRepository
+    }
     async execute(createUserParams: CreateUserParams) {
         // verificar se o e-mail já está cadastrado no banco
-        const postgresGetUserByEmailRepository =
-            new PostgresGetUserByEmailRepository()
 
         const userWithProviderEmail =
-            await postgresGetUserByEmailRepository.excute(
-                createUserParams.email,
-            )
+            await this.getUserByEmailRepository.excute(createUserParams.email)
 
         if (userWithProviderEmail) {
             throw new EmailAlreadyExistsError(createUserParams.email)
@@ -38,8 +36,7 @@ export class CreateUserService {
         // inserir o user no db
         // chamar o repository
         // 1º maneira de fazer isso
-        const postgresCreateUserRepository = new PostgresCreateUserRepository()
-        return await postgresCreateUserRepository.execute(user)
+        return await this.createUserRepository.execute(user)
 
         // 2º maneira de fazer isso é injetar como dependencia no constructor
     }

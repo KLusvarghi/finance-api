@@ -4,10 +4,12 @@ import {
     userBadRequestResponse,
     userNotFoundResponse,
 } from '@/modules/helpers'
-import { DeleteUserService } from '../services/delete-user'
 import { serverError, ok } from '@/shared'
 
 export class DeleteUserController {
+    constructor(deletedUserService: any) {
+        this.deletedUserService = deletedUserService
+    }
     async execute(httpRequest: any) {
         try {
             const userId = httpRequest.params.userId
@@ -19,8 +21,7 @@ export class DeleteUserController {
             const isIdValid = checkIfIdIsValid(userId)
             if (!isIdValid) return invalidIdResponse()
 
-            const deleteUserRepository = new DeleteUserService()
-            const deletedUser = await deleteUserRepository.execute(userId)
+            const deletedUser = await this.deletedUserService.execute(userId)
 
             if (!deletedUser) return userNotFoundResponse()
 

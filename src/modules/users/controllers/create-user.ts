@@ -1,4 +1,3 @@
-import { CreateUserService } from '../services/create-user'
 import { EmailAlreadyExistsError } from '@/errors/user'
 import {
     checkIfEmailIsValid,
@@ -9,6 +8,9 @@ import {
 import { serverError, badRequest, created } from '@/shared'
 
 export class CreateUserController {
+  constructor(createUserService: any) {
+    this.createUserService = createUserService
+  }
     async execute(httpRequest: any) {
         try {
             // validar a requisição (campos obrigatório, email e tamenho de senha)
@@ -37,11 +39,8 @@ export class CreateUserController {
                 return emailIsAlreadyInUseResponse()
             }
 
-            // chamar o service
-            const createUserService = new CreateUserService()
-
             // rxecutamos nossa regra de negocio
-            const createdUser = await createUserService.execute(params)
+            const createdUser = await this.createUserService.execute(params)
 
             // retornar a resposta para o user (status code)
             return created(createdUser)

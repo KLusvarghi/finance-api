@@ -1,8 +1,10 @@
-import { PostgresGetUserByIdRepository } from '@/repositories/postgres/users/get-user-by-id'
-
 export class GetUserByIdService {
+    constructor(getUserByIdRepository) {
+        this.getUserByIdRepository = getUserByIdRepository
+    }
     async execute(userId: string) {
-        const getUserByIdRepository = new PostgresGetUserByIdRepository()
-        return await getUserByIdRepository.execute(userId)
+        const user = await this.getUserByIdRepository.execute(userId)
+
+        return user
     }
 }
