@@ -1,6 +1,6 @@
 import isEmail from 'validator/lib/isEmail'
 import isUUID from 'validator/lib/isUUID'
-import { badRequest, notFound } from '../../../shared/http'
+import { badRequest, notFound } from './http'
 
 export const invalidPasswordResponse = () => badRequest('Invalid password')
 

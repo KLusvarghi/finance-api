@@ -1,15 +1,15 @@
-import { serverError, ok } from '@/shared'
-import { GetUserByIdService } from '../services/get-user-by-id'
 import {
     checkIfIdIsValid,
     invalidIdResponse,
-    userNotFoundResponse,
     userBadRequestResponse,
-} from '@/modules/helpers'
+    userNotFoundResponse,
+} from '../helpers/index'
 
-export class GetUserByIdController {
-    constructor(getUserByIdService: any) {
-        this.getUserByIdService = getUserByIdService
+import { serverError, ok } from '@/shared'
+
+export class DeleteUserController {
+    constructor(deletedUserService: any) {
+        this.deletedUserService = deletedUserService
     }
     async execute(httpRequest: any) {
         try {
@@ -22,13 +22,11 @@ export class GetUserByIdController {
             const isIdValid = checkIfIdIsValid(userId)
             if (!isIdValid) return invalidIdResponse()
 
-            const user = await this.getUserByIdService.execute(userId)
+            const deletedUser = await this.deletedUserService.execute(userId)
 
-            if (!user) {
-                return userNotFoundResponse()
-            }
+            if (!deletedUser) return userNotFoundResponse()
 
-            return ok(user)
+            return ok(deletedUser)
         } catch (error) {
             console.error(error)
             return serverError()

@@ -1,4 +1,4 @@
-import { HttpResponse } from './types'
+import { HttpResponse } from '../../shared/types'
 
 export const ok = <T = any>(data: T, message = 'Success'): HttpResponse<T> => ({
     statusCode: 200,

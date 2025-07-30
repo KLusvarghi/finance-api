@@ -4,7 +4,7 @@ import {
     checkIfPasswordIsValid,
     emailIsAlreadyInUseResponse,
     invalidPasswordResponse,
-} from '@/modules/helpers'
+} from '../helpers/index'
 import { serverError, badRequest, created } from '@/shared'
 
 export class CreateUserController {

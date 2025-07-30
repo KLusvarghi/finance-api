@@ -5,14 +5,14 @@ import {
     UpdateUserController,
     CreateUserController,
     GetUserByIdController,
-} from '@/modules/users/controllers'
+} from '@/controllers/users'
 import { PostgresGetUserByIdRepository } from '@/repositories/postgres/users/get-user-by-id'
-import { GetUserByIdService } from '@/modules/users/services/get-user-by-id'
+import { GetUserByIdService } from '@/services/users/get-user-by-id'
 import { PostgresCreateUserRepository } from '@/repositories/postgres/users/create-user'
-import { CreateUserService } from '@/modules/users/services/create-user'
+import { CreateUserService } from '@/services/users/create-user'
 import { PostgresUpdateUserRepository } from '@/repositories/postgres/users/update-user'
-import { UpdateUserService } from '@/modules/users/services/update-user'
-import { DeleteUserService } from '@/modules/users/services/delete-user'
+import { UpdateUserService } from '@/services/users/update-user'
+import { DeleteUserService } from '@/services/users/delete-user'
 import { PostgresGetUserByEmailRepository } from '@/repositories/postgres/users/get-user-by-email'
 import { PostgresDeleteUserRepository } from '@/repositories/postgres/users/delete-user'
 
@@ -58,8 +58,8 @@ app.patch('/api/users/:userId', async (request, response) => {
     const updateUserRepository = new PostgresUpdateUserRepository()
 
     const updateUserService = new UpdateUserService(
-      getUserByEmailRepository,
-      updateUserRepository,
+        getUserByEmailRepository,
+        updateUserRepository,
     )
 
     const updateUserController = new UpdateUserController(updateUserService)

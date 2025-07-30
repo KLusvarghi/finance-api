@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import bcrypt from 'bcrypt'
-import { CreateUserParams } from '../types'
+import { CreateUserParams } from '../../controllers/types'
 import { EmailAlreadyExistsError } from '@/errors/user'
 
 export class CreateUserService {

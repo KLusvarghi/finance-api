@@ -7,7 +7,7 @@ import {
     invalidIdResponse,
     invalidPasswordResponse,
     userBadRequestResponse,
-} from '@/modules/helpers'
+  } from '../helpers/index'
 
 import { serverError, ok, badRequest } from '@/shared'
 
