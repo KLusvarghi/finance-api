@@ -15,6 +15,12 @@ import { UpdateUserService } from '@/services/users/update-user'
 import { DeleteUserService } from '@/services/users/delete-user'
 import { PostgresGetUserByEmailRepository } from '@/repositories/postgres/users/get-user-by-email'
 import { PostgresDeleteUserRepository } from '@/repositories/postgres/users/delete-user'
+import {
+    makeCreateUserController,
+    makeDeleteUserController,
+    makeGetUserByIdController,
+    makeUpdateUserController,
+} from '@/factories/controllers/user'
 
 const app = express()
 const port = process.env.PORT || 3001
@@ -24,15 +30,7 @@ app.use(express.json())
 
 // cria user
 app.post('/api/users', async (request, response) => {
-    const getUserByEmailRepository = new PostgresGetUserByEmailRepository()
-    const createUserRepository = new PostgresCreateUserRepository()
-
-    const createUserService = new CreateUserService(
-        createUserRepository,
-        getUserByEmailRepository,
-    )
-
-    const createUserController = new CreateUserController(createUserService)
+    const createUserController = makeCreateUserController()
 
     const { statusCode, body } = await createUserController.execute(request)
 
@@ -41,11 +39,7 @@ app.post('/api/users', async (request, response) => {
 
 // consulta user
 app.get('/api/users/:userId', async (request, response) => {
-    const getUserByIdRepository = new PostgresGetUserByIdRepository()
-
-    const getUserByIdService = new GetUserByIdService(getUserByIdRepository)
-
-    const getUserByIdController = new GetUserByIdController(getUserByIdService)
+    const getUserByIdController = makeGetUserByIdController()
 
     const { statusCode, body } = await getUserByIdController.execute(request)
 
@@ -54,15 +48,7 @@ app.get('/api/users/:userId', async (request, response) => {
 
 // udpate user
 app.patch('/api/users/:userId', async (request, response) => {
-    const getUserByEmailRepository = new PostgresGetUserByEmailRepository()
-    const updateUserRepository = new PostgresUpdateUserRepository()
-
-    const updateUserService = new UpdateUserService(
-        getUserByEmailRepository,
-        updateUserRepository,
-    )
-
-    const updateUserController = new UpdateUserController(updateUserService)
+    const updateUserController = makeUpdateUserController()
 
     const { statusCode, body } = await updateUserController.execute(request)
 
@@ -71,11 +57,7 @@ app.patch('/api/users/:userId', async (request, response) => {
 
 // deletar user
 app.delete('/api/users/:userId', async (request, response) => {
-    const deletedUserRepository = new PostgresDeleteUserRepository()
-
-    const deleteUserService = new DeleteUserService(deletedUserRepository)
-
-    const deleteUserController = new DeleteUserController(deleteUserService)
+    const deleteUserController = makeDeleteUserController()
 
     const { statusCode, body } = await deleteUserController.execute(request)
 
