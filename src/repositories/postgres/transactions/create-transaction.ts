@@ -9,7 +9,7 @@ interface CreateTransactionParamsProps {
     type: string
 }
 
-export class PostgresCreateTransaction {
+export class PostgresCreateTransactionRepository {
     async execute(createTransactionParams: CreateTransactionParamsProps) {
         const result = await PostgresHelper.query(
             `INSERT INTO users (id, user_id, name, amount, date, type)
