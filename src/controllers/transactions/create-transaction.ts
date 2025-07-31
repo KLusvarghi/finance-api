@@ -1,5 +1,4 @@
 import {
-    badRequest,
     checkAmoutIsValid,
     checkIfIdIsValid,
     checkIsTypeValid,
@@ -37,14 +36,17 @@ export class CreateTransactionController {
 
             if (!userIdIsValid) return invalidIdResponse()
 
-            if (!checkAmoutIsValid(params.amount))
-                return invalidAmoutResponse()
+            if (!checkAmoutIsValid(params.amount)){
+              return invalidAmoutResponse()
+            }
 
             const type = params.type.trim().toUpperCase()
 
             const typeIsValid = checkIsTypeValid(type)
 
-            if (!typeIsValid) return invalidTypeResponse
+            if (!typeIsValid) {
+              return invalidTypeResponse
+            }
 
             const createdTransaction =
                 await this.createTransactionService.execute({

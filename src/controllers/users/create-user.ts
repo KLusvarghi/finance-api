@@ -32,8 +32,9 @@ export class CreateUserController {
 
             const { ok: requiredFieldsWereProvider, missingField } =
                 validateRequiredFields(params, requiredFields)
-            if (!requiredFieldsWereProvider)
-                return requiredFieldMissingResponse(missingField)
+            if (!requiredFieldsWereProvider){
+              return requiredFieldMissingResponse(missingField)
+            }
 
             const passwordIsValid = checkIfPasswordIsValid(params.password)
 
