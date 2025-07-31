@@ -1,3 +1,4 @@
+import { CreateTransactionParamsProps } from '@/controllers/_types'
 import { UserNotFoundError } from '@/errors/user'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -7,14 +8,6 @@ interface CreateTransactionRepository {
 
 interface GetUserByIdRepository {
     execute(userId: string): Promise<any>
-}
-
-interface CreateTransactionParamsProps {
-    user_id: string
-    name: string
-    amount: number
-    date: Date
-    type: string
 }
 
 export class CreateTransactionService {
