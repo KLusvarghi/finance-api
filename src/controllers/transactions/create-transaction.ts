@@ -5,6 +5,7 @@ import {
     checkIfIdIsValid,
     created,
     invalidIdResponse,
+    requiredFieldMissingResponse,
     serverError,
     validateRequiredFields,
 } from '../_helpers'
@@ -28,7 +29,7 @@ export class CreateTransactionController {
             const { ok: requiredFieldsWereProvider, missingField } =
                 validateRequiredFields(params, requiredFields)
             if (!requiredFieldsWereProvider)
-                return badRequest(`The field ${missingField} is required.`)
+                return requiredFieldMissingResponse(missingField)
 
             const userIdIsValid = checkIfIdIsValid(params.user_id)
 
@@ -55,7 +56,7 @@ export class CreateTransactionController {
             const createdTransaction =
                 await this.createTransactionService.execute({
                     ...params,
-                    amount: +params.amount,
+                    amount: params.amount,
                     type, // passando o type dnv porque nós tranformamos ele
                 })
 

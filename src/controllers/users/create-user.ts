@@ -4,6 +4,7 @@ import {
     checkIfPasswordIsValid,
     emailIsAlreadyInUseResponse,
     invalidPasswordResponse,
+    requiredFieldMissingResponse,
     validateRequiredFields,
 } from '../_helpers/index'
 import { serverError, badRequest, created } from '@/shared'
@@ -32,7 +33,7 @@ export class CreateUserController {
             const { ok: requiredFieldsWereProvider, missingField } =
                 validateRequiredFields(params, requiredFields)
             if (!requiredFieldsWereProvider)
-                return badRequest(`The field ${missingField} is required.`)
+                return requiredFieldMissingResponse(missingField)
 
             const passwordIsValid = checkIfPasswordIsValid(params.password)
 

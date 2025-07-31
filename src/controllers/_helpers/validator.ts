@@ -1,6 +1,6 @@
 import isUUID from 'validator/lib/isUUID'
-import { badRequest } from './http'
 import isEmpty from 'validator/lib/isEmpty'
+import { badRequest } from './http'
 
 export const checkIfIdIsValid = (id: string) => isUUID(id)
 
@@ -29,3 +29,6 @@ export const validateRequiredFields = (
     }
     return { ok: true, missingField: undefined }
 }
+
+export const requiredFieldMissingResponse = (missingField: string | undefined) =>
+    badRequest(`The field ${missingField} is required.`)
