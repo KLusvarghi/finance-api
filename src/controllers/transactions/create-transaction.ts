@@ -3,6 +3,7 @@ import isCurrency from 'validator/lib/isCurrency'
 import {
     badRequest,
     checkIfIdIsValid,
+    created,
     invalidIdResponse,
     serverError,
 } from '../_helpers'
@@ -58,14 +59,13 @@ export class CreateTransactionController {
 
             if (!typeIsValid) return badRequest('Transaction type is invalid')
 
-
             const createdTransaction =
                 await this.createTransactionService.execute({
-                  ...params,
-                  type, // passando o type dnv porque nós tranformamos ele
+                    ...params,
+                    type, // passando o type dnv porque nós tranformamos ele
                 })
 
-
+            return created(createdTransaction)
         } catch (error) {
             console.error(error)
             return serverError()
