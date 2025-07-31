@@ -13,3 +13,11 @@ export type HttpResponse<T = any> = {
     data?: T
   } | null
 }
+
+export interface CreateTransactionParamsProps {
+  user_id: string
+  name: string
+  amount: number
+  date: Date
+  type: string
+}
