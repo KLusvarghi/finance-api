@@ -23,7 +23,6 @@ export class CreateTransactionController {
         try {
             const params = httpRequest.body
             const requiredFields = [
-                'id',
                 'user_id',
                 'name',
                 'date',
@@ -32,7 +31,8 @@ export class CreateTransactionController {
             ]
 
             for (const field of requiredFields) {
-                if (!params[field] || params[field].trim().length === 0) {
+              // tendo que converter para string já que "amount" é number
+                if (!params[field] || params[field].toString().trim().length === 0) {
                     return badRequest(`Missing param: ${field}`)
                 }
             }
@@ -54,7 +54,7 @@ export class CreateTransactionController {
             const type = params.type.trim().toUpperCase()
 
             const typeIsValid = ['EARNING', 'EXPENSE', 'INVESTMENT'].includes(
-                params.type,
+                type,
             )
 
             if (!typeIsValid) return badRequest('Transaction type is invalid')
@@ -62,6 +62,7 @@ export class CreateTransactionController {
             const createdTransaction =
                 await this.createTransactionService.execute({
                     ...params,
+                    amount: +params.amount,
                     type, // passando o type dnv porque nós tranformamos ele
                 })
 
