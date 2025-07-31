@@ -12,7 +12,7 @@ export interface GetTransactionByUserIdService {
     execute(userId: string): Promise<any>
 }
 
-export class GetTransactionsController {
+export class GetTransactionsByUserIdController {
     private getTransactionByUserIdService: GetTransactionByUserIdService
 
     constructor(getTransactionByUserIdService: GetTransactionByUserIdService) {
@@ -32,10 +32,10 @@ export class GetTransactionsController {
                 return invalidIdResponse()
             }
 
-            const transaction =
-                this.getTransactionByUserIdService.execute(userId)
+            const transactions =
+                await this.getTransactionByUserIdService.execute(userId)
 
-            return ok(transaction)
+            return ok(transactions)
         } catch (error) {
             if (error instanceof UserNotFoundError) {
                 return userNotFoundResponse()

@@ -1,9 +1,16 @@
-import { CreateTransactionController } from '@/controllers'
+import {
+    CreateTransactionController,
+    GetTransactionsByUserIdController,
+} from '@/controllers'
 import {
     PostgresGetUserByIdRepository,
     PostgresCreateTransactionRepository,
+    PostgresGetTransactionsByUserIdRepository,
 } from '@/repositories/postgres'
-import { CreateTransactionService } from '@/services'
+import {
+    CreateTransactionService,
+    GetTransactionsByUserIdService,
+} from '@/services'
 
 export const makeCreateTransactionController = () => {
     const createTransactionRepository =
@@ -19,4 +26,20 @@ export const makeCreateTransactionController = () => {
     )
 
     return createTransactionController
+}
+
+export const makeGetTransactionsByUserIdController = () => {
+    const getUserByIdRepository = new PostgresGetUserByIdRepository()
+    const getTransactionsByUserIdRepository =
+        new PostgresGetTransactionsByUserIdRepository()
+
+    const getTransactionsByUserIdService = new GetTransactionsByUserIdService(
+      getUserByIdRepository,
+      getTransactionsByUserIdRepository,
+    )
+
+    const getTransactionsByUserIdController =
+        new GetTransactionsByUserIdController(getTransactionsByUserIdService)
+
+    return getTransactionsByUserIdController
 }

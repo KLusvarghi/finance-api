@@ -9,16 +9,16 @@ interface GetTransactionByUserIdRepository {
     execute(userId: string): Promise<any>
 }
 
-export class GetTransactionByUserId {
+export class GetTransactionsByUserIdService {
     private getUserByIdRepository: GetUserByIdRepository
-    private getTransactionRepository: GetTransactionByUserIdRepository
+    private getTransactionByUserIdRepository: GetTransactionByUserIdRepository
 
     constructor(
         getUserByIdRepository: GetUserByIdRepository,
-        getTransactionRepository: GetTransactionByUserIdRepository,
+        getTransactionByUserIdRepository: GetTransactionByUserIdRepository,
     ) {
         this.getUserByIdRepository = getUserByIdRepository
-        this.getTransactionRepository = getTransactionRepository
+        this.getTransactionByUserIdRepository = getTransactionByUserIdRepository
     }
 
     async execute(userId: string) {
@@ -28,7 +28,7 @@ export class GetTransactionByUserId {
             throw new UserNotFoundError(userId)
         }
 
-        const transaction = await this.getTransactionRepository.execute(userId)
+        const transaction = await this.getTransactionByUserIdRepository.execute(userId)
 
         return transaction
     }

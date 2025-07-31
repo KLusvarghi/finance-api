@@ -1,11 +1,13 @@
 import { PostgresHelper } from '@/infra/db/postgres/helper'
 
-export class PostgresGetTransactionRepository {
+export class PostgresGetTransactionsByUserIdRepository {
     async execute(userId: string) {
-        const transaction = await PostgresHelper.query(
+        const transactions = await PostgresHelper.query(
             `SELECT * FROM transactions WHERE user_id = $1`,
             [userId],
         )
-        return transaction[0]
+
+        console.log(transactions)
+        return transactions
     }
 }

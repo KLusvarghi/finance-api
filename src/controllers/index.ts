@@ -6,3 +6,4 @@ export * from './users/delete-user'
 
 // transaction
 export * from './transactions/create-transaction'
+export * from './transactions/get-transactions-by-user-id'

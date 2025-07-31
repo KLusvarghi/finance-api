@@ -6,7 +6,7 @@ import {
     makeGetUserByIdController,
     makeUpdateUserController,
 } from '@/factories/controllers/user'
-import { makeCreateTransactionController } from '@/factories/controllers/transactions'
+import { makeCreateTransactionController, makeGetTransactionsByUserIdController } from '@/factories/controllers/transactions'
 
 const app = express()
 const port = process.env.PORT || 3001
@@ -55,6 +55,15 @@ app.post('/api/transactions', async (request, response) => {
 
     const { statusCode, body } =
         await createTransactionController.execute(request)
+
+    response.status(statusCode).send(body)
+})
+
+app.get('/api/transactions', async (request, response) => {
+    const getTransactionsByUserIdController = makeGetTransactionsByUserIdController()
+
+    const { statusCode, body } =
+        await getTransactionsByUserIdController.execute(request)
 
     response.status(statusCode).send(body)
 })

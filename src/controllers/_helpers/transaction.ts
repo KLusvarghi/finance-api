@@ -2,9 +2,9 @@ import isCurrency from 'validator/lib/isCurrency'
 import { badRequest } from './http'
 
 export const checkAmoutIsValid = (amount: number): Boolean => {
-    if (amount <= 0) return false
+    if (typeof amount !== 'number') return false
 
-    const amountValid = isCurrency(amount.toString(), {
+    const amountValid = isCurrency(amount.toFixed(2), {
         digits_after_decimal: [2],
         allow_negatives: false,
         decimal_separator: '.',
