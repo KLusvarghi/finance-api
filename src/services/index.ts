@@ -4,3 +4,4 @@ export * from './users/update-user'
 export * from './users/delete-user'
 
 export * from './transactions/create-transaction'
+export * from './transactions/get-transactions'

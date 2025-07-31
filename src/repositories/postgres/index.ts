@@ -5,3 +5,4 @@ export * from './users/get-user-by-id'
 export * from './users/update-user'
 
 export * from './transactions/create-transaction'
+export * from './transactions/get-transaction'
