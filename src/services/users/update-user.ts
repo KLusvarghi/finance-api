@@ -1,4 +1,4 @@
-import { emailIsAlreadyInUseResponse } from '@/controllers/_helpers'
+import { EmailAlreadyExistsError } from '@/errors/user'
 import bcrypt from 'bcrypt'
 
 interface UpdateUserInterface {
@@ -38,7 +38,7 @@ export class UpdateUserService {
 
             // além de validar se o email já está em uso, validamos se o email a ser atualizado é diferente da pessoa que está atualizando, e caso sim, ele entra na condição e invalida a açao
             if (userWithProviderEmail && userWithProviderEmail.id !== userId) {
-                return emailIsAlreadyInUseResponse()
+                throw new EmailAlreadyExistsError(updateUserParams.email)
             }
         }
 
