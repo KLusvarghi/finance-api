@@ -1,7 +1,16 @@
-import { PostgresHelper } from "@/infra/db/postgres/helper"
+import { PostgresHelper } from '@/infra/db/postgres/helper'
+
+interface CreateTransactionParamsProps {
+    id: string
+    user_id: string
+    name: string
+    amount: number
+    date: Date
+    type: string
+}
 
 export class PostgresCreateTransaction {
-    async execute(createTransactionParams: any) {
+    async execute(createTransactionParams: CreateTransactionParamsProps) {
         const result = await PostgresHelper.query(
             `INSERT INTO users (id, user_id, name, amount, date, type)
             VALUES ($1, $2, $3, $4, $5, $6) 
