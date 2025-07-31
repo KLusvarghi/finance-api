@@ -1,4 +1,5 @@
 import { userNotFoundResponse } from '@/controllers/_helpers'
+import { UserNotFoundError } from '@/errors/user'
 
 interface GetUserByIdRepository {
     execute(userId: string): Promise<any>
@@ -24,7 +25,7 @@ export class GetTransactionByUserId {
         const user = await this.getUserByIdRepository.execute(userId)
 
         if (!user) {
-            return userNotFoundResponse()
+            throw new UserNotFoundError(userId)
         }
 
         const transaction = await this.getTransactionRepository.execute(userId)
