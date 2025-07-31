@@ -6,6 +6,7 @@ import {
     created,
     invalidIdResponse,
     serverError,
+    validateRequiredFields,
 } from '../_helpers'
 
 interface CreateTransactionService {
@@ -22,20 +23,12 @@ export class CreateTransactionController {
     async execute(httpRequest: any) {
         try {
             const params = httpRequest.body
-            const requiredFields = [
-                'user_id',
-                'name',
-                'date',
-                'amount',
-                'type',
-            ]
+            const requiredFields = ['user_id', 'name', 'date', 'amount', 'type']
 
-            for (const field of requiredFields) {
-              // tendo que converter para string já que "amount" é number
-                if (!params[field] || params[field].toString().trim().length === 0) {
-                    return badRequest(`Missing param: ${field}`)
-                }
-            }
+            const { ok: requiredFieldsWereProvider, missingField } =
+                validateRequiredFields(params, requiredFields)
+            if (!requiredFieldsWereProvider)
+                return badRequest(`The field ${missingField} is required.`)
 
             const userIdIsValid = checkIfIdIsValid(params.user_id)
 
