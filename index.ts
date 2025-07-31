@@ -6,6 +6,7 @@ import {
     makeGetUserByIdController,
     makeUpdateUserController,
 } from '@/factories/controllers/user'
+import { makeCreateTransactionController } from '@/factories/controllers/transactions'
 
 const app = express()
 const port = process.env.PORT || 3001
@@ -45,6 +46,15 @@ app.delete('/api/users/:userId', async (request, response) => {
     const deleteUserController = makeDeleteUserController()
 
     const { statusCode, body } = await deleteUserController.execute(request)
+
+    response.status(statusCode).send(body)
+})
+
+app.post('/api/transactions', async (request, response) => {
+    const createTransactionController = makeCreateTransactionController()
+
+    const { statusCode, body } =
+        await createTransactionController.execute(request)
 
     response.status(statusCode).send(body)
 })
