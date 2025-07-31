@@ -1,10 +1,12 @@
-import isCurrency from 'validator/lib/isCurrency'
-
 import {
     badRequest,
+    checkAmoutIsValid,
     checkIfIdIsValid,
+    checkIsTypeValid,
     created,
+    invalidAmoutResponse,
     invalidIdResponse,
+    invalidTypeResponse,
     requiredFieldMissingResponse,
     serverError,
     validateRequiredFields,
@@ -35,23 +37,14 @@ export class CreateTransactionController {
 
             if (!userIdIsValid) return invalidIdResponse()
 
-            if (params.amount <= 0) return badRequest('Invalid amount')
-
-            const amountValid = isCurrency(params.amount.toString(), {
-                digits_after_decimal: [2],
-                allow_negatives: false,
-                decimal_separator: '.',
-            })
-
-            if (!amountValid) return badRequest('Invalid amount')
+            if (!checkAmoutIsValid(params.amount))
+                return invalidAmoutResponse()
 
             const type = params.type.trim().toUpperCase()
 
-            const typeIsValid = ['EARNING', 'EXPENSE', 'INVESTMENT'].includes(
-                type,
-            )
+            const typeIsValid = checkIsTypeValid(type)
 
-            if (!typeIsValid) return badRequest('Transaction type is invalid')
+            if (!typeIsValid) return invalidTypeResponse
 
             const createdTransaction =
                 await this.createTransactionService.execute({

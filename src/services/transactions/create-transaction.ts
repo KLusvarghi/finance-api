@@ -25,8 +25,6 @@ export class CreateTransactionService {
     async execute(params: CreateTransactionParamsProps) {
         const userId = params.user_id
 
-        console.log(typeof params.amount)
-
         const user = await this.getUserByIdRepository.execute(userId)
 
         if (!user) {
