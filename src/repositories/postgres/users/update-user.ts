@@ -5,7 +5,6 @@ export class PostgresUpdateUserRepository {
         const updateFields: string[] = []
         const updateValues: any[] = []
 
-        // percorrendo o objeto
         Object.keys(upadetParams).forEach((key, index) => {
             updateFields.push(`${key} = $${updateValues.length + 1}`)
             updateValues.push(upadetParams[key])
