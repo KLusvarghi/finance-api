@@ -12,7 +12,7 @@ interface CreateTransactionParamsProps {
 export class PostgresCreateTransactionRepository {
     async execute(createTransactionParams: CreateTransactionParamsProps) {
         const result = await PostgresHelper.query(
-            `INSERT INTO users (id, user_id, name, amount, date, type)
+            `INSERT INTO transactions (id, user_id, name, amount, date, type)
             VALUES ($1, $2, $3, $4, $5, $6) 
             RETURNING *`,
             [
