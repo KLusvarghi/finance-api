@@ -10,6 +10,7 @@ import {
     ok,
     requiredFieldMissingResponse,
     serverError,
+    transactionNotFoundResponse,
     validateRequiredFields,
 } from '../_helpers'
 
@@ -67,6 +68,10 @@ export class UpdateTransactionController {
                     transactionId,
                     params,
                 )
+
+            if (!updatedTransaction) {
+                return transactionNotFoundResponse()
+            }
 
             return ok(updatedTransaction)
         } catch (error) {
