@@ -1,7 +1,7 @@
-import { UserNotFoundError } from "@/errors/user"
+import { UserNotFoundError } from '@/errors/user'
 
 interface UpdateTransactionRepository {
-    execute(userId: string): Promise<any>
+    execute(transactionId: string, params: string): Promise<any>
 }
 
 interface GetUserByIdRepository {
@@ -20,15 +20,12 @@ export class UpdateTransactionService {
         this.getUserByIdRepository = getUserByIdRepository
     }
 
-    async execute(params: any){
-      const user = await this.getUserByIdRepository.execute(params.userId)
+    async execute(transactionId: string, params: any) {
+        const transaction = await this.updateTransactionRepository.execute(
+            transactionId,
+            params,
+        )
 
-      if(!user){
-        throw new UserNotFoundError()
-      }
-
-      const transaction = await this.updateTransactionRepository.execute(params.userId)
-
-      return transaction
+        return transaction
     }
 }
