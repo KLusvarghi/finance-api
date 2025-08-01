@@ -1,5 +1,6 @@
 import {
     CreateTransactionController,
+    DeleteTransactionController,
     GetTransactionsByUserIdController,
     UpdateTransactionController,
 } from '@/controllers'
@@ -67,10 +68,16 @@ export const makeUpdateTransactionController = () => {
 }
 
 export const makeDeleteTransactionController = () => {
-  const deleteTransactionRepository = new PostgresDeleteTransactionRepository()
+    const deleteTransactionRepository =
+        new PostgresDeleteTransactionRepository()
 
-  const deleteTransactionService = new DeleteTransactionService(deleteTransactionRepository)
+    const deleteTransactionService = new DeleteTransactionService(
+        deleteTransactionRepository,
+    )
 
-  const deleteTransactionController = 
+    const deleteTransactionController = new DeleteTransactionController(
+        deleteTransactionService,
+    )
 
+    return deleteTransactionController
 }

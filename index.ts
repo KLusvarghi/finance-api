@@ -6,7 +6,12 @@ import {
     makeGetUserByIdController,
     makeUpdateUserController,
 } from '@/factories/controllers/user'
-import { makeCreateTransactionController, makeGetTransactionsByUserIdController, makeUpdateTransactionController } from '@/factories/controllers/transactions'
+import {
+    makeCreateTransactionController,
+    makeDeleteTransactionController,
+    makeGetTransactionsByUserIdController,
+    makeUpdateTransactionController,
+} from '@/factories/controllers/transactions'
 
 const app = express()
 const port = process.env.PORT || 3001
@@ -60,7 +65,8 @@ app.post('/api/transactions', async (request, response) => {
 })
 
 app.get('/api/transactions', async (request, response) => {
-    const getTransactionsByUserIdController = makeGetTransactionsByUserIdController()
+    const getTransactionsByUserIdController =
+        makeGetTransactionsByUserIdController()
 
     const { statusCode, body } =
         await getTransactionsByUserIdController.execute(request)
@@ -73,6 +79,15 @@ app.patch('/api/transactions/:transactionId', async (request, response) => {
 
     const { statusCode, body } =
         await updateTransactionsController.execute(request)
+
+    response.status(statusCode).send(body)
+})
+
+app.delete('/api/transactions/:transactionId', async (request, response) => {
+    const deleteTransactionsController = makeDeleteTransactionController()
+
+    const { statusCode, body } =
+        await deleteTransactionsController.execute(request)
 
     response.status(statusCode).send(body)
 })
