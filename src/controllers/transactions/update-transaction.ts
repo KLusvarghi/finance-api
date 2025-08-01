@@ -1,5 +1,6 @@
 import { HttpResponse } from '@/shared'
 import {
+    badRequest,
     checkAmoutIsValid,
     checkIfIdIsValid,
     checkIsTypeValid,
@@ -25,31 +26,40 @@ export class UpdateTransactionController {
 
     async execute(httpRequest: any): Promise<HttpResponse> {
         try {
-            const params = httpRequest.body
             const transactionId = httpRequest.params.transactionId
 
             const isValidId = checkIfIdIsValid(transactionId)
-            if (!isValidId) return invalidIdResponse()
 
-            const requiredFields = ['name', 'date', 'amount', 'type']
-
-            const { ok: requiredFieldsWereProvider, missingField } =
-                validateRequiredFields(params, requiredFields)
-
-            if (!requiredFieldsWereProvider) {
-                return requiredFieldMissingResponse(missingField)
+            if (!isValidId) {
+                return invalidIdResponse()
             }
 
-            if (!checkAmoutIsValid(params.amount)) {
-                return invalidAmoutResponse()
+            const params = httpRequest.body
+
+            const allowedFields = ['name', 'date', 'amount', 'type']
+
+            const someFielsNotAllowed = Object.keys(params).some(
+                (fiels) => !allowedFields.includes(fiels), // verifica se algum campo que recebemos com params "params" não está presente em "allowedFields"
+            )
+
+            if (someFielsNotAllowed) {
+                return badRequest('Some provided field is not allowed.')
             }
 
-            const type = params.type.trim().toUpperCase()
+            if (params.amount) {
+                if (!checkAmoutIsValid(params.amount)) {
+                    return invalidAmoutResponse()
+                }
+            }
 
-            const typeIsValid = checkIsTypeValid(type)
+            if (params.type) {
+                const type = params.type.trim().toUpperCase()
 
-            if (!typeIsValid) {
-                return invalidTypeResponse()
+                const typeIsValid = checkIsTypeValid(type)
+
+                if (!typeIsValid) {
+                    return invalidTypeResponse()
+                }
             }
 
             const updatedTransaction =
