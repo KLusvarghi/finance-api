@@ -29,12 +29,16 @@ export class CreateTransactionController {
 
             const { ok: requiredFieldsWereProvider, missingField } =
                 validateRequiredFields(params, requiredFields)
-            if (!requiredFieldsWereProvider)
-                return requiredFieldMissingResponse(missingField)
+                
+            if (!requiredFieldsWereProvider){
+              return requiredFieldMissingResponse(missingField)
+            }
 
             const userIdIsValid = checkIfIdIsValid(params.user_id)
 
-            if (!userIdIsValid) return invalidIdResponse()
+            if (!userIdIsValid){
+              return invalidIdResponse()
+            }
 
             if (!checkAmoutIsValid(params.amount)){
               return invalidAmoutResponse()
