@@ -7,6 +7,7 @@ import {
     invalidIdResponse,
     invalidPasswordResponse,
     userBadRequestResponse,
+    userNotFoundResponse,
 } from '../_helpers/index'
 
 import { serverError, ok, badRequest } from '@/shared'
@@ -70,6 +71,10 @@ export class UpdateUserController {
                 userId,
                 params,
             )
+
+            if(!updatedUser){
+              return userNotFoundResponse()
+            }
 
             // após chamar o service, já retornamos o status code, porque caso, dê algo errado no service ou no repositpry, eles vão instanciar um Error, e isso fará com que caia no catch
             return ok(updatedUser)
