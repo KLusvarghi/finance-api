@@ -7,8 +7,8 @@ import {
     PostgresGetUserByIdRepository,
     PostgresCreateTransactionRepository,
     PostgresGetTransactionsByUserIdRepository,
+    PostgresUpdateTransactionRepository,
 } from '@/repositories/postgres'
-import { PostgresUpdateTransactionRepository } from '@/repositories/postgres/transactions/update-transaction'
 import {
     CreateTransactionService,
     GetTransactionsByUserIdService,
