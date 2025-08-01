@@ -12,8 +12,8 @@ import {
 import {
     CreateTransactionService,
     GetTransactionsByUserIdService,
+    UpdateTransactionService,
 } from '@/services'
-import { UpdateTransactionService } from '@/services/transactions/update-transaction'
 
 export const makeCreateTransactionController = () => {
     const createTransactionRepository =
