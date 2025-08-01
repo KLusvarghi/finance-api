@@ -20,7 +20,7 @@ export const checkIsTypeValid = (type: string): Boolean | String => {
 }
 
 export const invalidAmoutResponse = () => {
-    return badRequest('The amout is must be a valid currency')
+    return badRequest('The amount is must be a valid currency')
 }
 export const invalidTypeResponse = () => {
     return badRequest('Transaction type is invalid')
