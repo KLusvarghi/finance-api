@@ -8,9 +8,11 @@ import {
     PostgresCreateTransactionRepository,
     PostgresGetTransactionsByUserIdRepository,
     PostgresUpdateTransactionRepository,
+    PostgresDeleteTransactionRepository,
 } from '@/repositories/postgres'
 import {
     CreateTransactionService,
+    DeleteTransactionService,
     GetTransactionsByUserIdService,
     UpdateTransactionService,
 } from '@/services'
@@ -62,4 +64,13 @@ export const makeUpdateTransactionController = () => {
     )
 
     return updateTransactionController
+}
+
+export const makeDeleteTransactionController = () => {
+  const deleteTransactionRepository = new PostgresDeleteTransactionRepository()
+
+  const deleteTransactionService = new DeleteTransactionService(deleteTransactionRepository)
+
+  const deleteTransactionController = 
+
 }
