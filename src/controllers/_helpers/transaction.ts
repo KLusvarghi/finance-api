@@ -1,5 +1,5 @@
 import isCurrency from 'validator/lib/isCurrency'
-import { badRequest } from './http'
+import { badRequest, notFound } from './http'
 
 export const checkAmoutIsValid = (amount: number): Boolean => {
     if (typeof amount !== 'number') return false
@@ -25,3 +25,5 @@ export const invalidAmoutResponse = () => {
 export const invalidTypeResponse = () => {
     return badRequest('Transaction type is invalid')
 }
+
+export const transactionNotFoundResponse = () => notFound('Transaction not found.')
