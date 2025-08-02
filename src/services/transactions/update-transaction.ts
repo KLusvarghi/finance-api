@@ -1,4 +1,4 @@
-import { UserNotFoundError } from '@/errors/user'
+import { TransactionNotFoundError } from "@/errors/user"
 
 interface UpdateTransactionRepository {
     execute(transactionId: string, params: string): Promise<any>
@@ -25,6 +25,10 @@ export class UpdateTransactionService {
             transactionId,
             params,
         )
+
+        if(!transactionId){
+          return TransactionNotFoundError
+        }
 
         return transaction
     }
