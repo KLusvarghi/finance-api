@@ -3,6 +3,7 @@ import 'dotenv/config'
 import {
     makeCreateUserController,
     makeDeleteUserController,
+    makeGetUserBalanceController,
     makeGetUserByIdController,
     makeUpdateUserController,
 } from '@/factories/controllers/user'
@@ -54,6 +55,17 @@ app.delete('/api/users/:userId', async (request, response) => {
 
     response.status(statusCode).send(body)
 })
+
+
+// get balance
+app.delete('/api/users/:userId/balance', async (request, response) => {
+  const getUserBalanceController = makeGetUserBalanceController()
+
+  const { statusCode, body } = await getUserBalanceController.execute(request)
+
+  response.status(statusCode).send(body)
+})
+
 
 app.post('/api/transactions', async (request, response) => {
     const createTransactionController = makeCreateTransactionController()
