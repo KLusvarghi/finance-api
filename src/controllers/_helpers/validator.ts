@@ -33,4 +33,3 @@ export const validateRequiredFields = (
 export const requiredFieldMissingResponse = (missingField: string | undefined) =>
     badRequest(`The field ${missingField} is required.`)
 
-export const transactionNotFoundResponse = () => notFound('Transaction not found.')
