@@ -1,15 +1,6 @@
 import { HttpResponse } from '@/shared'
-import {
-    badRequest,
-    checkAmoutIsValid,
-    checkIfIdIsValid,
-    checkIsTypeValid,
-    invalidAmoutResponse,
-    invalidIdResponse,
-    invalidTypeResponse,
-    ok,
-    serverError,
-} from '../_helpers'
+import { ok, serverError } from '../_helpers'
+import { updateTransactionSchema } from '@/schemas'
 
 interface UpdateTransactionService {
     execute(transactionId: string, params: any): Promise<any>
@@ -26,46 +17,15 @@ export class UpdateTransactionController {
         try {
             const transactionId = httpRequest.params.transactionId
 
-            const isValidId = checkIfIdIsValid(transactionId)
-
-            if (!isValidId) {
-                return invalidIdResponse()
-            }
-
             const params = httpRequest.body
 
-            const allowedFields = ['name', 'date', 'amount', 'type']
-
-            const someFielsNotAllowed = Object.keys(params).some(
-                (fiels) => !allowedFields.includes(fiels), // verifica se algum campo que recebemos com params "params" não está presente em "allowedFields"
-            )
-
-            if (someFielsNotAllowed) {
-                return badRequest('Some provided field is not allowed.')
-            }
-
-            if (params.amount) {
-                if (!checkAmoutIsValid(params.amount)) {
-                    return invalidAmoutResponse()
-                }
-            }
-
-            if (params.type) {
-                const type = params.type.trim().toUpperCase()
-
-                const typeIsValid = checkIsTypeValid(type)
-
-                if (!typeIsValid) {
-                    return invalidTypeResponse()
-                }
-            }
+            await updateTransactionSchema.parseAsync(params)
 
             const updatedTransaction =
                 await this.updateTransactionService.execute(
                     transactionId,
                     params,
                 )
-            console.log(updatedTransaction)
 
             return ok(updatedTransaction)
         } catch (error) {
