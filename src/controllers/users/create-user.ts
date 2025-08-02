@@ -1,13 +1,7 @@
 import { EmailAlreadyExistsError } from '@/errors/user'
-import {
-    checkIfEmailIsValid,
-    checkIfPasswordIsValid,
-    emailIsAlreadyInUseResponse,
-    invalidPasswordResponse,
-    requiredFieldMissingResponse,
-    validateRequiredFields,
-} from '../_helpers/index'
+import { createUserSchema } from '@/schemas'
 import { serverError, badRequest, created } from '@/shared'
+import { ZodError } from 'zod'
 
 interface CreateUserService {
     execute(params: any): Promise<any>
@@ -23,29 +17,9 @@ export class CreateUserController {
         try {
             // validar a requisição (campos obrigatório, email e tamenho de senha)
             const params = httpRequest.body
-            const requiredFields = [
-                'first_name',
-                'last_name',
-                'email',
-                'password',
-            ]
 
-            const { ok: requiredFieldsWereProvider, missingField } =
-                validateRequiredFields(params, requiredFields)
-            if (!requiredFieldsWereProvider){
-              return requiredFieldMissingResponse(missingField)
-            }
-
-            const passwordIsValid = checkIfPasswordIsValid(params.password)
-
-            if (!passwordIsValid) {
-                return invalidPasswordResponse()
-            }
-
-            const emailIsValid = checkIfEmailIsValid(params.email)
-            if (!emailIsValid) {
-                return emailIsAlreadyInUseResponse()
-            }
+            // validando o schema de forma asyncrona
+            await createUserSchema.parseAsync(params)
 
             // rxecutamos nossa regra de negocio
             const createdUser = await this.createUserService.execute(params)
@@ -53,6 +27,10 @@ export class CreateUserController {
             // retornar a resposta para o user (status code)
             return created(createdUser)
         } catch (error) {
+            if (error instanceof ZodError) {
+                return badRequest(error.issues[0].message)
+            }
+
             if (error instanceof EmailAlreadyExistsError) {
                 return badRequest(error.message)
             }
