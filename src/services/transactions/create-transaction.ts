@@ -28,7 +28,7 @@ export class CreateTransactionService {
         const user = await this.getUserByIdRepository.execute(userId)
 
         if (!user) {
-            throw new UserNotFoundError(userId)
+            throw new UserNotFoundError()
         }
 
         const transactionId = uuidv4()
