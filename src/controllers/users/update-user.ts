@@ -1,16 +1,14 @@
 import { EmailAlreadyExistsError } from '@/errors/user'
 import {
-    checkIfEmailIsValid,
     checkIfIdIsValid,
-    checkIfPasswordIsValid,
-    emailIsAlreadyInUseResponse,
     invalidIdResponse,
-    invalidPasswordResponse,
     userBadRequestResponse,
     userNotFoundResponse,
 } from '../_helpers/index'
 
 import { serverError, ok, badRequest } from '@/shared'
+import { ZodError } from 'zod'
+import { updateUserSchema } from '@/schemas'
 
 interface UpdateUserService {
     execute(userId: string, params: any): Promise<any>
@@ -32,53 +30,25 @@ export class UpdateUserController {
 
             if (!isIdValid) return invalidIdResponse()
 
-            const allowedFields = [
-                'first_name',
-                'last_name',
-                'email',
-                'password',
-            ]
-
             const params = httpRequest.body
 
-            // 1. validar se algum campo não permitido foi passado
-            const someFielsNotAllowed = Object.keys(params).some(
-                (fiels) => !allowedFields.includes(fiels), // verifica se algum campo que recebemos com params "params" não está presente em "allowedFields"
-            )
-
-            if (someFielsNotAllowed) {
-                return badRequest('Some provided field is not allowed.')
-            }
-
-            // 2. se receber password, validar o tamanho da string
-            if (params.password) {
-                const passwordIsValid = checkIfPasswordIsValid(params.password)
-
-                if (!passwordIsValid) {
-                    return invalidPasswordResponse()
-                }
-            }
-
-            if (params.email) {
-                const emailIsValid = checkIfEmailIsValid(params.email)
-
-                if (!emailIsValid) {
-                    return emailIsAlreadyInUseResponse()
-                }
-            }
+            await updateUserSchema.parseAsync(params)
 
             const updatedUser = await this.updateUserService.execute(
                 userId,
                 params,
             )
 
-            if(!updatedUser){
-              return userNotFoundResponse()
+            if (!updatedUser) {
+                return userNotFoundResponse()
             }
 
             // após chamar o service, já retornamos o status code, porque caso, dê algo errado no service ou no repositpry, eles vão instanciar um Error, e isso fará com que caia no catch
             return ok(updatedUser)
         } catch (error) {
+            if (error instanceof ZodError) {
+                return badRequest(error.issues[0].message)
+            }
             if (error instanceof EmailAlreadyExistsError) {
                 return badRequest(error.message)
             }
