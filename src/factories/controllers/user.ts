@@ -1,12 +1,14 @@
 import {
     CreateUserController,
     DeleteUserController,
+    GetUserBalanceController,
     GetUserByIdController,
     UpdateUserController,
 } from '@/controllers'
 import {
     PostgresCreateUserRepository,
     PostgresDeleteUserRepository,
+    PostgresGetUserBalanceRepository,
     PostgresGetUserByEmailRepository,
     PostgresGetUserByIdRepository,
     PostgresUpdateUserRepository,
@@ -14,6 +16,7 @@ import {
 import {
     CreateUserService,
     DeleteUserService,
+    GetUserBalanceService,
     GetUserByIdService,
     UpdateUserService,
 } from '@/services'
@@ -56,4 +59,20 @@ export const makeDeleteUserController = () => {
     const deleteUserController = new DeleteUserController(deleteUserService)
 
     return deleteUserController
+}
+
+export const makeGetUserBalanceController = () => {
+    const getUserByIdRepository = new PostgresGetUserByIdRepository()
+    const getUserBalanceRepository = new PostgresGetUserBalanceRepository()
+
+    const getUserBalanceService = new GetUserBalanceService(
+        getUserByIdRepository,
+        getUserBalanceRepository,
+    )
+
+    const getUserBalanceController = new GetUserBalanceController(
+        getUserBalanceService,
+    )
+
+    return getUserBalanceController
 }
