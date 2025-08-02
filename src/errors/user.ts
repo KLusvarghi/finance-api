@@ -11,3 +11,10 @@ export class UserNotFoundError extends Error {
       this.name = 'UserNotFoundError' // assim a gente deixa mais claro o name do error
   }
 }
+
+export class TransactionNotFoundError extends Error {
+  constructor() {
+      super(`Transaction not found`)
+      this.name = 'TransactionNotFoundError' // assim a gente deixa mais claro o name do error
+  }
+}
