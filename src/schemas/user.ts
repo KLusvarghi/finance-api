@@ -31,6 +31,6 @@ export const createUserSchema = z.object({
     }),
 })
 
-// assim a gente atribui o que tem no schema e deixamos ele opcional
+// o partial assim a gente atribui o que tem no schema e deixamos ele opcional
 // e o metodo "strict" fará com que ele seja estrito, e não deixará passar campos que não existem no schema
 export const updateUserSchema = createUserSchema.partial().strict()
