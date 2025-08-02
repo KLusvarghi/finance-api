@@ -36,3 +36,11 @@ export const createTransactionSchema = z.object({
             }),
         ),
 })
+
+
+export const updateTransactionSchema = createTransactionSchema
+    .omit({
+        user_id: true,
+    })
+    .partial() // o "partial" assim a gente atribui o que tem no schema e deixamos ele opcional
+    .strict() // "strict" fará com que ele seja estrito, e não deixará passar campos que não existem no schema
