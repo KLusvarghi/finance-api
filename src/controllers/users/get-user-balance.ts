@@ -1,12 +1,14 @@
+import { UserNotFoundError } from '@/errors/user'
 import {
     checkIfIdIsValid,
+    invalidIdResponse,
     ok,
     serverError,
     userNotFoundResponse,
 } from '../_helpers'
 
 interface GetUserBalanceService {
-    execute(userId: string): Promise<any>
+    execute({ params }: any): Promise<any>
 }
 
 export class GetUserBalanceController {
@@ -21,13 +23,18 @@ export class GetUserBalanceController {
             const userId = httpRequest.params.userId
 
             if (!checkIfIdIsValid(userId)) {
-                return userNotFoundResponse()
+                return invalidIdResponse()
             }
 
-            const userBalance = await this.getUserBalanceService.execute(userId)
+            const userBalance = await this.getUserBalanceService.execute({
+                userId,
+            })
 
             return ok(userBalance)
         } catch (error) {
+            if (error instanceof UserNotFoundError) {
+                return userNotFoundResponse()
+            }
             console.error(error)
             return serverError()
         }

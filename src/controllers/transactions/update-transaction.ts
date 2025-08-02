@@ -8,10 +8,7 @@ import {
     invalidIdResponse,
     invalidTypeResponse,
     ok,
-    requiredFieldMissingResponse,
     serverError,
-    transactionNotFoundResponse,
-    validateRequiredFields,
 } from '../_helpers'
 
 interface UpdateTransactionService {
@@ -68,10 +65,7 @@ export class UpdateTransactionController {
                     transactionId,
                     params,
                 )
-
-            if (!updatedTransaction) {
-                return transactionNotFoundResponse()
-            }
+            console.log(updatedTransaction)
 
             return ok(updatedTransaction)
         } catch (error) {
