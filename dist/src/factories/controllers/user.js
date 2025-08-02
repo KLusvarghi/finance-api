@@ -1,6 +1,6 @@
-import { CreateUserController, DeleteUserController, GetUserByIdController, UpdateUserController, } from '@/controllers';
-import { PostgresCreateUserRepository, PostgresDeleteUserRepository, PostgresGetUserByEmailRepository, PostgresGetUserByIdRepository, PostgresUpdateUserRepository, } from '@/repositories/postgres';
-import { CreateUserService, DeleteUserService, GetUserByIdService, UpdateUserService, } from '@/services';
+import { CreateUserController, DeleteUserController, GetUserBalanceController, GetUserByIdController, UpdateUserController, } from '@/controllers';
+import { PostgresCreateUserRepository, PostgresDeleteUserRepository, PostgresGetUserBalanceRepository, PostgresGetUserByEmailRepository, PostgresGetUserByIdRepository, PostgresUpdateUserRepository, } from '@/repositories/postgres';
+import { CreateUserService, DeleteUserService, GetUserBalanceService, GetUserByIdService, UpdateUserService, } from '@/services';
 export const makeGetUserByIdController = () => {
     const getUserByIdRepository = new PostgresGetUserByIdRepository();
     const getUserByIdService = new GetUserByIdService(getUserByIdRepository);
@@ -26,4 +26,11 @@ export const makeDeleteUserController = () => {
     const deleteUserService = new DeleteUserService(deletedUserRepository);
     const deleteUserController = new DeleteUserController(deleteUserService);
     return deleteUserController;
+};
+export const makeGetUserBalanceController = () => {
+    const getUserByIdRepository = new PostgresGetUserByIdRepository();
+    const getUserBalanceRepository = new PostgresGetUserBalanceRepository();
+    const getUserBalanceService = new GetUserBalanceService(getUserByIdRepository, getUserBalanceRepository);
+    const getUserBalanceController = new GetUserBalanceController(getUserBalanceService);
+    return getUserBalanceController;
 };

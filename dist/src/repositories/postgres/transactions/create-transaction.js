@@ -1,7 +1,7 @@
-import { PostgresHelper } from "@/infra/db/postgres/helper";
-export class PostgresCreateTransaction {
+import { PostgresHelper } from '@/infra/db/postgres/helper';
+export class PostgresCreateTransactionRepository {
     async execute(createTransactionParams) {
-        const result = await PostgresHelper.query(`INSERT INTO users (id, user_id, name, amount, date, type)
+        const result = await PostgresHelper.query(`INSERT INTO transactions (id, user_id, name, amount, date, type)
             VALUES ($1, $2, $3, $4, $5, $6) 
             RETURNING *`, [
             createTransactionParams.id,

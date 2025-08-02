@@ -1,5 +1,5 @@
 import { EmailAlreadyExistsError } from '@/errors/user';
-import { checkIfEmailIsValid, checkIfIdIsValid, checkIfPasswordIsValid, emailIsAlreadyInUseResponse, invalidIdResponse, invalidPasswordResponse, userBadRequestResponse, } from '../_helpers/index';
+import { checkIfEmailIsValid, checkIfIdIsValid, checkIfPasswordIsValid, emailIsAlreadyInUseResponse, invalidIdResponse, invalidPasswordResponse, userBadRequestResponse, userNotFoundResponse, } from '../_helpers/index';
 import { serverError, ok, badRequest } from '@/shared';
 export class UpdateUserController {
     updateUserService;
@@ -40,6 +40,9 @@ export class UpdateUserController {
                 }
             }
             const updatedUser = await this.updateUserService.execute(userId, params);
+            if (!updatedUser) {
+                return userNotFoundResponse();
+            }
             // após chamar o service, já retornamos o status code, porque caso, dê algo errado no service ou no repositpry, eles vão instanciar um Error, e isso fará com que caia no catch
             return ok(updatedUser);
         }

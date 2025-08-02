@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import fs from 'fs';
 import path from 'path';
-import { pool } from '../helper.js';
+import { pool } from '../helper';
 import { fileURLToPath } from 'url';
 // Para que tenhamos acesso ao filename e dirname, temos que fazer esse macete:
 // o metodo "fileURLToPath" tira a parte do path que seria por exemplo "file://Users/kaua-lusvarghi/..."
@@ -14,13 +14,21 @@ const execMigrations = async () => {
     const client = await pool.connect();
     try {
         // eu preciso especificar o diretorio atual que estou executando e depois o path do aql da migration
-        const filePath = path.join(__dirname, './02-correct-column-name.sql');
-        // pegando todo o escript dentro do arquivo .sql
-        // sendo essencial colocar o encoding para que não gere erros
-        const script = fs.readFileSync(filePath, 'utf-8');
-        // executando todo o script/query que estpá na migration
-        await client.query(script);
-        console.log('Migrations executed successfully');
+        // aqui nos pegamos todos os arquivos com extensão ".sql"
+        const files = fs
+            .readdirSync(__dirname)
+            .filter((file) => file.endsWith('.sql'));
+        // dessa maneira a gente consegue rodar todas as migrations sequencioalmente sem ter que fucar colcoando o nome delas explicitamente
+        for (const file of files) {
+            const filePath = path.join(__dirname, file);
+            // pegando todo o escript dentro do arquivo .sql
+            // sendo essencial colocar o encoding para que não gere erros
+            const script = fs.readFileSync(filePath, 'utf-8');
+            // executando todo o script/query que estpá na migration
+            await client.query(script);
+            console.log(`Migration ${file} executed successfully`);
+        }
+        console.log('All Migrations ware executed successfully');
     }
     catch (error) {
         console.error(error);
@@ -30,4 +38,4 @@ const execMigrations = async () => {
     }
 };
 execMigrations();
-// para rodar, basta: node 
+// para rodar, basta: node
