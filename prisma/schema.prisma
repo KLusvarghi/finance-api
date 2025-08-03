@@ -1,0 +1,30 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+  // https://www.prisma.io/docs/orm/prisma-client/special-fields-and-types
+  // https://www.prisma.io/docs/orm/reference/prisma-schema-reference
+  // dentro do "model" é onde definimos nossa tabela
+model User {
+  // o @id diz que é um capo PK (primary key)
+  // o @default irá dizer que o por padrão teremos um uuid caso não seja preenchido
+  id String @id @default(uuid())
+  // Se a gente coloca apenas "String" ele por padrão coloca como "text" (que nã otem limite de caracteres)
+  first_name String @db.VarChar(50)
+  last_name String @db.VarChar(50)
+  // definimos que ele é unico com @unique
+  email String @db.VarChar(100) @unique
+  password String @db.VarChar(100)
+}
