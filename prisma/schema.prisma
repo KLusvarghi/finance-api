@@ -6,7 +6,8 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  // para que eu consiga exportar o PrismaClient, eu preciso eliminar essa linha abaixo (isso porque eu uso typescript)
+  // output   = "../generated/prisma"
 }
 
 datasource db {
