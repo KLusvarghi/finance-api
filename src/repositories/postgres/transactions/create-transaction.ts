@@ -1,4 +1,6 @@
-import { PostgresHelper } from '@/infra/db/postgres/helper'
+import { EnumLike } from 'zod/v4/core/util.cjs'
+import { prisma } from '../../../../prisma/prisma'
+import { TransctionType } from '@prisma/client'
 
 interface CreateTransactionParamsProps {
     id: string
@@ -6,26 +8,13 @@ interface CreateTransactionParamsProps {
     name: string
     amount: number
     date: Date
-    type: string
+    type: TransctionType
 }
 
 export class PostgresCreateTransactionRepository {
     async execute(createTransactionParams: CreateTransactionParamsProps) {
-        const result = await PostgresHelper.query(
-            `INSERT INTO transactions (id, user_id, name, amount, date, type)
-            VALUES ($1, $2, $3, $4, $5, $6) 
-            RETURNING *`,
-            [
-                createTransactionParams.id,
-                createTransactionParams.user_id,
-                createTransactionParams.name,
-                createTransactionParams.amount,
-                createTransactionParams.date,
-                createTransactionParams.type,
-            ],
-        )
-
-        // como retorno, ele nos dará uma lista, e o primeiro item será o usuário criado
-        return result[0]
+        return await prisma.transaction.create({
+            data: createTransactionParams
+        })
     }
 }
