@@ -31,10 +31,10 @@ model User {
 
   // e para que o campo "id" ou qualquer outro consiga ser referenciado em outra tabela, precisamos dizer dizer que "User", pode ter várias transactions:
   // 1:N -> Um usuári pode ter várias transaction
-  transactions Transctions[]
+  transactions Transction[]
 }
 
-model Transctions {
+model Transction {
   id String @id @default(uuid())
   // para fazer uma relação no prisma, temos que primeiro instanciar a coluna apenas com o tipo dela
   // N:1 -> Varias transaction só pode ter um usuário
