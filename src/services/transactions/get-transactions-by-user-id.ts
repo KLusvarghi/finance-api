@@ -1,34 +1,33 @@
-import { userNotFoundResponse } from '@/controllers/_helpers'
 import { UserNotFoundError } from '@/errors/user'
-
-interface GetUserByIdRepository {
-    execute(userId: string): Promise<any>
-}
-
-interface GetTransactionByUserIdRepository {
-    execute(userId: string): Promise<any>
-}
+import {
+    GetUserByIdRepository,
+    GetTransactionsByUserIdRepository,
+    TransactionRepositoryResponse,
+} from '@/shared/types'
 
 export class GetTransactionsByUserIdService {
     private getUserByIdRepository: GetUserByIdRepository
-    private getTransactionByUserIdRepository: GetTransactionByUserIdRepository
+    private getTransactionByUserIdRepository: GetTransactionsByUserIdRepository
 
     constructor(
         getUserByIdRepository: GetUserByIdRepository,
-        getTransactionByUserIdRepository: GetTransactionByUserIdRepository,
+        getTransactionByUserIdRepository: GetTransactionsByUserIdRepository,
     ) {
         this.getUserByIdRepository = getUserByIdRepository
         this.getTransactionByUserIdRepository = getTransactionByUserIdRepository
     }
 
-    async execute(userId: string) {
+    async execute(
+        userId: string,
+    ): Promise<TransactionRepositoryResponse[] | null> {
         const user = await this.getUserByIdRepository.execute(userId)
 
         if (!user) {
             throw new UserNotFoundError()
         }
 
-        const transaction = await this.getTransactionByUserIdRepository.execute(userId)
+        const transaction =
+            await this.getTransactionByUserIdRepository.execute(userId)
 
         return transaction
     }

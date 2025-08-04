@@ -1,6 +1,4 @@
-interface GetUserByIdRepository {
-    execute(userId: string): Promise<any>
-}
+import { GetUserByIdRepository, UserRepositoryResponse } from '@/shared/types'
 
 export class GetUserByIdService {
     private getUserByIdRepository: GetUserByIdRepository
@@ -8,7 +6,8 @@ export class GetUserByIdService {
     constructor(getUserByIdRepository: GetUserByIdRepository) {
         this.getUserByIdRepository = getUserByIdRepository
     }
-    async execute(userId: string) {
+
+    async execute(userId: string): Promise<UserRepositoryResponse | null> {
         const user = await this.getUserByIdRepository.execute(userId)
 
         return user

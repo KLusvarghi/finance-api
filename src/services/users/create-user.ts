@@ -1,15 +1,12 @@
 import { v4 as uuidv4 } from 'uuid'
 import bcrypt from 'bcrypt'
-import { CreateUserParams } from '../../controllers/_types'
+import {
+    CreateUserParams,
+    CreateUserRepository,
+    GetUserByEmailRepository,
+    UserRepositoryResponse,
+} from '@/shared/types'
 import { EmailAlreadyExistsError } from '@/errors/user'
-
-interface CreateUserRepository {
-    execute(user: any): Promise<any>
-}
-
-interface GetUserByEmailRepository {
-    execute(email: string): Promise<any>
-}
 
 export class CreateUserService {
     private createUserRepository: CreateUserRepository
@@ -22,9 +19,10 @@ export class CreateUserService {
         this.createUserRepository = createUserRepository
         this.getUserByEmailRepository = getUserByEmailRepository
     }
-    async execute(createUserParams: CreateUserParams) {
-        // verificar se o e-mail já está cadastrado no banco
 
+    async execute(
+        createUserParams: CreateUserParams,
+    ): Promise<UserRepositoryResponse> {
         const userWithProviderEmail =
             await this.getUserByEmailRepository.execute(createUserParams.email)
 
@@ -32,7 +30,6 @@ export class CreateUserService {
             throw new EmailAlreadyExistsError(createUserParams.email)
         }
 
-        // gerar o UUID
         const userId = uuidv4()
 
         // criptografdar a senha
@@ -47,11 +44,8 @@ export class CreateUserService {
             password: hashPassword,
         }
 
-        // inserir o user no db
-        // chamar o repository
-        // 1º maneira de fazer isso
-        return await this.createUserRepository.execute(user)
+        const userResult = await this.createUserRepository.execute(user)
 
-        // 2º maneira de fazer isso é injetar como dependencia no constructor
+        return userResult
     }
 }

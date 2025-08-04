@@ -1,33 +1,28 @@
-import { TransactionNotFoundError } from "@/errors/user"
-
-interface UpdateTransactionRepository {
-    execute(transactionId: string, params: string): Promise<any>
-}
-
-interface GetUserByIdRepository {
-    execute(userId: string): Promise<any>
-}
+import { TransactionNotFoundError } from '@/errors/user'
+import {
+    UpdateTransactionRepository,
+    UpdateTransactionParams,
+    TransactionRepositoryResponse,
+} from '@/shared/types'
 
 export class UpdateTransactionService {
     private updateTransactionRepository: UpdateTransactionRepository
-    private getUserByIdRepository: GetUserByIdRepository
 
-    constructor(
-        updateTransactionRepository: UpdateTransactionRepository,
-        getUserByIdRepository: GetUserByIdRepository,
-    ) {
+    constructor(updateTransactionRepository: UpdateTransactionRepository) {
         this.updateTransactionRepository = updateTransactionRepository
-        this.getUserByIdRepository = getUserByIdRepository
     }
 
-    async execute(transactionId: string, params: any) {
+    async execute(
+        transactionId: string,
+        params: UpdateTransactionParams,
+    ): Promise<TransactionRepositoryResponse | null> {
         const transaction = await this.updateTransactionRepository.execute(
             transactionId,
             params,
         )
 
-        if(!transactionId){
-          return TransactionNotFoundError
+        if (!transaction) {
+            throw new TransactionNotFoundError()
         }
 
         return transaction

@@ -73,11 +73,88 @@ export interface UpdateUserParams {
 // TRANSACTION PARAMETER TYPES
 // ============================================================================
 
-export type CreateTransactionParams = Omit<Prisma.TransactionCreateInput, 'id'>
+export interface CreateTransactionParamsProps {
+    user_id: string
+    name: string
+    amount: number
+    date: Date
+    type: 'EARNING' | 'EXPENSE' | 'INVESTMENT'
+}
 
 export interface UpdateTransactionParams {
     name?: string
     amount?: Prisma.Decimal
     date?: Date
     type?: 'EARNING' | 'EXPENSE' | 'INVESTMENT'
+}
+
+// ============================================================================
+// SERVICE INTERFACE TYPES
+// ============================================================================
+
+// User Repository Interfaces
+export interface CreateUserRepository {
+    execute(
+        user: CreateUserParams & { id: string; password: string },
+    ): Promise<UserRepositoryResponse>
+}
+
+export interface GetUserByIdRepository {
+    execute(userId: string): Promise<UserRepositoryResponse | null>
+}
+
+export interface GetUserByEmailRepository {
+    execute(email: string): Promise<UserRepositoryResponse | null>
+}
+
+export interface UpdateUserRepository {
+    execute(
+        userId: string,
+        user: UpdateUserParams,
+    ): Promise<UserRepositoryResponse | null>
+}
+
+export interface DeleteUserRepository {
+    execute(userId: string): Promise<UserRepositoryResponse | null>
+}
+
+export interface GetUserBalanceRepository {
+    execute(userId: string): Promise<UserBalanceRepositoryResponse>
+}
+
+// Transaction Repository Interfaces
+export interface CreateTransactionRepository {
+    execute(
+        params: CreateTransactionParamsProps & { id: string },
+    ): Promise<TransactionRepositoryResponse>
+}
+
+export interface GetTransactionsByUserIdRepository {
+    execute(userId: string): Promise<TransactionRepositoryResponse[] | null>
+}
+
+export interface UpdateTransactionRepository {
+    execute(
+        transactionId: string,
+        params: UpdateTransactionParams,
+    ): Promise<TransactionRepositoryResponse | null>
+}
+
+export interface DeleteTransactionRepository {
+    execute(
+        transactionId: string,
+    ): Promise<TransactionRepositoryResponse | null>
+}
+
+// ============================================================================
+// SERVICE PARAMETER TYPES
+// ============================================================================
+
+export interface GetUserBalanceParams {
+    userId: string
+}
+
+export interface UpdateUserServiceParams {
+    userId: string
+    updateUserParams: UpdateUserParams
 }

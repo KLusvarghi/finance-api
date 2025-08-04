@@ -1,12 +1,10 @@
-import { UserNotFoundError } from "@/errors/user"
-
-interface GetUserByIdRepository {
-    execute(userId: string): Promise<any>
-}
-
-interface GetUserBalanceRepository {
-    execute(userId: string): Promise<any>
-}
+import { UserNotFoundError } from '@/errors/user'
+import {
+    GetUserByIdRepository,
+    GetUserBalanceRepository,
+    GetUserBalanceParams,
+    UserBalanceRepositoryResponse,
+} from '@/shared/types'
 
 export class GetUserBalanceService {
     private getUserByIdRepository: GetUserByIdRepository
@@ -15,20 +13,24 @@ export class GetUserBalanceService {
     constructor(
         getUserByIdRepository: GetUserByIdRepository,
         getUserBalanceRepository: GetUserBalanceRepository,
-    ){
-      this.getUserByIdRepository = getUserByIdRepository
-      this.getUserBalanceRepository = getUserBalanceRepository
+    ) {
+        this.getUserByIdRepository = getUserByIdRepository
+        this.getUserBalanceRepository = getUserBalanceRepository
     }
 
-    async execute(params: any){
-      const user = await this.getUserByIdRepository.execute(params.userId)
+    async execute(
+        params: GetUserBalanceParams,
+    ): Promise<UserBalanceRepositoryResponse> {
+        const user = await this.getUserByIdRepository.execute(params.userId)
 
-      if(!user){
-        throw new UserNotFoundError()
-      }
+        if (!user) {
+            throw new UserNotFoundError()
+        }
 
-      const userBalance = await this.getUserBalanceRepository.execute(params.userId)
-      
-      return userBalance
+        const userBalance = await this.getUserBalanceRepository.execute(
+            params.userId,
+        )
+
+        return userBalance
     }
 }

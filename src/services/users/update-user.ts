@@ -1,21 +1,11 @@
 import { EmailAlreadyExistsError } from '@/errors/user'
 import bcrypt from 'bcrypt'
-
-interface UpdateUserInterface {
-    first_name?: string
-    last_name?: string
-    email?: string
-    password?: string
-    userId: string
-}
-
-interface GetUserByEmailRepository {
-    execute(email: string): Promise<any>
-}
-
-interface UpdateUserRepository {
-    execute(userId: string, user: any): Promise<any>
-}
+import {
+    UpdateUserParams,
+    GetUserByEmailRepository,
+    UpdateUserRepository,
+    UserRepositoryResponse,
+} from '@/shared/types'
 
 export class UpdateUserService {
     private getUserByEmailRepository: GetUserByEmailRepository
@@ -28,7 +18,11 @@ export class UpdateUserService {
         this.getUserByEmailRepository = getUserByEmailRepository
         this.updateUserRepository = updateUserRepository
     }
-    async execute(userId: string, updateUserParams: UpdateUserInterface) {
+
+    async execute(
+        userId: string,
+        updateUserParams: UpdateUserParams,
+    ): Promise<UserRepositoryResponse | null> {
         // 1. se o email estiver sendo atualizado, verificar se já está em uso
         if (updateUserParams.email) {
             const userWithProviderEmail =

@@ -1,6 +1,4 @@
-interface DeleteUserRepository {
-    execute(userId: string): Promise<any>
-}
+import { DeleteUserRepository, UserRepositoryResponse } from '@/shared/types'
 
 export class DeleteUserService {
     private deletedUserRepository: DeleteUserRepository
@@ -8,7 +6,8 @@ export class DeleteUserService {
     constructor(deletedUserRepository: DeleteUserRepository) {
         this.deletedUserRepository = deletedUserRepository
     }
-    async execute(userId: string) {
+
+    async execute(userId: string): Promise<UserRepositoryResponse | null> {
         const userDeleted = await this.deletedUserRepository.execute(userId)
         return userDeleted
     }
