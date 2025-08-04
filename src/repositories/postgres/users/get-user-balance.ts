@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import { prisma } from '../../../../prisma/prisma'
 
 export class PostgresGetUserBalanceRepository {
@@ -7,43 +8,66 @@ export class PostgresGetUserBalanceRepository {
         // sem fazer o destructuring
         // const totalExpense = await prisma.transaction.aggregate({
         // fazendo o distructuring para que eu não precise acessar a variavel assim: _sum.amount; e sim:
-        const {
-            _sum: { amount: totalExpense },
-        } = await prisma.transaction.aggregate({
-            // dizemso primeiro onde / o que queremos agragar
-            where: {
-                user_id: userId,
-                type: 'EXPENSE',
-            },
-            // o que voltar do where eu irei somar
-            _sum: {
-                // soamndo o campo amount de tudo que voltar do where
-                amount: true,
-            },
-        })
-        const {
-            _sum: { amount: totalEarning },
-        } = await prisma.transaction.aggregate({
-            where: {
-                user_id: userId,
-                type: 'EARNING',
-            },
-            _sum: {
-                amount: true,
-            },
-        })
-        const {
-            _sum: { amount: totalInvestments },
-        } = await prisma.transaction.aggregate({
-            where: {
-                user_id: userId,
-                type: 'INVESTMENT',
-            },
-            _sum: {
-                amount: true,
-            },
-        })
-        
-        const balance = totalEarning 
+
+        // Executar todas as agregações em paralelo para melhor performance
+        const [expensesResult, earningsResult, investmentsResult] =
+            await Promise.all([
+                prisma.transaction.aggregate({
+                    // dizemso primeiro onde / o que queremos agragar
+
+                    where: {
+                        user_id: userId,
+                        type: 'EXPENSE',
+                    },
+                    // o que voltar do where eu irei somar
+
+                    _sum: {
+                        // somando o campo amount de tudo que voltar do where
+
+                        amount: true,
+                    },
+                }),
+                prisma.transaction.aggregate({
+                    where: {
+                        user_id: userId,
+                        type: 'EARNING',
+                    },
+                    _sum: {
+                        amount: true,
+                    },
+                }),
+                prisma.transaction.aggregate({
+                    where: {
+                        user_id: userId,
+                        type: 'INVESTMENT',
+                    },
+                    _sum: {
+                        amount: true,
+                    },
+                }),
+            ])
+
+        // Converter Decimal para number e tratar valores nulos
+        const totalExpenses =
+            Number(expensesResult._sum.amount) || new Prisma.Decimal(0)
+        const totalEarnings =
+            Number(earningsResult._sum.amount) || new Prisma.Decimal(0)
+        const totalInvestments =
+            Number(investmentsResult._sum.amount) || new Prisma.Decimal(0)
+
+        // Calcular o balance: ganhos - despesas + investimentos
+        const balance = new Prisma.Decimal(totalEarnings)
+            .sub(totalExpenses)
+            .add(totalInvestments)
+        // const balance2 = new Prisma.Decimal(
+        //     totalEarnings - totalExpenses + totalInvestments,
+        // )
+
+        return {
+            earning: totalEarnings,
+            expenses: totalExpenses,
+            investments: totalInvestments,
+            balance,
+        }
     }
 }
