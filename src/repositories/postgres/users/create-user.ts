@@ -1,12 +1,7 @@
+import { Prisma } from '@prisma/client'
 import { prisma } from '../../../../prisma/prisma'
 
-interface CreateUserParams {
-    id: string
-    first_name: string
-    last_name: string
-    email: string
-    password: string
-}
+type CreateUserParams = Omit<Prisma.UserCreateInput, 'id' | 'transactions'>
 
 export class PostgresCreateUserRepository {
     // como nomenclatura, podemos usar execute, handle ou até create
