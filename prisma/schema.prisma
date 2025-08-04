@@ -46,10 +46,10 @@ model Transaction {
   // se deixar apenas "DateTime" ele vai criar uma coluna do tipo timestamp
   // para especificar é só colocar @db.Date
   date DateTime @db.Date
-  type TransctionType
+  type TransactionType
 }
 
-enum TransctionType {
+enum TransactionType {
   EARNING
   EXPENSE
   INVESTMENT
