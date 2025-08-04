@@ -38,6 +38,16 @@ app.get('/api/users/:userId', async (request, response) => {
     response.status(statusCode).send(body)
 })
 
+
+// get balance
+app.get('/api/users/:userId/balance', async (request, response) => {
+  const getUserBalanceController = makeGetUserBalanceController()
+
+  const { statusCode, body } = await getUserBalanceController.execute(request)
+
+  response.status(statusCode).send(body)
+})
+
 // udpate user
 app.patch('/api/users/:userId', async (request, response) => {
     const updateUserController = makeUpdateUserController()
@@ -54,16 +64,6 @@ app.delete('/api/users/:userId', async (request, response) => {
     const { statusCode, body } = await deleteUserController.execute(request)
 
     response.status(statusCode).send(body)
-})
-
-
-// get balance
-app.get('/api/users/:userId/balance', async (request, response) => {
-  const getUserBalanceController = makeGetUserBalanceController()
-
-  const { statusCode, body } = await getUserBalanceController.execute(request)
-
-  response.status(statusCode).send(body)
 })
 
 
