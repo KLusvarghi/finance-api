@@ -5,10 +5,12 @@ import {
     serverError,
     transactionNotFoundResponse,
 } from '../_helpers'
-
-interface DeleteTransactionService {
-    execute(transactionId: string): Promise<any>
-}
+import {
+    DeleteTransactionService,
+    TransactionRepositoryResponse,
+    HttpResponse,
+    HttpRequest,
+} from '@/shared/types'
 
 export class DeleteTransactionController {
     private deleteTransactionService: DeleteTransactionService
@@ -17,7 +19,9 @@ export class DeleteTransactionController {
         this.deleteTransactionService = deleteTransactionService
     }
 
-    async execute(httpRequest: any) {
+    async execute(
+        httpRequest: HttpRequest,
+    ): Promise<HttpResponse<TransactionRepositoryResponse>> {
         try {
             const transactionId = httpRequest.params.transactionId
 
@@ -35,7 +39,7 @@ export class DeleteTransactionController {
             return ok(deletedTransaction)
         } catch (error) {
             console.error(error)
-            serverError()
+            return serverError()
         }
     }
 }

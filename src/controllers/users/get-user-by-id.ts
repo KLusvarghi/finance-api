@@ -1,5 +1,10 @@
 import { serverError, ok } from '@/shared'
-import { GetUserByIdService } from '../../services/users/get-user-by-id'
+import {
+    GetUserByIdService,
+    UserRepositoryResponse,
+    HttpResponse,
+    HttpRequest,
+} from '@/shared/types'
 import {
     checkIfIdIsValid,
     invalidIdResponse,
@@ -13,7 +18,10 @@ export class GetUserByIdController {
     constructor(getUserByIdService: GetUserByIdService) {
         this.getUserByIdService = getUserByIdService
     }
-    async execute(httpRequest: any) {
+
+    async execute(
+        httpRequest: HttpRequest,
+    ): Promise<HttpResponse<UserRepositoryResponse>> {
         try {
             const userId = httpRequest.params.userId
 

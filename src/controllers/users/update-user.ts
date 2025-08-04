@@ -9,10 +9,13 @@ import {
 import { serverError, ok, badRequest } from '@/shared'
 import { ZodError } from 'zod'
 import { updateUserSchema } from '@/schemas'
-
-interface UpdateUserService {
-    execute(userId: string, params: any): Promise<any>
-}
+import {
+    UpdateUserService,
+    UpdateUserParams,
+    UserRepositoryResponse,
+    HttpResponse,
+    HttpRequest,
+} from '@/shared/types'
 
 export class UpdateUserController {
     private updateUserService: UpdateUserService
@@ -20,7 +23,10 @@ export class UpdateUserController {
     constructor(updateUserService: UpdateUserService) {
         this.updateUserService = updateUserService
     }
-    async execute(httpRequest: any) {
+
+    async execute(
+        httpRequest: HttpRequest,
+    ): Promise<HttpResponse<UserRepositoryResponse>> {
         try {
             const userId = httpRequest.params.userId
 

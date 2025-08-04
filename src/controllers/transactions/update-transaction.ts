@@ -1,10 +1,10 @@
-import { HttpResponse } from '@/shared'
+import { HttpResponse, HttpRequest } from '@/shared/types'
 import { ok, serverError } from '../_helpers'
 import { updateTransactionSchema } from '@/schemas'
-
-interface UpdateTransactionService {
-    execute(transactionId: string, params: any): Promise<any>
-}
+import {
+    UpdateTransactionService,
+    TransactionRepositoryResponse,
+} from '@/shared/types'
 
 export class UpdateTransactionController {
     private updateTransactionService: UpdateTransactionService
@@ -13,7 +13,9 @@ export class UpdateTransactionController {
         this.updateTransactionService = updateTransactionService
     }
 
-    async execute(httpRequest: any): Promise<HttpResponse> {
+    async execute(
+        httpRequest: HttpRequest,
+    ): Promise<HttpResponse<TransactionRepositoryResponse | null>> {
         try {
             const transactionId = httpRequest.params.transactionId
 

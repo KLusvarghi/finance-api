@@ -6,10 +6,12 @@ import {
     serverError,
     userNotFoundResponse,
 } from '../_helpers'
-
-interface GetUserBalanceService {
-    execute({ params }: any): Promise<any>
-}
+import {
+    GetUserBalanceService,
+    UserBalanceRepositoryResponse,
+    HttpResponse,
+    HttpRequest,
+} from '@/shared/types'
 
 export class GetUserBalanceController {
     private getUserBalanceService: GetUserBalanceService
@@ -18,7 +20,9 @@ export class GetUserBalanceController {
         this.getUserBalanceService = getUserBalanceService
     }
 
-    async execute(httpRequest: any) {
+    async execute(
+        httpRequest: HttpRequest,
+    ): Promise<HttpResponse<UserBalanceRepositoryResponse>> {
         try {
             const userId = httpRequest.params.userId
 

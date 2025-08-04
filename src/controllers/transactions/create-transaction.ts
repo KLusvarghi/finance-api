@@ -1,10 +1,12 @@
 import { badRequest, created, serverError } from '../_helpers'
 import { createTransactionSchema } from '@/schemas'
 import { ZodError } from 'zod'
-
-interface CreateTransactionService {
-    execute(params: any): Promise<any>
-}
+import {
+    CreateTransactionService,
+    TransactionRepositoryResponse,
+    HttpResponse,
+    HttpRequest,
+} from '@/shared/types'
 
 export class CreateTransactionController {
     private createTransactionService: CreateTransactionService
@@ -13,7 +15,9 @@ export class CreateTransactionController {
         this.createTransactionService = createTransactionService
     }
 
-    async execute(httpRequest: any) {
+    async execute(
+        httpRequest: HttpRequest,
+    ): Promise<HttpResponse<TransactionRepositoryResponse>> {
         try {
             const params = httpRequest.body
 

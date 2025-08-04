@@ -6,10 +6,12 @@ import {
 } from '../_helpers/index'
 
 import { serverError, ok } from '@/shared'
-
-interface DeleteUserService {
-    execute(userId: string): Promise<any>
-}
+import {
+    DeleteUserService,
+    UserRepositoryResponse,
+    HttpResponse,
+    HttpRequest,
+} from '@/shared/types'
 
 export class DeleteUserController {
     private deletedUserService: DeleteUserService
@@ -17,7 +19,10 @@ export class DeleteUserController {
     constructor(deletedUserService: DeleteUserService) {
         this.deletedUserService = deletedUserService
     }
-    async execute(httpRequest: any) {
+
+    async execute(
+        httpRequest: HttpRequest,
+    ): Promise<HttpResponse<UserRepositoryResponse>> {
         try {
             const userId = httpRequest.params.userId
 

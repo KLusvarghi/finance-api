@@ -2,10 +2,12 @@ import { EmailAlreadyExistsError } from '@/errors/user'
 import { createUserSchema } from '@/schemas'
 import { serverError, badRequest, created } from '@/shared'
 import { ZodError } from 'zod'
-
-interface CreateUserService {
-    execute(params: any): Promise<any>
-}
+import {
+    CreateUserService,
+    UserRepositoryResponse,
+    HttpResponse,
+    HttpRequest,
+} from '@/shared/types'
 
 export class CreateUserController {
     private createUserService: CreateUserService
@@ -13,7 +15,10 @@ export class CreateUserController {
     constructor(createUserService: CreateUserService) {
         this.createUserService = createUserService
     }
-    async execute(httpRequest: any) {
+
+    async execute(
+        httpRequest: HttpRequest,
+    ): Promise<HttpResponse<UserRepositoryResponse>> {
         try {
             // validar a requisição (campos obrigatório, email e tamenho de senha)
             const params = httpRequest.body

@@ -7,22 +7,26 @@ import {
     serverError,
     userNotFoundResponse,
 } from '../_helpers'
-
-export interface GetTransactionByUserIdService {
-    execute(userId: string): Promise<any>
-}
+import {
+    GetTransactionsByUserIdService,
+    TransactionRepositoryResponse,
+    HttpResponse,
+    HttpRequest,
+} from '@/shared/types'
 
 export class GetTransactionsByUserIdController {
-    private getTransactionByUserIdService: GetTransactionByUserIdService
+    private getTransactionByUserIdService: GetTransactionsByUserIdService
 
-    constructor(getTransactionByUserIdService: GetTransactionByUserIdService) {
+    constructor(getTransactionByUserIdService: GetTransactionsByUserIdService) {
         this.getTransactionByUserIdService = getTransactionByUserIdService
     }
 
-    async execute(httpRequst: any) {
+    async execute(
+        httpRequest: HttpRequest,
+    ): Promise<HttpResponse<TransactionRepositoryResponse[] | null>> {
         try {
             // para que possamos pegar um valor que é passsado por uma query na url e não como um parametro no body, fazemos assim:
-            const userId = httpRequst.query.userId
+            const userId = httpRequest.query.userId
 
             if (!userId) {
                 return requiredFieldMissingResponse('userId is required')
