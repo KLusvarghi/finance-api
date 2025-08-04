@@ -4,7 +4,7 @@
     "main": "index.js",
     "type": "module",
     "scripts": {
-        "prepare": "npx husky install",
+        "prepare": "npx husky install && npx prisma generate",
         "start:dev": "npx tsx watch index.ts",
         "build": "tsc",
         "migrations": "npm run build && node dist/src/infra/db/postgres/migrations/exec.js",
