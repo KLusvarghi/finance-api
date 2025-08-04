@@ -1,10 +1,17 @@
 import { HttpResponse, HttpRequest } from '@/shared/types'
-import { ok, serverError } from '../_helpers'
+import {
+    checkIfIdIsValid,
+    handleZodValidationError,
+    invalidIdResponse,
+    ok,
+    serverError,
+} from '../_helpers'
 import { updateTransactionSchema } from '@/schemas'
 import {
     UpdateTransactionService,
     TransactionRepositoryResponse,
 } from '@/shared/types'
+import { ZodError } from 'zod'
 
 export class UpdateTransactionController {
     private updateTransactionService: UpdateTransactionService
@@ -19,6 +26,10 @@ export class UpdateTransactionController {
         try {
             const transactionId = httpRequest.params.transactionId
 
+            if (!checkIfIdIsValid(transactionId)) {
+                return invalidIdResponse()
+            }
+
             const params = httpRequest.body
 
             await updateTransactionSchema.parseAsync(params)
@@ -31,6 +42,9 @@ export class UpdateTransactionController {
 
             return ok(updatedTransaction)
         } catch (error) {
+            if (error instanceof ZodError) {
+                return handleZodValidationError(error)
+            }
             console.error(error)
             return serverError()
         }
