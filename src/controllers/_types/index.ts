@@ -1,3 +1,5 @@
+import { TransctionType } from '@prisma/client'
+
 export interface CreateUserParams {
   first_name: string
   last_name: string
@@ -19,5 +21,5 @@ export interface CreateTransactionParamsProps {
   name: string
   amount: number
   date: Date
-  type: string
+  type: TransctionType
 }
