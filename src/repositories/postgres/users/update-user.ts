@@ -6,9 +6,7 @@ export class PostgresUpdateUserRepository {
             where: {
                 id: userId,
             },
-            data: {
-                ...upadetParams,
-            },
+            data: upadetParams,
         })
     }
 }
