@@ -23,7 +23,6 @@ export class PostgresGetUserBalanceRepository {
 
                     _sum: {
                         // somando o campo amount de tudo que voltar do where
-
                         amount: true,
                     },
                 }),
