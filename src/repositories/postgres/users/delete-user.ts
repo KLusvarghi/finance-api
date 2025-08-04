@@ -1,8 +1,8 @@
-import { Prisma } from '@prisma/client'
 import { prisma } from '../../../../prisma/prisma'
+import { UserRepositoryResponse } from '@/shared/types'
 
 export class PostgresDeleteUserRepository {
-    async execute(userId: string): Promise<Prisma.UserGetPayload<{}> | null> {
+    async execute(userId: string): Promise<UserRepositoryResponse | null> {
         const user = await prisma.user.findUnique({
             where: { id: userId },
         })

@@ -1,8 +1,13 @@
+import {
+    CreateTransactionParams,
+    TransactionRepositoryResponse,
+} from '@/shared/types'
 import { prisma } from '../../../../prisma/prisma'
-import { Prisma } from '@prisma/client'
 
 export class PostgresCreateTransactionRepository {
-    async execute(createTransactionParams: Prisma.TransactionCreateInput) {
+    async execute(
+        createTransactionParams: CreateTransactionParams,
+    ): Promise<TransactionRepositoryResponse> {
         return await prisma.transaction.create({
             data: createTransactionParams,
         })
