@@ -158,3 +158,68 @@ export interface UpdateUserServiceParams {
     userId: string
     updateUserParams: UpdateUserParams
 }
+
+// ============================================================================
+// CONTROLLER INTERFACE TYPES
+// ============================================================================
+
+// User Service Interfaces
+export interface CreateUserService {
+    execute(params: CreateUserParams): Promise<UserRepositoryResponse>
+}
+
+export interface GetUserByIdService {
+    execute(userId: string): Promise<UserRepositoryResponse | null>
+}
+
+export interface GetUserBalanceService {
+    execute(
+        params: GetUserBalanceParams,
+    ): Promise<UserBalanceRepositoryResponse>
+}
+
+export interface UpdateUserService {
+    execute(
+        userId: string,
+        params: UpdateUserParams,
+    ): Promise<UserRepositoryResponse | null>
+}
+
+export interface DeleteUserService {
+    execute(userId: string): Promise<UserRepositoryResponse | null>
+}
+
+// Transaction Service Interfaces
+export interface CreateTransactionService {
+    execute(
+        params: CreateTransactionParamsProps,
+    ): Promise<TransactionRepositoryResponse>
+}
+
+export interface GetTransactionsByUserIdService {
+    execute(userId: string): Promise<TransactionRepositoryResponse[] | null>
+}
+
+export interface UpdateTransactionService {
+    execute(
+        transactionId: string,
+        params: UpdateTransactionParams,
+    ): Promise<TransactionRepositoryResponse | null>
+}
+
+export interface DeleteTransactionService {
+    execute(
+        transactionId: string,
+    ): Promise<TransactionRepositoryResponse | null>
+}
+
+// ============================================================================
+// HTTP REQUEST TYPES
+// ============================================================================
+
+export interface HttpRequest {
+    body?: any
+    params?: any
+    query?: any
+    headers?: any
+}
