@@ -15,12 +15,16 @@ const config: Config = {
         '^@/(.*)$': '<rootDir>/src/$1',
     },
 
-    globals: {
-        'ts-jest': {
-            // Aponta pro seu tsconfig e ativa o modo ESM
-            tsconfig: 'tsconfig.json',
-            useESM: true,
-        },
+    // Nova configuração do ts-jest usando transform
+    transform: {
+        '^.+\\.ts$': [
+            'ts-jest',
+            {
+                // Aponta pro seu tsconfig e ativa o modo ESM
+                tsconfig: 'tsconfig.json',
+                useESM: true,
+            },
+        ],
     },
 
     // Onde o Jest deve procurar seus testes
