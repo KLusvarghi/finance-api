@@ -9,7 +9,7 @@ interface User {
     password: string
 }
 
-describe('Create User Controller', () => {
+describe('CreateUserController', () => {
     // STUB
     // para que o teste passe, a classe CreateUserController precisa de um Stub, e o Stub é como se fosse uma classe de mentira que retornará o que a gente definir para ele
     // E um Stub, como nesse caso, irá simular uma classe do nosso service "CreateUserService", ele precisa simular essa classe, sendo o brigado a ter todos os métodos que essa classe tem
@@ -208,6 +208,8 @@ describe('Create User Controller', () => {
         // assert
         expect(result.statusCode).toBe(500)
     })
+
+    // no teste abaixo, a gente não testa de fato, criando um user com um email e testando se o email já existe poruqe isso não é responsabilidade do controller, e sim do service, e apenas testamos o que há no controller, que é o tratamento do erro
 
     it('should return 500 if CreateUserService throws EmailAlreadyExistsError', async () => {
         // arrange
