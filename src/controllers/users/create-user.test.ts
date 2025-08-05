@@ -19,7 +19,7 @@ describe('CreateUserController', () => {
         // e é o mesmo que temos que fazer
         execute(user: User) {
             return Promise.resolve({
-                id: 'any-id',
+                id: faker.string.uuid(),
                 ...user,
             })
         }
