@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "test": "jest",
-        "test:watch": "jest --watch --passWithNoTests",
+        "test:watch": "jest --watch --passWithNoTests --silent",
         "test:coverage": "jest --coverage",
         "prepare": "npx husky install && npx prisma generate",
         "start:dev": "npx tsx watch index.ts",
