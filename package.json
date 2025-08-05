@@ -4,6 +4,9 @@
     "main": "index.js",
     "type": "module",
     "scripts": {
+        "test": "jest",
+        "test:watch": "jest --watch",
+        "test:coverage": "jest --coverage",
         "prepare": "npx husky install && npx prisma generate",
         "start:dev": "npx tsx watch index.ts",
         "build": "tsc"
