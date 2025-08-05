@@ -200,4 +200,35 @@ describe('Create User Controller', () => {
         expect(executeSpy).toHaveBeenCalledWith(httpRequest.body)
         expect(executeSpy).toHaveBeenCalledTimes(1)
     })
+
+    // Vamos testar caso o nosso CreateUserService lançar uma execessão pra gente
+
+    // caso o repository lance um erro, isso gerara um erro para o service e o serivce para o controller, até o momento não tratamos e cairá no controller e gerar um erro da nossa classe "serverError" e quermos testar isso
+    it('should return 500 if CreateUserService throws', async () => {
+        // arrange
+        const createUserService = new CreateUserServiceStub()
+        const createUserController = new CreateUserController(createUserService)
+        const httpRequest = {
+            body: {
+                first_name: faker.person.firstName(),
+                last_name: faker.person.lastName(),
+                email: faker.internet.email(),
+                password: faker.internet.password({ length: 6 }),
+            },
+        }
+        // E para simular esse throw no service, podemos criar outros Stub que gere um erro, ou podemos usar "mocks"
+
+        // iremos monitorar novamente meu método "execute" do nosso service e usaremos o método "mockRejectedValueOnce" que irá mockar / fakear um valor uma vez, e colocamos o que queremos fakear, podendo passar o valor direto ou dentro de uma arrow function. No nosso caso queremos mokar um erro
+        // assim, quando mockamos, estamos sobrescrevendo o que esse método faz apenas um vez
+        // jest.spyOn(createUserService, 'execute').mockRejectedValueOnce(new Error())
+        jest.spyOn(createUserService, 'execute').mockRejectedValueOnce(() => {
+            new Error()
+        })
+
+        // act
+        const result = await createUserController.execute(httpRequest)
+
+        // assert
+        expect(result.statusCode).toBe(500)
+    })
 })
