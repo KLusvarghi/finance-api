@@ -153,7 +153,7 @@ describe('Create User Controller', () => {
         expect(result.body?.message).toBe('Password is required')
     })
     
-    it('should return 400 if Password is not valid', async () => {
+    it('should return 400 if Password is lass than 6 characters', async () => {
       // arrange
       const createUserService = new CreateUserServiceStub()
       const createUserController = new CreateUserController(createUserService)
