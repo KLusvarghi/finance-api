@@ -13,7 +13,8 @@
         "incremental": true,
         "paths": {
             "@/*": ["./src/*"]
-        }
+        },
+        "sourceMap": true       // importante para cobertura e debugging
     },
     "include": ["src/**/*.ts", "index.ts", "src/infra/db/postgres/migrations/exec.ts"],
     "exclude": ["node_modules", "dist"]
