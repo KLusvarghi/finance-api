@@ -25,10 +25,22 @@ describe('Create User Controller', () => {
         }
     }
 
+    // SUT = Suite Under Test
+    // É de boa prática a gente sempre nomear com SUT oque nos estamos testando
+    const makeSut = () => {
+        const createUserService = new CreateUserServiceStub()
+        // como o que queremos testar é o controller, então podemos nomear ele como "sut" afim de ficar mais claro do que estamos testando
+        const sut = new CreateUserController(createUserService)
+
+        return {
+            createUserService,
+            sut,
+        }
+    }
+
     it('should return 201 when creating a new user successfully', async () => {
         // arrange
-        const createUserService = new CreateUserServiceStub()
-        const createUserController = new CreateUserController(createUserService)
+        const { sut } = makeSut()
 
         // como o test precisa criar um user, eu passo para o httpRequest todos os campos que é necessário para criar um user
         const httpRequest = {
@@ -44,7 +56,7 @@ describe('Create User Controller', () => {
         }
 
         // act
-        const result = await createUserController.execute(httpRequest)
+        const result = await sut.execute(httpRequest)
 
         // assert
         expect(result.statusCode).toBe(201)
@@ -65,8 +77,8 @@ describe('Create User Controller', () => {
 
     it('should return 400 if first_name is not provided', async () => {
         // arrange
-        const createUserService = new CreateUserServiceStub()
-        const createUserController = new CreateUserController(createUserService)
+        const { sut } = makeSut()
+
         const httpRequest = {
             body: {
                 last_name: faker.person.lastName,
@@ -76,7 +88,7 @@ describe('Create User Controller', () => {
         }
 
         // act
-        const result = await createUserController.execute(httpRequest)
+        const result = await sut.execute(httpRequest)
 
         // assert
         expect(result.statusCode).toBe(400)
@@ -84,8 +96,8 @@ describe('Create User Controller', () => {
 
     it('should return 400 if last_name is not provided', async () => {
         // arrange
-        const createUserService = new CreateUserServiceStub()
-        const createUserController = new CreateUserController(createUserService)
+        const { sut } = makeSut()
+
         const httpRequest = {
             body: {
                 first_name: faker.person.firstName,
@@ -95,7 +107,7 @@ describe('Create User Controller', () => {
         }
 
         // act
-        const result = await createUserController.execute(httpRequest)
+        const result = await sut.execute(httpRequest)
 
         // assert
         expect(result.statusCode).toBe(400)
@@ -103,8 +115,8 @@ describe('Create User Controller', () => {
 
     it('should return 400 if Email is not provided', async () => {
         // arrange
-        const createUserService = new CreateUserServiceStub()
-        const createUserController = new CreateUserController(createUserService)
+        const { sut } = makeSut()
+
         const httpRequest = {
             body: {
                 first_name: faker.person.firstName,
@@ -114,7 +126,7 @@ describe('Create User Controller', () => {
         }
 
         // act
-        const result = await createUserController.execute(httpRequest)
+        const result = await sut.execute(httpRequest)
 
         // assert
         expect(result.statusCode).toBe(400)
@@ -122,8 +134,8 @@ describe('Create User Controller', () => {
 
     it('should return 400 if Email is not valid', async () => {
         // arrange
-        const createUserService = new CreateUserServiceStub()
-        const createUserController = new CreateUserController(createUserService)
+        const { sut } = makeSut()
+
         const httpRequest = {
             body: {
                 first_name: faker.person.firstName,
@@ -134,7 +146,7 @@ describe('Create User Controller', () => {
         }
 
         // act
-        const result = await createUserController.execute(httpRequest)
+        const result = await sut.execute(httpRequest)
 
         // assert
         expect(result.statusCode).toBe(400)
@@ -161,8 +173,8 @@ describe('Create User Controller', () => {
 
     it('should return 400 if Password is lass than 6 characters', async () => {
         // arrange
-        const createUserService = new CreateUserServiceStub()
-        const createUserController = new CreateUserController(createUserService)
+        const { sut } = makeSut()
+
         const httpRequest = {
             body: {
                 first_name: faker.person.firstName,
@@ -173,7 +185,7 @@ describe('Create User Controller', () => {
         }
 
         // act
-        const result = await createUserController.execute(httpRequest)
+        const result = await sut.execute(httpRequest)
 
         // assert
         expect(result.statusCode).toBe(400)
@@ -181,8 +193,8 @@ describe('Create User Controller', () => {
 
     it('should call CreateUserService with correct params', async () => {
         // arrange
-        const createUserService = new CreateUserServiceStub()
-        const createUserController = new CreateUserController(createUserService)
+        const { sut, createUserService } = makeSut()
+
         const httpRequest = {
             body: {
                 first_name: faker.person.firstName(),
@@ -195,7 +207,7 @@ describe('Create User Controller', () => {
         const executeSpy = jest.spyOn(createUserService, 'execute')
 
         // act
-        const result = await createUserController.execute(httpRequest)
+        await sut.execute(httpRequest)
 
         // assert
         expect(executeSpy).toHaveBeenCalledWith(httpRequest.body)
@@ -207,8 +219,8 @@ describe('Create User Controller', () => {
     // caso o repository lance um erro, isso gerara um erro para o service e o serivce para o controller, até o momento não tratamos e cairá no controller e gerar um erro da nossa classe "serverError" e quermos testar isso
     it('should return 500 if CreateUserService throws', async () => {
         // arrange
-        const createUserService = new CreateUserServiceStub()
-        const createUserController = new CreateUserController(createUserService)
+        const { sut, createUserService } = makeSut()
+
         const httpRequest = {
             body: {
                 first_name: faker.person.firstName(),
@@ -227,7 +239,7 @@ describe('Create User Controller', () => {
         })
 
         // act
-        const result = await createUserController.execute(httpRequest)
+        const result = await sut.execute(httpRequest)
 
         // assert
         expect(result.statusCode).toBe(500)
@@ -235,8 +247,7 @@ describe('Create User Controller', () => {
 
     it('should return 500 if CreateUserService throws EmailAlreadyExistsError', async () => {
         // arrange
-        const createUserService = new CreateUserServiceStub()
-        const createUserController = new CreateUserController(createUserService)
+        const { sut, createUserService } = makeSut()
         const httpRequest = {
             body: {
                 first_name: faker.person.firstName(),
@@ -251,7 +262,7 @@ describe('Create User Controller', () => {
         )
 
         // act
-        const result = await createUserController.execute(httpRequest)
+        const result = await sut.execute(httpRequest)
 
         // assert
         expect(result.statusCode).toBe(400)
