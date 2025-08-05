@@ -50,6 +50,8 @@ describe('Create User Controller', () => {
         // quando queremos esperar que algo não seja, usamos o "not"
         expect(result.body).not.toBeUndefined()
         expect(result.body).not.toBeNull()
+        // comparando dois objetos = usar toEqual
+        expect(result.body).toEqual(httpRequest.body)
     })
 
     it('should return 400 if first_name is not provided', async () => {
@@ -173,4 +175,29 @@ describe('Create User Controller', () => {
       expect(result.statusCode).toBe(400)
       expect(result.body?.message).toBe('Password must have at least 6 characters')
   })
+
+  it('should call CreateUserService with correct params', async () =>{
+    // arrange
+    const createUserService = new CreateUserServiceStub()
+    const createUserController = new CreateUserController(createUserService)
+    const httpRequest = {
+        body: {
+            first_name: 'kaua',
+            last_name: 'lusvarghi',
+            email: 'kaua@gmail.com',
+            password: '123',
+        },
+    }
+
+    const executeSpy = jest.spyOn(createUserService, 'execute')
+
+    // act
+    const result = await createUserController.execute(httpRequest)
+
+    // assert
+    expect(executeSpy).toHaveBeenCalledWith(httpRequest.body)
+    expect(executeSpy).toHaveBeenCalledTimes(1)
+
+  })
+  
 })
