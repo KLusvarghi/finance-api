@@ -1,3 +1,4 @@
+import { EmailAlreadyExistsError } from '@/errors/user'
 import { CreateUserController } from './create-user'
 import { faker } from '@faker-js/faker'
 
@@ -230,5 +231,32 @@ describe('Create User Controller', () => {
 
         // assert
         expect(result.statusCode).toBe(500)
+    })
+
+    it('should return 500 if CreateUserService throws EmailAlreadyExistsError', async () => {
+        // arrange
+        const createUserService = new CreateUserServiceStub()
+        const createUserController = new CreateUserController(createUserService)
+        const httpRequest = {
+            body: {
+                first_name: faker.person.firstName(),
+                last_name: faker.person.lastName(),
+                email: faker.internet.email(),
+                password: faker.internet.password({ length: 6 }),
+            },
+        }
+
+        jest.spyOn(createUserService, 'execute').mockRejectedValueOnce(
+            new EmailAlreadyExistsError(httpRequest.body.email),
+        )
+
+        // act
+        const result = await createUserController.execute(httpRequest)
+
+        // assert
+        expect(result.statusCode).toBe(400)
+        expect(result.body?.message).toBe(
+            `The e-mail ${httpRequest.body.email} is already in use.`,
+        )
     })
 })
