@@ -11,11 +11,11 @@ export const createUserSchema = z.object({
         }),
     last_name: z
         .string({
-            message: 'Last name must have at least 6 characters',
+            message: 'Last name is required',
         })
         .trim()
         .min(2, {
-            message: 'Email is required',
+            message: 'Last name must have at least 6 characters',
         }),
     email: z
         .string({
@@ -26,9 +26,14 @@ export const createUserSchema = z.object({
         })
         .trim()
         .min(2),
-    password: z.string().trim().min(6, {
-        message: 'Password must have at least 6 characters',
-    }),
+    password: z
+        .string({
+            message: 'Password is required',
+        })
+        .trim()
+        .min(6, {
+            message: 'Password must have at least 6 characters',
+        }),
 })
 
 // o partial assim a gente atribui o que tem no schema e deixamos ele opcional
