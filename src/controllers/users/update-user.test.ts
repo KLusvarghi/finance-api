@@ -106,19 +106,34 @@ describe('UpdateUserController', () => {
     })
 
     it('should return 400 when an aloowed field is provided', async () => {
-      // arrange
-      const { sut } = makeSut()
+        // arrange
+        const { sut } = makeSut()
 
-      // act
-      const result = await sut.execute({
-          ...httpRequest,
-          body: {
-            ...httpRequest.body,
-            anallowed_field: 'anallowed_field'
-          },
-      })
+        // act
+        const result = await sut.execute({
+            ...httpRequest,
+            body: {
+                ...httpRequest.body,
+                anallowed_field: 'anallowed_field',
+            },
+        })
 
-      // asset
-      expect(result.statusCode).toBe(400)
-  })
+        // asset
+        expect(result.statusCode).toBe(400)
+    })
+
+    // testando um erro generico
+    it('should return 400 when an aloowed field is provided', async () => {
+        // arrange
+        const { sut, updateUserService } = makeSut()
+        jest.spyOn(updateUserService, 'execute').mockRejectedValueOnce(
+            new Error(),
+        )
+
+        // act
+        const result = await sut.execute(httpRequest)
+
+        // asset
+        expect(result.statusCode).toBe(500)
+    })
 })
