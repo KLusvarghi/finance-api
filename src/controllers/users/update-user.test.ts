@@ -71,6 +71,41 @@ describe('UpdateUserController', () => {
     })
 
     it('should return 400 when an invalid password is provided', async () => {
+        // arrange
+        const { sut } = makeSut()
+
+        // act
+        const result = await sut.execute({
+            ...httpRequest,
+            body: {
+                ...httpRequest.body,
+                password: faker.internet.password({
+                    length: 5,
+                }),
+            },
+        })
+
+        // asset
+        expect(result.statusCode).toBe(400)
+    })
+
+    it('should return 400 when an invalid id is provided', async () => {
+        // arrange
+        const { sut } = makeSut()
+
+        // act
+        const result = await sut.execute({
+            params: {
+                userId: 'invalid_id',
+            },
+            body: httpRequest.body,
+        })
+
+        // asset
+        expect(result.statusCode).toBe(400)
+    })
+
+    it('should return 400 when an aloowed field is provided', async () => {
       // arrange
       const { sut } = makeSut()
 
@@ -78,32 +113,12 @@ describe('UpdateUserController', () => {
       const result = await sut.execute({
           ...httpRequest,
           body: {
-              ...httpRequest.body,
-              password: faker.internet.password({
-                length: 5,
-            }),
+            ...httpRequest.body,
+            anallowed_field: 'anallowed_field'
           },
       })
 
       // asset
       expect(result.statusCode).toBe(400)
   })
-
-  it('should return 400 when an invalid id is provided', async () => {
-    // arrange
-    const { sut } = makeSut()
-
-    // act
-    const result = await sut.execute({
-        params: {
-          userId: 'invalid_id',
-        },
-        body: httpRequest.body
-    })
-
-    // asset
-    expect(result.statusCode).toBe(400)
-})
-
-
 })
