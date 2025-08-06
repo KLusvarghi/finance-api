@@ -11,7 +11,6 @@ import { ZodError } from 'zod'
 import { updateUserSchema } from '@/schemas'
 import {
     UpdateUserService,
-    UpdateUserParams,
     UserRepositoryResponse,
     HttpResponse,
     HttpRequest,

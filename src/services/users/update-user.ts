@@ -36,9 +36,7 @@ export class UpdateUserService {
             }
         }
 
-        const user = {
-            ...updateUserParams,
-        }
+        const user = {...updateUserParams }
 
         // 2. se a senha estiver sendo atualizado, criptogra-lá
         if (updateUserParams.password) {
