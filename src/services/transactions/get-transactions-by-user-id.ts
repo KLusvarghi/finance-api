@@ -23,7 +23,7 @@ export class GetTransactionsByUserIdService {
         const user = await this.getUserByIdRepository.execute(userId)
 
         if (!user) {
-            throw new UserNotFoundError()
+            throw new UserNotFoundError(userId)
         }
 
         const transaction =

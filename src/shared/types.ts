@@ -25,7 +25,7 @@ export type TransactionRepositoryResponse = Prisma.TransactionGetPayload<{}>
 
 // Custom Repository Responses
 export interface UserBalanceRepositoryResponse {
-    earning: Prisma.Decimal | number
+    earnings: Prisma.Decimal | number
     expenses: Prisma.Decimal | number
     investments: Prisma.Decimal | number
     balance: Prisma.Decimal
