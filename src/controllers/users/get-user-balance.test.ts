@@ -8,7 +8,7 @@ import { GetUserBalanceController } from './get-user-balance'
 import { Prisma } from '@prisma/client'
 
 describe('GetUserBalanceController', () => {
-    class GetUserBalanceServiceStub implements GetUserBalanceService {
+    class GetUserBalanceServiceStub {
         execute() // params: GetUserBalanceParams,
         : Promise<UserBalanceRepositoryResponse> {
             return Promise.resolve({
@@ -49,9 +49,40 @@ describe('GetUserBalanceController', () => {
         const { sut } = makeSut()
 
         // act
-        const result = await sut.execute({params: {userId: 'invalid_id'}}) 
+        const result = await sut.execute({ params: { userId: 'invalid_id' } })
 
         // assert
         expect(result.statusCode).toBe(400)
+    })
+
+    it('should return 500 if GetUserBalanceService throws', async () => {
+        // arrange
+        const { sut, getUserBalanceService } = makeSut()
+        
+        // quando eu rejeito uma promisse, ele automaticamente está rejeitando, por isso não preciso instanciar o error e passar dentro de uma arrow function
+        jest.spyOn(getUserBalanceService, 'execute').mockRejectedValueOnce
+        (new Error())
+
+
+        // ambos acabam executando a mesma coisa, porém, usando o "mockImplementationOnce" é preciso instanciar o error e ser passado dentro de uma arrow function
+
+        // jest.spyOn(getUserBalanceService, 'execute').mockImplementationOnce(
+        //     () => {
+        //         throw new Error()
+        //     },
+        // )
+
+        // o código abaixo é o mesmo que o de cima, porém, é mais simples e direto
+        // ()=> Promise.reject(new Error()) 
+
+
+        // act
+    
+
+        // act
+        const result = await sut.execute(httpRequest)
+
+        // assert
+        expect(result.statusCode).toBe(500)
     })
 })
