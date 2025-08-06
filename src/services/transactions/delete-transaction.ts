@@ -1,3 +1,4 @@
+import { TransactionNotFoundError } from '@/errors/user'
 import {
     DeleteTransactionRepository,
     TransactionRepositoryResponse,
@@ -12,9 +13,14 @@ export class DeleteTransactionService {
 
     async execute(
         transactionId: string,
-    ): Promise<TransactionRepositoryResponse | null> {
+    ): Promise<TransactionRepositoryResponse> {
         const transactionDeleted =
             await this.deleteTransactionRepository.execute(transactionId)
+
+        if (!transactionDeleted) {
+            throw new TransactionNotFoundError(transactionId)
+        }
+
         return transactionDeleted
     }
 }
