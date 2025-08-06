@@ -1,6 +1,6 @@
 import isUUID from 'validator/lib/isUUID'
 import isEmpty from 'validator/lib/isEmpty'
-import { badRequest, notFound } from './http'
+import { badRequest } from './http'
 import { ZodError } from 'zod'
 
 export const checkIfIdIsValid = (id: string) => isUUID(id)
