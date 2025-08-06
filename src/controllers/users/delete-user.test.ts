@@ -65,7 +65,7 @@ describe('DeleteUserController', () => {
 
         // assert
         expect(result.statusCode).toBe(404)
-        // expect(result.body?.message).toEqual("User not found.")
+        // expect(result.body?.message).toBe("User not found.")
     })
 
     it('should return 500 if DeleteUserService throws', async () => {
@@ -82,6 +82,6 @@ describe('DeleteUserController', () => {
 
         // assert
         expect(result.statusCode).toBe(500)
-        // expect(result.body?.message).toEqual("User not found.")
+        // expect(result.body?.message).toBe("User not found.")
     })
 })
