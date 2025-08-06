@@ -30,7 +30,7 @@ describe('UpdateUserController', () => {
 
     const httpRequest = {
         params: {
-          userId: faker.string.uuid(),
+            userId: faker.string.uuid(),
         },
         body: {
             first_name: faker.person.firstName(),
@@ -52,4 +52,23 @@ describe('UpdateUserController', () => {
         // asset
         expect(result.statusCode).toBe(200)
     })
+
+    it('should return 400 when a n invalid email is provided', async () => {
+        // arrange
+        const { sut } = makeSut()
+
+        // act
+        const result = await sut.execute({
+            ...httpRequest,
+            body: {
+                ...httpRequest.body,
+                email: 'invalid_email',
+            },
+        })
+
+        // asset
+        expect(result.statusCode).toBe(400)
+    })
+
+    
 })
