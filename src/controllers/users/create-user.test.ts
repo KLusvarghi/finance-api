@@ -218,6 +218,10 @@ describe('CreateUserController', () => {
         jest.spyOn(createUserService, 'execute').mockRejectedValueOnce(
             new EmailAlreadyExistsError(httpRequest.body.email),
         )
+        // jest.spyOn(createUserService, 'execute').mockImplementationOnce(() =>
+        //     Promise.reject(
+        //     new EmailAlreadyExistsError(httpRequest.body.email))
+        // )
 
         // act
         const result = await sut.execute(httpRequest)
