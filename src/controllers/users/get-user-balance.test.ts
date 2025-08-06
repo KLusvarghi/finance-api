@@ -9,9 +9,8 @@ import { Prisma } from '@prisma/client'
 
 describe('GetUserBalanceController', () => {
     class GetUserBalanceServiceStub implements GetUserBalanceService {
-        execute(
-            // params: GetUserBalanceParams,
-        ): Promise<UserBalanceRepositoryResponse> {
+        execute() // params: GetUserBalanceParams,
+        : Promise<UserBalanceRepositoryResponse> {
             return Promise.resolve({
                 earnings: faker.number.float(),
                 expenses: faker.number.float(),
@@ -43,5 +42,16 @@ describe('GetUserBalanceController', () => {
 
         // assert
         expect(result.statusCode).toBe(200)
+    })
+
+    it('should return 404 when userId is invalid', async () => {
+        // arrange
+        const { sut } = makeSut()
+
+        // act
+        const result = await sut.execute({params: {userId: 'invalid_id'}}) 
+
+        // assert
+        expect(result.statusCode).toBe(400)
     })
 })
