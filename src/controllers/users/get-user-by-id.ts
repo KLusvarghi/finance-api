@@ -11,6 +11,7 @@ import {
     userNotFoundResponse,
     userBadRequestResponse,
 } from '../_helpers/index'
+import { UserNotFoundError } from '@/errors/user'
 
 export class GetUserByIdController {
     private getUserByIdService: GetUserByIdService
@@ -34,13 +35,14 @@ export class GetUserByIdController {
 
             const user = await this.getUserByIdService.execute(userId)
 
-            if (!user) {
-                return userNotFoundResponse()
-            }
-
             return ok(user)
         } catch (error) {
             console.error(error)
+
+            if (error instanceof UserNotFoundError) {
+                return userNotFoundResponse()
+            }
+
             return serverError()
         }
     }
