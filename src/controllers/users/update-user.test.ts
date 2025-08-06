@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { UpdateUserController } from './update-user'
 import { UpdateUserParams, UserRepositoryResponse } from '@/shared'
+import { EmailAlreadyExistsError } from '@/errors/user'
 
 describe('UpdateUserController', () => {
     class UpdateUserServiceStub {
@@ -123,7 +124,7 @@ describe('UpdateUserController', () => {
     })
 
     // testando um erro generico
-    it('should return 400 when an aloowed field is provided', async () => {
+    it('should return 500 when updateUserService throws a generic error', async () => {
         // arrange
         const { sut, updateUserService } = makeSut()
         jest.spyOn(updateUserService, 'execute').mockRejectedValueOnce(
@@ -136,4 +137,19 @@ describe('UpdateUserController', () => {
         // asset
         expect(result.statusCode).toBe(500)
     })
+
+    // simulando um erro de email já existente
+    it('should return 400 when updateUserService throws EmailAlreadyExistsError', async () => {
+      // arrange
+      const { sut, updateUserService } = makeSut()
+      jest.spyOn(updateUserService, 'execute').mockRejectedValueOnce(
+          new EmailAlreadyExistsError(faker.internet.email()),
+      )
+
+      // act
+      const result = await sut.execute(httpRequest)
+
+      // asset
+      expect(result.statusCode).toBe(400)
+  })
 })
