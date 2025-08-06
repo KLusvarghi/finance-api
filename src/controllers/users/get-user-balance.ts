@@ -22,7 +22,9 @@ export class GetUserBalanceController {
 
     async execute(
         httpRequest: HttpRequest,
-    ): Promise<HttpResponse<UserBalanceRepositoryResponse>> {
+    ): Promise<
+        HttpResponse<UserBalanceRepositoryResponse | UserNotFoundError>
+    > {
         try {
             const userId = httpRequest.params.userId
 
