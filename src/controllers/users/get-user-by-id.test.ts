@@ -1,6 +1,7 @@
 import { HttpResponse, UserRepositoryResponse } from '@/shared'
 import { faker } from '@faker-js/faker'
 import { GetUserByIdController } from './get-user-by-id'
+import { UserNotFoundError } from '@/errors/user'
 
 describe('GetUserByIdController', () => {
     class GetUserByIdServiceStub {
@@ -26,14 +27,14 @@ describe('GetUserByIdController', () => {
     }
 
     const httpRequest = {
-      params: {
-        userId: faker.string.uuid()
-      }
+        params: {
+            userId: faker.string.uuid(),
+        },
     }
 
     it('should return 200 if user is found', async () => {
         // arrange
-        const {sut} = makeSut()
+        const { sut } = makeSut()
 
         // act
         const result = await sut.execute(httpRequest)
@@ -43,35 +44,39 @@ describe('GetUserByIdController', () => {
     })
 
     it('should return 404 if userId is not provided', async () => {
-       // arrange
-       const {sut} = makeSut()
+        // arrange
+        const { sut } = makeSut()
 
-       // act
-       const result = await sut.execute({params: {userId: ''}})
+        // act
+        const result = await sut.execute({ params: { userId: '' } })
 
-       // assert
-       expect(result.statusCode).toBe(404)
+        // assert
+        expect(result.statusCode).toBe(404)
     })
 
     it('should return 400 if userId is invalid', async () => {
-      // arrange
-      const {sut} = makeSut()
+        // arrange
+        const { sut } = makeSut()
 
-      // act
-      const result = await sut.execute({params: {userId: 'invaid_id'}})
+        // act
+        const result = await sut.execute({ params: { userId: 'invaid_id' } })
 
-      // assert
-      expect(result.statusCode).toBe(400)
-   })
+        // assert
+        expect(result.statusCode).toBe(400)
+    })
 
-   it('should return 400 if userId is invalid', async () => {
-    // arrange
-    const {sut} = makeSut()
+    it('should return 404 if user is not found', async () => {
+        // arrange
+        const { sut, getUserByIdService } = makeSut()
+        
+        // simulando que o service lance um UserNotFoundError quando não encontra o usuário
+        jest.spyOn(getUserByIdService, 'execute').mockRejectedValue(
+            new UserNotFoundError(httpRequest.params.userId),
+        )
+        // act
+        const result = await sut.execute(httpRequest)
 
-    // act
-    const result = await sut.execute({params: {userId: 'invaid_id'}})
-
-    // assert
-    expect(result.statusCode).toBe(400)
- })
+        // assert
+        expect(result.statusCode).toBe(404)
+    })
 })
