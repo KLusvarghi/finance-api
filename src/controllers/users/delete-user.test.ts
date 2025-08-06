@@ -67,4 +67,21 @@ describe('DeleteUserController', () => {
         expect(result.statusCode).toBe(404)
         // expect(result.body?.message).toEqual("User not found.")
     })
+
+    it('should return 500 if DeleteUserService throws', async () => {
+        // arrange
+        const { sut, deleteUserService } = makeSut()
+
+        // mocando para que ele retrone null
+        jest.spyOn(deleteUserService, 'execute').mockRejectedValueOnce(() => {
+            new Error()
+        })
+
+        // act
+        const result = await sut.execute(httpRequest)
+
+        // assert
+        expect(result.statusCode).toBe(500)
+        // expect(result.body?.message).toEqual("User not found.")
+    })
 })
