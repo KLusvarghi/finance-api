@@ -5,14 +5,13 @@ import {
 } from '@/shared'
 import { faker } from '@faker-js/faker'
 import { GetUserBalanceController } from './get-user-balance'
-import { UserNotFoundError } from '@/errors/user'
 import { Prisma } from '@prisma/client'
 
 describe('GetUserBalanceController', () => {
     class GetUserBalanceServiceStub implements GetUserBalanceService {
         execute(
             // params: GetUserBalanceParams,
-        ): Promise<UserBalanceRepositoryResponse | UserNotFoundError> {
+        ): Promise<UserBalanceRepositoryResponse> {
             return Promise.resolve({
                 earnings: faker.number.float(),
                 expenses: faker.number.float(),
