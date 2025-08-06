@@ -169,7 +169,7 @@ export interface CreateUserService {
 }
 
 export interface GetUserByIdService {
-    execute(userId: string): Promise<UserRepositoryResponse | null>
+    execute(userId: string): Promise<UserRepositoryResponse>
 }
 
 export interface GetUserBalanceService {
