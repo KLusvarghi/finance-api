@@ -140,16 +140,16 @@ describe('UpdateUserController', () => {
 
     // simulando um erro de email já existente
     it('should return 400 when updateUserService throws EmailAlreadyExistsError', async () => {
-      // arrange
-      const { sut, updateUserService } = makeSut()
-      jest.spyOn(updateUserService, 'execute').mockRejectedValueOnce(
-          new EmailAlreadyExistsError(faker.internet.email()),
-      )
+        // arrange
+        const { sut, updateUserService } = makeSut()
+        jest.spyOn(updateUserService, 'execute').mockRejectedValueOnce(
+            new EmailAlreadyExistsError(faker.internet.email()),
+        )
 
-      // act
-      const result = await sut.execute(httpRequest)
+        // act
+        const result = await sut.execute(httpRequest)
 
-      // asset
-      expect(result.statusCode).toBe(400)
-  })
+        // asset
+        expect(result.statusCode).toBe(400)
+    })
 })
