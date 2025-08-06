@@ -33,7 +33,7 @@ describe('GetUserBalanceController', () => {
         },
     }
 
-    it('should return 200 when user getting balance', async () => {
+    it('should return 200 when getting user balance successfully', async () => {
         // arrange
         const { sut } = makeSut()
 
@@ -44,7 +44,7 @@ describe('GetUserBalanceController', () => {
         expect(result.statusCode).toBe(200)
     })
 
-    it('should return 404 when userId is invalid', async () => {
+    it('should return 400 when userId is invalid', async () => {
         // arrange
         const { sut } = makeSut()
 
@@ -58,11 +58,11 @@ describe('GetUserBalanceController', () => {
     it('should return 500 if GetUserBalanceService throws', async () => {
         // arrange
         const { sut, getUserBalanceService } = makeSut()
-        
-        // quando eu rejeito uma promisse, ele automaticamente está rejeitando, por isso não preciso instanciar o error e passar dentro de uma arrow function
-        jest.spyOn(getUserBalanceService, 'execute').mockRejectedValueOnce
-        (new Error())
 
+        // quando eu rejeito uma promisse, ele automaticamente está rejeitando, por isso não preciso instanciar o error e passar dentro de uma arrow function
+        jest.spyOn(getUserBalanceService, 'execute').mockRejectedValueOnce(
+            new Error(),
+        )
 
         // ambos acabam executando a mesma coisa, porém, usando o "mockImplementationOnce" é preciso instanciar o error e ser passado dentro de uma arrow function
 
@@ -73,8 +73,7 @@ describe('GetUserBalanceController', () => {
         // )
 
         // o código abaixo é o mesmo que o de cima, porém, é mais simples e direto
-        // ()=> Promise.reject(new Error()) 
-
+        // ()=> Promise.reject(new Error())
 
         // act
         const result = await sut.execute(httpRequest)

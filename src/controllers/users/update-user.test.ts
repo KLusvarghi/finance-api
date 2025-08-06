@@ -43,18 +43,18 @@ describe('UpdateUserController', () => {
         },
     }
 
-    it('should return 200 when updating a user successfully', async () => {
+    it('should return 200 when updating user successfully', async () => {
         // arrange
         const { sut } = makeSut()
 
         // act
         const result = await sut.execute(httpRequest)
 
-        // asset
+        // assert
         expect(result.statusCode).toBe(200)
     })
 
-    it('should return 400 when an invalid email is provided', async () => {
+    it('should return 400 when invalid email is provided', async () => {
         // arrange
         const { sut } = makeSut()
 
@@ -67,11 +67,11 @@ describe('UpdateUserController', () => {
             },
         })
 
-        // asset
+        // assert
         expect(result.statusCode).toBe(400)
     })
 
-    it('should return 400 when an invalid password is provided', async () => {
+    it('should return 400 when invalid password is provided', async () => {
         // arrange
         const { sut } = makeSut()
 
@@ -86,11 +86,11 @@ describe('UpdateUserController', () => {
             },
         })
 
-        // asset
+        // assert
         expect(result.statusCode).toBe(400)
     })
 
-    it('should return 400 when an invalid id is provided', async () => {
+    it('should return 400 when invalid userId is provided', async () => {
         // arrange
         const { sut } = makeSut()
 
@@ -102,11 +102,11 @@ describe('UpdateUserController', () => {
             body: httpRequest.body,
         })
 
-        // asset
+        // assert
         expect(result.statusCode).toBe(400)
     })
 
-    it('should return 400 when an aloowed field is provided', async () => {
+    it('should return 400 when disallowed field is provided', async () => {
         // arrange
         const { sut } = makeSut()
 
@@ -115,16 +115,16 @@ describe('UpdateUserController', () => {
             ...httpRequest,
             body: {
                 ...httpRequest.body,
-                anallowed_field: 'anallowed_field',
+                disallowed_field: 'disallowed_field',
             },
         })
 
-        // asset
+        // assert
         expect(result.statusCode).toBe(400)
     })
 
     // testando um erro generico
-    it('should return 500 when updateUserService throws a generic error', async () => {
+    it('should return 500 when UpdateUserService throws generic error', async () => {
         // arrange
         const { sut, updateUserService } = makeSut()
         jest.spyOn(updateUserService, 'execute').mockRejectedValueOnce(
@@ -134,12 +134,12 @@ describe('UpdateUserController', () => {
         // act
         const result = await sut.execute(httpRequest)
 
-        // asset
+        // assert
         expect(result.statusCode).toBe(500)
     })
 
     // simulando um erro de email já existente
-    it('should return 400 when updateUserService throws EmailAlreadyExistsError', async () => {
+    it('should return 400 when UpdateUserService throws EmailAlreadyExistsError', async () => {
         // arrange
         const { sut, updateUserService } = makeSut()
         jest.spyOn(updateUserService, 'execute').mockRejectedValueOnce(
@@ -149,7 +149,7 @@ describe('UpdateUserController', () => {
         // act
         const result = await sut.execute(httpRequest)
 
-        // asset
+        // assert
         expect(result.statusCode).toBe(400)
     })
 })

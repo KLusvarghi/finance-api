@@ -109,7 +109,7 @@ describe('CreateUserController', () => {
         expect(result.statusCode).toBe(400)
     })
 
-    it('should return 400 if Email is not provided', async () => {
+    it('should return 400 if email is not provided', async () => {
         // arrange
         const { sut } = makeSut()
 
@@ -117,7 +117,7 @@ describe('CreateUserController', () => {
         const result = await sut.execute({
             body: {
                 ...httpRequest.body,
-                last_name: undefined,
+                email: undefined,
             },
         })
 
@@ -125,7 +125,7 @@ describe('CreateUserController', () => {
         expect(result.statusCode).toBe(400)
     })
 
-    it('should return 400 if Email is not valid', async () => {
+    it('should return 400 if email is not valid', async () => {
         // arrange
         const { sut } = makeSut()
 
@@ -141,7 +141,7 @@ describe('CreateUserController', () => {
         expect(result.statusCode).toBe(400)
     })
 
-    it('should return 400 if Password is not provided', async () => {
+    it('should return 400 if password is not provided', async () => {
         // arrange
         const { sut } = makeSut()
 
@@ -157,7 +157,7 @@ describe('CreateUserController', () => {
         expect(result.statusCode).toBe(400)
     })
 
-    it('should return 400 if Password is lass than 6 characters', async () => {
+    it('should return 400 if password is less than 6 characters', async () => {
         // arrange
         const { sut } = makeSut()
 
@@ -173,7 +173,7 @@ describe('CreateUserController', () => {
         expect(result.statusCode).toBe(400)
     })
 
-    it('should call CreateUserService with correct params', async () => {
+    it('should call CreateUserService with correct parameters', async () => {
         // arrange
         const { sut, createUserService } = makeSut()
         const executeSpy = jest.spyOn(createUserService, 'execute')
@@ -211,7 +211,7 @@ describe('CreateUserController', () => {
 
     // no teste abaixo, a gente não testa de fato, criando um user com um email e testando se o email já existe poruqe isso não é responsabilidade do controller, e sim do service, e apenas testamos o que há no controller, que é o tratamento do erro
 
-    it('should return 500 if CreateUserService throws EmailAlreadyExistsError', async () => {
+    it('should return 400 if CreateUserService throws EmailAlreadyExistsError', async () => {
         // arrange
         const { sut, createUserService } = makeSut()
 

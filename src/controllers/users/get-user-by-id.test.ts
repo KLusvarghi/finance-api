@@ -32,7 +32,7 @@ describe('GetUserByIdController', () => {
         },
     }
 
-    it('should return 200 if user is found', async () => {
+    it('should return 200 if user is found successfully', async () => {
         // arrange
         const { sut } = makeSut()
 
@@ -59,7 +59,7 @@ describe('GetUserByIdController', () => {
         const { sut } = makeSut()
 
         // act
-        const result = await sut.execute({ params: { userId: 'invaid_id' } })
+        const result = await sut.execute({ params: { userId: 'invalid_id' } })
 
         // assert
         expect(result.statusCode).toBe(400)
@@ -68,7 +68,7 @@ describe('GetUserByIdController', () => {
     it('should return 404 if user is not found', async () => {
         // arrange
         const { sut, getUserByIdService } = makeSut()
-        
+
         // simulando que o service lance um UserNotFoundError quando não encontra o usuário
         jest.spyOn(getUserByIdService, 'execute').mockRejectedValue(
             new UserNotFoundError(httpRequest.params.userId),
@@ -81,15 +81,15 @@ describe('GetUserByIdController', () => {
     })
 
     it('should return 500 if GetUserByIdService throws an error', async () => {
-      // arrange
-      const {sut, getUserByIdService} = makeSut()
-      // precisamos mockar o retorno de execute de forma que seja rejeitada
-      jest.spyOn(getUserByIdService, 'execute').mockRejectedValue(new Error())
-      
-      // act
-      const result = await sut.execute(httpRequest)
+        // arrange
+        const { sut, getUserByIdService } = makeSut()
+        // precisamos mockar o retorno de execute de forma que seja rejeitada
+        jest.spyOn(getUserByIdService, 'execute').mockRejectedValue(new Error())
 
-      // assert
-      expect(result.statusCode).toBe(500)
+        // act
+        const result = await sut.execute(httpRequest)
+
+        // assert
+        expect(result.statusCode).toBe(500)
     })
 })

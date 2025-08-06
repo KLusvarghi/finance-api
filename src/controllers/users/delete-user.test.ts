@@ -28,7 +28,7 @@ describe('DeleteUserController', () => {
         return { deleteUserService, sut }
     }
 
-    it('should return 200 if user is deleted', async () => {
+    it('should return 200 if user is deleted successfully', async () => {
         // arrange
         const { sut } = makeSut()
 
@@ -50,7 +50,7 @@ describe('DeleteUserController', () => {
         expect(result.statusCode).toBe(400)
     })
 
-    it('should return 400 if user not found', async () => {
+    it('should return 404 if user is not found', async () => {
         // arrange
         const { sut, deleteUserService } = makeSut()
 
