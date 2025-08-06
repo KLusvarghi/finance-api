@@ -15,14 +15,14 @@ export class UpdateTransactionService {
     async execute(
         transactionId: string,
         params: UpdateTransactionParams,
-    ): Promise<TransactionRepositoryResponse | null> {
+    ): Promise<TransactionRepositoryResponse> {
         const transaction = await this.updateTransactionRepository.execute(
             transactionId,
             params,
         )
 
         if (!transaction) {
-            throw new TransactionNotFoundError()
+            throw new TransactionNotFoundError(transactionId)
         }
 
         return transaction
