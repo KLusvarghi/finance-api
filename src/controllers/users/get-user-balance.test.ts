@@ -77,9 +77,6 @@ describe('GetUserBalanceController', () => {
 
 
         // act
-    
-
-        // act
         const result = await sut.execute(httpRequest)
 
         // assert
