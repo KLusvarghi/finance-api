@@ -37,6 +37,10 @@ describe('DeleteUserController', () => {
 
         // assert
         expect(result.statusCode).toBe(200)
+        // Validação do body de sucesso para deleção
+        expect(result.body?.status).toBe('success')
+        expect(result.body?.message).toBeTruthy() // Ex: "Success" ou "User deleted successfully"
+        expect(result.body?.data).toBeTruthy() // Deve conter os dados do usuário deletado
     })
 
     it('should return 400 if userId is invalid', async () => {
@@ -48,6 +52,10 @@ describe('DeleteUserController', () => {
 
         // assert
         expect(result.statusCode).toBe(400)
+        // Validação do body de erro para UUID inválido
+        expect(result.body?.status).toBe('error')
+        expect(result.body?.message).toBeTruthy()
+        // Poderia ser mais específico: expect(result.body?.message).toContain('invalid')
     })
 
     it('should return 404 if user is not found', async () => {
@@ -65,7 +73,11 @@ describe('DeleteUserController', () => {
 
         // assert
         expect(result.statusCode).toBe(404)
+        // Validação do body de erro para usuário não encontrado
+        expect(result.body?.status).toBe('error')
+        expect(result.body?.message).toBeTruthy()
         // expect(result.body?.message).toBe("User not found.")
+        // Poderia ser mais específico: expect(result.body?.message).toContain('not found')
     })
 
     it('should return 500 if DeleteUserService throws', async () => {
@@ -82,6 +94,10 @@ describe('DeleteUserController', () => {
 
         // assert
         expect(result.statusCode).toBe(500)
+        // Validação do body de erro para erros internos do servidor
+        expect(result.body?.status).toBe('error')
+        expect(result.body?.message).toBeTruthy()
         // expect(result.body?.message).toBe("User not found.")
+        // Mensagem padrão seria: "Internal server error"
     })
 })
