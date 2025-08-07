@@ -1,5 +1,8 @@
 import { UserNotFoundError } from '@/errors/user'
-import { GetUserByIdRepository, UserRepositoryResponse } from '@/shared/types'
+import {
+    GetUserByIdRepository,
+    UserPublicResponse,
+} from '@/shared/types'
 
 export class GetUserByIdService {
     private getUserByIdRepository: GetUserByIdRepository
@@ -8,13 +11,14 @@ export class GetUserByIdService {
         this.getUserByIdRepository = getUserByIdRepository
     }
 
-    async execute(userId: string): Promise<UserRepositoryResponse> {
+    async execute(userId: string): Promise<UserPublicResponse> {
         const user = await this.getUserByIdRepository.execute(userId)
 
         if (!user) {
             throw new UserNotFoundError(userId)
         }
 
-        return user
+        const { password, ...userWithoutPassword } = user
+        return userWithoutPassword
     }
 }

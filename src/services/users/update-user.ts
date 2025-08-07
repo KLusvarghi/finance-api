@@ -1,4 +1,4 @@
-import { EmailAlreadyExistsError } from '@/errors/user'
+import { EmailAlreadyExistsError, UpdateUserFailedError, UserNotFoundError } from '@/errors/user'
 import bcrypt from 'bcrypt'
 import {
     UpdateUserParams,
@@ -23,6 +23,14 @@ export class UpdateUserService {
         userId: string,
         updateUserParams: UpdateUserParams,
     ): Promise<UserRepositoryResponse | null> {
+        const hasUserWithProvidedEMail = await this.getUserByEmailRepository.execute(
+            updateUserParams.email!,
+        )
+
+        if (!hasUserWithProvidedEMail) {
+            throw new UserNotFoundError(userId)
+        }
+
         // 1. se o email estiver sendo atualizado, verificar se já está em uso
         if (updateUserParams.email) {
             const userWithProviderEmail =
@@ -36,7 +44,7 @@ export class UpdateUserService {
             }
         }
 
-        const user = {...updateUserParams }
+        const user = { ...updateUserParams }
 
         // 2. se a senha estiver sendo atualizado, criptogra-lá
         if (updateUserParams.password) {
@@ -51,8 +59,15 @@ export class UpdateUserService {
         }
 
         // 3. chamar o repository para atualizar o user no banco de dados
-        const updateUser = await this.updateUserRepository.execute(userId, user)
+        const updatedUser = await this.updateUserRepository.execute(
+            userId,
+            user,
+        )
 
-        return updateUser
+        if (!updatedUser) {
+            throw new UpdateUserFailedError()
+        }
+
+        return updatedUser
     }
 }
