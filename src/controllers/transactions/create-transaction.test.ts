@@ -78,17 +78,34 @@ describe('CreateTransactionController', () => {
         })
 
         it('should call CreateTransactionService with correct parameters', async () => {
-          // arrange
-          const spy = jest.spyOn(createTransactionService, 'execute')
+            // arrange
+            const spy = jest.spyOn(createTransactionService, 'execute')
 
-          // act
-          await sut.execute({ body: validTransactionData })
+            // act
+            await sut.execute({ body: validTransactionData })
 
-          // assert
-          expect(spy).toHaveBeenCalledWith(validTransactionData)
-          expect(spy).toHaveBeenCalledTimes(1)
+            // assert
+            expect(spy).toHaveBeenCalledWith(validTransactionData)
+            expect(spy).toHaveBeenCalledTimes(1)
         })
     })
 
+    describe('validations', () => {
+        describe('user_id', () => {
+            it('should return 400 if user_id is not provided', async () => {
+                // arrange
+                const result = await sut.execute({
+                    body: {
+                        ...validTransactionData,
+                        user_id: undefined,
+                    },
+                })
 
+                // assaert
+                expect(result.statusCode).toBe(400)
+                expect(result.body?.status).toBe('error')
+                // expect(result.body?.message).toBeTruthy()
+            })
+        })
+    })
 })
