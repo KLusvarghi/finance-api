@@ -56,6 +56,7 @@ export interface TransactionPublicResponse {
 // ============================================================================
 
 export interface CreateUserParams {
+    id: string
     first_name: string
     last_name: string
     email: string
@@ -165,11 +166,11 @@ export interface UpdateUserServiceParams {
 
 // User Service Interfaces
 export interface CreateUserService {
-    execute(params: CreateUserParams): Promise<UserRepositoryResponse>
-}
+    execute(params: CreateUserParams): Promise<UserPublicResponse>
+} 
 
 export interface GetUserByIdService {
-    execute(userId: string): Promise<UserRepositoryResponse>
+    execute(userId: string): Promise<UserPublicResponse>
 }
 
 export interface GetUserBalanceService {
