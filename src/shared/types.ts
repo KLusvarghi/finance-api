@@ -74,7 +74,7 @@ export interface UpdateUserParams {
 // TRANSACTION PARAMETER TYPES
 // ============================================================================
 
-export interface CreateTransactionParamsProps {
+export interface CreateTransactionParams {
     user_id: string
     name: string
     amount: number
@@ -126,7 +126,7 @@ export interface GetUserBalanceRepository {
 // Transaction Repository Interfaces
 export interface CreateTransactionRepository {
     execute(
-        params: CreateTransactionParamsProps & { id: string },
+        params: CreateTransactionParams & { id: string },
     ): Promise<TransactionRepositoryResponse>
 }
 
@@ -193,7 +193,7 @@ export interface DeleteUserService {
 // Transaction Service Interfaces
 export interface CreateTransactionService {
     execute(
-        params: CreateTransactionParamsProps,
+        params: CreateTransactionParams,
     ): Promise<TransactionRepositoryResponse>
 }
 
