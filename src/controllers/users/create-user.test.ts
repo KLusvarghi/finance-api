@@ -44,62 +44,83 @@ describe('CreateUserController', () => {
     describe('validations', () => {
         describe('first_name', () => {
             it('should return 400 if first_name is not provided', async () => {
+                // arrange
                 const result = await sut.execute({
                     body: { ...validUserData, first_name: undefined },
                 })
+
+                // assert
                 expect(result.statusCode).toBe(400)
                 expect(result.body?.status).toBe('error')
                 expect(result.body?.message).toBeTruthy()
             })
 
             it('should return 400 if first_name is too short', async () => {
+                // arrange
                 const result = await sut.execute({
                     body: { ...validUserData, first_name: 'A' },
                 })
+
+                // assert
                 expect(result.statusCode).toBe(400)
             })
         })
 
         describe('last_name', () => {
             it('should return 400 if last_name is not provided', async () => {
+                // arrange
                 const result = await sut.execute({
                     body: { ...validUserData, last_name: undefined },
                 })
+
+                // assert
                 expect(result.statusCode).toBe(400)
             })
         })
 
         describe('email', () => {
             it('should return 400 if email is not provided', async () => {
+                // arrange
                 const result = await sut.execute({
                     body: { ...validUserData, email: undefined },
                 })
+
+                // assert
                 expect(result.statusCode).toBe(400)
             })
 
             it('should return 400 if email is invalid', async () => {
+                // arrange
                 const result = await sut.execute({
                     body: { ...validUserData, email: 'invalid' },
                 })
+
+                // assert
                 expect(result.statusCode).toBe(400)
             })
         })
 
         describe('password', () => {
             it('should return 400 if password is not provided', async () => {
+                // arrange
                 const result = await sut.execute({
                     body: { ...validUserData, password: undefined },
                 })
+
+                // assert
                 expect(result.statusCode).toBe(400)
             })
 
             it('should return 400 if password is less than 6 characters', async () => {
+                // arrange
                 const result = await sut.execute({
                     body: {
                         ...validUserData,
                         password: faker.internet.password({ length: 5 }),
                     },
                 })
+
+                // assert
                 expect(result.statusCode).toBe(400)
             })
         })
@@ -107,15 +128,23 @@ describe('CreateUserController', () => {
 
     describe('success cases', () => {
         it('should create a new user successfully and return 201', async () => {
+            // arrange
             const result = await sut.execute({ body: validUserData })
+
+            // assert
             expect(result.statusCode).toBe(201)
             expect(result.body?.status).toBe('success')
             expect(result.body?.data).toMatchObject(validUserData)
         })
 
         it('should call CreateUserService with correct parameters', async () => {
+            // arrange
             const spy = jest.spyOn(createUserService, 'execute')
+
+            // act
             await sut.execute({ body: validUserData })
+
+            // assert
             expect(spy).toHaveBeenCalledWith(validUserData)
             expect(spy).toHaveBeenCalledTimes(1)
         })
@@ -123,19 +152,29 @@ describe('CreateUserController', () => {
 
     describe('error handling', () => {
         it('should return 500 if CreateUserService throws generic error', async () => {
+            // arrange
             jest.spyOn(createUserService, 'execute').mockRejectedValueOnce(
                 new Error(),
             )
+
+            // act
             const result = await sut.execute({ body: validUserData })
+
+            // assert
             expect(result.statusCode).toBe(500)
             expect(result.body?.status).toBe('error')
         })
 
         it('should return 400 if CreateUserService throws EmailAlreadyExistsError', async () => {
+            // arrange
             jest.spyOn(createUserService, 'execute').mockRejectedValueOnce(
                 new EmailAlreadyExistsError(validUserData.email),
             )
+
+            // act
             const result = await sut.execute({ body: validUserData })
+
+            // assert
             expect(result.statusCode).toBe(400)
             expect(result.body?.message).toContain(validUserData.email)
         })
