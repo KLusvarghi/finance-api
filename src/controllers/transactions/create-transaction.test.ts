@@ -76,5 +76,19 @@ describe('CreateTransactionController', () => {
             expect(result.body?.status).toBe('success')
             // expect(result.body?.data).toMatchObject(validTransactionData)
         })
+
+        it('should call CreateTransactionService with correct parameters', async () => {
+          // arrange
+          const spy = jest.spyOn(createTransactionService, 'execute')
+
+          // act
+          await sut.execute({ body: validTransactionData })
+
+          // assert
+          expect(spy).toHaveBeenCalledWith(validTransactionData)
+          expect(spy).toHaveBeenCalledTimes(1)
+        })
     })
+
+
 })
