@@ -4,6 +4,11 @@ import { UpdateUserParams, UserRepositoryResponse } from '@/shared'
 import { EmailAlreadyExistsError } from '@/errors/user'
 
 describe('UpdateUserController', () => {
+    let sut: UpdateUserController
+    let updateUserService: UpdateUserServiceStub
+    let validUserId: string
+    let validUpdateData: any
+
     class UpdateUserServiceStub {
         async execute(
             userId: string,
@@ -29,131 +34,99 @@ describe('UpdateUserController', () => {
         }
     }
 
-    const httpRequest = {
-        params: {
-            userId: faker.string.uuid(),
-        },
-        body: {
+    beforeEach(() => {
+        // Setup executado antes de cada teste
+        const { sut: controller, updateUserService: service } = makeSut()
+        sut = controller
+        updateUserService = service
+
+        // Dados válidos sempre disponíveis
+        validUserId = faker.string.uuid()
+        validUpdateData = {
             first_name: faker.person.firstName(),
             last_name: faker.person.lastName(),
             email: faker.internet.email(),
-            password: faker.internet.password({
-                length: 6,
-            }),
-        },
-    }
+            password: faker.internet.password({ length: 7 }),
+        }
+    })
+
+    afterEach(() => {
+        // Limpeza após cada teste
+        jest.clearAllMocks()
+        jest.restoreAllMocks()
+    })
 
     describe('validations', () => {
         describe('email', () => {
             it('should return 400 when invalid email is provided', async () => {
-                // arrange
-                const { sut } = makeSut()
-
-                // act
                 const result = await sut.execute({
-                    ...httpRequest,
-                    body: {
-                        ...httpRequest.body,
-                        email: 'invalid_email',
-                    },
+                    params: { userId: validUserId },
+                    body: { ...validUpdateData, email: 'invalid_email' },
                 })
 
-                // assert
                 expect(result.statusCode).toBe(400)
-                // Validação do body de erro para email inválido
                 expect(result.body?.status).toBe('error')
                 expect(result.body?.message).toBeTruthy()
-                // Poderia ser mais específico: expect(result.body?.message).toContain('email')
             })
         })
 
         describe('password', () => {
             it('should return 400 when invalid password is provided', async () => {
-                // arrange
-                const { sut } = makeSut()
-
-                // act
                 const result = await sut.execute({
-                    ...httpRequest,
+                    params: { userId: validUserId },
                     body: {
-                        ...httpRequest.body,
-                        password: faker.internet.password({
-                            length: 5,
-                        }),
+                        ...validUpdateData,
+                        password: faker.internet.password({ length: 5 }),
                     },
                 })
 
-                // assert
                 expect(result.statusCode).toBe(400)
-                // Validação do body de erro para password muito curto
                 expect(result.body?.status).toBe('error')
                 expect(result.body?.message).toBeTruthy()
-                // Poderia ser mais específico: expect(result.body?.message).toContain('6 characters')
             })
         })
 
         describe('userId', () => {
             it('should return 400 when invalid userId is provided', async () => {
-                // arrange
-                const { sut } = makeSut()
-
-                // act
                 const result = await sut.execute({
-                    params: {
-                        userId: 'invalid_id',
-                    },
-                    body: httpRequest.body,
+                    params: { userId: 'invalid_id' },
+                    body: validUpdateData,
                 })
 
-                // assert
                 expect(result.statusCode).toBe(400)
-                // Validação do body de erro para UUID inválido
                 expect(result.body?.status).toBe('error')
                 expect(result.body?.message).toBeTruthy()
-                // Poderia ser mais específico: expect(result.body?.message).toContain('invalid')
             })
         })
 
         describe('disallowed fields', () => {
             it('should return 400 when disallowed field is provided', async () => {
-                // arrange
-                const { sut } = makeSut()
-
-                // act
                 const result = await sut.execute({
-                    ...httpRequest,
+                    params: { userId: validUserId },
                     body: {
-                        ...httpRequest.body,
+                        ...validUpdateData,
                         disallowed_field: 'disallowed_field',
                     },
                 })
 
-                // assert
                 expect(result.statusCode).toBe(400)
-                // Validação do body de erro para campo não permitido
                 expect(result.body?.status).toBe('error')
                 expect(result.body?.message).toBeTruthy()
-                // Poderia ser mais específico: expect(result.body?.message).toContain('not allowed')
             })
         })
     })
 
     describe('success cases', () => {
         it('should return 200 when updating user successfully', async () => {
-            // arrange
-            const { sut } = makeSut()
+            const result = await sut.execute({
+                params: { userId: validUserId },
+                body: validUpdateData,
+            })
 
-            // act
-            const result = await sut.execute(httpRequest)
-
-            // assert
             expect(result.statusCode).toBe(200)
-            // Validação completa do body de sucesso para atualização
             expect(result.body?.status).toBe('success')
-            expect(result.body?.message).toBeTruthy() // Ex: "Success"
+            expect(result.body?.message).toBeTruthy()
             expect(result.body?.data).toBeTruthy()
-
-            // Validação específica dos dados atualizados retornados
             expect(result.body?.data?.first_name).toBeTruthy()
             expect(result.body?.data?.last_name).toBeTruthy()
             expect(result.body?.data?.email).toBeTruthy()
@@ -161,43 +134,35 @@ describe('UpdateUserController', () => {
     })
 
     describe('error handling', () => {
-        // testando um erro generico
         it('should return 500 when UpdateUserService throws generic error', async () => {
-            // arrange
-            const { sut, updateUserService } = makeSut()
             jest.spyOn(updateUserService, 'execute').mockRejectedValueOnce(
                 new Error(),
             )
 
-            // act
-            const result = await sut.execute(httpRequest)
+            const result = await sut.execute({
+                params: { userId: validUserId },
+                body: validUpdateData,
+            })
 
-            // assert
             expect(result.statusCode).toBe(500)
-            // Validação do body de erro para erros internos do servidor
             expect(result.body?.status).toBe('error')
             expect(result.body?.message).toBeTruthy()
-            // Mensagem padrão seria: "Internal server error"
         })
 
-        // simulando um erro de email já existente
         it('should return 400 when UpdateUserService throws EmailAlreadyExistsError', async () => {
-            // arrange
-            const { sut, updateUserService } = makeSut()
             const duplicateEmail = faker.internet.email()
             jest.spyOn(updateUserService, 'execute').mockRejectedValueOnce(
                 new EmailAlreadyExistsError(duplicateEmail),
             )
 
-            // act
-            const result = await sut.execute(httpRequest)
+            const result = await sut.execute({
+                params: { userId: validUserId },
+                body: validUpdateData,
+            })
 
-            // assert
             expect(result.statusCode).toBe(400)
-            // Validação específica do body de erro para email já existente
             expect(result.body?.status).toBe('error')
             expect(result.body?.message).toBeTruthy()
-            // A mensagem deveria conter o email que já está em uso
             expect(result.body?.message).toContain(duplicateEmail)
             expect(result.body?.message).toContain('already in use')
         })
