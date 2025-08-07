@@ -4,9 +4,9 @@ import { serverError, badRequest, created } from '@/shared'
 import { ZodError } from 'zod'
 import {
     CreateUserService,
-    UserRepositoryResponse,
     HttpResponse,
     HttpRequest,
+    UserPublicResponse,
 } from '@/shared/types'
 
 export class CreateUserController {
@@ -18,7 +18,7 @@ export class CreateUserController {
 
     async execute(
         httpRequest: HttpRequest,
-    ): Promise<HttpResponse<UserRepositoryResponse>> {
+    ): Promise<HttpResponse<UserPublicResponse>> {
         try {
             // validar a requisição (campos obrigatório, email e tamenho de senha)
             const params = httpRequest.body
