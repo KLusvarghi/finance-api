@@ -109,24 +109,24 @@ describe('CreateTransactionController', () => {
             })
 
             it.each(invalidUUID)(
-              'should return 400 if user_id is $description',
-              async ({ id }) => {
-                  // arrange
-                  const result = await sut.execute({
-                      body: {
-                          ...validTransactionData,
-                          user_id: id,
-                      },
-                  })
+                'should return 400 if user_id is $description',
+                async ({ id }) => {
+                    // arrange
+                    const result = await sut.execute({
+                        body: {
+                            ...validTransactionData,
+                            user_id: id,
+                        },
+                    })
 
-                  // assert
-                  expect(result.statusCode).toBe(400)
-                  expect(result.body?.status).toBe('error')
-                  expect(result.body?.message).toBe(
-                      'User id must be a valid uuid',
-                  )
-              },
-          )
+                    // assert
+                    expect(result.statusCode).toBe(400)
+                    expect(result.body?.status).toBe('error')
+                    expect(result.body?.message).toBe(
+                        'User id must be a valid uuid',
+                    )
+                },
+            )
 
             it('should return 400 if user_id is an empty string', async () => {
                 // arrange
@@ -169,8 +169,37 @@ describe('CreateTransactionController', () => {
                 expect(result.statusCode).toBe(400)
                 expect(result.body?.status).toBe('error')
             })
+        })
+        describe('name', () => {
+            it('should return 400 if name is not provided', async () => {
+                // arrange
+                const result = await sut.execute({
+                    body: {
+                        ...validTransactionData,
+                        name: undefined,
+                    },
+                })
 
-            
+                // assert
+                expect(result.statusCode).toBe(400)
+                expect(result.body?.status).toBe('error')
+            })
+
+            it('should return 400 if name is too short', async () => {
+                // arrange
+                const result = await sut.execute({
+                    body: {
+                        ...validTransactionData,
+                        name: 'A',
+                    },
+                })
+
+                expect(result.statusCode).toBe(400)
+                expect(result.body?.status).toBe('error')
+                expect(result.body?.message).toBe(
+                    'Name must be at least 3 characters long',
+                )
+            })
         })
     })
 })
