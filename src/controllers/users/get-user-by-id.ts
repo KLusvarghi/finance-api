@@ -1,9 +1,9 @@
 import { serverError, ok } from '@/shared'
 import {
     GetUserByIdService,
-    UserRepositoryResponse,
     HttpResponse,
     HttpRequest,
+    UserPublicResponse,
 } from '@/shared/types'
 import {
     checkIfIdIsValid,
@@ -22,7 +22,7 @@ export class GetUserByIdController {
 
     async execute(
         httpRequest: HttpRequest,
-    ): Promise<HttpResponse<UserRepositoryResponse>> {
+    ): Promise<HttpResponse<UserPublicResponse>> {
         try {
             const userId = httpRequest.params.userId
 
@@ -40,7 +40,7 @@ export class GetUserByIdController {
             console.error(error)
 
             if (error instanceof UserNotFoundError) {
-                return userNotFoundResponse()
+                return userNotFoundResponse(error.message)
             }
 
             return serverError()
