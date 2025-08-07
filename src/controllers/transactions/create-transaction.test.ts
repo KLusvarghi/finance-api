@@ -5,6 +5,7 @@ import {
 import { CreateTransactionController } from './create-transaction'
 import { faker } from '@faker-js/faker'
 import { Prisma } from '@prisma/client'
+import { invalidUUID } from '@/test/fixtures/transactions'
 
 describe('CreateTransactionController', () => {
     let sut: CreateTransactionController
@@ -106,6 +107,70 @@ describe('CreateTransactionController', () => {
                 expect(result.body?.status).toBe('error')
                 // expect(result.body?.message).toBeTruthy()
             })
+
+            it.each(invalidUUID)(
+              'should return 400 if user_id is $description',
+              async ({ id }) => {
+                  // arrange
+                  const result = await sut.execute({
+                      body: {
+                          ...validTransactionData,
+                          user_id: id,
+                      },
+                  })
+
+                  // assert
+                  expect(result.statusCode).toBe(400)
+                  expect(result.body?.status).toBe('error')
+                  expect(result.body?.message).toBe(
+                      'User id must be a valid uuid',
+                  )
+              },
+          )
+
+            it('should return 400 if user_id is an empty string', async () => {
+                // arrange
+                const result = await sut.execute({
+                    body: {
+                        ...validTransactionData,
+                        user_id: '',
+                    },
+                })
+
+                // assert
+                expect(result.statusCode).toBe(400)
+                expect(result.body?.status).toBe('error')
+            })
+
+            it('should return 400 if user_id is null', async () => {
+                // arrange
+                const result = await sut.execute({
+                    body: {
+                        ...validTransactionData,
+                        user_id: null,
+                    },
+                })
+
+                // assert
+                expect(result.statusCode).toBe(400)
+                expect(result.body?.status).toBe('error')
+            })
+
+            it('should return 400 if user_id is a number', async () => {
+                // arrange
+                const result = await sut.execute({
+                    body: {
+                        ...validTransactionData,
+                        user_id: 123,
+                    },
+                })
+
+                // assert
+                expect(result.statusCode).toBe(400)
+                expect(result.body?.status).toBe('error')
+            })
+
+            
         })
     })
 })
