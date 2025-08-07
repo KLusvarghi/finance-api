@@ -1,17 +1,20 @@
-import { HttpResponse, UserRepositoryResponse } from '@/shared'
+import {
+    HttpResponse,
+    UserPublicResponse,
+    UserRepositoryResponse,
+} from '@/shared'
 import { faker } from '@faker-js/faker'
 import { GetUserByIdController } from './get-user-by-id'
 import { UserNotFoundError } from '@/errors/user'
 
 describe('GetUserByIdController', () => {
     class GetUserByIdServiceStub {
-        async execute(): Promise<UserRepositoryResponse> {
+        async execute(): Promise<UserPublicResponse> {
             return Promise.resolve({
                 id: faker.string.uuid(),
                 first_name: faker.person.firstName(),
                 last_name: faker.person.lastName(),
                 email: faker.internet.email(),
-                password: faker.internet.password({ length: 7 }),
             })
         }
     }
@@ -41,6 +44,18 @@ describe('GetUserByIdController', () => {
 
         // assert
         expect(result.statusCode).toBe(200)
+        // Validação completa do body de sucesso
+        expect(result.body?.status).toBe('success')
+        expect(result.body?.message).toBeTruthy() // Ex: "Success"
+        expect(result.body?.data).toBeTruthy()
+
+        // Validação específica dos dados do usuário retornados
+        expect(result.body?.data?.id).toBeTruthy()
+        expect(result.body?.data?.first_name).toBeTruthy()
+        expect(result.body?.data?.last_name).toBeTruthy()
+        expect(result.body?.data?.email).toBeTruthy()
+        // Importante: password NÃO deve ser retornado por segurança
+        expect(result.body?.data).not.toHaveProperty('password')
     })
 
     it('should return 404 if userId is not provided', async () => {
@@ -52,6 +67,10 @@ describe('GetUserByIdController', () => {
 
         // assert
         expect(result.statusCode).toBe(404)
+        // Validação do body de erro para userId vazio
+        expect(result.body?.status).toBe('error')
+        expect(result.body?.message).toBeTruthy()
+        // Poderia ser mais específico: expect(result.body?.message).toContain('required')
     })
 
     it('should return 400 if userId is invalid', async () => {
@@ -63,6 +82,10 @@ describe('GetUserByIdController', () => {
 
         // assert
         expect(result.statusCode).toBe(400)
+        // Validação do body de erro para UUID inválido
+        expect(result.body?.status).toBe('error')
+        expect(result.body?.message).toBeTruthy()
+        // Poderia ser mais específico: expect(result.body?.message).toContain('invalid')
     })
 
     it('should return 404 if user is not found', async () => {
@@ -78,6 +101,11 @@ describe('GetUserByIdController', () => {
 
         // assert
         expect(result.statusCode).toBe(404)
+        // Validação do body de erro específico para usuário não encontrado
+        expect(result.body?.status).toBe('error')
+        expect(result.body?.message).toBeTruthy()
+        // A mensagem deveria conter o ID do usuário que não foi encontrado
+        expect(result.body?.message).toContain(httpRequest.params.userId)
     })
 
     it('should return 500 if GetUserByIdService throws an error', async () => {
@@ -91,5 +119,9 @@ describe('GetUserByIdController', () => {
 
         // assert
         expect(result.statusCode).toBe(500)
+        // Validação do body de erro para erros internos do servidor
+        expect(result.body?.status).toBe('error')
+        expect(result.body?.message).toBeTruthy()
+        // Mensagem padrão seria: "Internal server error"
     })
 })
