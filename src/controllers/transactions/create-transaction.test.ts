@@ -200,6 +200,22 @@ describe('CreateTransactionController', () => {
                     'Name must be at least 3 characters long',
                 )
             })
+
+            it('should return 400 if name is too long', async () => {
+                // arrange
+                const result = await sut.execute({
+                    body: {
+                        ...validTransactionData,
+                        name: 'A'.repeat(101),
+                    },
+                })
+
+                expect(result.statusCode).toBe(400)
+                expect(result.body?.status).toBe('error')
+                expect(result.body?.message).toBe(
+                    'Name must be at most 100 characters long',
+                )
+            })
         })
     })
 })
