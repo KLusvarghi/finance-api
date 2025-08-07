@@ -9,6 +9,13 @@ export const createTransactionSchema = z.object({
         .uuid({
             message: 'User id must be a valid uuid',
         }),
+    name: z
+        .string({
+            message: 'Name is required',
+        })
+        .min(3, {
+            message: 'Name must be at least 3 characters long',
+        }),
     // esse tipo de date é um tipo que aceita vários formatos, e nos serve bem
     date: z
         .string({
