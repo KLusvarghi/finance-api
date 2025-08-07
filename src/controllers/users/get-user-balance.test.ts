@@ -42,6 +42,20 @@ describe('GetUserBalanceController', () => {
 
         // assert
         expect(result.statusCode).toBe(200)
+        // Validação completa do body de sucesso para saldo do usuário
+        expect(result.body?.status).toBe('success')
+        expect(result.body?.message).toBeTruthy() // Ex: "Success"
+        expect(result.body?.data).toBeTruthy()
+
+        // Validação específica dos dados de saldo
+        expect(result.body?.data?.earnings).toBeDefined()
+        expect(result.body?.data?.expenses).toBeDefined()
+        expect(result.body?.data?.investments).toBeDefined()
+        expect(result.body?.data?.balance).toBeDefined()
+        // Todos devem ser números (ou Decimal)
+        expect(typeof result.body?.data?.earnings).toBe('number')
+        expect(typeof result.body?.data?.expenses).toBe('number')
+        expect(typeof result.body?.data?.investments).toBe('number')
     })
 
     it('should return 400 when userId is invalid', async () => {
@@ -53,6 +67,10 @@ describe('GetUserBalanceController', () => {
 
         // assert
         expect(result.statusCode).toBe(400)
+        // Validação do body de erro para UUID inválido
+        expect(result.body?.status).toBe('error')
+        expect(result.body?.message).toBeTruthy()
+        // Poderia ser mais específico: expect(result.body?.message).toContain('invalid')
     })
 
     it('should return 500 if GetUserBalanceService throws', async () => {
@@ -80,5 +98,9 @@ describe('GetUserBalanceController', () => {
 
         // assert
         expect(result.statusCode).toBe(500)
+        // Validação do body de erro para erros internos do servidor
+        expect(result.body?.status).toBe('error')
+        expect(result.body?.message).toBeTruthy()
+        // Mensagem padrão seria: "Internal server error"
     })
 })
