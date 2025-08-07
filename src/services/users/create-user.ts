@@ -4,7 +4,7 @@ import {
     CreateUserParams,
     CreateUserRepository,
     GetUserByEmailRepository,
-    UserRepositoryResponse,
+    UserPublicResponse,
 } from '@/shared/types'
 import { EmailAlreadyExistsError } from '@/errors/user'
 
@@ -22,7 +22,7 @@ export class CreateUserService {
 
     async execute(
         createUserParams: CreateUserParams,
-    ): Promise<UserRepositoryResponse> {
+    ): Promise<UserPublicResponse> {
         const userWithProviderEmail =
             await this.getUserByEmailRepository.execute(createUserParams.email)
 
@@ -44,8 +44,14 @@ export class CreateUserService {
             password: hashPassword,
         }
 
-        const userResult = await this.createUserRepository.execute(user)
+        const { id, first_name, last_name, email } =
+            await this.createUserRepository.execute(user)
 
-        return userResult
+        return {
+            id,
+            first_name,
+            last_name,
+            email,
+        }
     }
 }
