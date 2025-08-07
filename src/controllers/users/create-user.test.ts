@@ -1,13 +1,7 @@
 import { EmailAlreadyExistsError } from '@/errors/user'
 import { CreateUserController } from './create-user'
 import { faker } from '@faker-js/faker'
-
-interface User {
-    first_name: string
-    last_name: string
-    email: string
-    password: string
-}
+import { CreateUserParams, UserPublicResponse } from '@/shared'
 
 describe('CreateUserController', () => {
     // STUB
@@ -17,11 +11,8 @@ describe('CreateUserController', () => {
         // na classe real, temos que analisar atentamente os params, no nosso caso, o nosso controle chama o nosso service e passa os params, que não os dados do user:
         // const createdUser = await this.createUserService.execute(params)
         // e é o mesmo que temos que fazer
-        execute(user: User) {
-            return Promise.resolve({
-                id: faker.string.uuid(),
-                ...user,
-            })
+        async execute(params: CreateUserParams) {
+            return params
         }
     }
 
@@ -66,6 +57,16 @@ describe('CreateUserController', () => {
         // esperamso que o body exista
         expect(result.body).toBeTruthy()
 
+        // Validação completa do body de sucesso
+        expect(result.body?.status).toBe('success')
+        expect(result.body?.message).toBeTruthy() // Ex: "Created successfully"
+        expect(result.body?.data).toBeTruthy() // Deve conter os dados do usuário criado
+
+        // Validação específica dos dados retornados
+        expect(result.body?.data?.first_name).toBeTruthy()
+        expect(result.body?.data?.last_name).toBeTruthy()
+        expect(result.body?.data?.email).toBeTruthy()
+
         // podemos ser bem expecífico no que esperamos
         // expect(result.body?.data?.first_name).toBe('Kauã')
 
@@ -91,6 +92,10 @@ describe('CreateUserController', () => {
 
         // assert
         expect(result.statusCode).toBe(400)
+        // Validação adicional: verificar se retorna mensagem de erro adequada
+        // Campos obrigatórios devem retornar mensagem específica sobre validação
+        expect(result.body?.status).toBe('error')
+        expect(result.body?.message).toBeTruthy() // Garante que há uma mensagem de erro
     })
 
     it('should return 400 if last_name is not provided', async () => {
@@ -107,6 +112,9 @@ describe('CreateUserController', () => {
 
         // assert
         expect(result.statusCode).toBe(400)
+        // Validação do body de erro para campos obrigatórios
+        expect(result.body?.status).toBe('error')
+        expect(result.body?.message).toBeTruthy()
     })
 
     it('should return 400 if email is not provided', async () => {
@@ -123,6 +131,9 @@ describe('CreateUserController', () => {
 
         // assert
         expect(result.statusCode).toBe(400)
+        // Validação do body de erro para email obrigatório
+        expect(result.body?.status).toBe('error')
+        expect(result.body?.message).toBeTruthy()
     })
 
     it('should return 400 if email is not valid', async () => {
@@ -139,6 +150,10 @@ describe('CreateUserController', () => {
 
         // assert
         expect(result.statusCode).toBe(400)
+        // Validação específica para formato de email inválido
+        expect(result.body?.status).toBe('error')
+        expect(result.body?.message).toBeTruthy()
+        // Poderia ser mais específico: expect(result.body?.message).toContain('email')
     })
 
     it('should return 400 if password is not provided', async () => {
@@ -155,6 +170,9 @@ describe('CreateUserController', () => {
 
         // assert
         expect(result.statusCode).toBe(400)
+        // Validação do body de erro para password obrigatório
+        expect(result.body?.status).toBe('error')
+        expect(result.body?.message).toBeTruthy()
     })
 
     it('should return 400 if password is less than 6 characters', async () => {
@@ -171,6 +189,10 @@ describe('CreateUserController', () => {
 
         // assert
         expect(result.statusCode).toBe(400)
+        // Validação específica para tamanho mínimo de password
+        expect(result.body?.status).toBe('error')
+        expect(result.body?.message).toBeTruthy()
+        // Poderia ser mais específico: expect(result.body?.message).toContain('6 characters')
     })
 
     it('should call CreateUserService with correct parameters', async () => {
@@ -207,6 +229,11 @@ describe('CreateUserController', () => {
 
         // assert
         expect(result.statusCode).toBe(500)
+        // Validação do body de erro para erros internos do servidor
+        // Erros 500 devem retornar mensagem genérica por segurança
+        expect(result.body?.status).toBe('error')
+        expect(result.body?.message).toBeTruthy()
+        // Mensagem padrão seria: "Internal server error"
     })
 
     // no teste abaixo, a gente não testa de fato, criando um user com um email e testando se o email já existe poruqe isso não é responsabilidade do controller, e sim do service, e apenas testamos o que há no controller, que é o tratamento do erro
