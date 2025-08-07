@@ -5,7 +5,7 @@ import {
 import { CreateTransactionController } from './create-transaction'
 import { faker } from '@faker-js/faker'
 import { Prisma } from '@prisma/client'
-import { invalidUUID } from '@/test/fixtures'
+import { invalidDate, invalidUUID } from '@/test/fixtures'
 
 describe('CreateTransactionController', () => {
     let sut: CreateTransactionController
@@ -216,6 +216,40 @@ describe('CreateTransactionController', () => {
                     'Name must be at most 100 characters long',
                 )
             })
+        })
+
+        describe('date', () => {
+            it('should return 400 if date is not provided', async () => {
+                // arrange
+                const result = await sut.execute({
+                    body: {
+                        ...validTransactionData,
+                        date: undefined,
+                    },
+                })
+
+                expect(result.statusCode).toBe(400)
+            })
+
+            it.each(invalidDate)(
+                'should return 400 if date is $description',
+                async ({ date }) => {
+                    // arrange
+                    const result = await sut.execute({
+                        body: {
+                            ...validTransactionData,
+                            date: date,
+                        },
+                    })
+
+                    // assert
+                    expect(result.statusCode).toBe(400)
+                    expect(result.body?.status).toBe('error')
+                    expect(result.body?.message).toBe(
+                        'Date must be a valid date',
+                    )
+                },
+            )
         })
     })
 })
