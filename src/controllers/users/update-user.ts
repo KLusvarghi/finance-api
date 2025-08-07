@@ -1,4 +1,4 @@
-import { EmailAlreadyExistsError } from '@/errors/user'
+import { EmailAlreadyExistsError, UpdateUserFailedError, UserNotFoundError } from '@/errors/user'
 import {
     checkIfIdIsValid,
     invalidIdResponse,
@@ -11,9 +11,9 @@ import { ZodError } from 'zod'
 import { updateUserSchema } from '@/schemas'
 import {
     UpdateUserService,
-    UserRepositoryResponse,
     HttpResponse,
     HttpRequest,
+    UserPublicResponse,
 } from '@/shared/types'
 
 export class UpdateUserController {
@@ -25,28 +25,21 @@ export class UpdateUserController {
 
     async execute(
         httpRequest: HttpRequest,
-    ): Promise<HttpResponse<UserRepositoryResponse>> {
+    ): Promise<HttpResponse<UserPublicResponse | null>> {
         try {
             const userId = httpRequest.params.userId
-
             if (!userId) return userBadRequestResponse()
 
             const isIdValid = checkIfIdIsValid(userId)
-
             if (!isIdValid) return invalidIdResponse()
 
             const params = httpRequest.body
-
             await updateUserSchema.parseAsync(params)
 
             const updatedUser = await this.updateUserService.execute(
                 userId,
                 params,
             )
-
-            if (!updatedUser) {
-                return userNotFoundResponse()
-            }
 
             // após chamar o service, já retornamos o status code, porque caso, dê algo errado no service ou no repositpry, eles vão instanciar um Error, e isso fará com que caia no catch
             return ok(updatedUser)
@@ -56,6 +49,12 @@ export class UpdateUserController {
             }
             if (error instanceof EmailAlreadyExistsError) {
                 return badRequest(error.message)
+            }
+            if (error instanceof UserNotFoundError) {
+                return userNotFoundResponse(error.message)
+            }
+            if (error instanceof UpdateUserFailedError) {
+                return serverError(error.message)
             }
             console.error(error)
             return serverError()
