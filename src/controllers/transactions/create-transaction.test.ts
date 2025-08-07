@@ -5,7 +5,7 @@ import {
 import { CreateTransactionController } from './create-transaction'
 import { faker } from '@faker-js/faker'
 import { Prisma } from '@prisma/client'
-import { invalidUUID } from '@/test/fixtures/transactions'
+import { invalidUUID } from '@/test/fixtures'
 
 describe('CreateTransactionController', () => {
     let sut: CreateTransactionController
