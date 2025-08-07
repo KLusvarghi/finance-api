@@ -1,7 +1,7 @@
 import { EmailAlreadyExistsError } from '@/errors/user'
 import { CreateUserController } from './create-user'
 import { faker } from '@faker-js/faker'
-import { CreateUserParams } from '@/shared'
+import { CreateUserParams, UserRepositoryResponse } from '@/shared'
 
 describe('CreateUserController', () => {
     let sut: CreateUserController
@@ -9,7 +9,9 @@ describe('CreateUserController', () => {
     let validUserData: any
 
     class CreateUserServiceStub {
-        async execute(params: CreateUserParams) {
+        async execute(
+            params: CreateUserParams,
+        ): Promise<UserRepositoryResponse> {
             return params
         }
     }
