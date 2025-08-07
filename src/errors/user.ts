@@ -18,3 +18,10 @@ export class TransactionNotFoundError extends Error {
         this.name = 'TransactionNotFoundError'
     }
 }
+
+export class UpdateUserFailedError extends Error {
+  constructor (msg = 'Failed to update user.') {
+    super(msg)
+    this.name = 'UpdateUserFailedError'
+  }
+}
