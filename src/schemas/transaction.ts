@@ -15,6 +15,9 @@ export const createTransactionSchema = z.object({
         })
         .min(3, {
             message: 'Name must be at least 3 characters long',
+        })
+        .max(100, {
+            message: 'Name must be at most 100 characters long',
         }),
     // esse tipo de date é um tipo que aceita vários formatos, e nos serve bem
     date: z
