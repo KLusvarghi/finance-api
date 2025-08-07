@@ -10,7 +10,7 @@ describe('DeleteUserController', () => {
     class DeleteUserServiceStub {
         execute(userId: string): Promise<UserRepositoryResponse | null> {
             return Promise.resolve({
-                id: userId || faker.string.uuid(),
+                id: userId,
                 first_name: faker.person.firstName(),
                 last_name: faker.person.lastName(),
                 email: faker.internet.email(),

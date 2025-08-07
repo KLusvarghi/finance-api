@@ -12,15 +12,14 @@ describe('UpdateUserController', () => {
     class UpdateUserServiceStub {
         async execute(
             userId: string,
-            params: UpdateUserParams,
+            _params: UpdateUserParams,
         ): Promise<UserRepositoryResponse> {
             return Promise.resolve({
-                id: userId || faker.string.uuid(),
-                first_name: params.first_name || faker.person.firstName(),
-                last_name: params.last_name || faker.person.lastName(),
-                email: params.email || faker.internet.email(),
-                password:
-                    params.password || faker.internet.password({ length: 6 }),
+                id: userId,
+                first_name: faker.person.firstName(),
+                last_name: faker.person.lastName(),
+                email: faker.internet.email(),
+                password: faker.internet.password({ length: 6 }),
             })
         }
     }

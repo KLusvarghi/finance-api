@@ -15,7 +15,7 @@ describe('GetUserByIdController', () => {
     class GetUserByIdServiceStub {
         async execute(userId: string): Promise<UserPublicResponse> {
             return Promise.resolve({
-                id: userId || faker.string.uuid(),
+                id: userId,
                 first_name: faker.person.firstName(),
                 last_name: faker.person.lastName(),
                 email: faker.internet.email(),
