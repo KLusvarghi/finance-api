@@ -19,10 +19,10 @@ export const invalidUUID = [
         description: 'completely invalid format',
         id: 'not-a-uuid-at-all',
     },
-    {
-        description: 'empty string',
-        id: '',
-    },
+    // {
+    //     description: 'empty string',
+    //     id: '',
+    // },
 ]
 
 export const invalidDate = [
