@@ -2,6 +2,8 @@ import { TransactionRepositoryResponse } from '@/shared'
 import { DeleteTransactionController } from './delete-transaction'
 import { faker } from '@faker-js/faker'
 import { Prisma } from '@prisma/client'
+import { invalidUUID } from '@/test/fixtures'
+import { TransactionNotFoundError } from '@/errors/user'
 
 describe('DeleteTransactionController', () => {
     let sut: DeleteTransactionController
@@ -60,6 +62,72 @@ describe('DeleteTransactionController', () => {
                 'Transaction deleted successfully',
             )
             expect(response.body?.data).toEqual(validTransactionData)
+        })
+    })
+
+    describe('validations', () => {
+        it.each(invalidUUID)(
+            'should return 400 if transactionId is $description',
+            async ({ id }) => {
+                // arrange
+                const response = await sut.execute({
+                    params: {
+                        transactionId: id,
+                    },
+                })
+
+                // assert
+                expect(response.statusCode).toBe(400)
+                expect(response.body?.status).toBe('error')
+                expect(response.body?.message).toBe(
+                    'The provider id is not valid.',
+                )
+            },
+        )
+    })
+    describe('error handling', () => {
+        it('should return 500 if DeleteTransactionService throws generic error', async () => {
+            // arrange
+            jest.spyOn(
+                deleteTransactionService,
+                'execute',
+            ).mockRejectedValueOnce(new Error())
+
+            // act
+            const response = await sut.execute({
+                params: {
+                    transactionId: validTransactionId,
+                },
+            })
+
+            // assert
+            expect(response.statusCode).toBe(500)
+            expect(response.body?.status).toBe('error')
+        })
+
+        it('should return 404 if DeleteTransactionService throws TransactionNotFoundError', async () => {
+            // arrange
+            // sempre usamos o "mockRejectedValueOnce" quando queremos testar um erro específico, porque ele irá dar um throw 
+            jest.spyOn(
+                deleteTransactionService,
+                'execute',
+            ).mockRejectedValueOnce(
+                new TransactionNotFoundError(validTransactionId),
+            )
+
+            // act
+            const response = await sut.execute({
+                params: {
+                    transactionId: validTransactionId,
+                },
+            })
+
+            // assert
+            expect(response.statusCode).toBe(404)
+            expect(response.body?.status).toBe('error')
+            expect(response.body?.message).toBe(
+                'Transaction not found.',
+            )
         })
     })
 })
