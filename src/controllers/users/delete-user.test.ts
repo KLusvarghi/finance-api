@@ -1,6 +1,7 @@
 import { UserRepositoryResponse } from '@/shared'
 import { DeleteUserController } from './delete-user'
 import { faker } from '@faker-js/faker'
+import { UserNotFoundError } from '@/errors/user'
 
 describe('DeleteUserController', () => {
     let sut: DeleteUserController
@@ -8,7 +9,7 @@ describe('DeleteUserController', () => {
     let validUserId: string
 
     class DeleteUserServiceStub {
-        execute(userId: string): Promise<UserRepositoryResponse | null> {
+        execute(userId: string): Promise<UserRepositoryResponse> {
             return Promise.resolve({
                 id: userId,
                 first_name: faker.person.firstName(),
@@ -72,7 +73,9 @@ describe('DeleteUserController', () => {
     describe('error handling', () => {
         it('should return 404 if user is not found', async () => {
             jest.spyOn(deleteUserService, 'execute').mockImplementationOnce(
-                async () => null,
+                async () => {
+                    throw new UserNotFoundError(validUserId)
+                },
             )
 
             const result = await sut.execute({
