@@ -38,16 +38,19 @@ export const createTransactionSchema = z.object({
             message: 'Amount must be greater than 0',
         })
         // quando temos que fazer validações que o zod não nos fornece, podemos usar o refine e se o que a gente colocar retornar false/null/undefined ele gera erro, caso contrário ele valida
-        .refine((value) =>
-            isCurrency(value.toFixed(2), {
-                digits_after_decimal: [2],
-                allow_negatives: false,
-                decimal_separator: '.',
-            }),
+        .refine(
+            (value) =>
+                isCurrency(value.toFixed(2), {
+                    digits_after_decimal: [2],
+                    allow_negatives: false,
+                    decimal_separator: '.',
+                }),
+            { message: 'Amount must be a valid currency (2 decimal places)' },
         ),
 })
 
 export const updateTransactionSchema = createTransactionSchema
+    // o omit ele exclui o campo "user_id" do schema, entõa ele não aceira esse campo na hora de valdiar
     .omit({
         user_id: true,
     })
