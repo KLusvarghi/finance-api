@@ -2,6 +2,7 @@ import { HttpRequest, TransactionRepositoryResponse } from "@/shared"
 import { GetTransactionsByUserIdController } from "./get-transactions-by-user-id"
 import { faker } from "@faker-js/faker"
 import { Prisma } from "@prisma/client"
+import { invalidUUID } from "@/test/fixtures"
 
 describe('GetTransactionsByUserIdController', () => {
   let sut: GetTransactionsByUserIdController
@@ -54,5 +55,28 @@ describe('GetTransactionsByUserIdController', () => {
       expect(response.statusCode).toBe(200)
       expect(response.body?.data).toEqual(validTransactionData)
     })
+  })
+  describe('error cases', () => {
+    it('should return 400 when userId is not provided', async() => {
+      // act
+      const response = await sut.execute({ query: { userId: undefined } })
+
+      // assert
+      expect(response.statusCode).toBe(400)
+      expect(response.body?.message).toBe('The field userId is required.')
+    })
+
+    it.each(invalidUUID)(
+      'should return 400 when userId is $description',
+      async ({id}) => {
+        const response = await sut.execute({
+          query: { userId: id }
+        })
+
+        // assert
+        expect(response.statusCode).toBe(400)
+        expect(response.body?.message).toBe('The provider userId is required.')
+      }
+    )
   })
 })
