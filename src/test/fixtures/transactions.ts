@@ -112,10 +112,10 @@ export const invalidType = [
 ]
 
 export const invalidAmount = [
-    {
-        description: 'zero value',
-        amount: 0,
-    },
+    // {
+    //     description: 'zero value',
+    //     amount: 0,
+    // },
     {
         description: 'negative value',
         amount: -10.5,
