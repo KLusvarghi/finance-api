@@ -302,10 +302,17 @@ describe('CreateTransactionController', () => {
             )
         })
         describe('error handling', () => {
-            it('should return 500 if CreateTransactionService throws generic error', async () => {
-                // arrange
-                jest.spyOn(createTransactionService, 'execute').mockRejectedValueOnce(new Error())
-            })
+              it('should return 500 if CreateTransactionService throws generic error', async () => {
+                  // arrange
+                  jest.spyOn(createTransactionService, 'execute').mockRejectedValueOnce(new Error())
+
+                  // act
+                  const result = await sut.execute({ body: validTransactionData })
+
+                  // assert
+                  expect(result.statusCode).toBe(500)
+                  expect(result.body?.status).toBe('error')
+              })
         })
     })
 })
