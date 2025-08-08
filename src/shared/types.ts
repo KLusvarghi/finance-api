@@ -71,6 +71,17 @@ export interface UpdateUserParams {
 }
 
 // ============================================================================
+// USER HTTP REQUEST TYPES
+// ============================================================================
+
+export interface UserHttpRequest {
+    first_name: string
+    last_name: string
+    email: string
+    password: string
+}
+
+// ============================================================================
 // TRANSACTION PARAMETER TYPES
 // ============================================================================
 
@@ -167,7 +178,7 @@ export interface UpdateUserServiceParams {
 // User Service Interfaces
 export interface CreateUserService {
     execute(params: CreateUserParams): Promise<UserPublicResponse>
-} 
+}
 
 export interface GetUserByIdService {
     execute(userId: string): Promise<UserPublicResponse>
@@ -209,9 +220,7 @@ export interface UpdateTransactionService {
 }
 
 export interface DeleteTransactionService {
-    execute(
-        transactionId: string,
-    ): Promise<TransactionRepositoryResponse>
+    execute(transactionId: string): Promise<TransactionRepositoryResponse>
 }
 
 // ============================================================================
