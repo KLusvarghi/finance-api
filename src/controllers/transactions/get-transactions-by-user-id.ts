@@ -29,7 +29,7 @@ export class GetTransactionsByUserIdController {
             const userId = httpRequest.query.userId
 
             if (!userId) {
-                return requiredFieldMissingResponse('userId is required')
+                return requiredFieldMissingResponse('userId')
             }
 
             if (!checkIfIdIsValid(userId)) {
