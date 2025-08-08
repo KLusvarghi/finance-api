@@ -86,7 +86,7 @@ describe('DeleteTransactionController', () => {
         )
     })
     describe('error handling', () => {
-        it('should return 500 if DeleteTransactionService throws generic error', async () => {
+        it('should return 500 if DeleteTransactionService throws an error', async () => {
             // arrange
             jest.spyOn(
                 deleteTransactionService,
