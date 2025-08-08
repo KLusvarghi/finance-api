@@ -12,7 +12,7 @@ describe('DeleteTransactionController', () => {
     let validTransactionData: TransactionRepositoryResponse
 
     class DeleteTransactionServiceStub {
-        execute(transactionId: string): Promise<TransactionRepositoryResponse> {
+        execute(_transactionId: string): Promise<TransactionRepositoryResponse> {
             return Promise.resolve(validTransactionData)
         }
     }
