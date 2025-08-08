@@ -95,8 +95,8 @@ export interface CreateTransactionParams {
 
 export interface UpdateTransactionParams {
     name?: string
-    amount?: Prisma.Decimal
-    date?: Date
+    amount?: number
+    date?: string
     type?: 'EARNING' | 'EXPENSE' | 'INVESTMENT'
 }
 
@@ -216,7 +216,7 @@ export interface UpdateTransactionService {
     execute(
         transactionId: string,
         params: UpdateTransactionParams,
-    ): Promise<TransactionRepositoryResponse | null>
+    ): Promise<TransactionRepositoryResponse>
 }
 
 export interface DeleteTransactionService {
