@@ -4,6 +4,7 @@ import {
     handleZodValidationError,
     invalidIdResponse,
     ok,
+    requiredFieldMissingResponse,
     serverError,
 } from '../_helpers'
 import { updateTransactionSchema } from '@/schemas'
@@ -22,9 +23,13 @@ export class UpdateTransactionController {
 
     async execute(
         httpRequest: HttpRequest,
-    ): Promise<HttpResponse<TransactionRepositoryResponse | null>> {
+    ): Promise<HttpResponse<TransactionRepositoryResponse>> {
         try {
             const transactionId = httpRequest.params.transactionId
+
+            if(!transactionId){
+              return requiredFieldMissingResponse('transactionId')
+            }
 
             if (!checkIfIdIsValid(transactionId)) {
                 return invalidIdResponse()
