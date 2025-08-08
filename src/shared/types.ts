@@ -187,7 +187,7 @@ export interface UpdateUserService {
 }
 
 export interface DeleteUserService {
-    execute(userId: string): Promise<UserRepositoryResponse | null>
+    execute(userId: string): Promise<UserRepositoryResponse>
 }
 
 // Transaction Service Interfaces

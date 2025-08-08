@@ -4,6 +4,7 @@ import {
     userBadRequestResponse,
     userNotFoundResponse,
 } from '../_helpers/index'
+import { UserNotFoundError } from '@/errors/user'
 
 import { serverError, ok } from '@/shared'
 import {
@@ -34,12 +35,15 @@ export class DeleteUserController {
             if (!isIdValid) return invalidIdResponse()
 
             const deletedUser = await this.deletedUserService.execute(userId)
-
-            if (!deletedUser) return userNotFoundResponse()
-
+            
             return ok(deletedUser)
         } catch (error) {
             console.error(error)
+
+            if (error instanceof UserNotFoundError) {
+                return userNotFoundResponse()
+            }
+
             return serverError()
         }
     }
