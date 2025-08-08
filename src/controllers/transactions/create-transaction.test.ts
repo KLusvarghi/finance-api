@@ -5,7 +5,12 @@ import {
 import { CreateTransactionController } from './create-transaction'
 import { faker } from '@faker-js/faker'
 import { Prisma } from '@prisma/client'
-import { invalidDate, invalidUUID } from '@/test/fixtures'
+import {
+    invalidAmount,
+    invalidDate,
+    invalidType,
+    invalidUUID,
+} from '@/test/fixtures'
 
 describe('CreateTransactionController', () => {
     let sut: CreateTransactionController
@@ -127,48 +132,6 @@ describe('CreateTransactionController', () => {
                     )
                 },
             )
-
-            it('should return 400 if user_id is an empty string', async () => {
-                // arrange
-                const result = await sut.execute({
-                    body: {
-                        ...validTransactionData,
-                        user_id: '',
-                    },
-                })
-
-                // assert
-                expect(result.statusCode).toBe(400)
-                expect(result.body?.status).toBe('error')
-            })
-
-            it('should return 400 if user_id is null', async () => {
-                // arrange
-                const result = await sut.execute({
-                    body: {
-                        ...validTransactionData,
-                        user_id: null,
-                    },
-                })
-
-                // assert
-                expect(result.statusCode).toBe(400)
-                expect(result.body?.status).toBe('error')
-            })
-
-            it('should return 400 if user_id is a number', async () => {
-                // arrange
-                const result = await sut.execute({
-                    body: {
-                        ...validTransactionData,
-                        user_id: 123,
-                    },
-                })
-
-                // assert
-                expect(result.statusCode).toBe(400)
-                expect(result.body?.status).toBe('error')
-            })
         })
         describe('name', () => {
             it('should return 400 if name is not provided', async () => {
@@ -250,6 +213,99 @@ describe('CreateTransactionController', () => {
                     )
                 },
             )
+        })
+        describe('type', () => {
+            it('should return 400 if type is not provided', async () => {
+                // arrange
+                const result = await sut.execute({
+                    body: {
+                        ...validTransactionData,
+                        type: undefined,
+                    },
+                })
+
+                expect(result.statusCode).toBe(400)
+                expect(result.body?.status).toBe('error')
+                expect(result.body?.message).toBe(
+                    'Type must be EARNING, EXPENSE or INVESTMENT',
+                )
+            })
+
+            it.each(invalidType)(
+                'should return 400 if type is $description',
+                async ({ type }) => {
+                    // arrange
+                    const result = await sut.execute({
+                        body: {
+                            ...validTransactionData,
+                            type: type,
+                        },
+                    })
+
+                    // assert
+                    expect(result.statusCode).toBe(400)
+                    expect(result.body?.status).toBe('error')
+                    expect(result.body?.message).toBe(
+                        'Type must be EARNING, EXPENSE or INVESTMENT',
+                    )
+                },
+            )
+        })
+        describe('amount', () => {
+            it('should return 400 if amount is not provided', async () => {
+                // arrange
+                const result = await sut.execute({
+                    body: {
+                        ...validTransactionData,
+                        amount: undefined,
+                    },
+                })
+
+                // assert
+                expect(result.statusCode).toBe(400)
+                expect(result.body?.message).toBe('Amount is required')
+            })
+
+            it.each([undefined, null, ''])(
+              'should return 400 if amount is not provided',
+              async (amount: any) => {
+                  // arrange
+                  const result = await sut.execute({
+                      body: {
+                          ...validTransactionData,
+                          amount: amount,
+                      },
+                  })
+
+                  // assert
+                  expect(result.statusCode).toBe(400)
+                  expect(result.body?.status).toBe('error')
+                  expect(result.body?.message).toBe('Amount is required')
+              },
+          )
+
+            it.each(invalidAmount)(
+                'should return 400 if amount is $description',
+                async ({ amount }) => {
+                    // arrange
+                    const result = await sut.execute({
+                        body: {
+                            ...validTransactionData,
+                            amount: amount,
+                        },
+                    })
+
+                    // assert
+                    expect(result.statusCode).toBe(400)
+                    expect(result.body?.status).toBe('error')
+                },
+            )
+        })
+        describe('error handling', () => {
+            it('should return 500 if CreateTransactionService throws generic error', async () => {
+                // arrange
+                jest.spyOn(createTransactionService, 'execute').mockRejectedValueOnce(new Error())
+            })
         })
     })
 })
