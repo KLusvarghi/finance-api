@@ -121,7 +121,7 @@ describe('GetTransactionsByUserIdController', () => {
 
           // assert
           expect(response.statusCode).toBe(404)
-          expect(response.body?.message).toBe('User not found.')
+          expect(response.body?.message).toBe(`User with id ${validUserId} not found`)
       })
     })
 })
