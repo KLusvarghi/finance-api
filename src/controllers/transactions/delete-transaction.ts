@@ -1,3 +1,4 @@
+import { TransactionNotFoundError } from '@/errors/user'
 import {
     checkIfIdIsValid,
     invalidIdResponse,
@@ -32,13 +33,14 @@ export class DeleteTransactionController {
             const deletedTransaction =
                 await this.deleteTransactionService.execute(transactionId)
 
-            if (!deletedTransaction) {
-                return transactionNotFoundResponse()
-            }
-
             return ok(deletedTransaction)
         } catch (error) {
             console.error(error)
+
+            if (error instanceof TransactionNotFoundError) {
+                return transactionNotFoundResponse()
+            }
+
             return serverError()
         }
     }

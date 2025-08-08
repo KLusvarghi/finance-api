@@ -211,7 +211,7 @@ export interface UpdateTransactionService {
 export interface DeleteTransactionService {
     execute(
         transactionId: string,
-    ): Promise<TransactionRepositoryResponse | null>
+    ): Promise<TransactionRepositoryResponse>
 }
 
 // ============================================================================
