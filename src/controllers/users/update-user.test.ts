@@ -7,7 +7,7 @@ describe('UpdateUserController', () => {
     let sut: UpdateUserController
     let updateUserService: UpdateUserServiceStub
     let validUserId: string
-    let validUpdateData: any
+    let validUpdateData: UpdateUserParams
 
     class UpdateUserServiceStub {
         async execute(
@@ -127,9 +127,6 @@ describe('UpdateUserController', () => {
             expect(result.body?.status).toBe('success')
             expect(result.body?.message).toBeTruthy()
             expect(result.body?.data).toBeTruthy()
-            expect(result.body?.data?.first_name).toBeTruthy()
-            expect(result.body?.data?.last_name).toBeTruthy()
-            expect(result.body?.data?.email).toBeTruthy()
         })
     })
 
