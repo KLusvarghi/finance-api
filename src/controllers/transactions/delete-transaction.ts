@@ -33,7 +33,7 @@ export class DeleteTransactionController {
             const deletedTransaction =
                 await this.deleteTransactionService.execute(transactionId)
 
-            return ok(deletedTransaction)
+            return ok(deletedTransaction, 'Transaction deleted successfully')
         } catch (error) {
             console.error(error)
 
