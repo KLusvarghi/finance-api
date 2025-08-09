@@ -60,58 +60,6 @@ describe('GetTransactionsByUserIdController', () => {
         jest.restoreAllMocks()
     })
 
-    describe('success cases', () => {
-        it('should return 200 when finding transactions by user id', async () => {
-            // act
-            const response = await sut.execute(baseHttpRequest)
-
-            // assert
-            expect(response.statusCode).toBe(200)
-            expect(response.body?.data).toEqual(validTransactionData)
-        })
-
-        it('should call GetTransactionsByUserIdService with correct parameters', async () => {
-            // arrange
-            const executeSpy = jest.spyOn(
-                getTransactionByUserIdService,
-                'execute',
-            )
-
-            // act
-            await sut.execute(baseHttpRequest)
-
-            // assert
-            expect(executeSpy).toHaveBeenCalledWith(baseHttpRequest.query.userId)
-            expect(executeSpy).toHaveBeenCalledTimes(1)
-        })
-    })
-    describe('validations', () => {
-        it('should return 400 when userId is not provided', async () => {
-            // act
-            const response = await sut.execute({ query: { userId: undefined } })
-
-            // assert
-            expect(response.statusCode).toBe(400)
-            expect(response.body?.message).toBe('The field userId is required.')
-        })
-
-        it.each(invalidUUID)(
-            'should return 400 when userId is $description',
-            async ({ id }) => {
-                // act
-                const response = await sut.execute({
-                    query: { userId: id },
-                })
-
-                // assert
-                expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBe(
-                    'The provider id is not valid.',
-                )
-            },
-        )
-    })
-
     describe('error handling', () => {
         it('should return 500 if GetTransactionsByUserIdService throws generic error', async () => {
             // arrange
@@ -141,6 +89,61 @@ describe('GetTransactionsByUserIdController', () => {
             expect(response.body?.message).toBe(
                 `User with id ${validUserId} not found`,
             )
+        })
+    })
+
+    describe('validations', () => {
+        it('should return 400 when userId is not provided', async () => {
+            // act
+            const response = await sut.execute({ query: { userId: undefined } })
+
+            // assert
+            expect(response.statusCode).toBe(400)
+            expect(response.body?.message).toBe('The field userId is required.')
+        })
+
+        it.each(invalidUUID)(
+            'should return 400 when userId is $description',
+            async ({ id }) => {
+                // act
+                const response = await sut.execute({
+                    query: { userId: id },
+                })
+
+                // assert
+                expect(response.statusCode).toBe(400)
+                expect(response.body?.message).toBe(
+                    'The provider id is not valid.',
+                )
+            },
+        )
+    })
+
+    describe('success cases', () => {
+        it('should return 200 when finding transactions by user id', async () => {
+            // act
+            const response = await sut.execute(baseHttpRequest)
+
+            // assert
+            expect(response.statusCode).toBe(200)
+            expect(response.body?.data).toEqual(validTransactionData)
+        })
+
+        it('should call GetTransactionsByUserIdService with correct parameters', async () => {
+            // arrange
+            const executeSpy = jest.spyOn(
+                getTransactionByUserIdService,
+                'execute',
+            )
+
+            // act
+            await sut.execute(baseHttpRequest)
+
+            // assert
+            expect(executeSpy).toHaveBeenCalledWith(
+                baseHttpRequest.query.userId,
+            )
+            expect(executeSpy).toHaveBeenCalledTimes(1)
         })
     })
 })

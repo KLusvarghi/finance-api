@@ -78,27 +78,20 @@ describe('CreateTransactionController', () => {
         jest.restoreAllMocks()
     })
 
-    describe('succes cases', () => {
-        it('should return 201 when creating transaction successfully', async () => {
+    describe('error handling', () => {
+        it('should return 500 if CreateTransactionService throws generic error', async () => {
             // arrange
+            jest.spyOn(
+                createTransactionService,
+                'execute',
+            ).mockRejectedValueOnce(new Error())
+
+            // act
             const response = await sut.execute(baseHttpRequest)
 
             // assert
-            expect(response.statusCode).toBe(201)
-            expect(response.body?.status).toBe('success')
-            // expect(response.body?.data).toMatchObject(validTransactionData)
-        })
-
-        it('should call CreateTransactionService with correct parameters', async () => {
-            // arrange
-            const executeSpy = jest.spyOn(createTransactionService, 'execute')
-
-            // act
-            await sut.execute(baseHttpRequest)
-
-            // assert
-            expect(executeSpy).toHaveBeenCalledWith(baseHttpRequest.body)
-            expect(executeSpy).toHaveBeenCalledTimes(1)
+            expect(response.statusCode).toBe(500)
+            expect(response.body?.status).toBe('error')
         })
     })
 
@@ -307,21 +300,29 @@ describe('CreateTransactionController', () => {
                 },
             )
         })
-        describe('error handling', () => {
-            it('should return 500 if CreateTransactionService throws generic error', async () => {
-                // arrange
-                jest.spyOn(
-                    createTransactionService,
-                    'execute',
-                ).mockRejectedValueOnce(new Error())
+    })
 
-                // act
-                const response = await sut.execute(baseHttpRequest)
+    describe('succes cases', () => {
+        it('should return 201 when creating transaction successfully', async () => {
+            // arrange
+            const response = await sut.execute(baseHttpRequest)
 
-                // assert
-                expect(response.statusCode).toBe(500)
-                expect(response.body?.status).toBe('error')
-            })
+            // assert
+            expect(response.statusCode).toBe(201)
+            expect(response.body?.status).toBe('success')
+            // expect(response.body?.data).toMatchObject(validTransactionData)
+        })
+
+        it('should call CreateTransactionService with correct parameters', async () => {
+            // arrange
+            const executeSpy = jest.spyOn(createTransactionService, 'execute')
+
+            // act
+            await sut.execute(baseHttpRequest)
+
+            // assert
+            expect(executeSpy).toHaveBeenCalledWith(baseHttpRequest.body)
+            expect(executeSpy).toHaveBeenCalledTimes(1)
         })
     })
 })

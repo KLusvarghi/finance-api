@@ -38,7 +38,7 @@ describe('UpdateTransactionController', () => {
 
     beforeEach(() => {
         const { sut: controller, updateTransactionService: service } = makeSut()
-        
+
         sut = controller
         updateTransactionService = service
 
@@ -71,30 +71,22 @@ describe('UpdateTransactionController', () => {
         jest.restoreAllMocks()
     })
 
-    describe('success cases', () => {
-        it('should return 200 when updating transaction successfully', async () => {
-            // act
-            const response = await sut.execute(baseHttpRequest)
+    describe('error handling', () => {
+        it('should return 500 if UpdateTransactionService throws generic error', async () => {
+            jest.spyOn(
+                updateTransactionService,
+                'execute',
+            ).mockRejectedValueOnce(new Error())
 
-            const data = response.body?.data
+            const result = await sut.execute({
+                ...baseHttpRequest,
+            })
 
-            // assert
-            expect(response.statusCode).toBe(200)
-            expect(data).toMatchObject(validUpdateResponse)
-        })
-
-        it('should call UpdateTransactionService with correct params', async () => {
-            const executeSpy = jest.spyOn(updateTransactionService, 'execute')
-
-            await sut.execute(baseHttpRequest)
-
-            expect(executeSpy).toHaveBeenCalledWith(
-                baseHttpRequest.params.transactionId,
-                baseHttpRequest.body,
-            )
-            expect(executeSpy).toHaveBeenCalledTimes(1)
+            expect(result.statusCode).toBe(500)
+            expect(result.body?.status).toBe('error')
         })
     })
+
     describe('validations', () => {
         it('should return 400 when transactionId is not provided', async () => {
             // act
@@ -261,21 +253,30 @@ describe('UpdateTransactionController', () => {
                 )
             })
         })
+    })
 
-        describe('error handling', () => {
-            it('should return 500 if UpdateTransactionService throws generic error', async () => {
-                jest.spyOn(
-                    updateTransactionService,
-                    'execute',
-                ).mockRejectedValueOnce(new Error())
+    describe('success cases', () => {
+        it('should return 200 when updating transaction successfully', async () => {
+            // act
+            const response = await sut.execute(baseHttpRequest)
 
-                const result = await sut.execute({
-                    ...baseHttpRequest,
-                })
+            const data = response.body?.data
 
-                expect(result.statusCode).toBe(500)
-                expect(result.body?.status).toBe('error')
-            })
+            // assert
+            expect(response.statusCode).toBe(200)
+            expect(data).toMatchObject(validUpdateResponse)
+        })
+
+        it('should call UpdateTransactionService with correct params', async () => {
+            const executeSpy = jest.spyOn(updateTransactionService, 'execute')
+
+            await sut.execute(baseHttpRequest)
+
+            expect(executeSpy).toHaveBeenCalledWith(
+                baseHttpRequest.params.transactionId,
+                baseHttpRequest.body,
+            )
+            expect(executeSpy).toHaveBeenCalledTimes(1)
         })
     })
 })
