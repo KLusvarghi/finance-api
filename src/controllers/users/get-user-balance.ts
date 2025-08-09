@@ -30,9 +30,7 @@ export class GetUserBalanceController {
                 return invalidIdResponse()
             }
 
-            const userBalance = await this.getUserBalanceService.execute({
-                userId,
-            })
+            const userBalance = await this.getUserBalanceService.execute(userId)
 
             return ok(userBalance)
         } catch (error) {
