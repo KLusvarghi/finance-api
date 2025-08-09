@@ -1,3 +1,4 @@
+import { IdGeneratorAdapter, PasswordHasherAdapter } from '@/adapters'
 import {
     CreateUserController,
     DeleteUserController,
@@ -32,9 +33,13 @@ export const makeGetUserByIdController = () => {
 export const makeCreateUserController = () => {
     const getUserByEmailRepository = new PostgresGetUserByEmailRepository()
     const createUserRepository = new PostgresCreateUserRepository()
+    const idGenerator = new IdGeneratorAdapter()
+    const passwordHasher = new PasswordHasherAdapter()
     const createUserService = new CreateUserService(
         createUserRepository,
         getUserByEmailRepository,
+        idGenerator,
+        passwordHasher,
     )
     const createUserController = new CreateUserController(createUserService)
 
