@@ -134,7 +134,10 @@ describe('UpdateTransactionController', () => {
 
         describe('validations', () => {
             it('should accept empty body (no fields provided)', async () => {
-                const spy = jest.spyOn(updateTransactionService, 'execute')
+                const executeSpy = jest.spyOn(
+                    updateTransactionService,
+                    'execute',
+                )
 
                 const response = await sut.execute({
                     ...baseHttpRequest,
@@ -142,7 +145,21 @@ describe('UpdateTransactionController', () => {
                 })
 
                 expect(response.statusCode).toBe(200)
-                expect(spy).toHaveBeenCalledWith(validTransactionId, {})
+                expect(executeSpy).toHaveBeenCalledWith(validTransactionId, {})
+            })
+            
+            it('should call UpdateTransactionService with correct params', async () => {
+                const executeSpy = jest.spyOn(
+                    updateTransactionService,
+                    'execute',
+                )
+
+                await sut.execute(baseHttpRequest)
+
+                expect(executeSpy).toHaveBeenCalledWith(
+                    baseHttpRequest.params.transactionId,
+                    baseHttpRequest.body,
+                )
             })
 
             describe('name', () => {
