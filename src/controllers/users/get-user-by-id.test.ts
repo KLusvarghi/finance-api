@@ -78,10 +78,10 @@ describe('GetUserByIdController', () => {
 
     describe('validations', () => {
         describe('userId', () => {
-            it('should return 404 if userId is not provided', async () => {
+            it('should return 400 if userId is not provided', async () => {
                 const result = await sut.execute({ params: { userId: '' } })
 
-                expect(result.statusCode).toBe(404)
+                expect(result.statusCode).toBe(400)
                 expect(result.body?.status).toBe('error')
                 expect(result.body?.message).toBeTruthy()
             })
@@ -114,15 +114,15 @@ describe('GetUserByIdController', () => {
         })
 
         it('should call GetUserByIdService with correct parameters', async () => {
-          // arrange
-          const spy = jest.spyOn(getUserByIdService, 'execute')
+            // arrange
+            const spy = jest.spyOn(getUserByIdService, 'execute')
 
-          // act
-          await sut.execute(baseHttpRequest)
+            // act
+            await sut.execute(baseHttpRequest)
 
-          // assert
-          expect(spy).toHaveBeenCalledWith(baseHttpRequest.params.userId)
-          expect(spy).toHaveBeenCalledTimes(1)
-      })
+            // assert
+            expect(spy).toHaveBeenCalledWith(baseHttpRequest.params.userId)
+            expect(spy).toHaveBeenCalledTimes(1)
+        })
     })
 })
