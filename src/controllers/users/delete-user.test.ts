@@ -82,6 +82,17 @@ describe('DeleteUserController', () => {
 
     describe('validations', () => {
         describe('userId', () => {
+            it('should return 400 if userId is not provided', async () => {
+                const result = await sut.execute({
+                    params: { userId: undefined },
+                })
+
+                expect(result.statusCode).toBe(400)
+                expect(result.body?.status).toBe('error')
+                expect(result.body?.message).toBeTruthy()
+                expect(result.body?.message).toBe('Missing param: userId')
+            })
+
             it('should return 400 if userId is invalid', async () => {
                 const result = await sut.execute({
                     params: { userId: 'invalid-uuid' },
@@ -105,15 +116,15 @@ describe('DeleteUserController', () => {
         })
 
         it('should call DeleteUserService with correct parameters', async () => {
-          // arrange
-          const spy = jest.spyOn(deleteUserService, 'execute')
+            // arrange
+            const spy = jest.spyOn(deleteUserService, 'execute')
 
-          // act
-          await sut.execute(baseHttpRequest)
+            // act
+            await sut.execute(baseHttpRequest)
 
-          // assert
-          expect(spy).toHaveBeenCalledWith(baseHttpRequest.params.userId)
-          expect(spy).toHaveBeenCalledTimes(1)
-      })
+            // assert
+            expect(spy).toHaveBeenCalledWith(baseHttpRequest.params.userId)
+            expect(spy).toHaveBeenCalledTimes(1)
+        })
     })
 })
