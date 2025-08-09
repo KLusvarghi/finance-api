@@ -6,17 +6,21 @@ import {
     GetUserByIdRepository,
     TransactionRepositoryResponse,
 } from '@/shared/types'
+import { IdGeneratorAdapter } from '@/adapters'
 
 export class CreateTransactionService {
     private createTransactionRepository: CreateTransactionRepository
     private getUserByIdRepository: GetUserByIdRepository
+    private idGenerator: IdGeneratorAdapter
 
     constructor(
         createTransactionRepository: CreateTransactionRepository,
         getUserByIdRepository: GetUserByIdRepository,
+        idGenerator: IdGeneratorAdapter,
     ) {
         this.createTransactionRepository = createTransactionRepository
         this.getUserByIdRepository = getUserByIdRepository
+        this.idGenerator = idGenerator
     }
 
     async execute(
@@ -28,7 +32,7 @@ export class CreateTransactionService {
             throw new UserNotFoundError(params.user_id)
         }
 
-        const transactionId = uuidv4()
+        const transactionId = this.idGenerator.execute()
 
         const transaction = await this.createTransactionRepository.execute({
             ...params,
