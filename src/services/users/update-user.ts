@@ -23,11 +23,11 @@ export class UpdateUserService {
         userId: string,
         updateUserParams: UpdateUserParams,
     ): Promise<UserRepositoryResponse | null> {
-        const hasUserWithProvidedEMail = await this.getUserByEmailRepository.execute(
+        const hasUserWithProvidedEmail = await this.getUserByEmailRepository.execute(
             updateUserParams.email!,
         )
 
-        if (!hasUserWithProvidedEMail) {
+        if (!hasUserWithProvidedEmail) {
             throw new UserNotFoundError(userId)
         }
 
