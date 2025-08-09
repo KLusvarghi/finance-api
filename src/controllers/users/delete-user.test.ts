@@ -43,33 +43,6 @@ describe('DeleteUserController', () => {
         jest.restoreAllMocks()
     })
 
-    describe('validations', () => {
-        describe('userId', () => {
-            it('should return 400 if userId is invalid', async () => {
-                const result = await sut.execute({
-                    params: { userId: 'invalid-uuid' },
-                })
-
-                expect(result.statusCode).toBe(400)
-                expect(result.body?.status).toBe('error')
-                expect(result.body?.message).toBeTruthy()
-            })
-        })
-    })
-
-    describe('success cases', () => {
-        it('should return 200 if user is deleted successfully', async () => {
-            const result = await sut.execute({
-                params: { userId: validUserId },
-            })
-
-            expect(result.statusCode).toBe(200)
-            expect(result.body?.status).toBe('success')
-            expect(result.body?.message).toBeTruthy()
-            expect(result.body?.data).toBeTruthy()
-        })
-    })
-
     describe('error handling', () => {
         it('should return 404 if user is not found', async () => {
             jest.spyOn(deleteUserService, 'execute').mockImplementationOnce(
@@ -101,6 +74,33 @@ describe('DeleteUserController', () => {
             expect(result.statusCode).toBe(500)
             expect(result.body?.status).toBe('error')
             expect(result.body?.message).toBeTruthy()
+        })
+    })
+
+    describe('validations', () => {
+        describe('userId', () => {
+            it('should return 400 if userId is invalid', async () => {
+                const result = await sut.execute({
+                    params: { userId: 'invalid-uuid' },
+                })
+
+                expect(result.statusCode).toBe(400)
+                expect(result.body?.status).toBe('error')
+                expect(result.body?.message).toBeTruthy()
+            })
+        })
+    })
+
+    describe('success cases', () => {
+        it('should return 200 if user is deleted successfully', async () => {
+            const result = await sut.execute({
+                params: { userId: validUserId },
+            })
+
+            expect(result.statusCode).toBe(200)
+            expect(result.body?.status).toBe('success')
+            expect(result.body?.message).toBeTruthy()
+            expect(result.body?.data).toBeTruthy()
         })
     })
 })

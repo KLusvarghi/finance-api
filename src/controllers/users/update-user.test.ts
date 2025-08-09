@@ -56,6 +56,41 @@ describe('UpdateUserController', () => {
         jest.restoreAllMocks()
     })
 
+    describe('error handling', () => {
+        it('should return 500 when UpdateUserService throws generic error', async () => {
+            jest.spyOn(updateUserService, 'execute').mockRejectedValueOnce(
+                new Error(),
+            )
+
+            const result = await sut.execute({
+                params: { userId: validUserId },
+                body: validUpdateData,
+            })
+
+            expect(result.statusCode).toBe(500)
+            expect(result.body?.status).toBe('error')
+            expect(result.body?.message).toBeTruthy()
+        })
+
+        it('should return 400 when UpdateUserService throws EmailAlreadyExistsError', async () => {
+            const duplicateEmail = faker.internet.email()
+            jest.spyOn(updateUserService, 'execute').mockRejectedValueOnce(
+                new EmailAlreadyExistsError(duplicateEmail),
+            )
+
+            const result = await sut.execute({
+                params: { userId: validUserId },
+                body: validUpdateData,
+            })
+
+            expect(result.statusCode).toBe(400)
+            expect(result.body?.status).toBe('error')
+            expect(result.body?.message).toBeTruthy()
+            expect(result.body?.message).toContain(duplicateEmail)
+            expect(result.body?.message).toContain('already in use')
+        })
+    })
+
     describe('validations', () => {
         describe('email', () => {
             it('should return 400 when invalid email is provided', async () => {
@@ -127,41 +162,6 @@ describe('UpdateUserController', () => {
             expect(result.body?.status).toBe('success')
             expect(result.body?.message).toBeTruthy()
             expect(result.body?.data).toBeTruthy()
-        })
-    })
-
-    describe('error handling', () => {
-        it('should return 500 when UpdateUserService throws generic error', async () => {
-            jest.spyOn(updateUserService, 'execute').mockRejectedValueOnce(
-                new Error(),
-            )
-
-            const result = await sut.execute({
-                params: { userId: validUserId },
-                body: validUpdateData,
-            })
-
-            expect(result.statusCode).toBe(500)
-            expect(result.body?.status).toBe('error')
-            expect(result.body?.message).toBeTruthy()
-        })
-
-        it('should return 400 when UpdateUserService throws EmailAlreadyExistsError', async () => {
-            const duplicateEmail = faker.internet.email()
-            jest.spyOn(updateUserService, 'execute').mockRejectedValueOnce(
-                new EmailAlreadyExistsError(duplicateEmail),
-            )
-
-            const result = await sut.execute({
-                params: { userId: validUserId },
-                body: validUpdateData,
-            })
-
-            expect(result.statusCode).toBe(400)
-            expect(result.body?.status).toBe('error')
-            expect(result.body?.message).toBeTruthy()
-            expect(result.body?.message).toContain(duplicateEmail)
-            expect(result.body?.message).toContain('already in use')
         })
     })
 })

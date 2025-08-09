@@ -42,6 +42,22 @@ describe('GetUserBalanceController', () => {
         jest.restoreAllMocks()
     })
 
+    describe('error handling', () => {
+        it('should return 500 if GetUserBalanceService throws', async () => {
+            jest.spyOn(getUserBalanceService, 'execute').mockRejectedValueOnce(
+                new Error(),
+            )
+
+            const result = await sut.execute({
+                params: { userId: validUserId },
+            })
+
+            expect(result.statusCode).toBe(500)
+            expect(result.body?.status).toBe('error')
+            expect(result.body?.message).toBeTruthy()
+        })
+    })
+
     describe('validations', () => {
         describe('userId', () => {
             it('should return 400 when userId is invalid', async () => {
@@ -73,22 +89,6 @@ describe('GetUserBalanceController', () => {
             expect(typeof result.body?.data?.earnings).toBe('number')
             expect(typeof result.body?.data?.expenses).toBe('number')
             expect(typeof result.body?.data?.investments).toBe('number')
-        })
-    })
-
-    describe('error handling', () => {
-        it('should return 500 if GetUserBalanceService throws', async () => {
-            jest.spyOn(getUserBalanceService, 'execute').mockRejectedValueOnce(
-                new Error(),
-            )
-
-            const result = await sut.execute({
-                params: { userId: validUserId },
-            })
-
-            expect(result.statusCode).toBe(500)
-            expect(result.body?.status).toBe('error')
-            expect(result.body?.message).toBeTruthy()
         })
     })
 })

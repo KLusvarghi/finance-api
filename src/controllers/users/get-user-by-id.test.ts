@@ -1,6 +1,4 @@
-import {
-    UserPublicResponse
-} from '@/shared'
+import { UserPublicResponse } from '@/shared'
 import { faker } from '@faker-js/faker'
 import { GetUserByIdController } from './get-user-by-id'
 import { UserNotFoundError } from '@/errors/user'
@@ -47,6 +45,37 @@ describe('GetUserByIdController', () => {
         jest.restoreAllMocks()
     })
 
+    describe('error handling', () => {
+        it('should return 404 if user is not found', async () => {
+            jest.spyOn(getUserByIdService, 'execute').mockRejectedValue(
+                new UserNotFoundError(validUserId),
+            )
+
+            const result = await sut.execute({
+                params: { userId: validUserId },
+            })
+
+            expect(result.statusCode).toBe(404)
+            expect(result.body?.status).toBe('error')
+            expect(result.body?.message).toBeTruthy()
+            expect(result.body?.message).toContain(validUserId)
+        })
+
+        it('should return 500 if GetUserByIdService throws an error', async () => {
+            jest.spyOn(getUserByIdService, 'execute').mockRejectedValue(
+                new Error(),
+            )
+
+            const result = await sut.execute({
+                params: { userId: validUserId },
+            })
+
+            expect(result.statusCode).toBe(500)
+            expect(result.body?.status).toBe('error')
+            expect(result.body?.message).toBeTruthy()
+        })
+    })
+
     describe('validations', () => {
         describe('userId', () => {
             it('should return 404 if userId is not provided', async () => {
@@ -84,37 +113,6 @@ describe('GetUserByIdController', () => {
             expect(result.body?.data?.last_name).toBeTruthy()
             expect(result.body?.data?.email).toBeTruthy()
             expect(result.body?.data).not.toHaveProperty('password')
-        })
-    })
-
-    describe('error handling', () => {
-        it('should return 404 if user is not found', async () => {
-            jest.spyOn(getUserByIdService, 'execute').mockRejectedValue(
-                new UserNotFoundError(validUserId),
-            )
-
-            const result = await sut.execute({
-                params: { userId: validUserId },
-            })
-
-            expect(result.statusCode).toBe(404)
-            expect(result.body?.status).toBe('error')
-            expect(result.body?.message).toBeTruthy()
-            expect(result.body?.message).toContain(validUserId)
-        })
-
-        it('should return 500 if GetUserByIdService throws an error', async () => {
-            jest.spyOn(getUserByIdService, 'execute').mockRejectedValue(
-                new Error(),
-            )
-
-            const result = await sut.execute({
-                params: { userId: validUserId },
-            })
-
-            expect(result.statusCode).toBe(500)
-            expect(result.body?.status).toBe('error')
-            expect(result.body?.message).toBeTruthy()
         })
     })
 })
