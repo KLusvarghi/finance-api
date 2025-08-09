@@ -1,7 +1,5 @@
 import {
-    HttpResponse,
-    UserPublicResponse,
-    UserRepositoryResponse,
+    UserPublicResponse
 } from '@/shared'
 import { faker } from '@faker-js/faker'
 import { GetUserByIdController } from './get-user-by-id'
