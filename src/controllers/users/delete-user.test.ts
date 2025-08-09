@@ -1,4 +1,4 @@
-import { UserRepositoryResponse } from '@/shared'
+import { HttpRequest, UserRepositoryResponse } from '@/shared'
 import { DeleteUserController } from './delete-user'
 import { faker } from '@faker-js/faker'
 import { UserNotFoundError } from '@/errors/user'
@@ -7,16 +7,12 @@ describe('DeleteUserController', () => {
     let sut: DeleteUserController
     let deleteUserService: DeleteUserServiceStub
     let validUserId: string
+    let validUserResponse: UserRepositoryResponse
+    let baseHttpRequest: HttpRequest
 
     class DeleteUserServiceStub {
-        execute(userId: string): Promise<UserRepositoryResponse> {
-            return Promise.resolve({
-                id: userId,
-                first_name: faker.person.firstName(),
-                last_name: faker.person.lastName(),
-                email: faker.internet.email(),
-                password: faker.internet.password({ length: 7 }),
-            })
+        execute(_userId: string): Promise<UserRepositoryResponse> {
+            return Promise.resolve(validUserResponse)
         }
     }
 
@@ -35,6 +31,17 @@ describe('DeleteUserController', () => {
 
         // Dados válidos sempre disponíveis
         validUserId = faker.string.uuid()
+        validUserResponse = {
+            id: validUserId,
+            first_name: faker.person.firstName(),
+            last_name: faker.person.lastName(),
+            email: faker.internet.email(),
+            password: faker.internet.password({ length: 7 }),
+        }
+
+        baseHttpRequest = {
+            params: { userId: validUserId },
+        }
     })
 
     afterEach(() => {
@@ -51,9 +58,7 @@ describe('DeleteUserController', () => {
                 },
             )
 
-            const result = await sut.execute({
-                params: { userId: validUserId },
-            })
+            const result = await sut.execute(baseHttpRequest)
 
             expect(result.statusCode).toBe(404)
             expect(result.body?.status).toBe('error')
@@ -67,9 +72,7 @@ describe('DeleteUserController', () => {
                 },
             )
 
-            const result = await sut.execute({
-                params: { userId: validUserId },
-            })
+            const result = await sut.execute(baseHttpRequest)
 
             expect(result.statusCode).toBe(500)
             expect(result.body?.status).toBe('error')
@@ -93,14 +96,12 @@ describe('DeleteUserController', () => {
 
     describe('success cases', () => {
         it('should return 200 if user is deleted successfully', async () => {
-            const result = await sut.execute({
-                params: { userId: validUserId },
-            })
+            const result = await sut.execute(baseHttpRequest)
 
             expect(result.statusCode).toBe(200)
             expect(result.body?.status).toBe('success')
             expect(result.body?.message).toBeTruthy()
-            expect(result.body?.data).toBeTruthy()
+            expect(result.body?.data).toEqual(validUserResponse)
         })
     })
 })

@@ -1,26 +1,22 @@
 import { faker } from '@faker-js/faker'
 import { UpdateUserController } from './update-user'
-import { UpdateUserParams, UserRepositoryResponse } from '@/shared'
+import { HttpRequest, UpdateUserParams, UserRepositoryResponse } from '@/shared'
 import { EmailAlreadyExistsError } from '@/errors/user'
 
 describe('UpdateUserController', () => {
     let sut: UpdateUserController
     let updateUserService: UpdateUserServiceStub
     let validUserId: string
-    let validUpdateData: UpdateUserParams
+    let validUpdateRequest: UpdateUserParams
+    let validUpdateResponse: UserRepositoryResponse
+    let baseHttpRequest: HttpRequest
 
     class UpdateUserServiceStub {
         async execute(
-            userId: string,
+            _userId: string,
             _params: UpdateUserParams,
         ): Promise<UserRepositoryResponse> {
-            return Promise.resolve({
-                id: userId,
-                first_name: faker.person.firstName(),
-                last_name: faker.person.lastName(),
-                email: faker.internet.email(),
-                password: faker.internet.password({ length: 6 }),
-            })
+            return Promise.resolve(validUpdateResponse)
         }
     }
 
@@ -42,11 +38,22 @@ describe('UpdateUserController', () => {
 
         // Dados válidos sempre disponíveis
         validUserId = faker.string.uuid()
-        validUpdateData = {
+        validUpdateRequest = {
             first_name: faker.person.firstName(),
             last_name: faker.person.lastName(),
             email: faker.internet.email(),
             password: faker.internet.password({ length: 7 }),
+        }
+        validUpdateResponse = {
+            id: validUserId,
+            first_name: faker.person.firstName(),
+            last_name: faker.person.lastName(),
+            email: faker.internet.email(),
+            password: faker.internet.password({ length: 7 }),
+        }
+        baseHttpRequest = {
+            params: { userId: validUserId },
+            body: validUpdateRequest,
         }
     })
 
@@ -62,10 +69,7 @@ describe('UpdateUserController', () => {
                 new Error(),
             )
 
-            const result = await sut.execute({
-                params: { userId: validUserId },
-                body: validUpdateData,
-            })
+            const result = await sut.execute(baseHttpRequest)
 
             expect(result.statusCode).toBe(500)
             expect(result.body?.status).toBe('error')
@@ -78,10 +82,7 @@ describe('UpdateUserController', () => {
                 new EmailAlreadyExistsError(duplicateEmail),
             )
 
-            const result = await sut.execute({
-                params: { userId: validUserId },
-                body: validUpdateData,
-            })
+            const result = await sut.execute(baseHttpRequest)
 
             expect(result.statusCode).toBe(400)
             expect(result.body?.status).toBe('error')
@@ -96,7 +97,7 @@ describe('UpdateUserController', () => {
             it('should return 400 when invalid email is provided', async () => {
                 const result = await sut.execute({
                     params: { userId: validUserId },
-                    body: { ...validUpdateData, email: 'invalid_email' },
+                    body: { ...validUpdateRequest, email: 'invalid_email' },
                 })
 
                 expect(result.statusCode).toBe(400)
@@ -110,7 +111,7 @@ describe('UpdateUserController', () => {
                 const result = await sut.execute({
                     params: { userId: validUserId },
                     body: {
-                        ...validUpdateData,
+                        ...validUpdateRequest,
                         password: faker.internet.password({ length: 5 }),
                     },
                 })
@@ -125,7 +126,7 @@ describe('UpdateUserController', () => {
             it('should return 400 when invalid userId is provided', async () => {
                 const result = await sut.execute({
                     params: { userId: 'invalid_id' },
-                    body: validUpdateData,
+                    body: validUpdateRequest,
                 })
 
                 expect(result.statusCode).toBe(400)
@@ -139,7 +140,7 @@ describe('UpdateUserController', () => {
                 const result = await sut.execute({
                     params: { userId: validUserId },
                     body: {
-                        ...validUpdateData,
+                        ...validUpdateRequest,
                         disallowed_field: 'disallowed_field',
                     },
                 })
@@ -153,15 +154,12 @@ describe('UpdateUserController', () => {
 
     describe('success cases', () => {
         it('should return 200 when updating user successfully', async () => {
-            const result = await sut.execute({
-                params: { userId: validUserId },
-                body: validUpdateData,
-            })
+            const result = await sut.execute(baseHttpRequest)
 
             expect(result.statusCode).toBe(200)
             expect(result.body?.status).toBe('success')
             expect(result.body?.message).toBeTruthy()
-            expect(result.body?.data).toBeTruthy()
+            expect(result.body?.data).toEqual(validUpdateResponse)
         })
     })
 })

@@ -1,4 +1,4 @@
-import { UserBalanceRepositoryResponse } from '@/shared'
+import { HttpRequest, UserBalanceRepositoryResponse } from '@/shared'
 import { faker } from '@faker-js/faker'
 import { GetUserBalanceController } from './get-user-balance'
 import { Prisma } from '@prisma/client'
@@ -7,15 +7,12 @@ describe('GetUserBalanceController', () => {
     let sut: GetUserBalanceController
     let getUserBalanceService: GetUserBalanceServiceStub
     let validUserId: string
+    let validBalanceResponse: UserBalanceRepositoryResponse
+    let baseHttpRequest: HttpRequest
 
     class GetUserBalanceServiceStub {
         execute(_userId: string): Promise<UserBalanceRepositoryResponse> {
-            return Promise.resolve({
-                earnings: faker.number.float(),
-                expenses: faker.number.float(),
-                investments: faker.number.float(),
-                balance: new Prisma.Decimal(faker.number.float()),
-            })
+            return Promise.resolve(validBalanceResponse)
         }
     }
 
@@ -34,6 +31,15 @@ describe('GetUserBalanceController', () => {
 
         // Dados válidos sempre disponíveis
         validUserId = faker.string.uuid()
+        validBalanceResponse = {
+            earnings: faker.number.float(),
+            expenses: faker.number.float(),
+            investments: faker.number.float(),
+            balance: new Prisma.Decimal(faker.number.float()),
+        }
+        baseHttpRequest = {
+            params: { userId: validUserId },
+        }
     })
 
     afterEach(() => {
@@ -48,9 +54,7 @@ describe('GetUserBalanceController', () => {
                 new Error(),
             )
 
-            const result = await sut.execute({
-                params: { userId: validUserId },
-            })
+            const result = await sut.execute(baseHttpRequest)
 
             expect(result.statusCode).toBe(500)
             expect(result.body?.status).toBe('error')
@@ -74,14 +78,12 @@ describe('GetUserBalanceController', () => {
 
     describe('success cases', () => {
         it('should return 200 when getting user balance successfully', async () => {
-            const result = await sut.execute({
-                params: { userId: validUserId },
-            })
+            const result = await sut.execute(baseHttpRequest)
 
             expect(result.statusCode).toBe(200)
             expect(result.body?.status).toBe('success')
             expect(result.body?.message).toBeTruthy()
-            expect(result.body?.data).toBeTruthy()
+            expect(result.body?.data).toEqual(validBalanceResponse)
             expect(result.body?.data?.earnings).toBeDefined()
             expect(result.body?.data?.expenses).toBeDefined()
             expect(result.body?.data?.investments).toBeDefined()

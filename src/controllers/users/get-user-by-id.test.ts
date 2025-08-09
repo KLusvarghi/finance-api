@@ -1,4 +1,4 @@
-import { UserPublicResponse } from '@/shared'
+import { HttpRequest, UserPublicResponse } from '@/shared'
 import { faker } from '@faker-js/faker'
 import { GetUserByIdController } from './get-user-by-id'
 import { UserNotFoundError } from '@/errors/user'
@@ -7,6 +7,7 @@ describe('GetUserByIdController', () => {
     let sut: GetUserByIdController
     let getUserByIdService: GetUserByIdServiceStub
     let validUserId: string
+    let baseHttpRequest: HttpRequest
 
     class GetUserByIdServiceStub {
         async execute(userId: string): Promise<UserPublicResponse> {
@@ -37,6 +38,9 @@ describe('GetUserByIdController', () => {
 
         // Dados válidos sempre disponíveis
         validUserId = faker.string.uuid()
+        baseHttpRequest = {
+            params: { userId: validUserId },
+        }
     })
 
     afterEach(() => {
@@ -51,9 +55,7 @@ describe('GetUserByIdController', () => {
                 new UserNotFoundError(validUserId),
             )
 
-            const result = await sut.execute({
-                params: { userId: validUserId },
-            })
+            const result = await sut.execute(baseHttpRequest)
 
             expect(result.statusCode).toBe(404)
             expect(result.body?.status).toBe('error')
@@ -66,9 +68,7 @@ describe('GetUserByIdController', () => {
                 new Error(),
             )
 
-            const result = await sut.execute({
-                params: { userId: validUserId },
-            })
+            const result = await sut.execute(baseHttpRequest)
 
             expect(result.statusCode).toBe(500)
             expect(result.body?.status).toBe('error')
@@ -100,9 +100,7 @@ describe('GetUserByIdController', () => {
 
     describe('success cases', () => {
         it('should return 200 if user is found successfully', async () => {
-            const result = await sut.execute({
-                params: { userId: validUserId },
-            })
+            const result = await sut.execute(baseHttpRequest)
 
             expect(result.statusCode).toBe(200)
             expect(result.body?.status).toBe('success')
