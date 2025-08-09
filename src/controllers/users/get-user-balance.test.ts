@@ -92,5 +92,17 @@ describe('GetUserBalanceController', () => {
             expect(typeof result.body?.data?.expenses).toBe('number')
             expect(typeof result.body?.data?.investments).toBe('number')
         })
+
+        it('should call GetUserBalanceService with correct parameters', async () => {
+          // arrange
+          const spy = jest.spyOn(getUserBalanceService, 'execute')
+
+          // act
+          await sut.execute(baseHttpRequest)
+
+          // assert
+          expect(spy).toHaveBeenCalledWith(baseHttpRequest.params.userId)
+          expect(spy).toHaveBeenCalledTimes(1)
+      })
     })
 })

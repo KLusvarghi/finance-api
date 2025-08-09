@@ -161,5 +161,20 @@ describe('UpdateUserController', () => {
             expect(result.body?.message).toBeTruthy()
             expect(result.body?.data).toEqual(validUpdateResponse)
         })
+
+        it('should call UpdateUserService with correct parameters', async () => {
+          // arrange
+          const spy = jest.spyOn(updateUserService, 'execute')
+
+          // act
+          await sut.execute(baseHttpRequest)
+
+          // assert
+          expect(spy).toHaveBeenCalledWith(
+            baseHttpRequest.params.userId,
+            baseHttpRequest.body,
+          )
+          expect(spy).toHaveBeenCalledTimes(1)
+      })
     })
 })

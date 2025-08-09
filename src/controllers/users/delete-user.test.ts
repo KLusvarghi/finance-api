@@ -103,5 +103,17 @@ describe('DeleteUserController', () => {
             expect(result.body?.message).toBeTruthy()
             expect(result.body?.data).toEqual(validUserResponse)
         })
+
+        it('should call DeleteUserService with correct parameters', async () => {
+          // arrange
+          const spy = jest.spyOn(deleteUserService, 'execute')
+
+          // act
+          await sut.execute(baseHttpRequest)
+
+          // assert
+          expect(spy).toHaveBeenCalledWith(baseHttpRequest.params.userId)
+          expect(spy).toHaveBeenCalledTimes(1)
+      })
     })
 })

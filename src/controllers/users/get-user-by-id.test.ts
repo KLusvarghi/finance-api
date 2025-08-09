@@ -112,5 +112,17 @@ describe('GetUserByIdController', () => {
             expect(result.body?.data?.email).toBeTruthy()
             expect(result.body?.data).not.toHaveProperty('password')
         })
+
+        it('should call GetUserByIdService with correct parameters', async () => {
+          // arrange
+          const spy = jest.spyOn(getUserByIdService, 'execute')
+
+          // act
+          await sut.execute(baseHttpRequest)
+
+          // assert
+          expect(spy).toHaveBeenCalledWith(baseHttpRequest.params.userId)
+          expect(spy).toHaveBeenCalledTimes(1)
+      })
     })
 })
