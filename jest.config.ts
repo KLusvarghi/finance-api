@@ -34,6 +34,8 @@ const config: Config = {
         '<rootDir>/*.test.ts',
         '<rootDir>/*.spec.ts',
     ],
+    // com isso ele irá fazer a cobertura de testes de todos os arquivos .ts e não apenas os que estão no testMatch
+    collectCoverageFrom: ['src/**/*.ts'],
 }
 
 export default config
