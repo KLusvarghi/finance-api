@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from 'uuid'
-import bcrypt from 'bcrypt'
 import {
     CreateUserParams,
     CreateUserRepository,
@@ -7,17 +5,24 @@ import {
     UserPublicResponse,
 } from '@/shared/types'
 import { EmailAlreadyExistsError } from '@/errors/user'
+import { IdGeneratorAdapter, PasswordHasherAdapter } from '@/adapters'
 
 export class CreateUserService {
     private createUserRepository: CreateUserRepository
     private getUserByEmailRepository: GetUserByEmailRepository
+    private idGenerator: IdGeneratorAdapter
+    private passwordHasher: PasswordHasherAdapter
 
     constructor(
         createUserRepository: CreateUserRepository,
         getUserByEmailRepository: GetUserByEmailRepository,
+        idGenerator: IdGeneratorAdapter,
+        passwordHasher: PasswordHasherAdapter,
     ) {
         this.createUserRepository = createUserRepository
         this.getUserByEmailRepository = getUserByEmailRepository
+        this.idGenerator = idGenerator
+        this.passwordHasher = passwordHasher
     }
 
     async execute(
@@ -30,11 +35,13 @@ export class CreateUserService {
             throw new EmailAlreadyExistsError(createUserParams.email)
         }
 
-        const userId = uuidv4()
+        const userId = this.idGenerator.execute()
 
         // criptografdar a senha
         // sendo o "10" o "Salt", que é o nível de criptografia
-        const hashPassword = await bcrypt.hash(createUserParams.password, 10)
+        const hashPassword = await this.passwordHasher.execute(
+            createUserParams.password,
+        )
 
         const user = {
             // dessestruturando o que a gente recebe como parametrp
