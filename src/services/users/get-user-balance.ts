@@ -2,7 +2,6 @@ import { UserNotFoundError } from '@/errors/user'
 import {
     GetUserByIdRepository,
     GetUserBalanceRepository,
-    GetUserBalanceParams,
     UserBalanceRepositoryResponse,
 } from '@/shared/types'
 
@@ -19,16 +18,16 @@ export class GetUserBalanceService {
     }
 
     async execute(
-        params: GetUserBalanceParams,
+        userId: string,
     ): Promise<UserBalanceRepositoryResponse> {
-        const user = await this.getUserByIdRepository.execute(params.userId)
+        const user = await this.getUserByIdRepository.execute(userId)
 
         if (!user) {
-            throw new UserNotFoundError(params.userId)
+            throw new UserNotFoundError(userId)
         }
 
         const userBalance = await this.getUserBalanceRepository.execute(
-            params.userId,
+            userId,
         )
 
         return userBalance
