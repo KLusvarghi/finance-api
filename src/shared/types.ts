@@ -162,10 +162,6 @@ export interface DeleteTransactionRepository {
 // SERVICE PARAMETER TYPES
 // ============================================================================
 
-export interface GetUserBalanceParams {
-    userId: string
-}
-
 export interface UpdateUserServiceParams {
     userId: string
     updateUserParams: UpdateUserParams
