@@ -89,7 +89,7 @@ export interface CreateTransactionParams {
     user_id: string
     name: string
     amount: number
-    date: Date
+    date: string
     type: 'EARNING' | 'EXPENSE' | 'INVESTMENT'
 }
 
