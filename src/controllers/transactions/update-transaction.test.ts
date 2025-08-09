@@ -1,4 +1,5 @@
 import {
+    HttpRequest,
     TransactionRepositoryResponse,
     UpdateTransactionParams,
 } from '@/shared'
@@ -16,8 +17,8 @@ describe('UpdateTransactionController', () => {
     let sut: UpdateTransactionController
     let updateTransactionService: UpdateTransactionServiceStub
     let validTransactionId: string
-    let validUpdateData: UpdateTransactionParams
     let validUpdateResponse: TransactionRepositoryResponse
+    let baseHttpRequest: HttpRequest
 
     class UpdateTransactionServiceStub {
         execute(
@@ -44,11 +45,16 @@ describe('UpdateTransactionController', () => {
 
     beforeEach(() => {
         validTransactionId = faker.string.uuid()
-        validUpdateData = {
-            name: faker.commerce.productName(),
-            amount: Number(faker.finance.amount()),
-            date: faker.date.anytime().toISOString(),
-            type: 'EARNING',
+        baseHttpRequest = {
+            params: {
+                transactionId: validTransactionId,
+            },
+            body: {
+                name: faker.commerce.productName(),
+                amount: Number(faker.finance.amount()),
+                date: faker.date.anytime().toISOString(),
+                type: 'EARNING',
+            },
         }
         validUpdateResponse = {
             id: validTransactionId,
@@ -72,10 +78,7 @@ describe('UpdateTransactionController', () => {
     describe('success cases', () => {
         it('should return 200 when updating transaction successfully', async () => {
             // act
-            const response = await sut.execute({
-                params: { transactionId: validTransactionId },
-                body: validUpdateData,
-            })
+            const response = await sut.execute(baseHttpRequest)
 
             const data = response.body?.data
 
@@ -97,8 +100,10 @@ describe('UpdateTransactionController', () => {
         it('should return 400 when transactionId is not provided', async () => {
             // act
             const response = await sut.execute({
-                params: { transactionId: undefined },
-                body: validUpdateData,
+                ...baseHttpRequest,
+                params: {
+                    transactionId: undefined,
+                },
             })
 
             // assert
@@ -113,8 +118,10 @@ describe('UpdateTransactionController', () => {
             async ({ id }) => {
                 // act
                 const response = await sut.execute({
-                    params: { transactionId: id },
-                    body: validUpdateData,
+                    ...baseHttpRequest,
+                    params: {
+                        transactionId: id,
+                    },
                 })
 
                 // assert
@@ -130,7 +137,7 @@ describe('UpdateTransactionController', () => {
                 const spy = jest.spyOn(updateTransactionService, 'execute')
 
                 const response = await sut.execute({
-                    params: { transactionId: validTransactionId },
+                    ...baseHttpRequest,
                     body: {},
                 })
 
@@ -141,8 +148,8 @@ describe('UpdateTransactionController', () => {
             describe('name', () => {
                 it('should return 400 if name is too short', async () => {
                     const response = await sut.execute({
-                        params: { transactionId: validTransactionId },
-                        body: { ...validUpdateData, name: 'A' },
+                        ...baseHttpRequest,
+                        body: { ...baseHttpRequest.body, name: 'A' },
                     })
 
                     expect(response.statusCode).toBe(400)
@@ -154,8 +161,11 @@ describe('UpdateTransactionController', () => {
 
                 it('should return 400 if name is too long', async () => {
                     const response = await sut.execute({
-                        params: { transactionId: validTransactionId },
-                        body: { ...validUpdateData, name: 'A'.repeat(101) },
+                        ...baseHttpRequest,
+                        body: {
+                            ...baseHttpRequest.body,
+                            name: 'A'.repeat(101),
+                        },
                     })
 
                     expect(response.statusCode).toBe(400)
@@ -171,8 +181,8 @@ describe('UpdateTransactionController', () => {
                     'should return 400 if date is $description',
                     async ({ date }) => {
                         const response = await sut.execute({
-                            params: { transactionId: validTransactionId },
-                            body: { ...validUpdateData, date },
+                            ...baseHttpRequest,
+                            body: { ...baseHttpRequest.body, date },
                         })
 
                         expect(response.statusCode).toBe(400)
@@ -189,8 +199,8 @@ describe('UpdateTransactionController', () => {
                     'should return 400 if type is $description',
                     async ({ type }) => {
                         const response = await sut.execute({
-                            params: { transactionId: validTransactionId },
-                            body: { ...validUpdateData, type },
+                            ...baseHttpRequest,
+                            body: { ...baseHttpRequest.body, type },
                         })
 
                         expect(response.statusCode).toBe(400)
@@ -207,8 +217,8 @@ describe('UpdateTransactionController', () => {
                     'should return 400 if amount is $description',
                     async ({ amount }) => {
                         const response = await sut.execute({
-                            params: { transactionId: validTransactionId },
-                            body: { ...validUpdateData, amount },
+                            ...baseHttpRequest,
+                            body: { ...baseHttpRequest.body, amount },
                         })
 
                         expect(response.statusCode).toBe(400)
@@ -220,8 +230,8 @@ describe('UpdateTransactionController', () => {
 
                 it('should return 400 if amount too small', async () => {
                     const response = await sut.execute({
-                        params: { transactionId: validTransactionId },
-                        body: { ...validUpdateData, amount: 0 },
+                        ...baseHttpRequest,
+                        body: { ...baseHttpRequest.body, amount: 0 },
                     })
 
                     expect(response.statusCode).toBe(400)
@@ -233,8 +243,8 @@ describe('UpdateTransactionController', () => {
 
             it('should return 400 if body has unrecognized keys', async () => {
                 const response = await sut.execute({
-                    params: { transactionId: validTransactionId },
-                    body: { ...validUpdateData, unexpected: 'value' },
+                    ...baseHttpRequest,
+                    body: { ...baseHttpRequest.body, unexpected: 'value' },
                 })
 
                 expect(response.statusCode).toBe(400)
@@ -255,8 +265,7 @@ describe('UpdateTransactionController', () => {
                 ).mockRejectedValueOnce(new Error())
 
                 const result = await sut.execute({
-                    params: { transactionId: validTransactionId },
-                    body: validUpdateData,
+                    ...baseHttpRequest,
                 })
 
                 expect(result.statusCode).toBe(500)
