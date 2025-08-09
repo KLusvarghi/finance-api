@@ -9,12 +9,12 @@ describe('GetTransactionsByUserIdController', () => {
     let sut: GetTransactionsByUserIdController
     let getTransactionByUserIdService: GetTransactionsByUserIdServiceStub
     let validUserId: string
-    let validTransactionData: TransactionRepositoryResponse[]
+    let validTransactionResponse: TransactionRepositoryResponse[]
     let baseHttpRequest: HttpRequest
 
     class GetTransactionsByUserIdServiceStub {
         execute(_userId: string): Promise<TransactionRepositoryResponse[]> {
-            return Promise.resolve(validTransactionData)
+            return Promise.resolve(validTransactionResponse)
         }
     }
 
@@ -37,7 +37,7 @@ describe('GetTransactionsByUserIdController', () => {
 
         validUserId = faker.string.uuid()
 
-        validTransactionData = [
+        validTransactionResponse = [
             {
                 id: faker.string.uuid(),
                 user_id: validUserId,
@@ -119,14 +119,14 @@ describe('GetTransactionsByUserIdController', () => {
         )
     })
 
-    describe('success cases', () => {
+    describe('success cases', () => { 
         it('should return 200 when finding transactions by user id', async () => {
             // act
             const response = await sut.execute(baseHttpRequest)
 
             // assert
             expect(response.statusCode).toBe(200)
-            expect(response.body?.data).toEqual(validTransactionData)
+            expect(response.body?.data).toEqual(validTransactionResponse)
         })
 
         it('should call GetTransactionsByUserIdService with correct parameters', async () => {

@@ -16,25 +16,15 @@ import {
 describe('CreateTransactionController', () => {
     let sut: CreateTransactionController
     let createTransactionService: CreateTransactionServiceStub
-    let validTransactionData: CreateTransactionParams
+    let validTransactionRequest: CreateTransactionParams
+    let validTransactionResponse: TransactionRepositoryResponse
     let baseHttpRequest: HttpRequest
 
     class CreateTransactionServiceStub {
         async execute(
             _transaction: CreateTransactionParams,
         ): Promise<TransactionRepositoryResponse> {
-            return Promise.resolve({
-                id: faker.string.uuid(),
-                user_id: faker.string.uuid(),
-                name: faker.commerce.productName(),
-                amount: new Prisma.Decimal(Number(faker.finance.amount())),
-                date: faker.date.anytime(),
-                type: faker.helpers.arrayElement([
-                    'EARNING',
-                    'EXPENSE',
-                    'INVESTMENT',
-                ]),
-            })
+            return Promise.resolve(validTransactionResponse)
         }
     }
 
@@ -51,11 +41,10 @@ describe('CreateTransactionController', () => {
         sut = controller
         createTransactionService = service
 
-        // Dados válidos sempre disponíveis
-        validTransactionData = {
+        // Request válido (entrada do controller)
+        validTransactionRequest = {
             user_id: faker.string.uuid(),
             name: faker.commerce.productName(),
-            // Tendo que definir corretamente o tipo do date, pois o faker.date.anytime() retorna um objeto Date e não uma string
             date: faker.date.anytime().toISOString(),
             type: faker.helpers.arrayElement([
                 'EARNING',
@@ -63,13 +52,20 @@ describe('CreateTransactionController', () => {
                 'INVESTMENT',
             ]),
             amount: Number(faker.finance.amount()),
-            // amount: new Prisma.Decimal(
-            //     faker.number.float({ min: 1, max: 1000 }),
-            // ),
+        }
+
+        // Resposta válida do serviço/repositório
+        validTransactionResponse = {
+            id: faker.string.uuid(),
+            user_id: validTransactionRequest.user_id,
+            name: validTransactionRequest.name,
+            amount: new Prisma.Decimal(Number(faker.finance.amount())),
+            date: faker.date.anytime(),
+            type: validTransactionRequest.type,
         }
 
         baseHttpRequest = {
-            body: validTransactionData,
+            body: validTransactionRequest,
         }
     })
 
@@ -101,7 +97,7 @@ describe('CreateTransactionController', () => {
                 // arrange
                 const response = await sut.execute({
                     body: {
-                        ...validTransactionData,
+                        ...validTransactionRequest,
                         user_id: undefined,
                     },
                 })
@@ -118,7 +114,7 @@ describe('CreateTransactionController', () => {
                     // arrange
                     const response = await sut.execute({
                         body: {
-                            ...validTransactionData,
+                            ...validTransactionRequest,
                             user_id: id,
                         },
                     })
@@ -137,7 +133,7 @@ describe('CreateTransactionController', () => {
                 // arrange
                 const response = await sut.execute({
                     body: {
-                        ...validTransactionData,
+                        ...validTransactionRequest,
                         name: undefined,
                     },
                 })
@@ -151,7 +147,7 @@ describe('CreateTransactionController', () => {
                 // arrange
                 const response = await sut.execute({
                     body: {
-                        ...validTransactionData,
+                        ...validTransactionRequest,
                         name: 'A',
                     },
                 })
@@ -167,7 +163,7 @@ describe('CreateTransactionController', () => {
                 // arrange
                 const response = await sut.execute({
                     body: {
-                        ...validTransactionData,
+                        ...validTransactionRequest,
                         name: 'A'.repeat(101),
                     },
                 })
@@ -185,7 +181,7 @@ describe('CreateTransactionController', () => {
                 // arrange
                 const response = await sut.execute({
                     body: {
-                        ...validTransactionData,
+                        ...validTransactionRequest,
                         date: undefined,
                     },
                 })
@@ -199,7 +195,7 @@ describe('CreateTransactionController', () => {
                     // arrange
                     const response = await sut.execute({
                         body: {
-                            ...validTransactionData,
+                            ...validTransactionRequest,
                             date: date,
                         },
                     })
@@ -218,7 +214,7 @@ describe('CreateTransactionController', () => {
                 // arrange
                 const response = await sut.execute({
                     body: {
-                        ...validTransactionData,
+                        ...validTransactionRequest,
                         type: undefined,
                     },
                 })
@@ -236,7 +232,7 @@ describe('CreateTransactionController', () => {
                     // arrange
                     const response = await sut.execute({
                         body: {
-                            ...validTransactionData,
+                            ...validTransactionRequest,
                             type: type,
                         },
                     })
@@ -255,7 +251,7 @@ describe('CreateTransactionController', () => {
                 // arrange
                 const response = await sut.execute({
                     body: {
-                        ...validTransactionData,
+                        ...validTransactionRequest,
                         amount: undefined,
                     },
                 })
@@ -271,7 +267,7 @@ describe('CreateTransactionController', () => {
                     // arrange
                     const response = await sut.execute({
                         body: {
-                            ...validTransactionData,
+                            ...validTransactionRequest,
                             amount: amount,
                         },
                     })
@@ -289,7 +285,7 @@ describe('CreateTransactionController', () => {
                     // arrange
                     const response = await sut.execute({
                         body: {
-                            ...validTransactionData,
+                            ...validTransactionRequest,
                             amount: amount,
                         },
                     })

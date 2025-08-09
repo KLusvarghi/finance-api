@@ -9,14 +9,14 @@ describe('DeleteTransactionController', () => {
     let sut: DeleteTransactionController
     let deleteTransactionService: DeleteTransactionServiceStub
     let validTransactionId: string
-    let validTransactionData: TransactionRepositoryResponse
+    let validTransactionResponse: TransactionRepositoryResponse
     let baseHttpRequest: HttpRequest
 
     class DeleteTransactionServiceStub {
         execute(
             _transactionId: string,
         ): Promise<TransactionRepositoryResponse> {
-            return Promise.resolve(validTransactionData)
+            return Promise.resolve(validTransactionResponse)
         }
     }
 
@@ -35,7 +35,7 @@ describe('DeleteTransactionController', () => {
 
         validTransactionId = faker.string.uuid()
 
-        validTransactionData = {
+        validTransactionResponse = {
             id: validTransactionId,
             user_id: faker.string.uuid(),
             name: faker.commerce.productName(),
@@ -124,7 +124,7 @@ describe('DeleteTransactionController', () => {
             expect(response.body?.message).toBe(
                 'Transaction deleted successfully',
             )
-            expect(response.body?.data).toEqual(validTransactionData)
+            expect(response.body?.data).toEqual(validTransactionResponse)
         })
 
         it('should call DeleteTransactionService with correct parameters', async () => {
