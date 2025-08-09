@@ -181,9 +181,7 @@ export interface GetUserByIdService {
 }
 
 export interface GetUserBalanceService {
-    execute(
-        params: GetUserBalanceParams,
-    ): Promise<UserBalanceRepositoryResponse>
+    execute(userId: string): Promise<UserBalanceRepositoryResponse>
 }
 
 export interface UpdateUserService {
