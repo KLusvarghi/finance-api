@@ -9,9 +9,9 @@ import { UserNotFoundError } from '@/errors/user'
 import { serverError, ok } from '@/shared'
 import {
     DeleteUserService,
-    UserRepositoryResponse,
     HttpResponse,
     HttpRequest,
+    UserPublicResponse,
 } from '@/shared/types'
 
 export class DeleteUserController {
@@ -23,7 +23,7 @@ export class DeleteUserController {
 
     async execute(
         httpRequest: HttpRequest,
-    ): Promise<HttpResponse<UserRepositoryResponse>> {
+    ): Promise<HttpResponse<UserPublicResponse>> {
         try {
             const userId = httpRequest.params.userId
 
@@ -35,7 +35,7 @@ export class DeleteUserController {
             if (!isIdValid) return invalidIdResponse()
 
             const deletedUser = await this.deletedUserService.execute(userId)
-            
+
             return ok(deletedUser)
         } catch (error) {
             console.error(error)
