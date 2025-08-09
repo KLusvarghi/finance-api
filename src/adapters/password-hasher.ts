@@ -1,7 +1,8 @@
 import bcrypt from 'bcrypt'
 
 export class PasswordHasherAdapter {
-    async execute(password: string): Promise<string> {
-        return await bcrypt.hash(password, 10)
+  // nesse caso, não precisamos explicitar o async e await já que estamos retornando os valores direto, o TS já entende
+    execute(password: string): Promise<string> {
+        return bcrypt.hash(password, 10)
     }
 }
