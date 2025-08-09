@@ -10,4 +10,4 @@ export const userNotFoundResponse = (message?: string) => {
     return notFound('User not found')
 }
 
-export const userBadRequestResponse = () => notFound('Missing param: userId')
+export const userBadRequestResponse = () => badRequest('Missing param: userId')
