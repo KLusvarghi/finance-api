@@ -1,8 +1,5 @@
 import { UserNotFoundError } from '@/errors/user'
-import {
-    GetUserByIdRepository,
-    UserPublicResponse,
-} from '@/shared/types'
+import { GetUserByIdRepository, UserPublicResponse } from '@/shared/types'
 
 export class GetUserByIdService {
     private getUserByIdRepository: GetUserByIdRepository
@@ -18,7 +15,7 @@ export class GetUserByIdService {
             throw new UserNotFoundError(userId)
         }
 
-        const { password, ...userWithoutPassword } = user
+        const { password: _password, ...userWithoutPassword } = user
         return userWithoutPassword
     }
 }
