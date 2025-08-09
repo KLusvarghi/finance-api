@@ -1,4 +1,4 @@
-import { GetUserBalanceParams, UserBalanceRepositoryResponse } from '@/shared'
+import { UserBalanceRepositoryResponse } from '@/shared'
 import { faker } from '@faker-js/faker'
 import { GetUserBalanceController } from './get-user-balance'
 import { Prisma } from '@prisma/client'
@@ -9,7 +9,7 @@ describe('GetUserBalanceController', () => {
     let validUserId: string
 
     class GetUserBalanceServiceStub {
-        execute(_params: GetUserBalanceParams): Promise<UserBalanceRepositoryResponse> {
+        execute(_userId: string): Promise<UserBalanceRepositoryResponse> {
             return Promise.resolve({
                 earnings: faker.number.float(),
                 expenses: faker.number.float(),
