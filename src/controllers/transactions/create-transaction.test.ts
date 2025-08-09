@@ -22,7 +22,7 @@ describe('CreateTransactionController', () => {
 
     class CreateTransactionServiceStub {
         async execute(
-            _transaction: CreateTransactionParams,
+          _params: CreateTransactionParams,
         ): Promise<TransactionRepositoryResponse> {
             return Promise.resolve(validTransactionResponse)
         }
