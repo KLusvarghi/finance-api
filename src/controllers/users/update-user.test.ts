@@ -1,7 +1,11 @@
 import { faker } from '@faker-js/faker'
 import { UpdateUserController } from './update-user'
 import { HttpRequest, UpdateUserParams, UserRepositoryResponse } from '@/shared'
-import { EmailAlreadyExistsError } from '@/errors/user'
+import {
+    EmailAlreadyExistsError,
+    UpdateUserFailedError,
+    UserNotFoundError,
+} from '@/errors/user'
 
 describe('UpdateUserController', () => {
     let sut: UpdateUserController
@@ -77,9 +81,8 @@ describe('UpdateUserController', () => {
         })
 
         it('should return 400 when UpdateUserService throws EmailAlreadyExistsError', async () => {
-            const duplicateEmail = faker.internet.email()
             jest.spyOn(updateUserService, 'execute').mockRejectedValueOnce(
-                new EmailAlreadyExistsError(duplicateEmail),
+                new EmailAlreadyExistsError(baseHttpRequest.body.email),
             )
 
             const result = await sut.execute(baseHttpRequest)
@@ -87,8 +90,35 @@ describe('UpdateUserController', () => {
             expect(result.statusCode).toBe(400)
             expect(result.body?.status).toBe('error')
             expect(result.body?.message).toBeTruthy()
-            expect(result.body?.message).toContain(duplicateEmail)
+            expect(result.body?.message).toContain(baseHttpRequest.body.email)
             expect(result.body?.message).toContain('already in use')
+        })
+
+        it('should return 404 when UpdateUserService throws UserNotFoundError', async () => {
+            jest.spyOn(updateUserService, 'execute').mockRejectedValueOnce(
+                new UserNotFoundError(baseHttpRequest.params.userId),
+            )
+
+            const result = await sut.execute(baseHttpRequest)
+
+            expect(result.statusCode).toBe(404)
+            expect(result.body?.status).toBe('error')
+            expect(result.body?.message).toBeTruthy()
+            expect(result.body?.message).toContain(
+                baseHttpRequest.params.userId,
+            )
+        })
+
+        it('should return 500 when UpdateUserService throws UpdateUserFailedError', async () => {
+            jest.spyOn(updateUserService, 'execute').mockRejectedValueOnce(
+                new UpdateUserFailedError(),
+            )
+
+            const result = await sut.execute(baseHttpRequest)
+
+            expect(result.statusCode).toBe(500)
+            expect(result.body?.status).toBe('error')
+            expect(result.body?.message).toBeTruthy()
         })
     })
 
@@ -123,6 +153,18 @@ describe('UpdateUserController', () => {
         })
 
         describe('userId', () => {
+            it('should return 400 when userId is not provided', async () => {
+                const result = await sut.execute({
+                    params: { userId: undefined },
+                    body: validUpdateRequest,
+                })
+
+                expect(result.statusCode).toBe(400)
+                expect(result.body?.status).toBe('error')
+                expect(result.body?.message).toBeTruthy()
+                expect(result.body?.message).toBe('Missing param: userId')
+            })
+
             it('should return 400 when invalid userId is provided', async () => {
                 const result = await sut.execute({
                     params: { userId: 'invalid_id' },
@@ -163,18 +205,18 @@ describe('UpdateUserController', () => {
         })
 
         it('should call UpdateUserService with correct parameters', async () => {
-          // arrange
-          const spy = jest.spyOn(updateUserService, 'execute')
+            // arrange
+            const spy = jest.spyOn(updateUserService, 'execute')
 
-          // act
-          await sut.execute(baseHttpRequest)
+            // act
+            await sut.execute(baseHttpRequest)
 
-          // assert
-          expect(spy).toHaveBeenCalledWith(
-            baseHttpRequest.params.userId,
-            baseHttpRequest.body,
-          )
-          expect(spy).toHaveBeenCalledTimes(1)
-      })
+            // assert
+            expect(spy).toHaveBeenCalledWith(
+                baseHttpRequest.params.userId,
+                baseHttpRequest.body,
+            )
+            expect(spy).toHaveBeenCalledTimes(1)
+        })
     })
 })
