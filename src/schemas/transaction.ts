@@ -6,6 +6,7 @@ export const createTransactionSchema = z.object({
         .string({
             message: 'User id is required',
         })
+        .min(1, { message: 'User id is required' }) // o min é para validar se o campo é obrigatório
         .uuid({
             message: 'User id must be a valid uuid',
         }),
