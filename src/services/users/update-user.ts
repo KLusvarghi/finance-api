@@ -1,31 +1,37 @@
-import { EmailAlreadyExistsError, UpdateUserFailedError, UserNotFoundError } from '@/errors/user'
-import bcrypt from 'bcrypt'
+import {
+    EmailAlreadyExistsError,
+    UpdateUserFailedError,
+    UserNotFoundError,
+} from '@/errors/user'
 import {
     UpdateUserParams,
     GetUserByEmailRepository,
     UpdateUserRepository,
     UserRepositoryResponse,
 } from '@/shared/types'
+import { PasswordHasherAdapter } from '@/adapters'
 
 export class UpdateUserService {
     private getUserByEmailRepository: GetUserByEmailRepository
     private updateUserRepository: UpdateUserRepository
+    private passwordHasher: PasswordHasherAdapter
 
     constructor(
         getUserByEmailRepository: GetUserByEmailRepository,
         updateUserRepository: UpdateUserRepository,
+        passwordHasher: PasswordHasherAdapter,
     ) {
         this.getUserByEmailRepository = getUserByEmailRepository
         this.updateUserRepository = updateUserRepository
+        this.passwordHasher = passwordHasher
     }
 
     async execute(
         userId: string,
         updateUserParams: UpdateUserParams,
     ): Promise<UserRepositoryResponse | null> {
-        const hasUserWithProvidedEmail = await this.getUserByEmailRepository.execute(
-            updateUserParams.email!,
-        )
+        const hasUserWithProvidedEmail =
+            await this.getUserByEmailRepository.execute(updateUserParams.email!)
 
         if (!hasUserWithProvidedEmail) {
             throw new UserNotFoundError(userId)
@@ -48,9 +54,8 @@ export class UpdateUserService {
 
         // 2. se a senha estiver sendo atualizado, criptogra-lá
         if (updateUserParams.password) {
-            const hashPassword = await bcrypt.hash(
+            const hashPassword = await this.passwordHasher.execute(
                 updateUserParams.password,
-                10,
             )
             user.password = hashPassword // assim a gente adiciona ou substitui a props "password" com o valor de hashPassword
 
