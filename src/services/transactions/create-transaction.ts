@@ -1,4 +1,4 @@
-import { CreateTransactionParamsProps } from '@/shared/types'
+import { CreateTransactionParams } from '@/shared/types'
 import { UserNotFoundError } from '@/errors/user'
 import { v4 as uuidv4 } from 'uuid'
 import {
@@ -20,7 +20,7 @@ export class CreateTransactionService {
     }
 
     async execute(
-        params: CreateTransactionParamsProps,
+        params: CreateTransactionParams,
     ): Promise<TransactionRepositoryResponse> {
         const userId = params.user_id
 
