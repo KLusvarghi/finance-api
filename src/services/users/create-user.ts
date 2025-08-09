@@ -44,14 +44,8 @@ export class CreateUserService {
             password: hashPassword,
         }
 
-        const { id, first_name, last_name, email } =
-            await this.createUserRepository.execute(user)
+        const newUser = await this.createUserRepository.execute(user)
 
-        return {
-            id,
-            first_name,
-            last_name,
-            email,
-        }
+        return newUser
     }
 }
