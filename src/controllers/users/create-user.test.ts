@@ -1,12 +1,13 @@
 import { EmailAlreadyExistsError } from '@/errors/user'
 import { CreateUserController } from './create-user'
 import { faker } from '@faker-js/faker'
-import { CreateUserParams, UserHttpRequest, UserRepositoryResponse } from '@/shared'
+import { CreateUserParams, HttpRequest, UserHttpRequest, UserRepositoryResponse } from '@/shared'
 
 describe('CreateUserController', () => {
     let sut: CreateUserController
     let createUserService: CreateUserServiceStub
     let validUserData: UserHttpRequest
+    let baseHttpRequest: HttpRequest
 
     class CreateUserServiceStub {
         async execute(
@@ -34,6 +35,9 @@ describe('CreateUserController', () => {
             last_name: faker.person.lastName(),
             email: faker.internet.email(),
             password: faker.internet.password({ length: 7 }),
+        }
+        baseHttpRequest = {
+            body: validUserData,
         }
     })
 
@@ -131,7 +135,7 @@ describe('CreateUserController', () => {
     describe('success cases', () => {
         it('should create a new user successfully and return 201', async () => {
             // arrange
-            const result = await sut.execute({ body: validUserData })
+            const result = await sut.execute(baseHttpRequest)
 
             // assert
             expect(result.statusCode).toBe(201)
@@ -144,7 +148,7 @@ describe('CreateUserController', () => {
             const spy = jest.spyOn(createUserService, 'execute')
 
             // act
-            await sut.execute({ body: validUserData })
+            await sut.execute(baseHttpRequest)
 
             // assert
             expect(spy).toHaveBeenCalledWith(validUserData)
@@ -160,7 +164,7 @@ describe('CreateUserController', () => {
             )
 
             // act
-            const result = await sut.execute({ body: validUserData })
+            const result = await sut.execute(baseHttpRequest)
 
             // assert
             expect(result.statusCode).toBe(500)
@@ -174,7 +178,7 @@ describe('CreateUserController', () => {
             )
 
             // act
-            const result = await sut.execute({ body: validUserData })
+            const result = await sut.execute(baseHttpRequest)
 
             // assert
             expect(result.statusCode).toBe(400)

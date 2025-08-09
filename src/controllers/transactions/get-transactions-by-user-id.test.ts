@@ -3,7 +3,6 @@ import { GetTransactionsByUserIdController } from './get-transactions-by-user-id
 import { faker } from '@faker-js/faker'
 import { Prisma } from '@prisma/client'
 import { invalidUUID } from '@/test/fixtures'
-import { userNotFoundResponse } from '../_helpers'
 import { UserNotFoundError } from '@/errors/user'
 
 describe('GetTransactionsByUserIdController', () => {
@@ -11,9 +10,10 @@ describe('GetTransactionsByUserIdController', () => {
     let getTransactionByUserIdService: GetTransactionsByUserIdServiceStub
     let validUserId: string
     let validTransactionData: TransactionRepositoryResponse[]
+    let baseHttpRequest: HttpRequest
 
     class GetTransactionsByUserIdServiceStub {
-        execute(userId: string): Promise<TransactionRepositoryResponse[]> {
+        execute(_userId: string): Promise<TransactionRepositoryResponse[]> {
             return Promise.resolve(validTransactionData)
         }
     }
@@ -29,7 +29,14 @@ describe('GetTransactionsByUserIdController', () => {
     }
 
     beforeEach(() => {
+        const { sut: controller, getTransactionByUserIdService: service } =
+            makeSut()
+
+        sut = controller
+        getTransactionByUserIdService = service
+
         validUserId = faker.string.uuid()
+
         validTransactionData = [
             {
                 id: faker.string.uuid(),
@@ -41,10 +48,11 @@ describe('GetTransactionsByUserIdController', () => {
             },
         ]
 
-        const { sut: controller, getTransactionByUserIdService: service } =
-            makeSut()
-        sut = controller
-        getTransactionByUserIdService = service
+        baseHttpRequest = {
+            query: {
+                userId: validUserId,
+            },
+        }
     })
 
     afterEach(() => {
@@ -55,13 +63,26 @@ describe('GetTransactionsByUserIdController', () => {
     describe('success cases', () => {
         it('should return 200 when finding transactions by user id', async () => {
             // act
-            const response = await sut.execute({
-                query: { userId: validUserId },
-            })
+            const response = await sut.execute(baseHttpRequest)
 
             // assert
             expect(response.statusCode).toBe(200)
             expect(response.body?.data).toEqual(validTransactionData)
+        })
+
+        it('should call GetTransactionsByUserIdService with correct parameters', async () => {
+            // arrange
+            const executeSpy = jest.spyOn(
+                getTransactionByUserIdService,
+                'execute',
+            )
+
+            // act
+            await sut.execute(baseHttpRequest)
+
+            // assert
+            expect(executeSpy).toHaveBeenCalledWith(baseHttpRequest.query.userId)
+            expect(executeSpy).toHaveBeenCalledTimes(1)
         })
     })
     describe('validations', () => {
@@ -99,9 +120,7 @@ describe('GetTransactionsByUserIdController', () => {
                 'execute',
             ).mockRejectedValueOnce(new Error())
             // act
-            const response = await sut.execute({
-                query: { userId: validUserId },
-            })
+            const response = await sut.execute(baseHttpRequest)
 
             // assert
             expect(response.statusCode).toBe(500)
@@ -109,19 +128,19 @@ describe('GetTransactionsByUserIdController', () => {
         })
 
         it('should return 404 if GetTransactionsByUserIdService throws UserNotFoundError', async () => {
-          // arrange
-          jest.spyOn(
-              getTransactionByUserIdService,
-              'execute',
-          ).mockRejectedValueOnce(new UserNotFoundError(validUserId))
-          // act
-          const response = await sut.execute({
-              query: { userId: validUserId },
-          })
+            // arrange
+            jest.spyOn(
+                getTransactionByUserIdService,
+                'execute',
+            ).mockRejectedValueOnce(new UserNotFoundError(validUserId))
+            // act
+            const response = await sut.execute(baseHttpRequest)
 
-          // assert
-          expect(response.statusCode).toBe(404)
-          expect(response.body?.message).toBe(`User with id ${validUserId} not found`)
-      })
+            // assert
+            expect(response.statusCode).toBe(404)
+            expect(response.body?.message).toBe(
+                `User with id ${validUserId} not found`,
+            )
+        })
     })
 })

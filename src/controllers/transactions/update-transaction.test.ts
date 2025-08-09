@@ -22,17 +22,10 @@ describe('UpdateTransactionController', () => {
 
     class UpdateTransactionServiceStub {
         execute(
-            transactionId: string,
+            _transactionId: string,
             _params: UpdateTransactionParams,
         ): Promise<TransactionRepositoryResponse> {
-            return Promise.resolve({
-                id: transactionId,
-                user_id: faker.string.uuid(),
-                name: faker.commerce.productName(),
-                amount: new Prisma.Decimal(Number(faker.finance.amount())),
-                date: faker.date.anytime(),
-                type: 'EARNING',
-            })
+            return Promise.resolve(validUpdateResponse)
         }
     }
 
@@ -44,7 +37,22 @@ describe('UpdateTransactionController', () => {
     }
 
     beforeEach(() => {
+        const { sut: controller, updateTransactionService: service } = makeSut()
+        
+        sut = controller
+        updateTransactionService = service
+
         validTransactionId = faker.string.uuid()
+
+        validUpdateResponse = {
+            id: validTransactionId,
+            user_id: faker.string.uuid(),
+            name: faker.commerce.productName(),
+            amount: new Prisma.Decimal(Number(faker.finance.amount())),
+            date: faker.date.anytime(),
+            type: 'EARNING',
+        }
+
         baseHttpRequest = {
             params: {
                 transactionId: validTransactionId,
@@ -56,18 +64,6 @@ describe('UpdateTransactionController', () => {
                 type: 'EARNING',
             },
         }
-        validUpdateResponse = {
-            id: validTransactionId,
-            user_id: faker.string.uuid(),
-            name: faker.commerce.productName(),
-            amount: new Prisma.Decimal(Number(faker.finance.amount())),
-            date: faker.date.anytime(),
-            type: 'EARNING',
-        }
-
-        const { sut: controller, updateTransactionService: service } = makeSut()
-        sut = controller
-        updateTransactionService = service
     })
 
     afterEach(() => {
@@ -84,16 +80,19 @@ describe('UpdateTransactionController', () => {
 
             // assert
             expect(response.statusCode).toBe(200)
-            expect(data).toMatchObject({
-                id: validTransactionId,
-                type: 'EARNING',
-            })
+            expect(data).toMatchObject(validUpdateResponse)
+        })
 
-            // Verificar se campos dinâmicos existem e têm tipos corretos
-            expect(typeof data?.name).toBe('string')
-            expect(data?.amount).toBeDefined()
-            expect(data?.date).toBeInstanceOf(Date)
-            expect(typeof data?.user_id).toBe('string')
+        it('should call UpdateTransactionService with correct params', async () => {
+            const executeSpy = jest.spyOn(updateTransactionService, 'execute')
+
+            await sut.execute(baseHttpRequest)
+
+            expect(executeSpy).toHaveBeenCalledWith(
+                baseHttpRequest.params.transactionId,
+                baseHttpRequest.body,
+            )
+            expect(executeSpy).toHaveBeenCalledTimes(1)
         })
     })
     describe('validations', () => {
@@ -145,20 +144,9 @@ describe('UpdateTransactionController', () => {
                 })
 
                 expect(response.statusCode).toBe(200)
-                expect(executeSpy).toHaveBeenCalledWith(validTransactionId, {})
-            })
-            
-            it('should call UpdateTransactionService with correct params', async () => {
-                const executeSpy = jest.spyOn(
-                    updateTransactionService,
-                    'execute',
-                )
-
-                await sut.execute(baseHttpRequest)
-
                 expect(executeSpy).toHaveBeenCalledWith(
                     baseHttpRequest.params.transactionId,
-                    baseHttpRequest.body,
+                    {},
                 )
             })
 

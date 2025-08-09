@@ -1,4 +1,4 @@
-import { TransactionRepositoryResponse } from '@/shared'
+import { HttpRequest, TransactionRepositoryResponse } from '@/shared'
 import { DeleteTransactionController } from './delete-transaction'
 import { faker } from '@faker-js/faker'
 import { Prisma } from '@prisma/client'
@@ -10,9 +10,12 @@ describe('DeleteTransactionController', () => {
     let deleteTransactionService: DeleteTransactionServiceStub
     let validTransactionId: string
     let validTransactionData: TransactionRepositoryResponse
+    let baseHttpRequest: HttpRequest
 
     class DeleteTransactionServiceStub {
-        execute(_transactionId: string): Promise<TransactionRepositoryResponse> {
+        execute(
+            _transactionId: string,
+        ): Promise<TransactionRepositoryResponse> {
             return Promise.resolve(validTransactionData)
         }
     }
@@ -25,6 +28,11 @@ describe('DeleteTransactionController', () => {
     }
 
     beforeEach(() => {
+        const { sut: controller, deleteTransactionService: service } = makeSut()
+
+        sut = controller
+        deleteTransactionService = service
+
         validTransactionId = faker.string.uuid()
 
         validTransactionData = {
@@ -36,9 +44,11 @@ describe('DeleteTransactionController', () => {
             type: 'EARNING',
         }
 
-        const { sut: controller, deleteTransactionService: service } = makeSut()
-        sut = controller
-        deleteTransactionService = service
+        baseHttpRequest = {
+            params: {
+                transactionId: validTransactionId,
+            },
+        }
     })
 
     afterEach(() => {
@@ -49,11 +59,7 @@ describe('DeleteTransactionController', () => {
     describe('success cases', () => {
         it('should return 200 when deleting transaction successfully', async () => {
             // act
-            const response = await sut.execute({
-                params: {
-                    transactionId: validTransactionId,
-                },
-            })
+            const response = await sut.execute(baseHttpRequest)
 
             // assert
             expect(response.statusCode).toBe(200)
@@ -62,6 +68,20 @@ describe('DeleteTransactionController', () => {
                 'Transaction deleted successfully',
             )
             expect(response.body?.data).toEqual(validTransactionData)
+        })
+
+        it('should call DeleteTransactionService with correct parameters', async () => {
+            // arrange
+            const executeSpy = jest.spyOn(deleteTransactionService, 'execute')
+
+            // act
+            await sut.execute(baseHttpRequest)
+
+            // assert
+            expect(executeSpy).toHaveBeenCalledWith(
+                baseHttpRequest.params.transactionId,
+            )
+            expect(executeSpy).toHaveBeenCalledTimes(1)
         })
     })
 
@@ -94,11 +114,7 @@ describe('DeleteTransactionController', () => {
             ).mockRejectedValueOnce(new Error())
 
             // act
-            const response = await sut.execute({
-                params: {
-                    transactionId: validTransactionId,
-                },
-            })
+            const response = await sut.execute(baseHttpRequest)
 
             // assert
             expect(response.statusCode).toBe(500)
@@ -107,7 +123,7 @@ describe('DeleteTransactionController', () => {
 
         it('should return 404 if DeleteTransactionService throws TransactionNotFoundError', async () => {
             // arrange
-            // sempre usamos o "mockRejectedValueOnce" quando queremos testar um erro específico, porque ele irá dar um throw 
+            // sempre usamos o "mockRejectedValueOnce" quando queremos testar um erro específico, porque ele irá dar um throw
             jest.spyOn(
                 deleteTransactionService,
                 'execute',
@@ -116,18 +132,12 @@ describe('DeleteTransactionController', () => {
             )
 
             // act
-            const response = await sut.execute({
-                params: {
-                    transactionId: validTransactionId,
-                },
-            })
+            const response = await sut.execute(baseHttpRequest)
 
             // assert
             expect(response.statusCode).toBe(404)
             expect(response.body?.status).toBe('error')
-            expect(response.body?.message).toBe(
-                'Transaction not found.',
-            )
+            expect(response.body?.message).toBe('Transaction not found.')
         })
     })
 })
