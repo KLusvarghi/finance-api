@@ -2,6 +2,7 @@ import { HttpRequest, UserBalanceRepositoryResponse } from '@/shared'
 import { faker } from '@faker-js/faker'
 import { GetUserBalanceController } from './get-user-balance'
 import { Prisma } from '@prisma/client'
+import { UserNotFoundError } from '@/errors/user'
 
 describe('GetUserBalanceController', () => {
     let sut: GetUserBalanceController
@@ -60,6 +61,19 @@ describe('GetUserBalanceController', () => {
             expect(result.body?.status).toBe('error')
             expect(result.body?.message).toBeTruthy()
         })
+
+        it('should return 404 if GetUserBalanceService throws UserNotFoundError', async () => {
+            jest.spyOn(getUserBalanceService, 'execute').mockRejectedValueOnce(
+                new UserNotFoundError(validUserId),
+            )
+
+            const result = await sut.execute(baseHttpRequest)
+
+            expect(result.statusCode).toBe(404)
+            expect(result.body?.status).toBe('error')
+            expect(result.body?.message).toBeTruthy()
+            expect(result.body?.message).toContain(validUserId)
+        })
     })
 
     describe('validations', () => {
@@ -94,15 +108,15 @@ describe('GetUserBalanceController', () => {
         })
 
         it('should call GetUserBalanceService with correct parameters', async () => {
-          // arrange
-          const spy = jest.spyOn(getUserBalanceService, 'execute')
+            // arrange
+            const spy = jest.spyOn(getUserBalanceService, 'execute')
 
-          // act
-          await sut.execute(baseHttpRequest)
+            // act
+            await sut.execute(baseHttpRequest)
 
-          // assert
-          expect(spy).toHaveBeenCalledWith(baseHttpRequest.params.userId)
-          expect(spy).toHaveBeenCalledTimes(1)
-      })
+            // assert
+            expect(spy).toHaveBeenCalledWith(baseHttpRequest.params.userId)
+            expect(spy).toHaveBeenCalledTimes(1)
+        })
     })
 })
