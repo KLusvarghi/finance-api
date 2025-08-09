@@ -22,12 +22,10 @@ export class CreateTransactionService {
     async execute(
         params: CreateTransactionParams,
     ): Promise<TransactionRepositoryResponse> {
-        const userId = params.user_id
-
-        const user = await this.getUserByIdRepository.execute(userId)
+        const user = await this.getUserByIdRepository.execute(params.user_id)
 
         if (!user) {
-            throw new UserNotFoundError(userId)
+            throw new UserNotFoundError(params.user_id)
         }
 
         const transactionId = uuidv4()
