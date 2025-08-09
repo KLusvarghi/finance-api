@@ -15,11 +15,7 @@ export class DeleteUserService {
             throw new UserNotFoundError(userId)
         }
 
-        return {
-            id: user.id,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            email: user.email,
-        }
+        const { password: _password, ...userWithoutPassword } = user
+        return userWithoutPassword
     }
 }
