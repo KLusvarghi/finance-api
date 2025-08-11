@@ -115,7 +115,7 @@ describe('UpdateUserService', () => {
             expect(response).toEqual(validUpdateUserServiceResponse)
         })
 
-        it('should successfully update a user with email', async () => {
+        it('should successfully update a user (with email)', async () => {
             // arrange
             const getUserByEmailRepositorySpy = jest.spyOn(
                 getUserByEmailRepository,
@@ -133,6 +133,27 @@ describe('UpdateUserService', () => {
             // para garantir que o repository seja chamado com o email que estamos passando no service:
             expect(getUserByEmailRepositorySpy).toHaveBeenCalledWith(
                 validUpdateUserServiceResponse.email,
+            )
+        })
+
+        it('should successfully update a user (with password)', async () => {
+          // arrange
+          const passwordHasherAdapterSpy = jest.spyOn(
+              passwordHasherAdapter,
+              'execute',
+          )
+
+          // act
+          const response = await sut.execute(validUserId, {
+              password: updateUserParams.password,
+          })
+
+          // assert
+          expect(response).toEqual(validUpdateUserServiceResponse)
+
+          // para garantir que o repository seja chamado com o email que estamos passando no service:
+            expect(passwordHasherAdapterSpy).toHaveBeenCalledWith(
+                updateUserParams.password,
             )
         })
     })
