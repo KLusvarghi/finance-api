@@ -114,5 +114,26 @@ describe('UpdateUserService', () => {
             // assert
             expect(response).toEqual(validUpdateUserServiceResponse)
         })
+
+        it('should successfully update a user with email', async () => {
+            // arrange
+            const getUserByEmailRepositorySpy = jest.spyOn(
+                getUserByEmailRepository,
+                'execute',
+            )
+
+            // act
+            const response = await sut.execute(validUserId, {
+                email: validUpdateUserServiceResponse.email,
+            })
+
+            // assert
+            expect(response).toEqual(validUpdateUserServiceResponse)
+
+            // para garantir que o repository seja chamado com o email que estamos passando no service:
+            expect(getUserByEmailRepositorySpy).toHaveBeenCalledWith(
+                validUpdateUserServiceResponse.email,
+            )
+        })
     })
 })
