@@ -1,6 +1,7 @@
 import { UserPublicResponse, UserRepositoryResponse } from '@/shared/types'
 import { DeleteUserService } from './delete-user'
 import { faker } from '@faker-js/faker'
+import { UserNotFoundError } from '@/errors/user'
 
 describe('DeleteUserService', () => {
     let sut: DeleteUserService
@@ -67,17 +68,32 @@ describe('DeleteUserService', () => {
     })
 
     describe('validations', () => {
-      //  validando se o deleteUserRepository foi chamado com o id correto
-      it('should call deleteUserRepository with correct params', async () => {
-        // arrange
-        const executeSpy = jest.spyOn(deleteUserRepository, 'execute')
+        //  validando se o deleteUserRepository foi chamado com o id correto
+        it('should call deleteUserRepository with correct params', async () => {
+            // arrange
+            const executeSpy = jest.spyOn(deleteUserRepository, 'execute')
 
-        // act
-        await sut.execute(validUserId)
+            // act
+            await sut.execute(validUserId)
 
-        // assert
-        expect(executeSpy).toHaveBeenCalledWith(validUserId)
-        expect(executeSpy).toHaveBeenCalledTimes(1)
-      })
+            // assert
+            expect(executeSpy).toHaveBeenCalledWith(validUserId)
+            expect(executeSpy).toHaveBeenCalledTimes(1)
+        })
+    })
+
+    describe('error handling', () => {
+        it('should throw if DeleteUserRepository throws', async () => {
+            // arrange
+            jest.spyOn(deleteUserRepository, 'execute').mockRejectedValueOnce(
+                new Error(),
+            )
+
+            // act
+            const response = sut.execute(validUserId)
+
+            // assert
+            expect(response).rejects.toThrow()
+        })
     })
 })
