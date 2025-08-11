@@ -82,11 +82,10 @@ describe('CreateUserService', () => {
             password: faker.internet.password({ length: 7 }),
         }
 
-        
         validUserRepositoryResponse = {
-          id: faker.string.uuid(),
-          ...createUserParams,
-          password: 'valid_hash',
+            id: faker.string.uuid(),
+            ...createUserParams,
+            password: 'valid_hash',
         }
 
         validCreateUserServiceResponse = {
@@ -125,56 +124,85 @@ describe('CreateUserService', () => {
                 new EmailAlreadyExistsError(createUserParams.email),
             )
         })
+
+        // se houver uma excessão de qualquer tipo, eu não quero que ela seja tratada dentro do meu service, mas sim, lançada para cima (para o nosso controller)
+        it('should throw if GetUserByEmailRepository throws', async () => {
+            // arrange
+            jest.spyOn(
+                getUserByEmailRepository,
+                'execute',
+            ).mockRejectedValueOnce(new Error())
+
+            // act
+            // não vamos usar o await, pois queremos que a promisse seja rejeitada
+            const response = sut.execute(createUserParams)
+
+            // assert
+            // e aqui, esperamos que nossa promisse seja rejeitada, lançando o erro "Error" para cima (para o nosso controller)
+            expect(response).rejects.toThrow()
+        })
     })
 
     describe('validations', () => {
-      it('should call idGeneratorAdapter to generate a random uuid', async () => {
-        // arrange
-        // neste caso, não precisamos mocar nada, apenas falar para ele espiar o idGeneratorAdapter
-        const idGeneratorAdapterSpy = jest.spyOn(idGeneratorAdapter, 'execute')
+        it('should call idGeneratorAdapter to generate a random uuid', async () => {
+            // arrange
+            // neste caso, não precisamos mocar nada, apenas falar para ele espiar o idGeneratorAdapter
+            const idGeneratorAdapterSpy = jest.spyOn(
+                idGeneratorAdapter,
+                'execute',
+            )
 
-        // para que a gente verifique se esse "id" foi retornado passado para o repository, temos que espiar a classe "CreateUserRepository"
-        const createUserRepositorySpy = jest.spyOn(createUserRepository, 'execute')
+            // para que a gente verifique se esse "id" foi retornado passado para o repository, temos que espiar a classe "CreateUserRepository"
+            const createUserRepositorySpy = jest.spyOn(
+                createUserRepository,
+                'execute',
+            )
 
-        // act
-        await sut.execute(createUserParams)
+            // act
+            await sut.execute(createUserParams)
 
-        // assert
-        // validando se o idGeneratorAdapter foi chamado
-        expect(idGeneratorAdapterSpy).toHaveBeenCalled()
-        expect(idGeneratorAdapterSpy).toHaveBeenCalledTimes(1)
+            // assert
+            // validando se o idGeneratorAdapter foi chamado
+            expect(idGeneratorAdapterSpy).toHaveBeenCalled()
+            expect(idGeneratorAdapterSpy).toHaveBeenCalledTimes(1)
 
-        // validando se o createUserRepository foi chamado contendo o Id gerado pelo idGeneratorAdapter
-        expect(createUserRepositorySpy).toHaveBeenCalledWith({
-            ...createUserParams,
-            id: validUserRepositoryResponse.id,
-            password: validUserRepositoryResponse.password,
+            // validando se o createUserRepository foi chamado contendo o Id gerado pelo idGeneratorAdapter
+            expect(createUserRepositorySpy).toHaveBeenCalledWith({
+                ...createUserParams,
+                id: validUserRepositoryResponse.id,
+                password: validUserRepositoryResponse.password,
+            })
+            expect(createUserRepositorySpy).toHaveBeenCalledTimes(1)
         })
-        expect(createUserRepositorySpy).toHaveBeenCalledTimes(1)
-      })
 
-      it('should call passwordHasherAdapter to hash the password', async () => {
-        // arrange
-        const passwordHasherAdapterSpy = jest.spyOn(passwordHasherAdapter, 'execute')
+        it('should call passwordHasherAdapter to hash the password', async () => {
+            // arrange
+            const passwordHasherAdapterSpy = jest.spyOn(
+                passwordHasherAdapter,
+                'execute',
+            )
 
-        const createUserRepositorySpy = jest.spyOn(createUserRepository, 'execute')
+            const createUserRepositorySpy = jest.spyOn(
+                createUserRepository,
+                'execute',
+            )
 
-        // act
-        await sut.execute(createUserParams)
+            // act
+            await sut.execute(createUserParams)
 
-        // assert
-        // validando se o passwordHasherAdapter foi chamado
-        expect(passwordHasherAdapterSpy).toHaveBeenCalled()
-        expect(passwordHasherAdapterSpy).toHaveBeenCalledTimes(1)
+            // assert
+            // validando se o passwordHasherAdapter foi chamado
+            expect(passwordHasherAdapterSpy).toHaveBeenCalled()
+            expect(passwordHasherAdapterSpy).toHaveBeenCalledTimes(1)
 
-        // validando se o createUserRepository foi chamado contendo o Id gerado pelo passwordHasherAdapter
-        expect(createUserRepositorySpy).toHaveBeenCalledWith({
-            ...createUserParams,
-            id: validUserRepositoryResponse.id,
-            password: validUserRepositoryResponse.password,
+            // validando se o createUserRepository foi chamado contendo o Id gerado pelo passwordHasherAdapter
+            expect(createUserRepositorySpy).toHaveBeenCalledWith({
+                ...createUserParams,
+                id: validUserRepositoryResponse.id,
+                password: validUserRepositoryResponse.password,
+            })
+            expect(createUserRepositorySpy).toHaveBeenCalledTimes(1)
         })
-        expect(createUserRepositorySpy).toHaveBeenCalledTimes(1)
-      })
     })
 
     describe('success', () => {
