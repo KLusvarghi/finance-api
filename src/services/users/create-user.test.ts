@@ -126,7 +126,7 @@ describe('CreateUserService', () => {
         })
 
         // se houver uma excessão de qualquer tipo, eu não quero que ela seja tratada dentro do meu service, mas sim, lançada para cima (para o nosso controller)
-        it('should throw if GetUserByEmailRepository throws', async () => {
+        it('should throw if GetUserByEmailRepository throws', () => {
             // arrange
             jest.spyOn(
                 getUserByEmailRepository,
@@ -143,13 +143,40 @@ describe('CreateUserService', () => {
         })
 
         // fazendo o mesmo para idGeneratorAdapter
-        it('should throw if IdGeneratorAdapter throws', async () => {
+        it('should throw if IdGeneratorAdapter throws', () => {
             // arrange
             // como o "execute" do idGeneratorAdapter é não é uma promisse e sim uma função normal, não podemos usar o "mockRejectedValueOnce"
             // então, vamos usar o "mockImplementationOnce"
-            jest.spyOn(idGeneratorAdapter, 'execute').mockImplementationOnce(() => {
-              throw new Error()
-            }) 
+            jest.spyOn(idGeneratorAdapter, 'execute').mockImplementationOnce(
+                () => {
+                    throw new Error()
+                },
+            )
+
+            // act
+            const response = sut.execute(createUserParams)
+
+            // assert
+            expect(response).rejects.toThrow()
+        })
+
+        it('should throw if PasswordHasherAdapter throws', () => {
+            // arrange
+            jest.spyOn(passwordHasherAdapter, 'execute').mockRejectedValueOnce(
+                new Error(),
+            )
+
+            // act
+            const response = sut.execute(createUserParams)
+
+            // assert
+            expect(response).rejects.toThrow()
+        })
+
+        // se meu repository lançar uma excessão, eu não quero que ela seja tratada dentro do meu service, mas sim, lançada para cima (para o nosso controller)
+        it('should throw if CreateUserRepository throws', () => {
+            // arrange
+            jest.spyOn(createUserRepository, 'execute').mockRejectedValueOnce(new Error())
 
             // act
             const response = sut.execute(createUserParams)
