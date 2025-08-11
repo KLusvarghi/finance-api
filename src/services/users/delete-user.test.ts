@@ -65,4 +65,19 @@ describe('DeleteUserService', () => {
             expect(response).toEqual(validUserServiceResponse)
         })
     })
+
+    describe('validations', () => {
+      //  validando se o deleteUserRepository foi chamado com o id correto
+      it('should call deleteUserRepository with correct params', async () => {
+        // arrange
+        const executeSpy = jest.spyOn(deleteUserRepository, 'execute')
+
+        // act
+        await sut.execute(validUserId)
+
+        // assert
+        expect(executeSpy).toHaveBeenCalledWith(validUserId)
+        expect(executeSpy).toHaveBeenCalledTimes(1)
+      })
+    })
 })
