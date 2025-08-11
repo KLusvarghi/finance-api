@@ -64,10 +64,10 @@ describe('DeleteUserService', () => {
             )
 
             // act
-            const response = sut.execute(validUserId)
+            const promise = sut.execute(validUserId)
 
             // assert
-            expect(response).rejects.toThrow(UserNotFoundError)
+            expect(promise).rejects.toThrow(new UserNotFoundError(validUserId))
         })
 
         // esse tipo de teste é importnate para garantir que o nosso service não está tratando a excessão do nosso repository e passando para cima para o nosso controller
@@ -78,10 +78,10 @@ describe('DeleteUserService', () => {
             )
 
             // act
-            const response = sut.execute(validUserId)
+            const promise = sut.execute(validUserId)
 
             // assert
-            expect(response).rejects.toThrow()
+            expect(promise).rejects.toThrow()
         })
     })
 
