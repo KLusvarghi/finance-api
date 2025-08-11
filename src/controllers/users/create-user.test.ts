@@ -4,6 +4,7 @@ import { faker } from '@faker-js/faker'
 import {
     CreateUserParams,
     HttpRequest,
+    UserPublicResponse,
     UserRepositoryResponse,
 } from '@/shared'
 
@@ -11,13 +12,11 @@ describe('CreateUserController', () => {
     let sut: CreateUserController
     let createUserService: CreateUserServiceStub
     let validUserRequest: CreateUserParams
-    let validUserResponse: UserRepositoryResponse
+    let validUserResponse: UserPublicResponse
     let baseHttpRequest: HttpRequest
 
     class CreateUserServiceStub {
-        async execute(
-            _params: CreateUserParams,
-        ): Promise<UserRepositoryResponse> {
+        async execute(_params: CreateUserParams): Promise<UserPublicResponse> {
             return Promise.resolve(validUserResponse)
         }
     }
@@ -47,7 +46,6 @@ describe('CreateUserController', () => {
             first_name: validUserRequest.first_name,
             last_name: validUserRequest.last_name,
             email: validUserRequest.email,
-            password: validUserRequest.password,
         }
 
         baseHttpRequest = {
