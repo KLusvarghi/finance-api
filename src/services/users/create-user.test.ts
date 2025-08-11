@@ -1,0 +1,143 @@
+import { EmailAlreadyExistsError } from '@/errors/user'
+import { CreateUserService } from './create-user'
+import {
+    CreateUserParams,
+    UserPublicResponse,
+    UserRepositoryResponse,
+} from '@/shared'
+import { faker } from '@faker-js/faker'
+
+describe('CreateUserService', () => {
+    let sut: CreateUserService
+    let createUserRepository: CreateUserRepositoryStub
+    let getUserByEmailRepository: GetUserByEmailRepositoryStub
+    let passwordHasherAdapter: PasswordHasherAdapterStub
+    let idGeneratorAdapter: IdGeneratorAdapterStub
+    let createUserParams: CreateUserParams
+    let validUserRepositoryResponse: UserRepositoryResponse
+    let validCreateUserServiceResponse: UserPublicResponse
+
+    class CreateUserRepositoryStub {
+        async execute(
+            _params: CreateUserParams,
+        ): Promise<UserRepositoryResponse> {
+            return Promise.resolve(validUserRepositoryResponse)
+        }
+    }
+
+    class GetUserByEmailRepositoryStub {
+        async execute(_email: string): Promise<UserRepositoryResponse | null> {
+            return Promise.resolve(null)
+        }
+    }
+    class PasswordHasherAdapterStub {
+        async execute(_password: string): Promise<string> {
+            return Promise.resolve('valid_hash')
+        }
+    }
+    class IdGeneratorAdapterStub {
+        execute(): string {
+            return 'valid_uuid'
+        }
+    }
+
+    const makeSut = () => {
+        const createUserRepository = new CreateUserRepositoryStub()
+        const getUserByEmailRepository = new GetUserByEmailRepositoryStub()
+        const passwordHasherAdapter = new PasswordHasherAdapterStub()
+        const idGeneratorAdapter = new IdGeneratorAdapterStub()
+        const sut = new CreateUserService(
+            createUserRepository,
+            getUserByEmailRepository,
+            idGeneratorAdapter,
+            passwordHasherAdapter,
+        )
+        return {
+            sut,
+            createUserRepository,
+            getUserByEmailRepository,
+            passwordHasherAdapter,
+            idGeneratorAdapter,
+        }
+    }
+
+    beforeEach(() => {
+        const {
+            sut: service,
+            createUserRepository: createUserRepositoryStub,
+            getUserByEmailRepository: getUserByEmailRepositoryStub,
+            passwordHasherAdapter: passwordHasherAdapterStub,
+            idGeneratorAdapter: idGeneratorAdapterStub,
+        } = makeSut()
+        sut = service
+        createUserRepository = createUserRepositoryStub
+        getUserByEmailRepository = getUserByEmailRepositoryStub
+        passwordHasherAdapter = passwordHasherAdapterStub
+        idGeneratorAdapter = idGeneratorAdapterStub
+
+        createUserParams = {
+            first_name: faker.person.firstName(),
+            last_name: faker.person.lastName(),
+            email: faker.internet.email(),
+            password: faker.internet.password({ length: 7 }),
+        }
+
+        validCreateUserServiceResponse = {
+            id: faker.string.uuid(),
+            first_name: createUserParams.first_name,
+            last_name: createUserParams.last_name,
+            email: createUserParams.email,
+        }
+
+        validUserRepositoryResponse = {
+            id: faker.string.uuid(),
+            ...createUserParams,
+            password: 'valid_hash',
+        }
+
+        const { password: _password, ...userWithoutPassword } =
+            validUserRepositoryResponse
+        validCreateUserServiceResponse = userWithoutPassword
+    })
+
+    afterEach(() => {
+        jest.clearAllMocks()
+        jest.restoreAllMocks()
+        jest.resetAllMocks()
+    })
+
+    describe('success', () => {
+        it('should successefully create a user', async () => {
+            // act
+            const response = await sut.execute(createUserParams)
+
+            // assert
+            expect(response).toBeTruthy()
+            expect(response).toEqual(validCreateUserServiceResponse)
+        })
+    })
+
+    describe('error handling', () => {
+        it('should throw an EmailAlreadyExistsError if getUserByEmailRepository returns a user', async () => {
+            // arrange
+            // mockando o retorno do getUserByEmailRepository, mas dessa vez, retornando um usuário válido
+            jest.spyOn(
+                getUserByEmailRepository,
+                'execute',
+            ).mockResolvedValueOnce(validUserRepositoryResponse)
+
+            // act
+            // nestes casos, o teste deve falhar, pois o usuário já existe
+            // então, não queremos que nossa promise seja resolvida
+            // então, não vamos usar o await (assim a promisse não é resolvida)
+
+            const response = sut.execute(createUserParams)
+
+            // assert
+            // e aqui, esperamos que nossa promisse seja rejeitada, lançando o erro "EmailAlreadyExistsError" para cima (para o nosso controller)
+            expect(response).rejects.toThrow(
+                new EmailAlreadyExistsError(createUserParams.email),
+            )
+        })
+    })
+})
