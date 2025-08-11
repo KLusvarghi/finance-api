@@ -92,9 +92,9 @@ describe('GetUserBalanceService', () => {
         })
 
         // garantindo que o nosso service não está tratando a excessão do nosso repository e passando para cima para o nosso controller
-        it('should throw if GetUserBalanceRepository throws', async () => {
+        it('should throw if getUserByIdRepository throws', async () => {
             // arrange
-            jest.spyOn(getUserBalanceRepository, 'execute').mockRejectedValueOnce(
+            jest.spyOn(getUserByIdRepository, 'execute').mockRejectedValueOnce(
                 new Error(),
             )
 
@@ -104,13 +104,21 @@ describe('GetUserBalanceService', () => {
             // assert
             expect(promise).rejects.toThrow()
         })
+
+        it('should throw if GetUserBalanceRepository throws', async () => {
+            // arrange
+            jest.spyOn(
+                getUserBalanceRepository,
+                'execute',
+            ).mockRejectedValueOnce(new Error())
+
+            // act
+            const promise = sut.execute(validUserId)
+
+            // assert
+            expect(promise).rejects.toThrow()
+        })
     })
-
-
-
-
-
-
 
     describe('success', () => {
         it('should successefully get user balance', async () => {
@@ -122,10 +130,6 @@ describe('GetUserBalanceService', () => {
             expect(response).toEqual(validGetUserBalanceResponse)
         })
     })
-
-
-
-
 
     describe('validations', () => {
         //  validando se o getUserByIdRepository foi chamado com o id correto
@@ -142,15 +146,15 @@ describe('GetUserBalanceService', () => {
         })
 
         it('should call GetUserBalanceRepository with correct params', async () => {
-          // arrange
-          const executeSpy = jest.spyOn(getUserBalanceRepository, 'execute')
+            // arrange
+            const executeSpy = jest.spyOn(getUserBalanceRepository, 'execute')
 
-          // act
-          await sut.execute(validUserId)
+            // act
+            await sut.execute(validUserId)
 
-          // assert
-          expect(executeSpy).toHaveBeenCalledWith(validUserId)
-          expect(executeSpy).toHaveBeenCalledTimes(1)
-      })
+            // assert
+            expect(executeSpy).toHaveBeenCalledWith(validUserId)
+            expect(executeSpy).toHaveBeenCalledTimes(1)
+        })
     })
 })
