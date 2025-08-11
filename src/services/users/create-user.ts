@@ -51,8 +51,8 @@ export class CreateUserService {
             password: hashPassword,
         }
 
-        const newUser = await this.createUserRepository.execute(user)
+        const { password: _password, ...userWithoutPassword } = await this.createUserRepository.execute(user)
 
-        return newUser
+        return userWithoutPassword
     }
 }
