@@ -32,12 +32,12 @@ describe('CreateUserService', () => {
     }
     class PasswordHasherAdapterStub {
         async execute(_password: string): Promise<string> {
-            return Promise.resolve('valid_hash')
+            return Promise.resolve(validUserRepositoryResponse.password)
         }
     }
     class IdGeneratorAdapterStub {
         execute(): string {
-            return 'valid_uuid'
+            return validUserRepositoryResponse.id
         }
     }
 
@@ -82,39 +82,25 @@ describe('CreateUserService', () => {
             password: faker.internet.password({ length: 7 }),
         }
 
-        validCreateUserServiceResponse = {
-            id: faker.string.uuid(),
-            first_name: createUserParams.first_name,
-            last_name: createUserParams.last_name,
-            email: createUserParams.email,
-        }
-
+        
         validUserRepositoryResponse = {
-            id: faker.string.uuid(),
-            ...createUserParams,
-            password: 'valid_hash',
+          id: faker.string.uuid(),
+          ...createUserParams,
+          password: 'valid_hash',
         }
 
-        const { password: _password, ...userWithoutPassword } =
-            validUserRepositoryResponse
-        validCreateUserServiceResponse = userWithoutPassword
+        validCreateUserServiceResponse = {
+            id: validUserRepositoryResponse.id,
+            first_name: validUserRepositoryResponse.first_name,
+            last_name: validUserRepositoryResponse.last_name,
+            email: validUserRepositoryResponse.email,
+        }
     })
 
     afterEach(() => {
         jest.clearAllMocks()
         jest.restoreAllMocks()
         jest.resetAllMocks()
-    })
-
-    describe('success', () => {
-        it('should successefully create a user', async () => {
-            // act
-            const response = await sut.execute(createUserParams)
-
-            // assert
-            expect(response).toBeTruthy()
-            expect(response).toEqual(validCreateUserServiceResponse)
-        })
     })
 
     describe('error handling', () => {
@@ -138,6 +124,46 @@ describe('CreateUserService', () => {
             expect(response).rejects.toThrow(
                 new EmailAlreadyExistsError(createUserParams.email),
             )
+        })
+    })
+
+    describe('validations', () => {
+      it('should call idGeneratorAdapter to generate a random uuid', async () => {
+        // arrange
+        // neste caso, não precisamos mocar nada, apenas falar para ele espiar o idGeneratorAdapter
+        const idGeneratorAdapterSpy = jest.spyOn(idGeneratorAdapter, 'execute')
+
+        // para que a gente verifique se esse "id" foi retornado passado para o repository, temos que espiar a classe "CreateUserRepository"
+        const createUserRepositorySpy = jest.spyOn(createUserRepository, 'execute')
+
+        // act
+        await sut.execute(createUserParams)
+
+        // assert
+        // validando se o idGeneratorAdapter foi chamado
+        expect(idGeneratorAdapterSpy).toHaveBeenCalled()
+        expect(idGeneratorAdapterSpy).toHaveBeenCalledTimes(1)
+
+        // validando se o createUserRepository foi chamado contendo o Id gerado pelo idGeneratorAdapter
+        expect(createUserRepositorySpy).toHaveBeenCalledWith({
+            ...createUserParams,
+            id: validUserRepositoryResponse.id,
+            password: validUserRepositoryResponse.password,
+        })
+        expect(createUserRepositorySpy).toHaveBeenCalledTimes(1)
+      })
+
+      
+    })
+
+    describe('success', () => {
+        it('should successefully create a user', async () => {
+            // act
+            const response = await sut.execute(createUserParams)
+
+            // assert
+            expect(response).toBeTruthy()
+            expect(response).toEqual(validCreateUserServiceResponse)
         })
     })
 })
