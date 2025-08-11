@@ -9,6 +9,7 @@ import {
     UpdateUserRepository,
     UserRepositoryResponse,
     UserPublicResponse,
+    GetUserByIdRepository,
 } from '@/shared/types'
 import { PasswordHasherAdapter } from '@/adapters'
 
@@ -16,55 +17,54 @@ export class UpdateUserService {
     private getUserByEmailRepository: GetUserByEmailRepository
     private updateUserRepository: UpdateUserRepository
     private passwordHasher: PasswordHasherAdapter
+    private getUserByIdRepository: GetUserByIdRepository
 
     constructor(
         getUserByEmailRepository: GetUserByEmailRepository,
         updateUserRepository: UpdateUserRepository,
         passwordHasher: PasswordHasherAdapter,
+        getUserByIdRepository: GetUserByIdRepository,
     ) {
         this.getUserByEmailRepository = getUserByEmailRepository
         this.updateUserRepository = updateUserRepository
         this.passwordHasher = passwordHasher
+        this.getUserByIdRepository = getUserByIdRepository
     }
 
     async execute(
         userId: string,
         updateUserParams: UpdateUserParams,
     ): Promise<UserPublicResponse> {
-        const hasUserWithProvidedEmail =
-            await this.getUserByEmailRepository.execute(updateUserParams.email!)
-
-        if (!hasUserWithProvidedEmail) {
+        // 1. Primeiro verificar se o usuário que está sendo atualizado existe
+        const existingUser = await this.getUserByIdRepository.execute(userId)
+        if (!existingUser) {
             throw new UserNotFoundError(userId)
         }
 
-        // 1. se o email estiver sendo atualizado, verificar se já está em uso
+        // 2. Se o email estiver sendo atualizado, verificar se já está em uso por outro usuário
         if (updateUserParams.email) {
-            const userWithProviderEmail =
+            const userWithProvidedEmail =
                 await this.getUserByEmailRepository.execute(
                     updateUserParams.email,
                 )
 
-            // além de validar se o email já está em uso, validamos se o email a ser atualizado é diferente da pessoa que está atualizando, e caso sim, ele entra na condição e invalida a açao
-            if (userWithProviderEmail && userWithProviderEmail.id !== userId) {
+            // Verificar se o email já está em uso por outro usuário
+            if (userWithProvidedEmail && userWithProvidedEmail.id !== userId) {
                 throw new EmailAlreadyExistsError(updateUserParams.email)
             }
         }
 
         const user = { ...updateUserParams }
 
-        // 2. se a senha estiver sendo atualizado, criptogra-lá
+        // 3. Se a senha estiver sendo atualizada, criptografá-la
         if (updateUserParams.password) {
             const hashPassword = await this.passwordHasher.execute(
                 updateUserParams.password,
             )
-            user.password = hashPassword // assim a gente adiciona ou substitui a props "password" com o valor de hashPassword
-
-            // poderiamos fazer dessa maneira abaixo tbm, mas, para deixar masi claro e separar o que vem e o que retornamos, é melhor criar outra variável
-            // updateUserParams.password = hashPassword
+            user.password = hashPassword
         }
 
-        // 3. chamar o repository para atualizar o user no banco de dados
+        // 4. Chamar o repository para atualizar o user no banco de dados
         const updatedUser = await this.updateUserRepository.execute(
             userId,
             user,
