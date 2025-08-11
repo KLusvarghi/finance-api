@@ -57,7 +57,7 @@ describe('DeleteUserService', () => {
     })
 
     describe('error handling', () => {
-        it('should return UserNotFoundError if user is not found', async () => {
+        it('should return UserNotFoundError if DeleteUserRepository returns null', async () => {
             // arrange
             jest.spyOn(deleteUserRepository, 'execute').mockResolvedValueOnce(
                 null,
