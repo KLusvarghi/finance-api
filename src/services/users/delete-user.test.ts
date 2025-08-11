@@ -56,6 +56,35 @@ describe('DeleteUserService', () => {
         jest.resetAllMocks()
     })
 
+    describe('error handling', () => {
+        it('should return UserNotFoundError if user is not found', async () => {
+            // arrange
+            jest.spyOn(deleteUserRepository, 'execute').mockResolvedValueOnce(
+                null,
+            )
+
+            // act
+            const response = sut.execute(validUserId)
+
+            // assert
+            expect(response).rejects.toThrow(UserNotFoundError)
+        })
+
+        // esse tipo de teste é importnate para garantir que o nosso service não está tratando a excessão do nosso repository e passando para cima para o nosso controller
+        it('should throw if DeleteUserRepository throws', async () => {
+            // arrange
+            jest.spyOn(deleteUserRepository, 'execute').mockRejectedValueOnce(
+                new UserNotFoundError(validUserId),
+            )
+
+            // act
+            const response = sut.execute(validUserId)
+
+            // assert
+            expect(response).rejects.toThrow()
+        })
+    })
+
     describe('success', () => {
         it('should successefully delete an user', async () => {
             // act
@@ -79,21 +108,6 @@ describe('DeleteUserService', () => {
             // assert
             expect(executeSpy).toHaveBeenCalledWith(validUserId)
             expect(executeSpy).toHaveBeenCalledTimes(1)
-        })
-    })
-
-    describe('error handling', () => {
-        it('should throw if DeleteUserRepository throws', async () => {
-            // arrange
-            jest.spyOn(deleteUserRepository, 'execute').mockRejectedValueOnce(
-                new Error(),
-            )
-
-            // act
-            const response = sut.execute(validUserId)
-
-            // assert
-            expect(response).rejects.toThrow()
         })
     })
 })
