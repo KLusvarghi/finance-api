@@ -116,11 +116,11 @@ describe('CreateUserService', () => {
             // então, não queremos que nossa promise seja resolvida
             // então, não vamos usar o await (assim a promisse não é resolvida)
 
-            const response = sut.execute(createUserParams)
+            const promise = sut.execute(createUserParams)
 
             // assert
             // e aqui, esperamos que nossa promisse seja rejeitada, lançando o erro "EmailAlreadyExistsError" para cima (para o nosso controller)
-            expect(response).rejects.toThrow(
+            expect(promise).rejects.toThrow(
                 new EmailAlreadyExistsError(createUserParams.email),
             )
         })
@@ -135,11 +135,11 @@ describe('CreateUserService', () => {
 
             // act
             // não vamos usar o await, pois queremos que a promisse seja rejeitada
-            const response = sut.execute(createUserParams)
+            const promise = sut.execute(createUserParams)
 
             // assert
             // e aqui, esperamos que nossa promisse seja rejeitada, lançando o erro "Error" para cima (para o nosso controller)
-            expect(response).rejects.toThrow()
+            expect(promise).rejects.toThrow()
         })
 
         // fazendo o mesmo para idGeneratorAdapter
@@ -154,10 +154,10 @@ describe('CreateUserService', () => {
             )
 
             // act
-            const response = sut.execute(createUserParams)
+            const promise = sut.execute(createUserParams)
 
             // assert
-            expect(response).rejects.toThrow()
+            expect(promise).rejects.toThrow()
         })
 
         it('should throw if PasswordHasherAdapter throws', () => {
@@ -167,10 +167,10 @@ describe('CreateUserService', () => {
             )
 
             // act
-            const response = sut.execute(createUserParams)
+            const promise = sut.execute(createUserParams)
 
             // assert
-            expect(response).rejects.toThrow()
+            expect(promise).rejects.toThrow()
         })
 
         // se meu repository lançar uma excessão, eu não quero que ela seja tratada dentro do meu service, mas sim, lançada para cima (para o nosso controller)
@@ -181,10 +181,10 @@ describe('CreateUserService', () => {
             )
 
             // act
-            const response = sut.execute(createUserParams)
+            const promise = sut.execute(createUserParams)
 
             // assert
-            expect(response).rejects.toThrow()
+            expect(promise).rejects.toThrow()
         })
     })
 
