@@ -153,7 +153,28 @@ describe('CreateUserService', () => {
         expect(createUserRepositorySpy).toHaveBeenCalledTimes(1)
       })
 
-      
+      it('should call passwordHasherAdapter to hash the password', async () => {
+        // arrange
+        const passwordHasherAdapterSpy = jest.spyOn(passwordHasherAdapter, 'execute')
+
+        const createUserRepositorySpy = jest.spyOn(createUserRepository, 'execute')
+
+        // act
+        await sut.execute(createUserParams)
+
+        // assert
+        // validando se o passwordHasherAdapter foi chamado
+        expect(passwordHasherAdapterSpy).toHaveBeenCalled()
+        expect(passwordHasherAdapterSpy).toHaveBeenCalledTimes(1)
+
+        // validando se o createUserRepository foi chamado contendo o Id gerado pelo passwordHasherAdapter
+        expect(createUserRepositorySpy).toHaveBeenCalledWith({
+            ...createUserParams,
+            id: validUserRepositoryResponse.id,
+            password: validUserRepositoryResponse.password,
+        })
+        expect(createUserRepositorySpy).toHaveBeenCalledTimes(1)
+      })
     })
 
     describe('success', () => {
