@@ -5,6 +5,7 @@ import {
 } from '@/shared'
 import { UpdateUserService } from './update-user'
 import { faker } from '@faker-js/faker'
+import { EmailAlreadyExistsError } from '@/errors/user'
 
 describe('UpdateUserService', () => {
     let sut: UpdateUserService
@@ -106,6 +107,31 @@ describe('UpdateUserService', () => {
         }
     })
 
+    describe('error handling', () => {
+        it('should throw EmailAlreadyExistsError if email already exists', () => {
+            // arrange
+            // mockamos o retorno para que o email já exista e ele entre no if do service
+            jest.spyOn(
+                getUserByEmailRepository,
+                'execute',
+            ).mockResolvedValueOnce(validUserRepositoryResponse)
+
+            // act
+            // não passamos o await para que ele retorne uma promise e não um valor
+            // passando um id diferente do que é passado no "validUserRepositoryResponse" para que ele entre no outro if do service e retorne o erro
+            const promise = sut.execute(faker.string.uuid(), {
+                email: validUpdateUserServiceResponse.email,
+            })
+
+            // assert
+            expect(promise).rejects.toThrow(
+                new EmailAlreadyExistsError(
+                    validUpdateUserServiceResponse.email,
+                ),
+            )
+        })
+    })
+
     describe('success', () => {
         it('should successfully update a user (without password and email)', async () => {
             // act
@@ -137,21 +163,21 @@ describe('UpdateUserService', () => {
         })
 
         it('should successfully update a user (with password)', async () => {
-          // arrange
-          const passwordHasherAdapterSpy = jest.spyOn(
-              passwordHasherAdapter,
-              'execute',
-          )
+            // arrange
+            const passwordHasherAdapterSpy = jest.spyOn(
+                passwordHasherAdapter,
+                'execute',
+            )
 
-          // act
-          const response = await sut.execute(validUserId, {
-              password: updateUserParams.password,
-          })
+            // act
+            const response = await sut.execute(validUserId, {
+                password: updateUserParams.password,
+            })
 
-          // assert
-          expect(response).toEqual(validUpdateUserServiceResponse)
+            // assert
+            expect(response).toEqual(validUpdateUserServiceResponse)
 
-          // para garantir que o repository seja chamado com o email que estamos passando no service:
+            // para garantir que o repository seja chamado com o email que estamos passando no service:
             expect(passwordHasherAdapterSpy).toHaveBeenCalledWith(
                 updateUserParams.password,
             )
