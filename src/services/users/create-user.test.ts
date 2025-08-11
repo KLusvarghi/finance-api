@@ -176,13 +176,26 @@ describe('CreateUserService', () => {
         // se meu repository lançar uma excessão, eu não quero que ela seja tratada dentro do meu service, mas sim, lançada para cima (para o nosso controller)
         it('should throw if CreateUserRepository throws', () => {
             // arrange
-            jest.spyOn(createUserRepository, 'execute').mockRejectedValueOnce(new Error())
+            jest.spyOn(createUserRepository, 'execute').mockRejectedValueOnce(
+                new Error(),
+            )
 
             // act
             const response = sut.execute(createUserParams)
 
             // assert
             expect(response).rejects.toThrow()
+        })
+    })
+
+    describe('success', () => {
+        it('should successefully create a user', async () => {
+            // act
+            const response = await sut.execute(createUserParams)
+
+            // assert
+            expect(response).toBeTruthy()
+            expect(response).toEqual(validCreateUserServiceResponse)
         })
     })
 
@@ -245,17 +258,6 @@ describe('CreateUserService', () => {
                 password: validUserRepositoryResponse.password,
             })
             expect(createUserRepositorySpy).toHaveBeenCalledTimes(1)
-        })
-    })
-
-    describe('success', () => {
-        it('should successefully create a user', async () => {
-            // act
-            const response = await sut.execute(createUserParams)
-
-            // assert
-            expect(response).toBeTruthy()
-            expect(response).toEqual(validCreateUserServiceResponse)
         })
     })
 })
