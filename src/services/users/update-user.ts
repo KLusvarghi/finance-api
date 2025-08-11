@@ -8,6 +8,7 @@ import {
     GetUserByEmailRepository,
     UpdateUserRepository,
     UserRepositoryResponse,
+    UserPublicResponse,
 } from '@/shared/types'
 import { PasswordHasherAdapter } from '@/adapters'
 
@@ -29,7 +30,7 @@ export class UpdateUserService {
     async execute(
         userId: string,
         updateUserParams: UpdateUserParams,
-    ): Promise<UserRepositoryResponse | null> {
+    ): Promise<UserPublicResponse> {
         const hasUserWithProvidedEmail =
             await this.getUserByEmailRepository.execute(updateUserParams.email!)
 
@@ -73,6 +74,7 @@ export class UpdateUserService {
             throw new UpdateUserFailedError()
         }
 
-        return updatedUser
+        const { password: _password, ...userWithoutPassword } = updatedUser
+        return userWithoutPassword
     }
 }
