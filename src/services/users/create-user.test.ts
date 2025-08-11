@@ -141,6 +141,22 @@ describe('CreateUserService', () => {
             // e aqui, esperamos que nossa promisse seja rejeitada, lançando o erro "Error" para cima (para o nosso controller)
             expect(response).rejects.toThrow()
         })
+
+        // fazendo o mesmo para idGeneratorAdapter
+        it('should throw if IdGeneratorAdapter throws', async () => {
+            // arrange
+            // como o "execute" do idGeneratorAdapter é não é uma promisse e sim uma função normal, não podemos usar o "mockRejectedValueOnce"
+            // então, vamos usar o "mockImplementationOnce"
+            jest.spyOn(idGeneratorAdapter, 'execute').mockImplementationOnce(() => {
+              throw new Error()
+            }) 
+
+            // act
+            const response = sut.execute(createUserParams)
+
+            // assert
+            expect(response).rejects.toThrow()
+        })
     })
 
     describe('validations', () => {
