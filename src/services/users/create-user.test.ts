@@ -118,7 +118,7 @@ describe('CreateUserService', () => {
     })
 
     describe('error handling', () => {
-        it('should throw an EmailAlreadyExistsError if getUserByEmailRepository returns a user', async () => {
+        it('should throw an EmailAlreadyExistsError if getUserByEmailRepository returns a user', () => {
             // arrange
             // mockando o retorno do getUserByEmailRepository, mas dessa vez, retornando um usuário válido
             jest.spyOn(
