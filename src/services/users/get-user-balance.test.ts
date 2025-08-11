@@ -91,6 +91,7 @@ describe('GetUserBalanceService', () => {
             expect(promise).rejects.toThrow(new UserNotFoundError(validUserId))
         })
 
+        // garantindo que o nosso service não está tratando a excessão do nosso repository e passando para cima para o nosso controller
         it('should throw if GetUserBalanceRepository throws', async () => {
             // arrange
             jest.spyOn(getUserBalanceRepository, 'execute').mockRejectedValueOnce(
@@ -126,18 +127,18 @@ describe('GetUserBalanceService', () => {
 
 
 
-    // describe('validations', () => {
-    //     //  validando se o deleteUserRepository foi chamado com o id correto
-    //     it('should call deleteUserRepository with correct params', async () => {
-    //         // arrange
-    //         const executeSpy = jest.spyOn(deleteUserRepository, 'execute')
+    describe('validations', () => {
+        //  validando se o getUserByIdRepository foi chamado com o id correto
+        it('should call GetUserByIdRepository with correct params', async () => {
+            // arrange
+            const executeSpy = jest.spyOn(getUserByIdRepository, 'execute')
 
-    //         // act
-    //         await sut.execute(validUserId)
+            // act
+            await sut.execute(validUserId)
 
-    //         // assert
-    //         expect(executeSpy).toHaveBeenCalledWith(validUserId)
-    //         expect(executeSpy).toHaveBeenCalledTimes(1)
-    //     })
-    // })
+            // assert
+            expect(executeSpy).toHaveBeenCalledWith(validUserId)
+            expect(executeSpy).toHaveBeenCalledTimes(1)
+        })
+    })
 })
