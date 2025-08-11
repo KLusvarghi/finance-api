@@ -77,34 +77,33 @@ describe('GetUserBalanceService', () => {
         jest.resetAllMocks()
     })
 
-    // describe('error handling', () => {
-    //     it('should return UserNotFoundError if user is not found', async () => {
-    //         // arrange
-    //         jest.spyOn(deleteUserRepository, 'execute').mockResolvedValueOnce(
-    //             null,
-    //         )
+    describe('error handling', () => {
+        it('should return UserNotFoundError if GetUserByIdRepository returns null', async () => {
+            // arrange
+            jest.spyOn(getUserByIdRepository, 'execute').mockResolvedValueOnce(
+                null,
+            )
 
-    //         // act
-    //         const response = sut.execute(validUserId)
+            // act
+            const promise = sut.execute(validUserId)
 
-    //         // assert
-    //         expect(response).rejects.toThrow(UserNotFoundError)
-    //     })
+            // assert
+            expect(promise).rejects.toThrow(new UserNotFoundError(validUserId))
+        })
 
-    //     // esse tipo de teste é importnate para garantir que o nosso service não está tratando a excessão do nosso repository e passando para cima para o nosso controller
-    //     it('should throw if DeleteUserRepository throws', async () => {
-    //         // arrange
-    //         jest.spyOn(deleteUserRepository, 'execute').mockRejectedValueOnce(
-    //             new UserNotFoundError(validUserId),
-    //         )
+        it('should throw if GetUserBalanceRepository throws', async () => {
+            // arrange
+            jest.spyOn(getUserBalanceRepository, 'execute').mockRejectedValueOnce(
+                new Error(),
+            )
 
-    //         // act
-    //         const response = sut.execute(validUserId)
+            // act
+            const promise = sut.execute(validUserId)
 
-    //         // assert
-    //         expect(response).rejects.toThrow()
-    //     })
-    // })
+            // assert
+            expect(promise).rejects.toThrow()
+        })
+    })
 
 
 
