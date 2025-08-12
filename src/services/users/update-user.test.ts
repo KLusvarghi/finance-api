@@ -5,7 +5,7 @@ import {
 } from '@/shared'
 import { UpdateUserService } from './update-user'
 import { faker } from '@faker-js/faker'
-import { EmailAlreadyExistsError } from '@/errors/user'
+import { EmailAlreadyExistsError, UserNotFoundError } from '@/errors/user'
 
 describe('UpdateUserService', () => {
     let sut: UpdateUserService
@@ -130,6 +130,20 @@ describe('UpdateUserService', () => {
                 ),
             )
         })
+
+        it('should throw UserNotFoundError if GetUserByIdRepository throws', async () => {
+          // arrange
+          jest.spyOn(
+              getUserByIdRepository,
+              'execute',
+          ).mockRejectedValueOnce(new Error())
+
+          // act
+          const promise = sut.execute(validUserId, updateUserParams)
+
+          // assert
+          expect(promise).rejects.toThrow()
+      })
     })
 
     describe('success', () => {
@@ -181,6 +195,29 @@ describe('UpdateUserService', () => {
             expect(passwordHasherAdapterSpy).toHaveBeenCalledWith(
                 updateUserParams.password,
             )
+        })
+
+        describe('validations', () => {
+            it('should call UpdateUserRepository with correct params', async () => {
+                // arrange
+                const executeSpy = jest.spyOn(updateUserRepository, 'execute')
+
+                // act
+                await sut.execute(validUserId, updateUserParams)
+
+                // assert
+                // O serviço deve fazer hash da senha antes de chamar o repository
+                const expectedParams = {
+                    ...updateUserParams,
+                    password: 'valid_hash', // Senha já com hash
+                }
+
+                expect(executeSpy).toHaveBeenCalledWith(
+                    validUserId,
+                    expectedParams,
+                )
+                expect(executeSpy).toHaveBeenCalledTimes(1)
+            })
         })
     })
 })
