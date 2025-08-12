@@ -1,10 +1,11 @@
-import { CreateTransactionParams } from '@/shared/types'
+import {
+    CreateTransactionParams,
+    TransactionPublicResponse,
+} from '@/shared/types'
 import { UserNotFoundError } from '@/errors/user'
-import { v4 as uuidv4 } from 'uuid'
 import {
     CreateTransactionRepository,
     GetUserByIdRepository,
-    TransactionRepositoryResponse,
 } from '@/shared/types'
 import { IdGeneratorAdapter } from '@/adapters'
 
@@ -25,7 +26,7 @@ export class CreateTransactionService {
 
     async execute(
         params: CreateTransactionParams,
-    ): Promise<TransactionRepositoryResponse> {
+    ): Promise<TransactionPublicResponse> {
         const user = await this.getUserByIdRepository.execute(params.user_id)
 
         if (!user) {
