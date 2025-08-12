@@ -119,6 +119,23 @@ describe('DeleteTransactionService', () => {
             // assert
             expect(promise).rejects.toThrow(new UserNotFoundError(validUserId))
         })
+
+        // garantindo que o erro é passado para cima (controller)
+        it('should throw if GetUserByIdRepository throws', async () => {
+            // arrange
+            jest.spyOn(getUserByIdRepository, 'execute').mockRejectedValueOnce(
+                new Error('GetUserByIdRepository error'),
+            )
+            // act
+            const promise = sut.execute(validUserId)
+
+            // assert
+            expect(promise).rejects.toThrow(
+                new Error('GetUserByIdRepository error'),
+            )
+        })
+
+       
     })
 
     describe('success', () => {
