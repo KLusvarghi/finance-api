@@ -1,93 +1,137 @@
 import { faker } from '@faker-js/faker'
-import { CreateUserParams, UpdateUserParams } from '@/shared/types'
+import { Prisma } from '@prisma/client'
 
-// Tipo para dados de entrada (sem id)
-type CreateUserInput = Omit<CreateUserParams, 'id'>
+export const userId = faker.string.uuid()
 
-// Dados válidos
-export const createValidUserFixture = (): CreateUserInput => ({
-    first_name: faker.person.firstName(),
-    last_name: faker.person.lastName(),
-    email: faker.internet.email(),
-    password: faker.internet.password({ length: 7 }), // um char a mais que o mínimo
-})
+// ============================================================================
+// PARAMS
+// ============================================================================
 
-// Dados válidos para update (todos os campos são opcionais)
-export const createValidUpdateUserFixture = (): Partial<UpdateUserParams> => ({
+export const createUserParams = {
     first_name: faker.person.firstName(),
     last_name: faker.person.lastName(),
     email: faker.internet.email(),
     password: faker.internet.password({ length: 7 }),
-})
-
-// Dados inválidos para testes
-export const invalidUserFixtures = {
-    // Emails inválidos
-    invalidEmails: [
-        '', // vazio
-        ' ', // espaço
-        'not-an-email', // sem @
-        'missing@', // sem domínio
-        '@nodomain.com', // sem local part
-        'spaces in@email.com', // espaço no local part
-        'double@@email.com', // @ duplo
-        'unicode@🙂.com', // emoji no domínio
-        `${faker.string.alpha(95)}@test.com`, // > 100 chars
-    ],
-
-    // Nomes inválidos (first_name e last_name têm as mesmas regras)
-    invalidNames: [
-        '', // vazio
-        ' ', // espaço
-        '1', // um caractere (mínimo é 2)
-        faker.string.alpha(51), // > 50 chars (limite do DB)
-        '123456', // apenas números
-        '@#$%', // apenas símbolos
-        ' '.repeat(10), // apenas espaços
-    ],
-
-    // Senhas inválidas
-    invalidPasswords: [
-        '', // vazia
-        ' ', // espaço
-        'short', // < 6 chars
-        faker.string.alpha(5), // exatamente 5 chars
-        ' '.repeat(6), // 6 espaços
-    ],
-
-    // Casos especiais que devem ser válidos
-    specialCases: {
-        names: [
-            "O'Connor", // apóstrofo
-            'João-Maria', // hífen
-            'Smith Jr.', // ponto
-            'María José', // acento
-            'Jean-Pierre', // hífen
-            'McDonald', // CamelCase
-        ],
-        emails: [
-            'user+tag@domain.com', // + no email
-            'user.name@domain.com', // ponto no local part
-            'user@sub.domain.com', // subdomínio
-            '12345@domain.com', // números no local part
-            'user@domain.co.uk', // múltiplos pontos no domínio
-        ],
-    },
 }
 
-// Helper para gerar dados inválidos mantendo um campo específico válido
-export const createInvalidUserFixtureExcept = (
-    validField: keyof CreateUserInput,
-): CreateUserInput => {
-    const base = {
-        first_name: invalidUserFixtures.invalidNames[0],
-        last_name: invalidUserFixtures.invalidNames[0],
-        email: invalidUserFixtures.invalidEmails[0],
-        password: invalidUserFixtures.invalidPasswords[0],
-    }
+export const updateUserParams = {
+    first_name: faker.person.firstName(),
+    last_name: faker.person.lastName(),
+    email: faker.internet.email(),
+    password: faker.internet.password({ length: 7 }),
+}
 
-    return {
-        ...base,
-        [validField]: createValidUserFixture()[validField],
-    }
+// ============================================================================
+// SHARED DATA (Base para responses)
+// ============================================================================
+
+export const userResponse = {
+    id: userId,
+    first_name: faker.person.firstName(),
+    last_name: faker.person.lastName(),
+    email: faker.internet.email(),
+}
+
+export const userBalanceResponse = {
+    earnings: faker.number.float(),
+    expenses: faker.number.float(),
+    investments: faker.number.float(),
+    balance: new Prisma.Decimal(faker.number.float()),
+}
+
+// ============================================================================
+// REPOSITORY RESPONSES
+// ============================================================================
+
+export const createUserRepositoryResponse = {
+    id: faker.string.uuid(),
+    ...createUserParams,
+    password: 'valid_hash',
+}
+
+export const deleteUserRepositoryResponse = {
+    id: userId,
+    first_name: faker.person.firstName(),
+    last_name: faker.person.lastName(),
+    email: faker.internet.email(),
+    password: faker.internet.password({ length: 7 }),
+}
+
+export const getUserByIdRepositoryResponse = {
+    id: userId,
+    first_name: faker.person.firstName(),
+    last_name: faker.person.lastName(),
+    email: faker.internet.email(),
+    password: faker.internet.password({ length: 7 }),
+}
+
+export const updateUserRepositoryResponse = {
+    id: userId,
+    first_name: updateUserParams.first_name,
+    last_name: updateUserParams.last_name,
+    email: updateUserParams.email,
+    password: 'valid_hash',
+}
+
+// ============================================================================
+// UNIFIED RESPONSES (Service + Controller)
+// ============================================================================
+
+const createUserResponse = {
+    id: createUserRepositoryResponse.id,
+    first_name: createUserRepositoryResponse.first_name,
+    last_name: createUserRepositoryResponse.last_name,
+    email: createUserRepositoryResponse.email,
+}
+
+const deleteUserResponse = userResponse
+const getUserByIdResponse = userResponse
+const updateUserResponse = {
+    id: userId,
+    first_name: updateUserParams.first_name,
+    last_name: updateUserParams.last_name,
+    email: updateUserParams.email,
+}
+const getUserBalanceResponse = userBalanceResponse
+
+// ============================================================================
+// LEGACY EXPORTS (Para manter compatibilidade)
+// ============================================================================
+
+// Service responses 
+export const createUserServiceResponse = createUserResponse
+export const deleteUserServiceResponse = deleteUserResponse
+export const getUserBalanceServiceResponse = getUserBalanceResponse
+export const getUserByIdServiceResponse = getUserByIdResponse
+export const updateUserServiceResponse = updateUserResponse
+
+// Controller responses 
+export const createUserControllerResponse = createUserResponse
+export const deleteUserControllerResponse = deleteUserResponse
+export const getUserBalanceControllerResponse = getUserBalanceResponse
+export const updateUserControllerResponse = updateUserResponse
+
+// ============================================================================
+// BASE HTTP REQUEST
+// ============================================================================
+
+export const createUserBaseHttpRequest = {
+    body: createUserParams,
+}
+
+export const deleteUserBaseHttpRequest = {
+    params: { userId },
+}
+
+export const getUserBalanceBaseHttpRequest = {
+    params: { userId },
+}
+
+export const getUserByIdBaseHttpRequest = {
+    params: { userId },
+}
+
+export const updateUserBaseHttpRequest = {
+    params: { userId },
+    body: updateUserParams,
 }
