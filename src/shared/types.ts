@@ -48,7 +48,7 @@ export interface TransactionPublicResponse {
     name: string
     amount: Prisma.Decimal
     date: Date
-    type: 'EARNING' | 'EXPENSE' | 'INVESTMENT'
+    type: Prisma.TransactionGetPayload<{}>['type']
 }
 
 // ============================================================================
@@ -196,9 +196,7 @@ export interface DeleteUserService {
 
 // Transaction Service Interfaces
 export interface CreateTransactionService {
-    execute(
-        params: CreateTransactionParams,
-    ): Promise<TransactionRepositoryResponse>
+    execute(params: CreateTransactionParams): Promise<TransactionPublicResponse>
 }
 
 export interface GetTransactionsByUserIdService {
