@@ -141,7 +141,7 @@ export interface CreateTransactionRepository {
 }
 
 export interface GetTransactionsByUserIdRepository {
-    execute(userId: string): Promise<TransactionRepositoryResponse[] | null>
+    execute(userId: string): Promise<TransactionRepositoryResponse[]>
 }
 
 export interface UpdateTransactionRepository {
