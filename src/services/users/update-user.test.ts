@@ -5,7 +5,7 @@ import {
 } from '@/shared'
 import { UpdateUserService } from './update-user'
 import { faker } from '@faker-js/faker'
-import { EmailAlreadyExistsError, UserNotFoundError } from '@/errors/user'
+import { EmailAlreadyExistsError, UpdateUserFailedError, UserNotFoundError } from '@/errors/user'
 
 describe('UpdateUserService', () => {
     let sut: UpdateUserService
@@ -22,7 +22,7 @@ describe('UpdateUserService', () => {
         async execute(
             userId: string,
             updateUserParams: UpdateUserParams,
-        ): Promise<UserRepositoryResponse> {
+        ): Promise<UserRepositoryResponse | null> {
             return Promise.resolve(validUserRepositoryResponse)
         }
     }
@@ -108,6 +108,19 @@ describe('UpdateUserService', () => {
     })
 
     describe('error handling', () => {
+        it('should throw UpdateUserFailedError if UpdateUserRepository throws', async () => {
+            // arrange
+            jest.spyOn(updateUserRepository, 'execute').mockResolvedValueOnce(
+                null,
+            )
+
+            // act
+            const promise = sut.execute(validUserId, updateUserParams)
+
+            // assert
+            expect(promise).rejects.toThrow(new UpdateUserFailedError())
+        })
+
         it('should throw EmailAlreadyExistsError if email already exists', () => {
             // arrange
             // mockamos o retorno para que o email já exista e ele entre no if do service
@@ -133,8 +146,8 @@ describe('UpdateUserService', () => {
 
         it('should throw UserNotFoundError if GetUserByIdRepository throws', async () => {
             // arrange
-            jest.spyOn(getUserByIdRepository, 'execute').mockRejectedValueOnce(
-                new Error(),
+            jest.spyOn(getUserByIdRepository, 'execute').mockResolvedValueOnce(
+                null,
             )
 
             // act
@@ -144,6 +157,7 @@ describe('UpdateUserService', () => {
 
             // assert
             expect(promise).rejects.toThrow()
+            expect(promise).rejects.toThrow(new UserNotFoundError(validUserId))
         })
 
         it('should throw if PasswordHasherAdapter throws', async () => {
@@ -162,17 +176,17 @@ describe('UpdateUserService', () => {
         })
 
         it('should throw if UpdateUserRepository throws', async () => {
-          // arrange
-          jest.spyOn(updateUserRepository, 'execute').mockRejectedValueOnce(
-              new Error(),
-          )
+            // arrange
+            jest.spyOn(updateUserRepository, 'execute').mockRejectedValueOnce(
+                new Error(),
+            )
 
-          // act
-          const promise = sut.execute(validUserId, updateUserParams)
+            // act
+            const promise = sut.execute(validUserId, updateUserParams)
 
-          // assert
-          expect(promise).rejects.toThrow()
-      })
+            // assert
+            expect(promise).rejects.toThrow()
+        })
     })
 
     describe('success', () => {
