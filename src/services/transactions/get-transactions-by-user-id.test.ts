@@ -135,7 +135,22 @@ describe('DeleteTransactionService', () => {
             )
         })
 
-       
+        it('should throw if GetTransactionsByUserIdRepository throws', async () => {
+            // arrange
+            jest.spyOn(
+                getTransactionByUserIdRepository,
+                'execute',
+            ).mockRejectedValueOnce(
+                new Error('GetTransactionsByUserIdRepository error'),
+            )
+            // act
+            const promise = sut.execute(validUserId)
+
+            // assert
+            expect(promise).rejects.toThrow(
+                new Error('GetTransactionsByUserIdRepository error'),
+            )
+        })
     })
 
     describe('success', () => {
