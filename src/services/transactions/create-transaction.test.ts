@@ -153,6 +153,20 @@ describe('CreateTransactionService', () => {
             // assert
             await expect(promise).rejects.toThrow()
         })
+
+        // garantindo que o erro seja lançado para cima
+        it('should throw if IdGeneratorAdapter throws', async () => {
+            // arrange
+            jest.spyOn(idGenerator, 'execute').mockImplementationOnce(() => {
+                throw new Error('idGenerator error')
+            })
+
+            // act
+            const promise = sut.execute(createTransactionParams)
+
+            // assert
+            await expect(promise).rejects.toThrow(new Error('idGenerator error'))
+        })
     })
 
     describe('success', () => {
