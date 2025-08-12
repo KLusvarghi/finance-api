@@ -94,4 +94,18 @@ describe('UpdateTransactionService', () => {
             expect(response).toEqual(validTransactionServiceResponse)
         })
     })
+
+    describe('validations', () => {
+      it('should call UpdateTransactionRepository with correct params', async () => {
+        // arrange
+        const updateTransactionRepositorySpy = jest.spyOn(updateTransactionRepository, 'execute')
+
+        // act
+        await sut.execute(validTransactionId, validUpdateTransactionParams)
+
+        // assert
+        expect(updateTransactionRepositorySpy).toHaveBeenCalledWith(validTransactionId, validUpdateTransactionParams)
+        expect(updateTransactionRepositorySpy).toHaveBeenCalledTimes(1)
+      })
+    })
 })
