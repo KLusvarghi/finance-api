@@ -1,11 +1,11 @@
 import { EmailAlreadyExistsError } from '@/errors/user'
 import { CreateUserService } from './create-user'
+import { CreateUserParams, UserRepositoryResponse } from '@/shared'
 import {
-    CreateUserParams,
-    UserPublicResponse,
-    UserRepositoryResponse,
-} from '@/shared'
-import { faker } from '@faker-js/faker'
+    createUserParams,
+    createUserServiceResponse,
+    createUserRepositoryResponse,
+} from '@/test/fixtures'
 
 describe('CreateUserService', () => {
     let sut: CreateUserService
@@ -13,15 +13,12 @@ describe('CreateUserService', () => {
     let getUserByEmailRepository: GetUserByEmailRepositoryStub
     let passwordHasherAdapter: PasswordHasherAdapterStub
     let idGeneratorAdapter: IdGeneratorAdapterStub
-    let createUserParams: CreateUserParams
-    let validCreateUserRepositoryResponse: UserRepositoryResponse
-    let validCreateUserServiceResponse: UserPublicResponse
 
     class CreateUserRepositoryStub {
         async execute(
             _params: CreateUserParams,
         ): Promise<UserRepositoryResponse> {
-            return Promise.resolve(validCreateUserRepositoryResponse)
+            return Promise.resolve(createUserRepositoryResponse)
         }
     }
 
@@ -32,12 +29,12 @@ describe('CreateUserService', () => {
     }
     class PasswordHasherAdapterStub {
         async execute(_password: string): Promise<string> {
-            return Promise.resolve(validCreateUserRepositoryResponse.password)
+            return Promise.resolve(createUserRepositoryResponse.password)
         }
     }
     class IdGeneratorAdapterStub {
         execute(): string {
-            return validCreateUserRepositoryResponse.id
+            return createUserServiceResponse.id
         }
     }
 
@@ -74,26 +71,6 @@ describe('CreateUserService', () => {
         getUserByEmailRepository = getUserByEmailRepositoryStub
         passwordHasherAdapter = passwordHasherAdapterStub
         idGeneratorAdapter = idGeneratorAdapterStub
-
-        createUserParams = {
-            first_name: faker.person.firstName(),
-            last_name: faker.person.lastName(),
-            email: faker.internet.email(),
-            password: faker.internet.password({ length: 7 }),
-        }
-
-        validCreateUserRepositoryResponse = {
-            id: faker.string.uuid(),
-            ...createUserParams,
-            password: 'valid_hash',
-        }
-
-        validCreateUserServiceResponse = {
-            id: validCreateUserRepositoryResponse.id,
-            first_name: validCreateUserRepositoryResponse.first_name,
-            last_name: validCreateUserRepositoryResponse.last_name,
-            email: validCreateUserRepositoryResponse.email,
-        }
     })
 
     afterEach(() => {
@@ -109,7 +86,7 @@ describe('CreateUserService', () => {
             jest.spyOn(
                 getUserByEmailRepository,
                 'execute',
-            ).mockResolvedValueOnce(validCreateUserRepositoryResponse)
+            ).mockResolvedValueOnce(createUserRepositoryResponse)
 
             // act
             // nestes casos, o teste deve falhar, pois o usuário já existe
@@ -195,7 +172,7 @@ describe('CreateUserService', () => {
 
             // assert
             expect(response).toBeTruthy()
-            expect(response).toEqual(validCreateUserServiceResponse)
+            expect(response).toEqual(createUserServiceResponse)
         })
     })
 
@@ -208,7 +185,9 @@ describe('CreateUserService', () => {
             await sut.execute(createUserParams)
 
             // assert
-            expect(executeSpy).toHaveBeenCalledWith(validCreateUserRepositoryResponse)
+            expect(executeSpy).toHaveBeenCalledWith(
+                createUserRepositoryResponse,
+            )
             expect(executeSpy).toHaveBeenCalledTimes(1)
         })
 
@@ -237,8 +216,8 @@ describe('CreateUserService', () => {
             // validando se o createUserRepository foi chamado contendo o Id gerado pelo idGeneratorAdapter
             expect(createUserRepositorySpy).toHaveBeenCalledWith({
                 ...createUserParams,
-                id: validCreateUserRepositoryResponse.id,
-                password: validCreateUserRepositoryResponse.password,
+                id: createUserServiceResponse.id,
+                password: createUserRepositoryResponse.password,
             })
             expect(createUserRepositorySpy).toHaveBeenCalledTimes(1)
         })
@@ -266,8 +245,8 @@ describe('CreateUserService', () => {
             // validando se o createUserRepository foi chamado contendo o Id gerado pelo passwordHasherAdapter
             expect(createUserRepositorySpy).toHaveBeenCalledWith({
                 ...createUserParams,
-                id: validCreateUserRepositoryResponse.id,
-                password: validCreateUserRepositoryResponse.password,
+                id: createUserServiceResponse.id,
+                password: createUserRepositoryResponse.password,
             })
             expect(createUserRepositorySpy).toHaveBeenCalledTimes(1)
         })

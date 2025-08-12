@@ -2,28 +2,28 @@ import {
     UserBalanceRepositoryResponse,
     UserRepositoryResponse,
 } from '@/shared/types'
-import { faker } from '@faker-js/faker'
 import { UserNotFoundError } from '@/errors/user'
 import { GetUserBalanceService } from './get-user-balance'
-import { Prisma } from '@prisma/client'
+import {
+    userId,
+    getUserBalanceServiceResponse,
+    getUserByIdRepositoryResponse,
+} from '@/test/fixtures'
 
 describe('GetUserBalanceService', () => {
     let sut: GetUserBalanceService
     let getUserByIdRepository: GetUserByIdRepositoryStub
     let getUserBalanceRepository: GetUserBalanceRepositoryStub
-    let validGetUserByIdRepositoryResponse: UserRepositoryResponse | null
-    let validGetUserBalanceResponse: UserBalanceRepositoryResponse
-    let validUserId: string
 
     class GetUserByIdRepositoryStub {
         async execute(_id: string): Promise<UserRepositoryResponse | null> {
-            return Promise.resolve(validGetUserByIdRepositoryResponse)
+            return Promise.resolve(getUserByIdRepositoryResponse)
         }
     }
 
     class GetUserBalanceRepositoryStub {
         async execute(_id: string): Promise<UserBalanceRepositoryResponse> {
-            return Promise.resolve(validGetUserBalanceResponse)
+            return Promise.resolve(getUserBalanceServiceResponse)
         }
     }
 
@@ -52,23 +52,6 @@ describe('GetUserBalanceService', () => {
         sut = service
         getUserByIdRepository = getUserByIdRepositoryStub
         getUserBalanceRepository = getUserBalanceRepositoryStub
-
-        validUserId = faker.string.uuid()
-
-        validGetUserByIdRepositoryResponse = {
-            id: validUserId,
-            first_name: faker.person.firstName(),
-            last_name: faker.person.lastName(),
-            email: faker.internet.email(),
-            password: faker.internet.password({ length: 7 }),
-        }
-
-        validGetUserBalanceResponse = {
-            earnings: faker.number.int({ min: 1, max: 1000 }),
-            expenses: faker.number.int({ min: 1, max: 1000 }),
-            investments: faker.number.int({ min: 1, max: 1000 }),
-            balance: new Prisma.Decimal(faker.number.float()),
-        }
     })
 
     afterEach(() => {
@@ -85,10 +68,10 @@ describe('GetUserBalanceService', () => {
             )
 
             // act
-            const promise = sut.execute(validUserId)
+            const promise = sut.execute(userId)
 
             // assert
-            expect(promise).rejects.toThrow(new UserNotFoundError(validUserId))
+            expect(promise).rejects.toThrow(new UserNotFoundError(userId))
         })
 
         // garantindo que o nosso service não está tratando a excessão do nosso repository e passando para cima para o nosso controller
@@ -99,7 +82,7 @@ describe('GetUserBalanceService', () => {
             )
 
             // act
-            const promise = sut.execute(validUserId)
+            const promise = sut.execute(userId)
 
             // assert
             expect(promise).rejects.toThrow()
@@ -113,7 +96,7 @@ describe('GetUserBalanceService', () => {
             ).mockRejectedValueOnce(new Error())
 
             // act
-            const promise = sut.execute(validUserId)
+            const promise = sut.execute(userId)
 
             // assert
             expect(promise).rejects.toThrow()
@@ -123,11 +106,11 @@ describe('GetUserBalanceService', () => {
     describe('success', () => {
         it('should successefully get user balance', async () => {
             // act
-            const response = await sut.execute(validUserId)
+            const response = await sut.execute(userId)
 
             // assert
             expect(response).toBeTruthy()
-            expect(response).toEqual(validGetUserBalanceResponse)
+            expect(response).toEqual(getUserBalanceServiceResponse)
         })
     })
 
@@ -138,10 +121,10 @@ describe('GetUserBalanceService', () => {
             const executeSpy = jest.spyOn(getUserByIdRepository, 'execute')
 
             // act
-            await sut.execute(validUserId)
+            await sut.execute(userId)
 
             // assert
-            expect(executeSpy).toHaveBeenCalledWith(validUserId)
+            expect(executeSpy).toHaveBeenCalledWith(userId)
             expect(executeSpy).toHaveBeenCalledTimes(1)
         })
 
@@ -150,10 +133,10 @@ describe('GetUserBalanceService', () => {
             const executeSpy = jest.spyOn(getUserBalanceRepository, 'execute')
 
             // act
-            await sut.execute(validUserId)
+            await sut.execute(userId)
 
             // assert
-            expect(executeSpy).toHaveBeenCalledWith(validUserId)
+            expect(executeSpy).toHaveBeenCalledWith(userId)
             expect(executeSpy).toHaveBeenCalledTimes(1)
         })
     })

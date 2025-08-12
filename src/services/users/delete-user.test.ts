@@ -1,18 +1,19 @@
-import { UserPublicResponse, UserRepositoryResponse } from '@/shared/types'
+import { UserRepositoryResponse } from '@/shared'
 import { DeleteUserService } from './delete-user'
-import { faker } from '@faker-js/faker'
 import { UserNotFoundError } from '@/errors/user'
+import {
+    userId,
+    deleteUserServiceResponse,
+    deleteUserRepositoryResponse,
+} from '@/test/fixtures'
 
 describe('DeleteUserService', () => {
     let sut: DeleteUserService
     let deleteUserRepository: DeleteUserRepositoryStub
-    let validUserRepositoryResponse: UserRepositoryResponse
-    let validUserServiceResponse: UserPublicResponse
-    let validUserId: string
 
     class DeleteUserRepositoryStub {
         async execute(_id: string): Promise<UserRepositoryResponse | null> {
-            return Promise.resolve(validUserRepositoryResponse)
+            return Promise.resolve(deleteUserRepositoryResponse)
         }
     }
 
@@ -32,22 +33,6 @@ describe('DeleteUserService', () => {
 
         sut = service
         deleteUserRepository = deleteUserRepositoryStub
-
-        validUserId = faker.string.uuid()
-
-        validUserRepositoryResponse = {
-            id: validUserId,
-            first_name: faker.person.firstName(),
-            last_name: faker.person.lastName(),
-            email: faker.internet.email(),
-            password: faker.internet.password({ length: 7 }),
-        }
-        validUserServiceResponse = {
-            id: validUserId,
-            first_name: validUserRepositoryResponse.first_name,
-            last_name: validUserRepositoryResponse.last_name,
-            email: validUserRepositoryResponse.email,
-        }
     })
 
     afterEach(() => {
@@ -64,10 +49,10 @@ describe('DeleteUserService', () => {
             )
 
             // act
-            const promise = sut.execute(validUserId)
+            const promise = sut.execute(userId)
 
             // assert
-            expect(promise).rejects.toThrow(new UserNotFoundError(validUserId))
+            expect(promise).rejects.toThrow(new UserNotFoundError(userId))
         })
 
         // esse tipo de teste é importnate para garantir que o nosso service não está tratando a excessão do nosso repository e passando para cima para o nosso controller
@@ -81,18 +66,20 @@ describe('DeleteUserService', () => {
             const promise = sut.execute('invalid_user_id')
 
             // assert
-            expect(promise).rejects.toThrow(new UserNotFoundError('invalid_user_id'))
+            expect(promise).rejects.toThrow(
+                new UserNotFoundError('invalid_user_id'),
+            )
         })
     })
 
     describe('success', () => {
         it('should successefully delete an user', async () => {
             // act
-            const response = await sut.execute(validUserId)
+            const response = await sut.execute(userId)
 
             // assert
             expect(response).toBeTruthy()
-            expect(response).toEqual(validUserServiceResponse)
+            expect(response).toEqual(deleteUserServiceResponse)
         })
     })
 
@@ -103,10 +90,10 @@ describe('DeleteUserService', () => {
             const executeSpy = jest.spyOn(deleteUserRepository, 'execute')
 
             // act
-            await sut.execute(validUserId)
+            await sut.execute(userId)
 
             // assert
-            expect(executeSpy).toHaveBeenCalledWith(validUserId)
+            expect(executeSpy).toHaveBeenCalledWith(userId)
             expect(executeSpy).toHaveBeenCalledTimes(1)
         })
     })

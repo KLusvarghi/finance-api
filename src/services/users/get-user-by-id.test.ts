@@ -1,18 +1,19 @@
-import { UserPublicResponse, UserRepositoryResponse } from '@/shared/types'
-import { faker } from '@faker-js/faker'
+import { UserRepositoryResponse } from '@/shared'
 import { UserNotFoundError } from '@/errors/user'
 import { GetUserByIdService } from './get-user-by-id'
+import {
+    userId,
+    getUserByIdServiceResponse,
+    getUserByIdRepositoryResponse,
+} from '@/test/fixtures'
 
 describe('GetUserByIdService', () => {
     let sut: GetUserByIdService
     let getUserByIdRepository: GetUserByIdRepositoryStub
-    let validUserRepositoryResponse: UserRepositoryResponse
-    let validUserServiceResponse: UserPublicResponse
-    let validUserId: string
 
     class GetUserByIdRepositoryStub {
         async execute(_id: string): Promise<UserRepositoryResponse | null> {
-            return Promise.resolve(validUserRepositoryResponse)
+            return Promise.resolve(getUserByIdRepositoryResponse)
         }
     }
 
@@ -34,22 +35,6 @@ describe('GetUserByIdService', () => {
 
         sut = service
         getUserByIdRepository = getUserByIdRepositoryStub
-
-        validUserId = faker.string.uuid()
-
-        validUserRepositoryResponse = {
-            id: validUserId,
-            first_name: faker.person.firstName(),
-            last_name: faker.person.lastName(),
-            email: faker.internet.email(),
-            password: faker.internet.password({ length: 7 }),
-        }
-        validUserServiceResponse = {
-            id: validUserId,
-            first_name: validUserRepositoryResponse.first_name,
-            last_name: validUserRepositoryResponse.last_name,
-            email: validUserRepositoryResponse.email,
-        }
     })
 
     afterEach(() => {
@@ -66,21 +51,21 @@ describe('GetUserByIdService', () => {
             )
 
             // act
-            const promise = sut.execute(validUserId)
+            const promise = sut.execute(userId)
 
             // assert
-            expect(promise).rejects.toThrow(new UserNotFoundError(validUserId))
+            expect(promise).rejects.toThrow(new UserNotFoundError(userId))
         })
 
         // esse tipo de teste é importnate para garantir que o nosso service não está tratando a excessão do nosso repository e passando para cima para o nosso controller
         it('should throw if GetUserByIdRepository throws', async () => {
             // arrange
             jest.spyOn(getUserByIdRepository, 'execute').mockRejectedValueOnce(
-                new UserNotFoundError(validUserId),
+                new UserNotFoundError(userId),
             )
 
             // act
-            const promise = sut.execute(validUserId)
+            const promise = sut.execute(userId)
 
             // assert
             expect(promise).rejects.toThrow()
@@ -90,11 +75,11 @@ describe('GetUserByIdService', () => {
     describe('success', () => {
         it('should successefully get an user by id', async () => {
             // act
-            const response = await sut.execute(validUserId)
+            const response = await sut.execute(userId)
 
             // assert
             expect(response).toBeTruthy()
-            expect(response).toEqual(validUserServiceResponse)
+            expect(response).toEqual(getUserByIdServiceResponse)
         })
     })
 
@@ -105,10 +90,10 @@ describe('GetUserByIdService', () => {
             const executeSpy = jest.spyOn(getUserByIdRepository, 'execute')
 
             // act
-            await sut.execute(validUserId)
+            await sut.execute(userId)
 
             // assert
-            expect(executeSpy).toHaveBeenCalledWith(validUserId)
+            expect(executeSpy).toHaveBeenCalledWith(userId)
             expect(executeSpy).toHaveBeenCalledTimes(1)
         })
     })

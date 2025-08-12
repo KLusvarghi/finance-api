@@ -1,11 +1,16 @@
-import {
-    UpdateUserParams,
-    UserPublicResponse,
-    UserRepositoryResponse,
-} from '@/shared'
+import { UpdateUserParams, UserRepositoryResponse } from '@/shared'
 import { UpdateUserService } from './update-user'
-import { faker } from '@faker-js/faker'
-import { EmailAlreadyExistsError, UpdateUserFailedError, UserNotFoundError } from '@/errors/user'
+import {
+    EmailAlreadyExistsError,
+    UpdateUserFailedError,
+    UserNotFoundError,
+} from '@/errors/user'
+import {
+    userId,
+    updateUserParams,
+    updateUserServiceResponse,
+    updateUserRepositoryResponse,
+} from '@/test/fixtures'
 
 describe('UpdateUserService', () => {
     let sut: UpdateUserService
@@ -13,23 +18,19 @@ describe('UpdateUserService', () => {
     let getUserByEmailRepository: GetUserByEmailRepositoryStub
     let getUserByIdRepository: GetUserByIdRepositoryStub
     let passwordHasherAdapter: PasswordHasherAdapterStub
-    let updateUserParams: UpdateUserParams
-    let validUserRepositoryResponse: UserRepositoryResponse
-    let validUpdateUserServiceResponse: UserPublicResponse
-    let validUserId: string
 
     class UpdateUserRepositoryStub {
         async execute(
-            userId: string,
-            updateUserParams: UpdateUserParams,
+            _userId: string,
+            _updateUserParams: UpdateUserParams,
         ): Promise<UserRepositoryResponse | null> {
-            return Promise.resolve(validUserRepositoryResponse)
+            return Promise.resolve(updateUserRepositoryResponse)
         }
     }
 
     class GetUserByIdRepositoryStub {
-        async execute(userId: string): Promise<UserRepositoryResponse | null> {
-            return Promise.resolve(validUserRepositoryResponse)
+        async execute(_userId: string): Promise<UserRepositoryResponse | null> {
+            return Promise.resolve(updateUserRepositoryResponse)
         }
     }
 
@@ -41,7 +42,7 @@ describe('UpdateUserService', () => {
 
     class PasswordHasherAdapterStub {
         async execute(_password: string): Promise<string> {
-            return Promise.resolve(validUserRepositoryResponse.password)
+            return Promise.resolve(updateUserRepositoryResponse.password)
         }
     }
 
@@ -81,30 +82,6 @@ describe('UpdateUserService', () => {
         getUserByEmailRepository = getUserByEmailRepositoryStub
         getUserByIdRepository = getUserByIdRepositoryStub
         passwordHasherAdapter = passwordHasherAdapterStub
-
-        validUserId = faker.string.uuid()
-
-        updateUserParams = {
-            first_name: faker.person.firstName(),
-            last_name: faker.person.lastName(),
-            email: faker.internet.email(),
-            password: faker.internet.password({ length: 7 }),
-        }
-
-        validUserRepositoryResponse = {
-            id: validUserId,
-            first_name: updateUserParams.first_name!,
-            last_name: updateUserParams.last_name!,
-            email: updateUserParams.email!,
-            password: 'valid_hash',
-        }
-
-        validUpdateUserServiceResponse = {
-            id: validUserId,
-            first_name: validUserRepositoryResponse.first_name,
-            last_name: validUserRepositoryResponse.last_name,
-            email: validUserRepositoryResponse.email,
-        }
     })
 
     describe('error handling', () => {
@@ -115,7 +92,7 @@ describe('UpdateUserService', () => {
             )
 
             // act
-            const promise = sut.execute(validUserId, updateUserParams)
+            const promise = sut.execute(userId, updateUserParams)
 
             // assert
             expect(promise).rejects.toThrow(new UpdateUserFailedError())
@@ -127,20 +104,18 @@ describe('UpdateUserService', () => {
             jest.spyOn(
                 getUserByEmailRepository,
                 'execute',
-            ).mockResolvedValueOnce(validUserRepositoryResponse)
+            ).mockResolvedValueOnce(updateUserRepositoryResponse)
 
             // act
             // não passamos o await para que ele retorne uma promise e não um valor
-            // passando um id diferente do que é passado no "validUserRepositoryResponse" para que ele entre no outro if do service e retorne o erro
-            const promise = sut.execute(faker.string.uuid(), {
-                email: validUpdateUserServiceResponse.email,
+            // passando um id diferente do que é passado no "updateUserRepositoryResponse" para que ele entre no outro if do service e retorne o erro
+            const promise = sut.execute('different-user-id', {
+                email: updateUserServiceResponse.email,
             })
 
             // assert
             expect(promise).rejects.toThrow(
-                new EmailAlreadyExistsError(
-                    validUpdateUserServiceResponse.email,
-                ),
+                new EmailAlreadyExistsError(updateUserServiceResponse.email),
             )
         })
 
@@ -151,13 +126,13 @@ describe('UpdateUserService', () => {
             )
 
             // act
-            const promise = sut.execute(validUserId, {
-                email: faker.internet.email(),
+            const promise = sut.execute(userId, {
+                email: 'different-email@example.com',
             })
 
             // assert
             expect(promise).rejects.toThrow()
-            expect(promise).rejects.toThrow(new UserNotFoundError(validUserId))
+            expect(promise).rejects.toThrow(new UserNotFoundError(userId))
         })
 
         it('should throw if PasswordHasherAdapter throws', async () => {
@@ -167,8 +142,8 @@ describe('UpdateUserService', () => {
             )
 
             // act
-            const promise = sut.execute(validUserId, {
-                password: faker.internet.password({ length: 7 }),
+            const promise = sut.execute(userId, {
+                password: 'different-password',
             })
 
             // assert
@@ -182,7 +157,7 @@ describe('UpdateUserService', () => {
             )
 
             // act
-            const promise = sut.execute(validUserId, updateUserParams)
+            const promise = sut.execute(userId, updateUserParams)
 
             // assert
             expect(promise).rejects.toThrow()
@@ -192,10 +167,10 @@ describe('UpdateUserService', () => {
     describe('success', () => {
         it('should successfully update a user (without password and email)', async () => {
             // act
-            const response = await sut.execute(validUserId, updateUserParams)
+            const response = await sut.execute(userId, updateUserParams)
 
             // assert
-            expect(response).toEqual(validUpdateUserServiceResponse)
+            expect(response).toEqual(updateUserServiceResponse)
         })
 
         it('should successfully update a user (with email)', async () => {
@@ -206,16 +181,16 @@ describe('UpdateUserService', () => {
             )
 
             // act
-            const response = await sut.execute(validUserId, {
-                email: validUpdateUserServiceResponse.email,
+            const response = await sut.execute(userId, {
+                email: updateUserServiceResponse.email,
             })
 
             // assert
-            expect(response).toEqual(validUpdateUserServiceResponse)
+            expect(response).toEqual(updateUserServiceResponse)
 
             // para garantir que o repository seja chamado com o email que estamos passando no service:
             expect(getUserByEmailRepositorySpy).toHaveBeenCalledWith(
-                validUpdateUserServiceResponse.email,
+                updateUserServiceResponse.email,
             )
         })
 
@@ -227,12 +202,12 @@ describe('UpdateUserService', () => {
             )
 
             // act
-            const response = await sut.execute(validUserId, {
+            const response = await sut.execute(userId, {
                 password: updateUserParams.password,
             })
 
             // assert
-            expect(response).toEqual(validUpdateUserServiceResponse)
+            expect(response).toEqual(updateUserServiceResponse)
 
             // para garantir que o repository seja chamado com o email que estamos passando no service:
             expect(passwordHasherAdapterSpy).toHaveBeenCalledWith(
@@ -246,7 +221,7 @@ describe('UpdateUserService', () => {
                 const executeSpy = jest.spyOn(updateUserRepository, 'execute')
 
                 // act
-                await sut.execute(validUserId, updateUserParams)
+                await sut.execute(userId, updateUserParams)
 
                 // assert
                 // O serviço deve fazer hash da senha antes de chamar o repository
@@ -255,10 +230,7 @@ describe('UpdateUserService', () => {
                     password: 'valid_hash', // Senha já com hash
                 }
 
-                expect(executeSpy).toHaveBeenCalledWith(
-                    validUserId,
-                    expectedParams,
-                )
+                expect(executeSpy).toHaveBeenCalledWith(userId, expectedParams)
                 expect(executeSpy).toHaveBeenCalledTimes(1)
             })
         })
