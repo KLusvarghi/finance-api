@@ -74,50 +74,63 @@ describe('DeleteTransactionService', () => {
     })
 
     describe('error handling', () => {
-      it('should throw TransactionNotFoundError if DeleteTransactionRepository returns null', async () => {
-        // arrange
-        jest.spyOn(deleteTransactionRepository, 'execute').mockRejectedValueOnce(new TransactionNotFoundError('invalid_transaction_id'))
+        it('should throw TransactionNotFoundError if DeleteTransactionRepository returns null', async () => {
+            // arrange
+            jest.spyOn(
+                deleteTransactionRepository,
+                'execute',
+            ).mockResolvedValueOnce(null)
 
-        // act
-        const promise = sut.execute(validTransactionId)
+            // act
+            const promise = sut.execute('invalid_transaction_id')
 
-        // assert
-        expect(promise).rejects.toThrow(new TransactionNotFoundError('invalid_transaction_id'))
-      })
+            // assert
+            expect(promise).rejects.toThrow(
+                new TransactionNotFoundError('invalid_transaction_id'),
+            )
+        })
     })
 
-      it('should throw if DeleteTransactionRepository throws', async () => {
+    it('should throw if DeleteTransactionRepository throws', async () => {
         // arrange
-        jest.spyOn(deleteTransactionRepository, 'execute').mockRejectedValueOnce(new Error())
+        jest.spyOn(
+            deleteTransactionRepository,
+            'execute',
+        ).mockRejectedValueOnce(new Error())
 
         // act
         const promise = sut.execute(validTransactionId)
 
         // assert
         expect(promise).rejects.toThrow()
-      })
+    })
 
     describe('success', () => {
-      it('should delete transaction successfully', async () => {
-        // act
-        const response = await sut.execute(validTransactionId)
+        it('should delete transaction successfully', async () => {
+            // act
+            const response = await sut.execute(validTransactionId)
 
-        // assert
-        expect(response).toEqual(validTransactionServiceResponse)
-      })
+            // assert
+            expect(response).toEqual(validTransactionServiceResponse)
+        })
     })
 
     describe('validation', () => {
-      it('should call DeleteTransactionRepository with correct params', async () => {
-        // arrange
-        const deleteTransactionRepositorySpy = jest.spyOn(deleteTransactionRepository, 'execute')
+        it('should call DeleteTransactionRepository with correct params', async () => {
+            // arrange
+            const deleteTransactionRepositorySpy = jest.spyOn(
+                deleteTransactionRepository,
+                'execute',
+            )
 
-        // act
-        await sut.execute(validTransactionId)
+            // act
+            await sut.execute(validTransactionId)
 
-        // assert
-        expect(deleteTransactionRepositorySpy).toHaveBeenCalledWith(validTransactionId)
-        expect(deleteTransactionRepositorySpy).toHaveBeenCalledTimes(1)
-      })
+            // assert
+            expect(deleteTransactionRepositorySpy).toHaveBeenCalledWith(
+                validTransactionId,
+            )
+            expect(deleteTransactionRepositorySpy).toHaveBeenCalledTimes(1)
+        })
     })
 })
