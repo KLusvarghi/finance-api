@@ -109,13 +109,29 @@ describe('CreateTransactionService', () => {
     })
 
     describe('success', () => {
-      it('should create transaction successfully', async () => {
-        // act
-        const response = await sut.execute(createTransactionParams)
+        it('should create transaction successfully', async () => {
+            // act
+            const response = await sut.execute(createTransactionParams)
 
-        // assert
-        expect(response).toBeTruthy()
-        expect(response).toEqual(validCreateTransactionResponse)
-      })
+            // assert
+            expect(response).toBeTruthy()
+            expect(response).toEqual(validCreateTransactionResponse)
+        })
+    })
+
+    describe('validations', () => {
+        it('should call GetUserByIdRepository with correct params', async () => {
+            const getUserByIdRepositorySpy = jest.spyOn(
+                getUserByIdRepository,
+                'execute',
+            )
+
+            await sut.execute(createTransactionParams)
+
+            expect(getUserByIdRepositorySpy).toHaveBeenCalledWith(
+                createTransactionParams.user_id,
+            )
+            expect(getUserByIdRepositorySpy).toHaveBeenCalledTimes(1)
+        })
     })
 })
