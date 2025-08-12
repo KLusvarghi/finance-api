@@ -110,7 +110,9 @@ describe('DeleteTransactionService', () => {
     describe('error handling', () => {
         it('should throw UserNotFoundError if user not found', async () => {
             // arrange
-            jest.spyOn(getUserByIdRepository, 'execute').mockResolvedValueOnce(null)
+            jest.spyOn(getUserByIdRepository, 'execute').mockResolvedValueOnce(
+                null,
+            )
             // act
             const promise = sut.execute(validUserId)
 
@@ -132,7 +134,10 @@ describe('DeleteTransactionService', () => {
     describe('validations', () => {
         it('should call GetUserByIdRepository with correct params', async () => {
             // arrange
-            const getUserByIdRepositorySpy = jest.spyOn(getUserByIdRepository, 'execute')
+            const getUserByIdRepositorySpy = jest.spyOn(
+                getUserByIdRepository,
+                'execute',
+            )
 
             // act
             await sut.execute(validUserId)
@@ -140,6 +145,23 @@ describe('DeleteTransactionService', () => {
             // assert
             expect(getUserByIdRepositorySpy).toHaveBeenCalledWith(validUserId)
             expect(getUserByIdRepositorySpy).toHaveBeenCalledTimes(1)
+        })
+
+        it('should call GetTransactionByUserIdRepository with correct params', async () => {
+            // arrange
+            const getTransactionByUserIdRepositorySpy = jest.spyOn(
+                getTransactionByUserIdRepository,
+                'execute',
+            )
+
+            // act
+            await sut.execute(validUserId)
+
+            // assert
+            expect(getTransactionByUserIdRepositorySpy).toHaveBeenCalledWith(
+                validUserId,
+            )
+            expect(getTransactionByUserIdRepositorySpy).toHaveBeenCalledTimes(1)
         })
     })
 })
