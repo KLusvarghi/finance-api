@@ -141,6 +141,18 @@ describe('CreateTransactionService', () => {
                 new UserNotFoundError(createTransactionParams.user_id),
             )
         })
+
+        // garantindo que o erro seja lançado para cima
+        it('should throw if GetUserByIdRepository throws', async () => {
+            // arrange
+            jest.spyOn(getUserByIdRepository, 'execute').mockRejectedValue(new Error())
+
+            // act
+            const promise = sut.execute(createTransactionParams)
+
+            // assert
+            await expect(promise).rejects.toThrow()
+        })
     })
 
     describe('success', () => {
