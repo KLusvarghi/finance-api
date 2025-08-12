@@ -125,11 +125,8 @@ describe('CreateTransactionService', () => {
 
     describe('error handling', () => {
         it('should throw UserNotFoundError if user is not found', async () => {
-          // arrange
-           jest.spyOn(
-                getUserByIdRepository,
-                'execute',
-            ).mockResolvedValue(null)
+            // arrange
+            jest.spyOn(getUserByIdRepository, 'execute').mockResolvedValue(null)
 
             // act
             // lembrando que não passamos o await para que a promise não seja resolvida
@@ -145,7 +142,9 @@ describe('CreateTransactionService', () => {
         // garantindo que o erro seja lançado para cima
         it('should throw if GetUserByIdRepository throws', async () => {
             // arrange
-            jest.spyOn(getUserByIdRepository, 'execute').mockRejectedValue(new Error())
+            jest.spyOn(getUserByIdRepository, 'execute').mockRejectedValue(
+                new Error(),
+            )
 
             // act
             const promise = sut.execute(createTransactionParams)
@@ -165,7 +164,26 @@ describe('CreateTransactionService', () => {
             const promise = sut.execute(createTransactionParams)
 
             // assert
-            await expect(promise).rejects.toThrow(new Error('idGenerator error'))
+            await expect(promise).rejects.toThrow(
+                new Error('idGenerator error'),
+            )
+        })
+
+        // garantindo que o erro seja lançado para cima
+        it('should throw if CreateTransactionRepository throws', async () => {
+            // arrange
+            jest.spyOn(
+                createTransactionRepository,
+                'execute',
+            ).mockRejectedValue(new Error('createTransactionRepository error'))
+
+            // act
+            const promise = sut.execute(createTransactionParams)
+
+            // assert
+            await expect(promise).rejects.toThrow(
+                new Error('createTransactionRepository error'),
+            )
         })
     })
 
