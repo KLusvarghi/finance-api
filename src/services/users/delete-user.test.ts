@@ -74,14 +74,14 @@ describe('DeleteUserService', () => {
         it('should throw if DeleteUserRepository throws', async () => {
             // arrange
             jest.spyOn(deleteUserRepository, 'execute').mockRejectedValueOnce(
-                new UserNotFoundError(validUserId),
+                new UserNotFoundError('invalid_user_id'),
             )
 
             // act
-            const promise = sut.execute(validUserId)
+            const promise = sut.execute('invalid_user_id')
 
             // assert
-            expect(promise).rejects.toThrow()
+            expect(promise).rejects.toThrow(new UserNotFoundError('invalid_user_id'))
         })
     })
 
