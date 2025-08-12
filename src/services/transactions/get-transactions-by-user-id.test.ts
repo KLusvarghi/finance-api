@@ -13,11 +13,9 @@ describe('DeleteTransactionService', () => {
     let getUserByIdRepository: GetUserByIdRepositoryStub
     let getTransactionByUserIdRepository: GetTransactionsByUserIdRepositoryStub
 
-    let validGetUserByIdRepositoryResponse: UserRepositoryResponse | null
-    let validTransactionRepositoryResponse:
-        | TransactionRepositoryResponse[]
-        | null
-    let validTransactionServiceResponse: TransactionPublicResponse[] | null
+    let validGetUserByIdRepositoryResponse: UserRepositoryResponse
+    let validTransactionRepositoryResponse: TransactionRepositoryResponse[]
+    let validTransactionServiceResponse: TransactionPublicResponse[]
     let validUserId: string
 
     class GetUserByIdRepositoryStub {
@@ -29,7 +27,7 @@ describe('DeleteTransactionService', () => {
     class GetTransactionsByUserIdRepositoryStub {
         async execute(
             _userId: string,
-        ): Promise<TransactionRepositoryResponse[] | null> {
+        ): Promise<TransactionRepositoryResponse[]> {
             return Promise.resolve(validTransactionRepositoryResponse)
         }
     }
