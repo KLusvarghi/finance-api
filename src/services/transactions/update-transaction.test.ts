@@ -6,6 +6,7 @@ import {
 } from '@/shared'
 import { Prisma } from '@prisma/client'
 import { UpdateTransactionService } from './update-transaction'
+import { TransactionNotFoundError } from '@/errors/user'
 
 describe('UpdateTransactionService', () => {
     let sut: UpdateTransactionService
@@ -84,10 +85,55 @@ describe('UpdateTransactionService', () => {
         jest.resetAllMocks()
     })
 
+    describe('error handling', () => {
+        it('should throw TransactionNotFoundError if updateTransactionRepository return null', () => {
+            // arrange
+            jest.spyOn(
+                updateTransactionRepository,
+                'execute',
+            ).mockResolvedValueOnce(null as any)
+
+            // act
+            const promise = sut.execute(
+                validTransactionId,
+                validUpdateTransactionParams,
+            )
+
+            // assert
+            expect(promise).rejects.toThrow(
+                new TransactionNotFoundError(validTransactionId),
+            )
+        })
+
+        it('should throw if UpdateTransactionRepository throws', () => {
+            // arrange
+            jest.spyOn(
+                updateTransactionRepository,
+                'execute',
+            ).mockRejectedValueOnce(
+                new Error('UpdateTransactionRepository error'),
+            )
+
+            // act
+            const promise = sut.execute(
+                validTransactionId,
+                validUpdateTransactionParams,
+            )
+
+            // assert
+            expect(promise).rejects.toThrow(
+                new Error('UpdateTransactionRepository error'),
+            )
+        })
+    })
+
     describe('success', () => {
         it('should update transaction successfully', async () => {
             // act
-            const response = await sut.execute(validTransactionId, validUpdateTransactionParams)
+            const response = await sut.execute(
+                validTransactionId,
+                validUpdateTransactionParams,
+            )
 
             // assert
             expect(response).toBeTruthy()
@@ -96,16 +142,22 @@ describe('UpdateTransactionService', () => {
     })
 
     describe('validations', () => {
-      it('should call UpdateTransactionRepository with correct params', async () => {
-        // arrange
-        const updateTransactionRepositorySpy = jest.spyOn(updateTransactionRepository, 'execute')
+        it('should call UpdateTransactionRepository with correct params', async () => {
+            // arrange
+            const updateTransactionRepositorySpy = jest.spyOn(
+                updateTransactionRepository,
+                'execute',
+            )
 
-        // act
-        await sut.execute(validTransactionId, validUpdateTransactionParams)
+            // act
+            await sut.execute(validTransactionId, validUpdateTransactionParams)
 
-        // assert
-        expect(updateTransactionRepositorySpy).toHaveBeenCalledWith(validTransactionId, validUpdateTransactionParams)
-        expect(updateTransactionRepositorySpy).toHaveBeenCalledTimes(1)
-      })
+            // assert
+            expect(updateTransactionRepositorySpy).toHaveBeenCalledWith(
+                validTransactionId,
+                validUpdateTransactionParams,
+            )
+            expect(updateTransactionRepositorySpy).toHaveBeenCalledTimes(1)
+        })
     })
 })
