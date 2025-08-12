@@ -200,6 +200,18 @@ describe('CreateUserService', () => {
     })
 
     describe('validations', () => {
+        it('should call CreateUserRepository with correct params', async () => {
+            // arrange
+            const executeSpy = jest.spyOn(createUserRepository, 'execute')
+
+            // act
+            await sut.execute(createUserParams)
+
+            // assert
+            expect(executeSpy).toHaveBeenCalledWith(validUserRepositoryResponse)
+            expect(executeSpy).toHaveBeenCalledTimes(1)
+        })
+
         it('should call idGeneratorAdapter to generate a random uuid', async () => {
             // arrange
             // neste caso, não precisamos mocar nada, apenas falar para ele espiar o idGeneratorAdapter
