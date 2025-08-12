@@ -81,4 +81,18 @@ describe('DeleteTransactionService', () => {
         expect(response).toEqual(validTransactionServiceResponse)
       })
     })
+
+    describe('validation', () => {
+      it('should call DeleteTransactionRepository with correct params', async () => {
+        // arrange
+        const deleteTransactionRepositorySpy = jest.spyOn(deleteTransactionRepository, 'execute')
+
+        // act
+        await sut.execute(validTransactionId)
+
+        // assert
+        expect(deleteTransactionRepositorySpy).toHaveBeenCalledWith(validTransactionId)
+        expect(deleteTransactionRepositorySpy).toHaveBeenCalledTimes(1)
+      })
+    })
 })
