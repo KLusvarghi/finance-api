@@ -7,6 +7,7 @@ import {
 import { CreateTransactionService } from './create-transaction'
 import { faker } from '@faker-js/faker'
 import { Prisma } from '@prisma/client'
+import { UserNotFoundError } from '@/errors/user'
 
 describe('CreateTransactionService', () => {
     let sut: CreateTransactionService
@@ -120,6 +121,26 @@ describe('CreateTransactionService', () => {
         jest.clearAllMocks()
         jest.restoreAllMocks()
         jest.resetAllMocks()
+    })
+
+    describe('error handling', () => {
+        it('should throw UserNotFoundError if user is not found', async () => {
+          // arrange
+           jest.spyOn(
+                getUserByIdRepository,
+                'execute',
+            ).mockResolvedValue(null)
+
+            // act
+            // lembrando que não passamos o await para que a promise não seja resolvida
+            // e sim rejeitada
+            const promise = sut.execute(createTransactionParams)
+
+            // assert
+            await expect(promise).rejects.toThrow(
+                new UserNotFoundError(createTransactionParams.user_id),
+            )
+        })
     })
 
     describe('success', () => {
