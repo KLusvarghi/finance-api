@@ -1,26 +1,21 @@
-import { faker } from '@faker-js/faker'
-import {
-    TransactionPublicResponse,
-    TransactionRepositoryResponse,
-    UserRepositoryResponse,
-} from '@/shared'
-import { Prisma } from '@prisma/client'
+import { TransactionRepositoryResponse, UserRepositoryResponse } from '@/shared'
 import { GetTransactionsByUserIdService } from './get-transactions-by-user-id'
 import { UserNotFoundError } from '@/errors/user'
+import {
+    getTransactionByUserIdServiceResponse,
+    getTransactionByUserIdRepositoryResponse,
+    getUserByIdRepositoryResponse,
+    userId,
+} from '@/test/fixtures'
 
-describe('DeleteTransactionService', () => {
+describe('GetTransactionsByUserIdService', () => {
     let sut: GetTransactionsByUserIdService
     let getUserByIdRepository: GetUserByIdRepositoryStub
     let getTransactionByUserIdRepository: GetTransactionsByUserIdRepositoryStub
 
-    let validGetUserByIdRepositoryResponse: UserRepositoryResponse
-    let validTransactionRepositoryResponse: TransactionRepositoryResponse[]
-    let validTransactionServiceResponse: TransactionPublicResponse[]
-    let validUserId: string
-
     class GetUserByIdRepositoryStub {
         async execute(_userId: string): Promise<UserRepositoryResponse | null> {
-            return Promise.resolve(validGetUserByIdRepositoryResponse)
+            return Promise.resolve(getUserByIdRepositoryResponse)
         }
     }
 
@@ -28,7 +23,7 @@ describe('DeleteTransactionService', () => {
         async execute(
             _userId: string,
         ): Promise<TransactionRepositoryResponse[]> {
-            return Promise.resolve(validTransactionRepositoryResponse)
+            return Promise.resolve(getTransactionByUserIdRepositoryResponse)
         }
     }
 
@@ -59,44 +54,6 @@ describe('DeleteTransactionService', () => {
         sut = service
         getUserByIdRepository = getUserByIdRepositoryStub
         getTransactionByUserIdRepository = getTransactionByUserIdRepositoryStub
-
-        validUserId = faker.string.uuid()
-
-        validGetUserByIdRepositoryResponse = {
-            id: validUserId,
-            first_name: faker.person.firstName(),
-            last_name: faker.person.lastName(),
-            email: faker.internet.email(),
-            password: faker.internet.password(),
-        }
-
-        validTransactionRepositoryResponse = [
-            {
-                id: faker.string.uuid(),
-                user_id: validUserId,
-                name: faker.lorem.words(3),
-                amount: new Prisma.Decimal(
-                    faker.number.int({ min: 1, max: 1000 }),
-                ),
-                date: faker.date.recent(),
-                type: faker.helpers.arrayElement([
-                    'EARNING',
-                    'EXPENSE',
-                    'INVESTMENT',
-                ]),
-            },
-        ]
-
-        validTransactionServiceResponse = [
-            {
-                id: validTransactionRepositoryResponse[0].id,
-                user_id: validUserId,
-                name: validTransactionRepositoryResponse[0].name,
-                amount: validTransactionRepositoryResponse[0].amount,
-                date: validTransactionRepositoryResponse[0].date,
-                type: validTransactionRepositoryResponse[0].type,
-            },
-        ]
     })
 
     afterEach(() => {
@@ -112,10 +69,10 @@ describe('DeleteTransactionService', () => {
                 null,
             )
             // act
-            const promise = sut.execute(validUserId)
+            const promise = sut.execute(userId)
 
             // assert
-            expect(promise).rejects.toThrow(new UserNotFoundError(validUserId))
+            expect(promise).rejects.toThrow(new UserNotFoundError(userId))
         })
 
         // garantindo que o erro é passado para cima (controller)
@@ -125,7 +82,7 @@ describe('DeleteTransactionService', () => {
                 new Error('GetUserByIdRepository error'),
             )
             // act
-            const promise = sut.execute(validUserId)
+            const promise = sut.execute(userId)
 
             // assert
             expect(promise).rejects.toThrow(
@@ -142,7 +99,7 @@ describe('DeleteTransactionService', () => {
                 new Error('GetTransactionsByUserIdRepository error'),
             )
             // act
-            const promise = sut.execute(validUserId)
+            const promise = sut.execute(userId)
 
             // assert
             expect(promise).rejects.toThrow(
@@ -154,10 +111,10 @@ describe('DeleteTransactionService', () => {
     describe('success', () => {
         it('should get transactions by user id successfully', async () => {
             // act
-            const response = await sut.execute(validUserId)
+            const response = await sut.execute(userId)
 
             // assert
-            expect(response).toEqual(validTransactionServiceResponse)
+            expect(response).toEqual(getTransactionByUserIdServiceResponse)
         })
     })
 
@@ -170,10 +127,10 @@ describe('DeleteTransactionService', () => {
             )
 
             // act
-            await sut.execute(validUserId)
+            await sut.execute(userId)
 
             // assert
-            expect(getUserByIdRepositorySpy).toHaveBeenCalledWith(validUserId)
+            expect(getUserByIdRepositorySpy).toHaveBeenCalledWith(userId)
             expect(getUserByIdRepositorySpy).toHaveBeenCalledTimes(1)
         })
 
@@ -185,11 +142,11 @@ describe('DeleteTransactionService', () => {
             )
 
             // act
-            await sut.execute(validUserId)
+            await sut.execute(userId)
 
             // assert
             expect(getTransactionByUserIdRepositorySpy).toHaveBeenCalledWith(
-                validUserId,
+                userId,
             )
             expect(getTransactionByUserIdRepositorySpy).toHaveBeenCalledTimes(1)
         })

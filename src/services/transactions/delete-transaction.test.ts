@@ -1,24 +1,21 @@
-import { faker } from '@faker-js/faker'
 import { DeleteTransactionService } from './delete-transaction'
-import {
-    TransactionPublicResponse,
-    TransactionRepositoryResponse,
-} from '@/shared'
-import { Prisma } from '@prisma/client'
+import { TransactionRepositoryResponse } from '@/shared'
 import { TransactionNotFoundError } from '@/errors/user'
+import {
+    transactionId,
+    deleteTransactionServiceResponse,
+    deleteTransactionRepositoryResponse,
+} from '@/test/fixtures'
 
 describe('DeleteTransactionService', () => {
     let sut: DeleteTransactionService
     let deleteTransactionRepository: DeleteTransactionRepositoryStub
-    let validTransactionRepositoryResponse: TransactionRepositoryResponse
-    let validTransactionServiceResponse: TransactionPublicResponse
-    let validTransactionId: string
 
     class DeleteTransactionRepositoryStub {
         async execute(
             _id: string,
         ): Promise<TransactionRepositoryResponse | null> {
-            return Promise.resolve(validTransactionRepositoryResponse)
+            return Promise.resolve(deleteTransactionRepositoryResponse)
         }
     }
 
@@ -41,30 +38,6 @@ describe('DeleteTransactionService', () => {
 
         sut = service
         deleteTransactionRepository = deleteTransactionRepositoryStub
-
-        validTransactionId = faker.string.uuid()
-
-        validTransactionRepositoryResponse = {
-            id: validTransactionId,
-            user_id: faker.string.uuid(),
-            name: faker.lorem.words(3),
-            amount: new Prisma.Decimal(faker.number.int({ min: 1, max: 1000 })),
-            date: faker.date.recent(),
-            type: faker.helpers.arrayElement([
-                'EARNING',
-                'EXPENSE',
-                'INVESTMENT',
-            ]),
-        }
-
-        validTransactionServiceResponse = {
-            id: validTransactionId,
-            user_id: validTransactionRepositoryResponse.user_id,
-            name: validTransactionRepositoryResponse.name,
-            amount: validTransactionRepositoryResponse.amount,
-            date: validTransactionRepositoryResponse.date,
-            type: validTransactionRepositoryResponse.type,
-        }
     })
 
     afterEach(() => {
@@ -99,7 +72,7 @@ describe('DeleteTransactionService', () => {
         ).mockRejectedValueOnce(new Error())
 
         // act
-        const promise = sut.execute(validTransactionId)
+        const promise = sut.execute(transactionId)
 
         // assert
         expect(promise).rejects.toThrow()
@@ -108,10 +81,10 @@ describe('DeleteTransactionService', () => {
     describe('success', () => {
         it('should delete transaction successfully', async () => {
             // act
-            const response = await sut.execute(validTransactionId)
+            const response = await sut.execute(transactionId)
 
             // assert
-            expect(response).toEqual(validTransactionServiceResponse)
+            expect(response).toEqual(deleteTransactionServiceResponse)
         })
     })
 
@@ -124,11 +97,11 @@ describe('DeleteTransactionService', () => {
             )
 
             // act
-            await sut.execute(validTransactionId)
+            await sut.execute(transactionId)
 
             // assert
             expect(deleteTransactionRepositorySpy).toHaveBeenCalledWith(
-                validTransactionId,
+                transactionId,
             )
             expect(deleteTransactionRepositorySpy).toHaveBeenCalledTimes(1)
         })

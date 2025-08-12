@@ -1,27 +1,26 @@
-import { faker } from '@faker-js/faker'
 import {
-    TransactionPublicResponse,
     TransactionRepositoryResponse,
     UpdateTransactionParams,
 } from '@/shared'
-import { Prisma } from '@prisma/client'
 import { UpdateTransactionService } from './update-transaction'
 import { TransactionNotFoundError } from '@/errors/user'
+import {
+    transactionId,
+    updateTransactionParams,
+    updateTransactionServiceResponse,
+    updateTransactionRepositoryResponse,
+} from '@/test/fixtures'
 
 describe('UpdateTransactionService', () => {
     let sut: UpdateTransactionService
     let updateTransactionRepository: UpdateTransactionRepositoryStub
-    let validTransactionRepositoryResponse: TransactionRepositoryResponse
-    let validTransactionServiceResponse: TransactionPublicResponse
-    let validUpdateTransactionParams: UpdateTransactionParams
-    let validTransactionId: string
 
     class UpdateTransactionRepositoryStub {
         async execute(
             _transactionId: string,
             _params: UpdateTransactionParams,
         ): Promise<TransactionRepositoryResponse> {
-            return Promise.resolve(validTransactionRepositoryResponse)
+            return Promise.resolve(updateTransactionRepositoryResponse)
         }
     }
 
@@ -44,39 +43,6 @@ describe('UpdateTransactionService', () => {
 
         sut = service
         updateTransactionRepository = updateTransactionRepositoryStub
-
-        validTransactionId = faker.string.uuid()
-
-        validUpdateTransactionParams = {
-            name: faker.lorem.words(3),
-            amount: faker.number.int({ min: 1, max: 1000 }),
-            date: faker.date.recent().toISOString(),
-            type: faker.helpers.arrayElement([
-                'EARNING',
-                'EXPENSE',
-                'INVESTMENT',
-            ]),
-        }
-
-        validTransactionRepositoryResponse = {
-            id: validTransactionId,
-            user_id: faker.string.uuid(),
-            name: validUpdateTransactionParams.name || '',
-            amount: new Prisma.Decimal(
-                validUpdateTransactionParams.amount || 0,
-            ),
-            date: new Date(validUpdateTransactionParams.date || ''),
-            type: validUpdateTransactionParams.type as Prisma.TransactionGetPayload<{}>['type'],
-        }
-
-        validTransactionServiceResponse = {
-            id: validTransactionId,
-            user_id: validTransactionRepositoryResponse.user_id,
-            name: validTransactionRepositoryResponse.name,
-            amount: validTransactionRepositoryResponse.amount,
-            date: validTransactionRepositoryResponse.date,
-            type: validTransactionRepositoryResponse.type,
-        }
     })
 
     afterEach(() => {
@@ -94,14 +60,11 @@ describe('UpdateTransactionService', () => {
             ).mockResolvedValueOnce(null as any)
 
             // act
-            const promise = sut.execute(
-                validTransactionId,
-                validUpdateTransactionParams,
-            )
+            const promise = sut.execute(transactionId, updateTransactionParams)
 
             // assert
             expect(promise).rejects.toThrow(
-                new TransactionNotFoundError(validTransactionId),
+                new TransactionNotFoundError(transactionId),
             )
         })
 
@@ -115,10 +78,7 @@ describe('UpdateTransactionService', () => {
             )
 
             // act
-            const promise = sut.execute(
-                validTransactionId,
-                validUpdateTransactionParams,
-            )
+            const promise = sut.execute(transactionId, updateTransactionParams)
 
             // assert
             expect(promise).rejects.toThrow(
@@ -131,13 +91,13 @@ describe('UpdateTransactionService', () => {
         it('should update transaction successfully', async () => {
             // act
             const response = await sut.execute(
-                validTransactionId,
-                validUpdateTransactionParams,
+                transactionId,
+                updateTransactionParams,
             )
 
             // assert
             expect(response).toBeTruthy()
-            expect(response).toEqual(validTransactionServiceResponse)
+            expect(response).toEqual(updateTransactionServiceResponse)
         })
     })
 
@@ -150,12 +110,12 @@ describe('UpdateTransactionService', () => {
             )
 
             // act
-            await sut.execute(validTransactionId, validUpdateTransactionParams)
+            await sut.execute(transactionId, updateTransactionParams)
 
             // assert
             expect(updateTransactionRepositorySpy).toHaveBeenCalledWith(
-                validTransactionId,
-                validUpdateTransactionParams,
+                transactionId,
+                updateTransactionParams,
             )
             expect(updateTransactionRepositorySpy).toHaveBeenCalledTimes(1)
         })

@@ -1,42 +1,40 @@
 import {
     CreateTransactionParams,
-    TransactionPublicResponse,
     TransactionRepositoryResponse,
     UserRepositoryResponse,
 } from '@/shared/types'
 import { CreateTransactionService } from './create-transaction'
-import { faker } from '@faker-js/faker'
-import { Prisma } from '@prisma/client'
 import { UserNotFoundError } from '@/errors/user'
+import {
+    createTransactionParams,
+    createTransactionServiceResponse,
+    createTransactionRepositoryResponse,
+    getUserByIdRepositoryResponse,
+} from '@/test/fixtures'
 
 describe('CreateTransactionService', () => {
     let sut: CreateTransactionService
     let createTransactionRepository: CreateTransactionRepositoryStub
     let getUserByIdRepository: GetUserByIdRepositoryStub
     let idGenerator: IdGeneratorAdapterStub
-    let validTransactionId: string
-    let createTransactionParams: CreateTransactionParams
-    let validCreateTransactionServiceResponse: TransactionPublicResponse
-    let validCreateTransactionRepositoryResponse: TransactionRepositoryResponse
-    let validGetUserByIdRepositoryResponse: UserRepositoryResponse
 
     class CreateTransactionRepositoryStub {
         async execute(
             _params: CreateTransactionParams,
         ): Promise<TransactionRepositoryResponse> {
-            return Promise.resolve(validCreateTransactionRepositoryResponse)
+            return Promise.resolve(createTransactionRepositoryResponse)
         }
     }
 
     class GetUserByIdRepositoryStub {
         async execute(_userId: string): Promise<UserRepositoryResponse | null> {
-            return Promise.resolve(validGetUserByIdRepositoryResponse)
+            return Promise.resolve(getUserByIdRepositoryResponse)
         }
     }
 
     class IdGeneratorAdapterStub {
         execute(): string {
-            return validCreateTransactionServiceResponse.id
+            return createTransactionServiceResponse.id
         }
     }
 
@@ -70,51 +68,6 @@ describe('CreateTransactionService', () => {
         createTransactionRepository = createTransactionRepositoryStub
         getUserByIdRepository = getUserByIdRepositoryStub
         idGenerator = idGeneratorAdapterStub
-
-        validTransactionId = faker.string.uuid()
-        createTransactionParams = {
-            user_id: faker.string.uuid(),
-            name: faker.finance.transactionDescription(),
-            amount: faker.number.int({ min: 1, max: 1000 }),
-            date: faker.date.recent().toISOString(),
-            type: faker.helpers.arrayElement([
-                'EARNING',
-                'EXPENSE',
-                'INVESTMENT',
-            ]),
-        }
-
-        validCreateTransactionServiceResponse = {
-            id: validTransactionId,
-            user_id: createTransactionParams.user_id,
-            name: createTransactionParams.name,
-            amount: new Prisma.Decimal(createTransactionParams.amount),
-            date: new Date(createTransactionParams.date),
-            type: createTransactionParams.type as
-                | 'EARNING'
-                | 'EXPENSE'
-                | 'INVESTMENT',
-        }
-
-        validCreateTransactionRepositoryResponse = {
-            id: validTransactionId,
-            user_id: createTransactionParams.user_id,
-            name: createTransactionParams.name,
-            amount: new Prisma.Decimal(createTransactionParams.amount),
-            date: new Date(createTransactionParams.date),
-            type: createTransactionParams.type as
-                | 'EARNING'
-                | 'EXPENSE'
-                | 'INVESTMENT',
-        }
-
-        validGetUserByIdRepositoryResponse = {
-            id: createTransactionParams.user_id,
-            first_name: faker.person.firstName(),
-            last_name: faker.person.lastName(),
-            email: faker.internet.email(),
-            password: faker.internet.password({ length: 7 }),
-        }
     })
 
     afterEach(() => {
@@ -194,7 +147,7 @@ describe('CreateTransactionService', () => {
 
             // assert
             expect(response).toBeTruthy()
-            expect(response).toEqual(validCreateTransactionServiceResponse)
+            expect(response).toEqual(createTransactionServiceResponse)
         })
     })
 
@@ -220,7 +173,9 @@ describe('CreateTransactionService', () => {
 
             expect(idGeneratorAdapterSpy).toHaveBeenCalled()
             expect(idGeneratorAdapterSpy).toHaveBeenCalledTimes(1)
-            expect(idGeneratorAdapterSpy).toHaveReturnedWith(validTransactionId)
+            expect(idGeneratorAdapterSpy).toHaveReturnedWith(
+                createTransactionServiceResponse.id,
+            )
         })
 
         it('should call CreateTransactionRepository with correct params', async () => {
@@ -233,10 +188,10 @@ describe('CreateTransactionService', () => {
 
             expect(createTransactionRepositorySpy).toHaveBeenCalledWith({
                 ...createTransactionParams,
-                id: validTransactionId,
+                id: createTransactionServiceResponse.id,
             })
             expect(createTransactionRepositorySpy).toHaveBeenCalledTimes(1)
-            expect(response).toEqual(validCreateTransactionServiceResponse)
+            expect(response).toEqual(createTransactionServiceResponse)
         })
     })
 })
