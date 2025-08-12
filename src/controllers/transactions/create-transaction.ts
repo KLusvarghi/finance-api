@@ -3,9 +3,9 @@ import { createTransactionSchema } from '@/schemas'
 import { ZodError } from 'zod'
 import {
     CreateTransactionService,
-    TransactionRepositoryResponse,
     HttpResponse,
     HttpRequest,
+    TransactionPublicResponse,
 } from '@/shared/types'
 
 export class CreateTransactionController {
@@ -17,7 +17,7 @@ export class CreateTransactionController {
 
     async execute(
         httpRequest: HttpRequest,
-    ): Promise<HttpResponse<TransactionRepositoryResponse>> {
+    ): Promise<HttpResponse<TransactionPublicResponse>> {
         try {
             const params = httpRequest.body
 
