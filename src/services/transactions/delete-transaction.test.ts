@@ -72,6 +72,19 @@ describe('DeleteTransactionService', () => {
         jest.resetAllMocks()
     })
 
+    describe('error handling', () => {
+      it('should throw if DeleteTransactionRepository throws', async () => {
+        // arrange
+        jest.spyOn(deleteTransactionRepository, 'execute').mockRejectedValueOnce(new Error())
+
+        // act
+        const promise = sut.execute(validTransactionId)
+
+        // assert
+        expect(promise).rejects.toThrow()
+      })
+    })
+
     describe('success', () => {
       it('should delete transaction successfully', async () => {
         // act
