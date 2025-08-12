@@ -128,4 +128,18 @@ describe('DeleteTransactionService', () => {
             expect(response).toEqual(validTransactionServiceResponse)
         })
     })
+
+    describe('validations', () => {
+        it('should call GetUserByIdRepository with correct params', async () => {
+            // arrange
+            const getUserByIdRepositorySpy = jest.spyOn(getUserByIdRepository, 'execute')
+
+            // act
+            await sut.execute(validUserId)
+
+            // assert
+            expect(getUserByIdRepositorySpy).toHaveBeenCalledWith(validUserId)
+            expect(getUserByIdRepositorySpy).toHaveBeenCalledTimes(1)
+        })
+    })
 })
