@@ -6,6 +6,7 @@ import {
 } from '@/shared'
 import { Prisma } from '@prisma/client'
 import { GetTransactionsByUserIdService } from './get-transactions-by-user-id'
+import { UserNotFoundError } from '@/errors/user'
 
 describe('DeleteTransactionService', () => {
     let sut: GetTransactionsByUserIdService
@@ -107,12 +108,15 @@ describe('DeleteTransactionService', () => {
     })
 
     describe('error handling', () => {
-        // it('should throw UserNotFoundError if GetUserByIdRepository returns null', async () => {
-        //     // arrange
-        //     jest.spyOn(getUserByIdRepository, 'execute').mockResolvedValueOnce(null)
-        //     // act
-        //     const promise = sut.execute(validUserId)
-        // })
+        it('should throw UserNotFoundError if user not found', async () => {
+            // arrange
+            jest.spyOn(getUserByIdRepository, 'execute').mockResolvedValueOnce(null)
+            // act
+            const promise = sut.execute(validUserId)
+
+            // assert
+            expect(promise).rejects.toThrow(new UserNotFoundError(validUserId))
+        })
     })
 
     describe('success', () => {
