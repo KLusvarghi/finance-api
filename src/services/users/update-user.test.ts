@@ -132,18 +132,34 @@ describe('UpdateUserService', () => {
         })
 
         it('should throw UserNotFoundError if GetUserByIdRepository throws', async () => {
-          // arrange
-          jest.spyOn(
-              getUserByIdRepository,
-              'execute',
-          ).mockRejectedValueOnce(new Error())
+            // arrange
+            jest.spyOn(getUserByIdRepository, 'execute').mockRejectedValueOnce(
+                new Error(),
+            )
 
-          // act
-          const promise = sut.execute(validUserId, updateUserParams)
+            // act
+            const promise = sut.execute(validUserId, {
+                email: faker.internet.email(),
+            })
 
-          // assert
-          expect(promise).rejects.toThrow()
-      })
+            // assert
+            expect(promise).rejects.toThrow()
+        })
+
+        it('should throw if PasswordHasherAdapter throws', async () => {
+            // arrange
+            jest.spyOn(passwordHasherAdapter, 'execute').mockRejectedValueOnce(
+                new Error(),
+            )
+
+            // act
+            const promise = sut.execute(validUserId, {
+                password: faker.internet.password({ length: 7 }),
+            })
+
+            // assert
+            expect(promise).rejects.toThrow()
+        })
     })
 
     describe('success', () => {
