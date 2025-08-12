@@ -189,7 +189,7 @@ describe('CreateUserService', () => {
     })
 
     describe('success', () => {
-        it('should create a user successefully', async () => {
+        it('should create a user successfully', async () => {
             // act
             const response = await sut.execute(createUserParams)
 
