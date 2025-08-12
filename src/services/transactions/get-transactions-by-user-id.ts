@@ -7,14 +7,14 @@ import {
 
 export class GetTransactionsByUserIdService {
     private getUserByIdRepository: GetUserByIdRepository
-    private getTransactionByUserIdRepository: GetTransactionsByUserIdRepository
+    private getTransactionsByUserIdRepository: GetTransactionsByUserIdRepository
 
     constructor(
         getUserByIdRepository: GetUserByIdRepository,
-        getTransactionByUserIdRepository: GetTransactionsByUserIdRepository,
+        getTransactionsByUserIdRepository: GetTransactionsByUserIdRepository,
     ) {
         this.getUserByIdRepository = getUserByIdRepository
-        this.getTransactionByUserIdRepository = getTransactionByUserIdRepository
+        this.getTransactionsByUserIdRepository = getTransactionsByUserIdRepository
     }
 
     async execute(userId: string): Promise<TransactionPublicResponse[]> {
@@ -25,7 +25,7 @@ export class GetTransactionsByUserIdService {
         }
 
         const transactions =
-            await this.getTransactionByUserIdRepository.execute(userId)
+            await this.getTransactionsByUserIdRepository.execute(userId)
 
         return transactions || []
     }
