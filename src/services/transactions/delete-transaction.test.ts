@@ -5,6 +5,7 @@ import {
     TransactionRepositoryResponse,
 } from '@/shared'
 import { Prisma } from '@prisma/client'
+import { TransactionNotFoundError } from '@/errors/user'
 
 describe('DeleteTransactionService', () => {
     let sut: DeleteTransactionService
@@ -73,6 +74,18 @@ describe('DeleteTransactionService', () => {
     })
 
     describe('error handling', () => {
+      it('should throw TransactionNotFoundError if DeleteTransactionRepository returns null', async () => {
+        // arrange
+        jest.spyOn(deleteTransactionRepository, 'execute').mockRejectedValueOnce(new TransactionNotFoundError('invalid_transaction_id'))
+
+        // act
+        const promise = sut.execute(validTransactionId)
+
+        // assert
+        expect(promise).rejects.toThrow(new TransactionNotFoundError('invalid_transaction_id'))
+      })
+    })
+
       it('should throw if DeleteTransactionRepository throws', async () => {
         // arrange
         jest.spyOn(deleteTransactionRepository, 'execute').mockRejectedValueOnce(new Error())
@@ -83,7 +96,6 @@ describe('DeleteTransactionService', () => {
         // assert
         expect(promise).rejects.toThrow()
       })
-    })
 
     describe('success', () => {
       it('should delete transaction successfully', async () => {
