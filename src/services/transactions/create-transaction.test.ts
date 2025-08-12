@@ -1,6 +1,7 @@
 import {
     CreateTransactionParams,
     TransactionPublicResponse,
+    TransactionRepositoryResponse,
     UserRepositoryResponse,
 } from '@/shared/types'
 import { CreateTransactionService } from './create-transaction'
@@ -14,14 +15,15 @@ describe('CreateTransactionService', () => {
     let idGenerator: IdGeneratorAdapterStub
     let validTransactionId: string
     let createTransactionParams: CreateTransactionParams
-    let validCreateTransactionResponse: TransactionPublicResponse
+    let validCreateTransactionServiceResponse: TransactionPublicResponse
+    let validCreateTransactionRepositoryResponse: TransactionRepositoryResponse
     let validGetUserByIdRepositoryResponse: UserRepositoryResponse
 
     class CreateTransactionRepositoryStub {
         async execute(
             _params: CreateTransactionParams,
-        ): Promise<TransactionPublicResponse> {
-            return Promise.resolve(validCreateTransactionResponse)
+        ): Promise<TransactionRepositoryResponse> {
+            return Promise.resolve(validCreateTransactionRepositoryResponse)
         }
     }
 
@@ -33,7 +35,7 @@ describe('CreateTransactionService', () => {
 
     class IdGeneratorAdapterStub {
         execute(): string {
-            return validCreateTransactionResponse.id
+            return validCreateTransactionServiceResponse.id
         }
     }
 
@@ -81,7 +83,19 @@ describe('CreateTransactionService', () => {
             ]),
         }
 
-        validCreateTransactionResponse = {
+        validCreateTransactionServiceResponse = {
+            id: validTransactionId,
+            user_id: createTransactionParams.user_id,
+            name: createTransactionParams.name,
+            amount: new Prisma.Decimal(createTransactionParams.amount),
+            date: new Date(createTransactionParams.date),
+            type: createTransactionParams.type as
+                | 'EARNING'
+                | 'EXPENSE'
+                | 'INVESTMENT',
+        }
+
+        validCreateTransactionRepositoryResponse = {
             id: validTransactionId,
             user_id: createTransactionParams.user_id,
             name: createTransactionParams.name,
@@ -115,7 +129,7 @@ describe('CreateTransactionService', () => {
 
             // assert
             expect(response).toBeTruthy()
-            expect(response).toEqual(validCreateTransactionResponse)
+            expect(response).toEqual(validCreateTransactionServiceResponse)
         })
     })
 
@@ -132,6 +146,32 @@ describe('CreateTransactionService', () => {
                 createTransactionParams.user_id,
             )
             expect(getUserByIdRepositorySpy).toHaveBeenCalledTimes(1)
+        })
+
+        it('should call IdGeneratorAdapter to generate a random uuid', async () => {
+            const idGeneratorAdapterSpy = jest.spyOn(idGenerator, 'execute')
+
+            await sut.execute(createTransactionParams)
+
+            expect(idGeneratorAdapterSpy).toHaveBeenCalled()
+            expect(idGeneratorAdapterSpy).toHaveBeenCalledTimes(1)
+            expect(idGeneratorAdapterSpy).toHaveReturnedWith(validTransactionId)
+        })
+
+        it('should call CreateTransactionRepository with correct params', async () => {
+            const createTransactionRepositorySpy = jest.spyOn(
+                createTransactionRepository,
+                'execute',
+            )
+
+            const response = await sut.execute(createTransactionParams)
+
+            expect(createTransactionRepositorySpy).toHaveBeenCalledWith({
+                ...createTransactionParams,
+                id: validTransactionId,
+            })
+            expect(createTransactionRepositorySpy).toHaveBeenCalledTimes(1)
+            expect(response).toEqual(validCreateTransactionServiceResponse)
         })
     })
 })
