@@ -160,6 +160,19 @@ describe('UpdateUserService', () => {
             // assert
             expect(promise).rejects.toThrow()
         })
+
+        it('should throw if UpdateUserRepository throws', async () => {
+          // arrange
+          jest.spyOn(updateUserRepository, 'execute').mockRejectedValueOnce(
+              new Error(),
+          )
+
+          // act
+          const promise = sut.execute(validUserId, updateUserParams)
+
+          // assert
+          expect(promise).rejects.toThrow()
+      })
     })
 
     describe('success', () => {
