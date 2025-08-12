@@ -27,6 +27,6 @@ export class GetTransactionsByUserIdService {
         const transactions =
             await this.getTransactionsByUserIdRepository.execute(userId)
 
-        return transactions || []
+        return transactions
     }
 }
