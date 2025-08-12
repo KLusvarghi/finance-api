@@ -27,9 +27,9 @@ export const updateUserParams = {
 
 export const userResponse = {
     id: userId,
-    first_name: faker.person.firstName(),
-    last_name: faker.person.lastName(),
-    email: faker.internet.email(),
+    first_name: createUserParams.first_name,
+    last_name: createUserParams.last_name,
+    email: createUserParams.email,
 }
 
 export const userBalanceResponse = {
@@ -51,18 +51,18 @@ export const createUserRepositoryResponse = {
 
 export const deleteUserRepositoryResponse = {
     id: userId,
-    first_name: faker.person.firstName(),
-    last_name: faker.person.lastName(),
-    email: faker.internet.email(),
-    password: faker.internet.password({ length: 7 }),
+    first_name: createUserParams.first_name,
+    last_name: createUserParams.last_name,
+    email: createUserParams.email,
+    password: 'valid_hash',
 }
 
 export const getUserByIdRepositoryResponse = {
     id: userId,
-    first_name: faker.person.firstName(),
-    last_name: faker.person.lastName(),
-    email: faker.internet.email(),
-    password: faker.internet.password({ length: 7 }),
+    first_name: createUserParams.first_name,
+    last_name: createUserParams.last_name,
+    email: createUserParams.email,
+    password: 'valid_hash',
 }
 
 export const updateUserRepositoryResponse = {
@@ -98,14 +98,14 @@ const getUserBalanceResponse = userBalanceResponse
 // LEGACY EXPORTS (Para manter compatibilidade)
 // ============================================================================
 
-// Service responses 
+// Service responses
 export const createUserServiceResponse = createUserResponse
 export const deleteUserServiceResponse = deleteUserResponse
 export const getUserBalanceServiceResponse = getUserBalanceResponse
 export const getUserByIdServiceResponse = getUserByIdResponse
 export const updateUserServiceResponse = updateUserResponse
 
-// Controller responses 
+// Controller responses
 export const createUserControllerResponse = createUserResponse
 export const deleteUserControllerResponse = deleteUserResponse
 export const getUserBalanceControllerResponse = getUserBalanceResponse
