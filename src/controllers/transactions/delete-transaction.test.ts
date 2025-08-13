@@ -2,7 +2,7 @@ import { HttpRequest, TransactionRepositoryResponse } from '@/shared'
 import { DeleteTransactionController } from './delete-transaction'
 import { faker } from '@faker-js/faker'
 import { Prisma } from '@prisma/client'
-import { invalidUUID } from '@/test/fixtures'
+import { invalidUUID } from '@/test'
 import { TransactionNotFoundError } from '@/errors/user'
 
 describe('DeleteTransactionController', () => {

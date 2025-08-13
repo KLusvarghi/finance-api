@@ -11,7 +11,7 @@ import {
     invalidDate,
     invalidType,
     invalidAmount,
-} from '@/test/fixtures'
+} from '@/test'
 
 describe('UpdateTransactionController', () => {
     let sut: UpdateTransactionController

@@ -5,7 +5,7 @@ import {
     userId,
     getUserByIdServiceResponse,
     getUserByIdRepositoryResponse,
-} from '@/test/fixtures'
+} from '@/test'
 
 describe('GetUserByIdService', () => {
     let sut: GetUserByIdService

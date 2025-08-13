@@ -2,7 +2,7 @@ import { HttpRequest, TransactionRepositoryResponse } from '@/shared'
 import { GetTransactionsByUserIdController } from './get-transactions-by-user-id'
 import { faker } from '@faker-js/faker'
 import { Prisma } from '@prisma/client'
-import { invalidUUID } from '@/test/fixtures'
+import { invalidUUID } from '@/test'
 import { UserNotFoundError } from '@/errors/user'
 
 describe('GetTransactionsByUserIdController', () => {

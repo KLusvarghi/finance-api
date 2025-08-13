@@ -5,7 +5,7 @@ import {
     transactionId,
     deleteTransactionServiceResponse,
     deleteTransactionRepositoryResponse,
-} from '@/test/fixtures'
+} from '@/test'
 
 describe('DeleteTransactionService', () => {
     let sut: DeleteTransactionService

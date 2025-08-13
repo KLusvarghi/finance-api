@@ -10,7 +10,7 @@ import {
     updateUserParams,
     updateUserServiceResponse,
     updateUserRepositoryResponse,
-} from '@/test/fixtures'
+} from '@/test'
 
 describe('UpdateUserService', () => {
     let sut: UpdateUserService

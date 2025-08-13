@@ -5,7 +5,7 @@ import {
     createUserParams,
     createUserServiceResponse,
     createUserRepositoryResponse,
-} from '@/test/fixtures'
+} from '@/test'
 
 describe('CreateUserService', () => {
     let sut: CreateUserService

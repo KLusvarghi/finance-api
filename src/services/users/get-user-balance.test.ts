@@ -8,7 +8,7 @@ import {
     userId,
     getUserBalanceServiceResponse,
     getUserByIdRepositoryResponse,
-} from '@/test/fixtures'
+} from '@/test'
 
 describe('GetUserBalanceService', () => {
     let sut: GetUserBalanceService

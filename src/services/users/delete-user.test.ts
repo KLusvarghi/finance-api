@@ -5,7 +5,7 @@ import {
     userId,
     deleteUserServiceResponse,
     deleteUserRepositoryResponse,
-} from '@/test/fixtures'
+} from '@/test'
 
 describe('DeleteUserService', () => {
     let sut: DeleteUserService

@@ -9,7 +9,7 @@ import {
     updateTransactionParams,
     updateTransactionServiceResponse,
     updateTransactionRepositoryResponse,
-} from '@/test/fixtures'
+} from '@/test'
 
 describe('UpdateTransactionService', () => {
     let sut: UpdateTransactionService

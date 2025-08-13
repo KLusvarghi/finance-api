@@ -10,7 +10,7 @@ import {
     createTransactionServiceResponse,
     createTransactionRepositoryResponse,
     getUserByIdRepositoryResponse,
-} from '@/test/fixtures'
+} from '@/test'
 
 describe('CreateTransactionService', () => {
     let sut: CreateTransactionService
