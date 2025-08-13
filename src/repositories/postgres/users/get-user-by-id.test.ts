@@ -5,6 +5,19 @@ import { PostgresGetUserByIdRepository } from './get-user-by-id'
 describe('PostgresGetUserByIdRepository', () => {
     let sut = new PostgresGetUserByIdRepository()
 
+    describe('error handling', () => {
+      it('should throw an error if Prisma throws', async () => {
+          // arrange
+          jest.spyOn(prisma.user, 'findUnique').mockRejectedValueOnce(
+              new Error('Prisma error'),
+          )
+          // act
+          const promise = sut.execute(fakeUser.id)
+
+          expect(promise).rejects.toThrow(new Error('Prisma error'))
+      })
+  })
+
     describe('success', () => {
         it('should get user by id on database successfully', async () => {
             const user = await prisma.user.create({
