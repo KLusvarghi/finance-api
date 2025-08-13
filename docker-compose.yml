@@ -4,23 +4,28 @@ services:
     postgres:
         image: postgres:15
         container_name: finance-app-postgres
-        restart: unless-stopped           # reinicia em caso de falha
-        environment: 
+        restart: unless-stopped # reinicia em caso de falha
+        environment:
             POSTGRES_PASSWORD: password
             POSTGRES_USER: root
             POSTGRES_DB: finance-app
         ports:
-            - '5432:5432' 
+            - '5432:5432'
         volumes:
             - ./.postgres-data:/var/lib/postgresql/data
 
     postgres-test:
         image: postgres:15
         container_name: finance-app-postgres-test
-        restart: unless-stopped           # reinicia em caso de falha
-        environment: 
+        restart: unless-stopped # reinicia em caso de falha
+        environment:
             POSTGRES_PASSWORD: password
             POSTGRES_USER: root
             POSTGRES_DB: finance-app-test
         ports:
-            - '5433:5432' 
+            - '5433:5432'
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U root -d finance-app-test']
+            interval: 10s
+            timeout: 5s
+            retries: 5
