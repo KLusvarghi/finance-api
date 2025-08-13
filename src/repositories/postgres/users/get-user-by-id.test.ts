@@ -16,4 +16,21 @@ describe('PostgresGetUserByIdRepository', () => {
             expect(response).toStrictEqual(user)
         })
     })
+    describe('validations', () => {
+        it('should call Prisma with correct params', async () => {
+            // arrange
+            // monitoramos o metodo "findUnique" do prisma
+            const prismaSpy = jest.spyOn(prisma.user, 'findUnique')
+
+            // act
+            await sut.execute(fakeUser.id)
+
+            // assert
+            expect(prismaSpy).toHaveBeenCalledWith({
+                where: {
+                    id: fakeUser.id,
+                },
+            })
+        })
+    })
 })
