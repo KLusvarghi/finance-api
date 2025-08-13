@@ -2,6 +2,7 @@ import { createUserRepositoryResponse as user } from '@/test'
 import { PostgresGetUserBalanceRepository } from './get-user-balance'
 import { prisma } from '../../../../prisma/prisma'
 import { faker } from '@faker-js/faker'
+import { TransactionType } from '@prisma/client'
 
 describe('PostgresGetUserBalanceRepository', () => {
     let sut = new PostgresGetUserBalanceRepository()
@@ -70,5 +71,46 @@ describe('PostgresGetUserBalanceRepository', () => {
         })
     })
 
-    describe('validations', () => {})
+    describe('validations', () => {
+        it('should call Prisma with correct params', async () => {
+            // arrange
+            // monitoramos o metodo "aggregate" do prisma
+            const prismaSpy = jest.spyOn(prisma.transaction, 'aggregate')
+
+            // act
+            await sut.execute(user.id)
+
+            // assert
+            expect(prismaSpy).toHaveBeenCalledTimes(3)
+            expect(prismaSpy).toHaveBeenCalledWith({
+                where: {
+                    user_id: user.id,
+                    type: TransactionType.EXPENSE,
+                },
+                _sum: {
+                    amount: true,
+                },
+            })
+
+            expect(prismaSpy).toHaveBeenCalledWith({
+                where: {
+                    user_id: user.id,
+                    type: TransactionType.EARNING,
+                },
+                _sum: {
+                    amount: true,
+                },
+            })
+
+            expect(prismaSpy).toHaveBeenCalledWith({
+                where: {
+                    user_id: user.id,
+                    type: TransactionType.INVESTMENT,
+                },
+                _sum: {
+                    amount: true,
+                },
+            })
+        })
+    })
 })
