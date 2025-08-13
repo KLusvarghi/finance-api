@@ -1,4 +1,4 @@
-import { createUserRepositoryResponse as user } from '@/test'
+import { createUserRepositoryResponse as fakerUser } from '@/test'
 import { PostgresGetUserBalanceRepository } from './get-user-balance'
 import { prisma } from '../../../../prisma/prisma'
 import { faker } from '@faker-js/faker'
@@ -13,7 +13,7 @@ describe('PostgresGetUserBalanceRepository', () => {
             const to = new Date('2024-01-31')
             // precisamos criar um usuário antes de querer deletar
             await prisma.user.create({
-                data: user,
+                data: fakerUser,
             })
 
             await prisma.transaction.createMany({
@@ -23,47 +23,47 @@ describe('PostgresGetUserBalanceRepository', () => {
                         amount: 5000,
                         date: new Date(from),
                         type: 'EARNING',
-                        user_id: user.id,
+                        user_id: fakerUser.id,
                     },
                     {
                         name: faker.string.sample(),
                         date: new Date(from),
                         amount: 5000,
                         type: 'EARNING',
-                        user_id: user.id,
+                        user_id: fakerUser.id,
                     },
                     {
                         name: faker.string.sample(),
                         date: new Date(from),
                         amount: 1000,
                         type: 'EXPENSE',
-                        user_id: user.id,
+                        user_id: fakerUser.id,
                     },
                     {
                         name: faker.string.sample(),
                         date: new Date(to),
                         amount: 1000,
                         type: 'EXPENSE',
-                        user_id: user.id,
+                        user_id: fakerUser.id,
                     },
                     {
                         name: faker.string.sample(),
                         date: new Date(to),
                         amount: 3000,
                         type: 'INVESTMENT',
-                        user_id: user.id,
+                        user_id: fakerUser.id,
                     },
                     {
                         name: faker.string.sample(),
                         date: new Date(to),
                         amount: 3000,
                         type: 'INVESTMENT',
-                        user_id: user.id,
+                        user_id: fakerUser.id,
                     },
                 ],
             })
 
-            const response = await sut.execute(user.id)
+            const response = await sut.execute(fakerUser.id)
             expect(response.earnings.toString()).toBe('10000')
             expect(response.expenses.toString()).toBe('2000')
             expect(response.investments.toString()).toBe('6000')
@@ -78,13 +78,13 @@ describe('PostgresGetUserBalanceRepository', () => {
             const prismaSpy = jest.spyOn(prisma.transaction, 'aggregate')
 
             // act
-            await sut.execute(user.id)
+            await sut.execute(fakerUser.id)
 
             // assert
             expect(prismaSpy).toHaveBeenCalledTimes(3)
             expect(prismaSpy).toHaveBeenCalledWith({
                 where: {
-                    user_id: user.id,
+                    user_id: fakerUser.id,
                     type: TransactionType.EXPENSE,
                 },
                 _sum: {
@@ -94,7 +94,7 @@ describe('PostgresGetUserBalanceRepository', () => {
 
             expect(prismaSpy).toHaveBeenCalledWith({
                 where: {
-                    user_id: user.id,
+                    user_id: fakerUser.id,
                     type: TransactionType.EARNING,
                 },
                 _sum: {
@@ -104,7 +104,7 @@ describe('PostgresGetUserBalanceRepository', () => {
 
             expect(prismaSpy).toHaveBeenCalledWith({
                 where: {
-                    user_id: user.id,
+                    user_id: fakerUser.id,
                     type: TransactionType.INVESTMENT,
                 },
                 _sum: {
