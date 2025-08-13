@@ -10,7 +10,7 @@ describe('CreateUserRepository', () => {
             const response = await sut.execute(createUserRepositoryResponse)
 
             expect(response).not.toBeNull()
-            expect(response).toEqual(createUserRepositoryResponse)
+            expect(response).toStrictEqual(createUserRepositoryResponse)
         })
     })
 
