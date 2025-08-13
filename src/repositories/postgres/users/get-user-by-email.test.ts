@@ -16,4 +16,22 @@ describe('PostgresGetUserByEmailRepository', () => {
             expect(response).toStrictEqual(user)
         })
     })
+
+    describe('validations', () => {
+      it('should call Prisma with correct params', async () => {
+          // arrange
+          // monitoramos o metodo "findUnique" do prisma
+          const prismaSpy = jest.spyOn(prisma.user, 'findUnique')
+
+          // act
+          await sut.execute(fakeUser.email)
+
+          // assert
+          expect(prismaSpy).toHaveBeenCalledWith({
+            where: {
+                email: fakeUser.email,
+            },
+          })
+        })
+    })
 })
