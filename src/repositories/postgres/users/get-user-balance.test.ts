@@ -66,7 +66,7 @@ describe('PostgresGetUserBalanceRepository', () => {
             expect(response.earnings.toString()).toBe('10000')
             expect(response.expenses.toString()).toBe('2000')
             expect(response.investments.toString()).toBe('6000')
-            // expect(response.balance.toString()).toBe('2000')
+            expect(response.balance.toString()).toBe('2000')
         })
     })
 
