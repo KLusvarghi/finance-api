@@ -36,6 +36,10 @@ const config: Config = {
     ],
     // com isso ele irá fazer a cobertura de testes de todos os arquivos .ts e não apenas os que estão no testMatch
     collectCoverageFrom: ['src/**/*.ts'],
+
+    // para ele rodar todas as configs necessárias antes de rodar os testes
+    // "rootDir" é o diretório raiz do projeto
+    globalSetup: '<rootDir>/jest.global-setup.mjs',
 }
 
 export default config
