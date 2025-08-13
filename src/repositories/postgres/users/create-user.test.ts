@@ -12,12 +12,12 @@ describe('PostgresCreateUserRepository', () => {
         it('should throw an error if Prisma throws', async () => {
             // arrange
             jest.spyOn(prisma.user, 'create').mockRejectedValueOnce(
-                new Error(),
+                new Error('Prisma error'),
             )
             // act
             const promise = sut.execute(fakerUser)
 
-            expect(promise).rejects.toThrow(new Error())
+            expect(promise).rejects.toThrow(new Error('Prisma error'))
         })
     })
 
