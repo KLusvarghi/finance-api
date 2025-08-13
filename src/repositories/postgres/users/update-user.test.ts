@@ -12,6 +12,19 @@ describe('PostgresUpdateUserRepository', () => {
         password: 'valid_hash',
     }
 
+    describe('error handling', () => {
+      it('should throw an error if Prisma throws', async () => {
+          // arrange
+          jest.spyOn(prisma.user, 'update').mockRejectedValueOnce(
+              new Error('Prisma error'),
+          )
+          // act
+          const promise = sut.execute(fakeUser.id, updateUserParams)
+
+          expect(promise).rejects.toThrow(new Error('Prisma error'))
+      })
+  })
+
     describe('success', () => {
         it('should update user on database successfully', async () => {
             // arrange
