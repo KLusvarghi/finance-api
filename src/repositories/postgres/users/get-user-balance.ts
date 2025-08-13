@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client'
+import { Prisma, TransactionType } from '@prisma/client'
 import { prisma } from '../../../../prisma/prisma'
 import { UserBalanceRepositoryResponse } from '@/shared/types'
 
@@ -18,7 +18,7 @@ export class PostgresGetUserBalanceRepository {
 
                     where: {
                         user_id: userId,
-                        type: 'EXPENSE',
+                        type: TransactionType.EXPENSE,
                     },
                     // o que voltar do where eu irei somar
 
@@ -30,7 +30,7 @@ export class PostgresGetUserBalanceRepository {
                 prisma.transaction.aggregate({
                     where: {
                         user_id: userId,
-                        type: 'EARNING',
+                        type: TransactionType.EARNING,
                     },
                     _sum: {
                         amount: true,
@@ -39,7 +39,7 @@ export class PostgresGetUserBalanceRepository {
                 prisma.transaction.aggregate({
                     where: {
                         user_id: userId,
-                        type: 'INVESTMENT',
+                        type: TransactionType.INVESTMENT,
                     },
                     _sum: {
                         amount: true,
