@@ -1,4 +1,4 @@
-import { createUserRepositoryResponse } from '@/test'
+import { createUserRepositoryResponse, userId } from '@/test'
 import { PostgresDeleteUserRepository } from './delete-user'
 import { prisma } from '../../../../prisma/prisma'
 
@@ -19,14 +19,28 @@ describe('DeleteUserRepository', () => {
     })
 
     describe('validations', () => {
-        // it('should call Prisma with correct params', async () => {
-        //     const prismaSpy = jest.spyOn(prisma.user, 'create')
+        it('should call Prisma with correct params', async () => {
+            // Criar um usuário antes de testar a validação
+            await prisma.user.create({
+                data: createUserRepositoryResponse,
+            })
 
-        //     await sut.execute(createUserRepositoryResponse)
+            const prismaSpy = jest.spyOn(prisma.user, 'delete')
 
-        //     expect(prismaSpy).toHaveBeenCalledWith({
-        //         data: createUserRepositoryResponse,
-        //     })
-        // })
+            await sut.execute(createUserRepositoryResponse.id)
+
+            expect(prismaSpy).toHaveBeenCalledWith({
+                where: {
+                    id: createUserRepositoryResponse.id,
+                },
+            })
+        })
+
+        it('should return null if user does not exist', async () => {
+            // como não tem usuário no banco, ele retorna null
+            const response = await sut.execute(userId)
+
+            expect(response).toBeNull()
+        })
     })
 })
