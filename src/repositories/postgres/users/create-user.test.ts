@@ -2,7 +2,7 @@ import { createUserRepositoryResponse } from '@/test'
 import { PostgresCreateUserRepository } from './create-user'
 import { prisma } from '../../../../prisma/prisma'
 
-describe('CreateUserRepository', () => {
+describe('PostgresCreateUserRepository', () => {
     let sut = new PostgresCreateUserRepository()
 
     describe('success', () => {

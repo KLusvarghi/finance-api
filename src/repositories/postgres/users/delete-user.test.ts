@@ -2,7 +2,7 @@ import { createUserRepositoryResponse, userId } from '@/test'
 import { PostgresDeleteUserRepository } from './delete-user'
 import { prisma } from '../../../../prisma/prisma'
 
-describe('DeleteUserRepository', () => {
+describe('PostgresDeleteUserRepository', () => {
     let sut = new PostgresDeleteUserRepository()
 
     describe('success', () => {
