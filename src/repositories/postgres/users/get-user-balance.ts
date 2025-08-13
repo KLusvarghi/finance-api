@@ -3,9 +3,7 @@ import { prisma } from '../../../../prisma/prisma'
 import { UserBalanceRepositoryResponse } from '@/shared/types'
 
 export class PostgresGetUserBalanceRepository {
-    async execute(
-        userId: string,
-    ): Promise<UserBalanceRepositoryResponse> {
+    async execute(userId: string): Promise<UserBalanceRepositoryResponse> {
         // para que a gente consiga fazer essa query, ao invés de usar uma function que abstraia a query, vamos usar aggragation: https://www.prisma.io/docs/orm/prisma-client/queries/aggregation-grouping-summarizing
 
         // sem fazer o destructuring
@@ -57,10 +55,10 @@ export class PostgresGetUserBalanceRepository {
         const totalInvestments =
             Number(investmentsResult._sum.amount) || new Prisma.Decimal(0)
 
-        // Calcular o balance: ganhos - despesas + investimentos
+        // Calcular o balance: ganhos - despesas - investimentos
         const balance = new Prisma.Decimal(totalEarnings)
             .sub(totalExpenses)
-            .add(totalInvestments)
+            .sub(totalInvestments)
         // const balance2 = new Prisma.Decimal(
         //     totalEarnings - totalExpenses + totalInvestments,
         // )
