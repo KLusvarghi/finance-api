@@ -1,4 +1,4 @@
-import { createUserRepositoryResponse, userId } from '@/test'
+import { createUserRepositoryResponse as user, userId } from '@/test'
 import { PostgresDeleteUserRepository } from './delete-user'
 import { prisma } from '../../../../prisma/prisma'
 
@@ -9,12 +9,12 @@ describe('PostgresDeleteUserRepository', () => {
         it('should delete a user on database successfully', async () => {
             // precisamos criar um usuário antes de querer deletar
             await prisma.user.create({
-                data: createUserRepositoryResponse,
+                data: user,
             })
 
-            const response = await sut.execute(createUserRepositoryResponse.id)
+            const response = await sut.execute(user.id)
 
-            expect(response).toStrictEqual(createUserRepositoryResponse)
+            expect(response).toStrictEqual(user)
         })
     })
 
@@ -22,16 +22,16 @@ describe('PostgresDeleteUserRepository', () => {
         it('should call Prisma with correct params', async () => {
             // Criar um usuário antes de testar a validação
             await prisma.user.create({
-                data: createUserRepositoryResponse,
+                data: user,
             })
 
             const prismaSpy = jest.spyOn(prisma.user, 'delete')
 
-            await sut.execute(createUserRepositoryResponse.id)
+            await sut.execute(user.id)
 
             expect(prismaSpy).toHaveBeenCalledWith({
                 where: {
-                    id: createUserRepositoryResponse.id,
+                    id: user.id,
                 },
             })
         })
