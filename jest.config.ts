@@ -39,7 +39,10 @@ const config: Config = {
 
     // para ele rodar todas as configs necessárias antes de rodar os testes
     // "rootDir" é o diretório raiz do projeto
-    globalSetup: '<rootDir>/jest.global-setup.mjs',
+    globalSetup: '<rootDir>/jest.global-setup.ts',
+
+    // para rodar o setup-after-env.ts antes de cada teste
+    setupFilesAfterEnv: ['<rootDir>/jest.setup-after-env.ts'],
 }
 
 export default config
