@@ -1,25 +1,22 @@
-import { HttpRequest, TransactionRepositoryResponse } from '@/shared'
+import { TransactionRepositoryResponse } from '@/shared'
 import { DeleteTransactionController } from './delete-transaction'
 import { TransactionNotFoundError } from '@/errors/user'
 import {
     invalidUUID,
     transactionId,
     deleteTransactionControllerResponse,
-    deleteTransactionBaseHttpRequest,
+    deleteTransactionHttpRequest as baseHttpRequest,
 } from '@/test'
 
 describe('DeleteTransactionController', () => {
     let sut: DeleteTransactionController
     let deleteTransactionService: DeleteTransactionServiceStub
-    let validTransactionId: string
-    let validTransactionResponse: TransactionRepositoryResponse
-    let baseHttpRequest: HttpRequest
 
     class DeleteTransactionServiceStub {
         execute(
             _transactionId: string,
         ): Promise<TransactionRepositoryResponse> {
-            return Promise.resolve(validTransactionResponse)
+            return Promise.resolve(deleteTransactionControllerResponse)
         }
     }
 
@@ -35,11 +32,6 @@ describe('DeleteTransactionController', () => {
 
         sut = controller
         deleteTransactionService = service
-
-        // Dados válidos usando fixtures
-        validTransactionId = transactionId
-        validTransactionResponse = deleteTransactionControllerResponse
-        baseHttpRequest = deleteTransactionBaseHttpRequest
     })
 
     afterEach(() => {
@@ -69,9 +61,7 @@ describe('DeleteTransactionController', () => {
             jest.spyOn(
                 deleteTransactionService,
                 'execute',
-            ).mockRejectedValueOnce(
-                new TransactionNotFoundError(validTransactionId),
-            )
+            ).mockRejectedValueOnce(new TransactionNotFoundError(transactionId))
 
             // act
             const response = await sut.execute(baseHttpRequest)
@@ -115,7 +105,9 @@ describe('DeleteTransactionController', () => {
             expect(response.body?.message).toBe(
                 'Transaction deleted successfully',
             )
-            expect(response.body?.data).toEqual(validTransactionResponse)
+            expect(response.body?.data).toEqual(
+                deleteTransactionControllerResponse,
+            )
         })
 
         it('should call DeleteTransactionService with correct parameters', async () => {
