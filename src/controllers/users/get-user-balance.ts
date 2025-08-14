@@ -4,6 +4,7 @@ import {
     invalidIdResponse,
     ok,
     serverError,
+    userBadRequestResponse,
     userNotFoundResponse,
 } from '../_helpers'
 import {
@@ -25,6 +26,9 @@ export class GetUserBalanceController {
     ): Promise<HttpResponse<UserBalanceRepositoryResponse>> {
         try {
             const userId = httpRequest.params.userId
+            if (!userId) {
+                return userBadRequestResponse()
+            }
 
             if (!checkIfIdIsValid(userId)) {
                 return invalidIdResponse()
