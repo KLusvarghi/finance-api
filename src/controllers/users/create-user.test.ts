@@ -2,9 +2,9 @@ import { EmailAlreadyExistsError } from '@/errors/user'
 import { CreateUserController } from './create-user'
 import { CreateUserParams, UserPublicResponse } from '@/shared'
 import {
-    createUserParams,
+    createUserParams as params,
     createUserControllerResponse,
-    createUserBaseHttpRequest as baseHttpRequest,
+    createUserHttpRequest as baseHttpRequest,
 } from '@/test'
 
 describe('CreateUserController', () => {
@@ -54,7 +54,7 @@ describe('CreateUserController', () => {
         it('should return 400 if CreateUserService throws EmailAlreadyExistsError', async () => {
             // arrange
             jest.spyOn(createUserService, 'execute').mockRejectedValueOnce(
-                new EmailAlreadyExistsError(createUserParams.email),
+                new EmailAlreadyExistsError(params.email),
             )
 
             // act
@@ -62,7 +62,7 @@ describe('CreateUserController', () => {
 
             // assert
             expect(result.statusCode).toBe(400)
-            expect(result.body?.message).toContain(createUserParams.email)
+            expect(result.body?.message).toContain(params.email)
         })
     })
 
@@ -71,7 +71,7 @@ describe('CreateUserController', () => {
             it('should return 400 if first_name is not provided', async () => {
                 // arrange
                 const result = await sut.execute({
-                    body: { ...createUserParams, first_name: undefined },
+                    body: { ...params, first_name: undefined },
                 })
 
                 // assert
@@ -83,7 +83,7 @@ describe('CreateUserController', () => {
             it('should return 400 if first_name is too short', async () => {
                 // arrange
                 const result = await sut.execute({
-                    body: { ...createUserParams, first_name: 'A' },
+                    body: { ...params, first_name: 'A' },
                 })
 
                 // assert
@@ -95,7 +95,7 @@ describe('CreateUserController', () => {
             it('should return 400 if last_name is not provided', async () => {
                 // arrange
                 const result = await sut.execute({
-                    body: { ...createUserParams, last_name: undefined },
+                    body: { ...params, last_name: undefined },
                 })
 
                 // assert
@@ -107,7 +107,7 @@ describe('CreateUserController', () => {
             it('should return 400 if email is not provided', async () => {
                 // arrange
                 const result = await sut.execute({
-                    body: { ...createUserParams, email: undefined },
+                    body: { ...params, email: undefined },
                 })
 
                 // assert
@@ -117,7 +117,7 @@ describe('CreateUserController', () => {
             it('should return 400 if email is invalid', async () => {
                 // arrange
                 const result = await sut.execute({
-                    body: { ...createUserParams, email: 'invalid' },
+                    body: { ...params, email: 'invalid' },
                 })
 
                 // assert
@@ -129,7 +129,7 @@ describe('CreateUserController', () => {
             it('should return 400 if password is not provided', async () => {
                 // arrange
                 const result = await sut.execute({
-                    body: { ...createUserParams, password: undefined },
+                    body: { ...params, password: undefined },
                 })
 
                 // assert
@@ -140,7 +140,7 @@ describe('CreateUserController', () => {
                 // arrange
                 const result = await sut.execute({
                     body: {
-                        ...createUserParams,
+                        ...params,
                         password: '12345', // Less than 6 characters
                     },
                 })

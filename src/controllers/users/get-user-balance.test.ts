@@ -4,7 +4,7 @@ import { UserNotFoundError } from '@/errors/user'
 import {
     userId,
     userBalanceResponse,
-    getUserBalanceBaseHttpRequest as baseHttpRequest,
+    getUserBalanceHttpRequest as baseHttpRequest,
     invalidUUID,
 } from '@/test'
 

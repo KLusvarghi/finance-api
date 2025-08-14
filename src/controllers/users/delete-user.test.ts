@@ -4,7 +4,7 @@ import { UserNotFoundError } from '@/errors/user'
 import {
     userId,
     deleteUserRepositoryResponse,
-    deleteUserBaseHttpRequest as baseHttpRequest,
+    deleteUserHttpRequest as baseHttpRequest,
     invalidUUID,
 } from '@/test'
 

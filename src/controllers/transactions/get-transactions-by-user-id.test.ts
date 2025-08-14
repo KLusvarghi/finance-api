@@ -5,19 +5,16 @@ import {
     invalidUUID,
     userId,
     getTransactionsByUserIdControllerResponse,
-    getTransactionsByUserIdBaseHttpRequest,
+    getTransactionsByUserIdHttpRequest as baseHttpRequest,
 } from '@/test'
 
 describe('GetTransactionsByUserIdController', () => {
     let sut: GetTransactionsByUserIdController
     let getTransactionByUserIdService: GetTransactionsByUserIdServiceStub
-    let validUserId: string
-    let validTransactionResponse: TransactionRepositoryResponse[]
-    let baseHttpRequest: HttpRequest
 
     class GetTransactionsByUserIdServiceStub {
         execute(_userId: string): Promise<TransactionRepositoryResponse[]> {
-            return Promise.resolve(validTransactionResponse)
+            return Promise.resolve(getTransactionsByUserIdControllerResponse)
         }
     }
 
@@ -37,11 +34,6 @@ describe('GetTransactionsByUserIdController', () => {
 
         sut = controller
         getTransactionByUserIdService = service
-
-        // Dados válidos usando fixtures
-        validUserId = userId
-        validTransactionResponse = getTransactionsByUserIdControllerResponse
-        baseHttpRequest = getTransactionsByUserIdBaseHttpRequest
     })
 
     afterEach(() => {
@@ -57,7 +49,9 @@ describe('GetTransactionsByUserIdController', () => {
                 'execute',
             ).mockRejectedValueOnce(new Error())
             // act
-            const response = await sut.execute(baseHttpRequest)
+            const response = await sut.execute(
+                baseHttpRequest,
+            )
 
             // assert
             expect(response.statusCode).toBe(500)
@@ -69,14 +63,16 @@ describe('GetTransactionsByUserIdController', () => {
             jest.spyOn(
                 getTransactionByUserIdService,
                 'execute',
-            ).mockRejectedValueOnce(new UserNotFoundError(validUserId))
+            ).mockRejectedValueOnce(new UserNotFoundError(userId))
             // act
-            const response = await sut.execute(baseHttpRequest)
+            const response = await sut.execute(
+                baseHttpRequest,
+            )
 
             // assert
             expect(response.statusCode).toBe(404)
             expect(response.body?.message).toBe(
-                `User with id ${validUserId} not found`,
+                `User with id ${userId} not found`,
             )
         })
     })
@@ -115,7 +111,9 @@ describe('GetTransactionsByUserIdController', () => {
 
             // assert
             expect(response.statusCode).toBe(200)
-            expect(response.body?.data).toEqual(validTransactionResponse)
+            expect(response.body?.data).toEqual(
+                getTransactionsByUserIdControllerResponse,
+            )
         })
 
         it('should call GetTransactionsByUserIdService with correct parameters', async () => {
@@ -129,9 +127,7 @@ describe('GetTransactionsByUserIdController', () => {
             await sut.execute(baseHttpRequest)
 
             // assert
-            expect(executeSpy).toHaveBeenCalledWith(
-                baseHttpRequest.query.userId,
-            )
+            expect(executeSpy).toHaveBeenCalledWith(baseHttpRequest.query.userId)
             expect(executeSpy).toHaveBeenCalledTimes(1)
         })
     })

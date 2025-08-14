@@ -4,7 +4,7 @@ import { UserNotFoundError } from '@/errors/user'
 import {
     userId,
     getUserByIdServiceResponse,
-    getUserByIdBaseHttpRequest as baseHttpRequest,
+    getUserByIdHttpRequest as baseHttpRequest,
     invalidUUID,
 } from '@/test'
 
@@ -53,8 +53,10 @@ describe('GetUserByIdController', () => {
             expect(result.body?.status).toBe('error')
             expect(result.body?.message).toBeTruthy()
             expect(result.body?.message).toContain(userId)
+            expect(result.body?.message).toBe(
+                `User with id ${userId} not found`,
+            )
         })
-
         it('should return 500 if GetUserByIdService throws an error', async () => {
             jest.spyOn(getUserByIdService, 'execute').mockRejectedValue(
                 new Error(),

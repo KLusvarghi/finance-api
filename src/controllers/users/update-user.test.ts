@@ -9,7 +9,7 @@ import {
     userId,
     updateUserParams,
     updateUserRepositoryResponse,
-    updateUserBaseHttpRequest as baseHttpRequest,
+    updateUserHttpRequest as baseHttpRequest,
     invalidUUID,
 } from '@/test'
 
