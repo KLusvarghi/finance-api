@@ -1,9 +1,12 @@
 import { HttpRequest, TransactionRepositoryResponse } from '@/shared'
 import { GetTransactionsByUserIdController } from './get-transactions-by-user-id'
-import { faker } from '@faker-js/faker'
-import { Prisma } from '@prisma/client'
-import { invalidUUID } from '@/test'
 import { UserNotFoundError } from '@/errors/user'
+import {
+    invalidUUID,
+    userId,
+    getTransactionsByUserIdControllerResponse,
+    getTransactionsByUserIdBaseHttpRequest,
+} from '@/test'
 
 describe('GetTransactionsByUserIdController', () => {
     let sut: GetTransactionsByUserIdController
@@ -35,24 +38,10 @@ describe('GetTransactionsByUserIdController', () => {
         sut = controller
         getTransactionByUserIdService = service
 
-        validUserId = faker.string.uuid()
-
-        validTransactionResponse = [
-            {
-                id: faker.string.uuid(),
-                user_id: validUserId,
-                name: faker.commerce.productName(),
-                amount: new Prisma.Decimal(Number(faker.finance.amount())),
-                date: faker.date.anytime(),
-                type: 'EARNING',
-            },
-        ]
-
-        baseHttpRequest = {
-            query: {
-                userId: validUserId,
-            },
-        }
+        // Dados válidos usando fixtures
+        validUserId = userId
+        validTransactionResponse = getTransactionsByUserIdControllerResponse
+        baseHttpRequest = getTransactionsByUserIdBaseHttpRequest
     })
 
     afterEach(() => {
@@ -119,7 +108,7 @@ describe('GetTransactionsByUserIdController', () => {
         )
     })
 
-    describe('success cases', () => { 
+    describe('success cases', () => {
         it('should return 200 when finding transactions by user id', async () => {
             // act
             const response = await sut.execute(baseHttpRequest)

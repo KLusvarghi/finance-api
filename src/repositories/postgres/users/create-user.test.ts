@@ -1,7 +1,4 @@
-import {
-    updateUserParams,
-    createUserRepositoryResponse as fakerUser,
-} from '@/test'
+import { createUserRepositoryResponse as fakeUser } from '@/test'
 import { PostgresCreateUserRepository } from './create-user'
 import { prisma } from '../../../../prisma/prisma'
 
@@ -15,7 +12,7 @@ describe('PostgresCreateUserRepository', () => {
                 new Error('Prisma error'),
             )
             // act
-            const promise = sut.execute(fakerUser)
+            const promise = sut.execute(fakeUser)
 
             expect(promise).rejects.toThrow(new Error('Prisma error'))
         })
@@ -23,10 +20,10 @@ describe('PostgresCreateUserRepository', () => {
 
     describe('success', () => {
         it('should create a user on database', async () => {
-            const response = await sut.execute(fakerUser)
+            const response = await sut.execute(fakeUser)
 
             expect(response).not.toBeNull()
-            expect(response).toStrictEqual(fakerUser)
+            expect(response).toStrictEqual(fakeUser)
         })
     })
 
@@ -34,10 +31,10 @@ describe('PostgresCreateUserRepository', () => {
         it('should call Prisma with correct params', async () => {
             const prismaSpy = jest.spyOn(prisma.user, 'create')
 
-            await sut.execute(fakerUser)
+            await sut.execute(fakeUser)
 
             expect(prismaSpy).toHaveBeenCalledWith({
-                data: fakerUser,
+                data: fakeUser,
             })
         })
     })

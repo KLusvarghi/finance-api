@@ -1,22 +1,20 @@
-import { HttpRequest, UserPublicResponse } from '@/shared'
-import { faker } from '@faker-js/faker'
+import { UserPublicResponse } from '@/shared'
 import { GetUserByIdController } from './get-user-by-id'
 import { UserNotFoundError } from '@/errors/user'
+import {
+    userId,
+    getUserByIdServiceResponse,
+    getUserByIdBaseHttpRequest as baseHttpRequest,
+    invalidUUID,
+} from '@/test'
 
 describe('GetUserByIdController', () => {
     let sut: GetUserByIdController
     let getUserByIdService: GetUserByIdServiceStub
-    let validUserId: string
-    let baseHttpRequest: HttpRequest
 
     class GetUserByIdServiceStub {
-        async execute(userId: string): Promise<UserPublicResponse> {
-            return Promise.resolve({
-                id: userId,
-                first_name: faker.person.firstName(),
-                last_name: faker.person.lastName(),
-                email: faker.internet.email(),
-            })
+        async execute(_userId: string): Promise<UserPublicResponse> {
+            return Promise.resolve(getUserByIdServiceResponse)
         }
     }
 
@@ -35,12 +33,6 @@ describe('GetUserByIdController', () => {
         const { sut: controller, getUserByIdService: service } = makeSut()
         sut = controller
         getUserByIdService = service
-
-        // Dados válidos sempre disponíveis
-        validUserId = faker.string.uuid()
-        baseHttpRequest = {
-            params: { userId: validUserId },
-        }
     })
 
     afterEach(() => {
@@ -52,7 +44,7 @@ describe('GetUserByIdController', () => {
     describe('error handling', () => {
         it('should return 404 if user is not found', async () => {
             jest.spyOn(getUserByIdService, 'execute').mockRejectedValue(
-                new UserNotFoundError(validUserId),
+                new UserNotFoundError(userId),
             )
 
             const result = await sut.execute(baseHttpRequest)
@@ -60,7 +52,7 @@ describe('GetUserByIdController', () => {
             expect(result.statusCode).toBe(404)
             expect(result.body?.status).toBe('error')
             expect(result.body?.message).toBeTruthy()
-            expect(result.body?.message).toContain(validUserId)
+            expect(result.body?.message).toContain(userId)
         })
 
         it('should return 500 if GetUserByIdService throws an error', async () => {
@@ -79,22 +71,31 @@ describe('GetUserByIdController', () => {
     describe('validations', () => {
         describe('userId', () => {
             it('should return 400 if userId is not provided', async () => {
-                const result = await sut.execute({ params: { userId: '' } })
-
-                expect(result.statusCode).toBe(400)
-                expect(result.body?.status).toBe('error')
-                expect(result.body?.message).toBeTruthy()
-            })
-
-            it('should return 400 if userId is invalid', async () => {
                 const result = await sut.execute({
-                    params: { userId: 'invalid_id' },
+                    params: { userId: undefined },
                 })
 
                 expect(result.statusCode).toBe(400)
                 expect(result.body?.status).toBe('error')
-                expect(result.body?.message).toBeTruthy()
+                expect(result.body?.message).toBe('Missing param: userId')
             })
+
+            it.each(invalidUUID)(
+                'should return 400 if userId is $description',
+                async ({ id }) => {
+                    // arrange
+                    const result = await sut.execute({
+                        params: { userId: id },
+                    })
+
+                    // assert
+                    expect(result.statusCode).toBe(400)
+                    expect(result.body?.status).toBe('error')
+                    expect(result.body?.message).toBe(
+                        'The provider id is not valid.',
+                    )
+                },
+            )
         })
     })
 

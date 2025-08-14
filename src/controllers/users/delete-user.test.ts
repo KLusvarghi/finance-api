@@ -1,18 +1,20 @@
-import { HttpRequest, UserRepositoryResponse } from '@/shared'
+import { UserRepositoryResponse } from '@/shared'
 import { DeleteUserController } from './delete-user'
-import { faker } from '@faker-js/faker'
 import { UserNotFoundError } from '@/errors/user'
+import {
+    userId,
+    deleteUserRepositoryResponse,
+    deleteUserBaseHttpRequest as baseHttpRequest,
+    invalidUUID,
+} from '@/test'
 
 describe('DeleteUserController', () => {
     let sut: DeleteUserController
     let deleteUserService: DeleteUserServiceStub
-    let validUserId: string
-    let validUserResponse: UserRepositoryResponse
-    let baseHttpRequest: HttpRequest
 
     class DeleteUserServiceStub {
         execute(_userId: string): Promise<UserRepositoryResponse> {
-            return Promise.resolve(validUserResponse)
+            return Promise.resolve(deleteUserRepositoryResponse)
         }
     }
 
@@ -28,20 +30,6 @@ describe('DeleteUserController', () => {
         const { sut: controller, deleteUserService: service } = makeSut()
         sut = controller
         deleteUserService = service
-
-        // Dados válidos sempre disponíveis
-        validUserId = faker.string.uuid()
-        validUserResponse = {
-            id: validUserId,
-            first_name: faker.person.firstName(),
-            last_name: faker.person.lastName(),
-            email: faker.internet.email(),
-            password: faker.internet.password({ length: 7 }),
-        }
-
-        baseHttpRequest = {
-            params: { userId: validUserId },
-        }
     })
 
     afterEach(() => {
@@ -54,7 +42,7 @@ describe('DeleteUserController', () => {
         it('should return 404 if user is not found', async () => {
             jest.spyOn(deleteUserService, 'execute').mockImplementationOnce(
                 async () => {
-                    throw new UserNotFoundError(validUserId)
+                    throw new UserNotFoundError(userId)
                 },
             )
 
@@ -93,15 +81,22 @@ describe('DeleteUserController', () => {
                 expect(result.body?.message).toBe('Missing param: userId')
             })
 
-            it('should return 400 if userId is invalid', async () => {
-                const result = await sut.execute({
-                    params: { userId: 'invalid-uuid' },
-                })
+            it.each(invalidUUID)(
+                'should return 400 if userId is $description',
+                async ({ id }) => {
+                    // arrange
+                    const result = await sut.execute({
+                        params: { userId: id },
+                    })
 
-                expect(result.statusCode).toBe(400)
-                expect(result.body?.status).toBe('error')
-                expect(result.body?.message).toBeTruthy()
-            })
+                    // assert
+                    expect(result.statusCode).toBe(400)
+                    expect(result.body?.status).toBe('error')
+                    expect(result.body?.message).toBe(
+                        'The provider id is not valid.',
+                    )
+                },
+            )
         })
     })
 
@@ -112,7 +107,7 @@ describe('DeleteUserController', () => {
             expect(result.statusCode).toBe(200)
             expect(result.body?.status).toBe('success')
             expect(result.body?.message).toBeTruthy()
-            expect(result.body?.data).toEqual(validUserResponse)
+            expect(result.body?.data).toEqual(deleteUserRepositoryResponse)
         })
 
         it('should call DeleteUserService with correct parameters', async () => {

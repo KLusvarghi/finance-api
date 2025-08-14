@@ -1,23 +1,19 @@
 import { EmailAlreadyExistsError } from '@/errors/user'
 import { CreateUserController } from './create-user'
-import { faker } from '@faker-js/faker'
+import { CreateUserParams, UserPublicResponse } from '@/shared'
 import {
-    CreateUserParams,
-    HttpRequest,
-    UserPublicResponse,
-    UserRepositoryResponse,
-} from '@/shared'
+    createUserParams,
+    createUserControllerResponse,
+    createUserBaseHttpRequest as baseHttpRequest,
+} from '@/test'
 
 describe('CreateUserController', () => {
     let sut: CreateUserController
     let createUserService: CreateUserServiceStub
-    let validUserRequest: CreateUserParams
-    let validUserResponse: UserPublicResponse
-    let baseHttpRequest: HttpRequest
 
     class CreateUserServiceStub {
         async execute(_params: CreateUserParams): Promise<UserPublicResponse> {
-            return Promise.resolve(validUserResponse)
+            return Promise.resolve(createUserControllerResponse)
         }
     }
 
@@ -32,25 +28,6 @@ describe('CreateUserController', () => {
         const { sut: controller, createUserService: service } = makeSut()
         sut = controller
         createUserService = service
-
-        // Dados válidos sempre disponíveis
-        validUserRequest = {
-            first_name: faker.person.firstName(),
-            last_name: faker.person.lastName(),
-            email: faker.internet.email(),
-            password: faker.internet.password({ length: 7 }),
-        }
-
-        validUserResponse = {
-            id: faker.string.uuid(),
-            first_name: validUserRequest.first_name,
-            last_name: validUserRequest.last_name,
-            email: validUserRequest.email,
-        }
-
-        baseHttpRequest = {
-            body: validUserRequest,
-        }
     })
 
     afterEach(() => {
@@ -77,7 +54,7 @@ describe('CreateUserController', () => {
         it('should return 400 if CreateUserService throws EmailAlreadyExistsError', async () => {
             // arrange
             jest.spyOn(createUserService, 'execute').mockRejectedValueOnce(
-                new EmailAlreadyExistsError(validUserRequest.email),
+                new EmailAlreadyExistsError(createUserParams.email),
             )
 
             // act
@@ -85,7 +62,7 @@ describe('CreateUserController', () => {
 
             // assert
             expect(result.statusCode).toBe(400)
-            expect(result.body?.message).toContain(validUserRequest.email)
+            expect(result.body?.message).toContain(createUserParams.email)
         })
     })
 
@@ -94,7 +71,7 @@ describe('CreateUserController', () => {
             it('should return 400 if first_name is not provided', async () => {
                 // arrange
                 const result = await sut.execute({
-                    body: { ...validUserRequest, first_name: undefined },
+                    body: { ...createUserParams, first_name: undefined },
                 })
 
                 // assert
@@ -106,7 +83,7 @@ describe('CreateUserController', () => {
             it('should return 400 if first_name is too short', async () => {
                 // arrange
                 const result = await sut.execute({
-                    body: { ...validUserRequest, first_name: 'A' },
+                    body: { ...createUserParams, first_name: 'A' },
                 })
 
                 // assert
@@ -118,7 +95,7 @@ describe('CreateUserController', () => {
             it('should return 400 if last_name is not provided', async () => {
                 // arrange
                 const result = await sut.execute({
-                    body: { ...validUserRequest, last_name: undefined },
+                    body: { ...createUserParams, last_name: undefined },
                 })
 
                 // assert
@@ -130,7 +107,7 @@ describe('CreateUserController', () => {
             it('should return 400 if email is not provided', async () => {
                 // arrange
                 const result = await sut.execute({
-                    body: { ...validUserRequest, email: undefined },
+                    body: { ...createUserParams, email: undefined },
                 })
 
                 // assert
@@ -140,7 +117,7 @@ describe('CreateUserController', () => {
             it('should return 400 if email is invalid', async () => {
                 // arrange
                 const result = await sut.execute({
-                    body: { ...validUserRequest, email: 'invalid' },
+                    body: { ...createUserParams, email: 'invalid' },
                 })
 
                 // assert
@@ -152,7 +129,7 @@ describe('CreateUserController', () => {
             it('should return 400 if password is not provided', async () => {
                 // arrange
                 const result = await sut.execute({
-                    body: { ...validUserRequest, password: undefined },
+                    body: { ...createUserParams, password: undefined },
                 })
 
                 // assert
@@ -163,8 +140,8 @@ describe('CreateUserController', () => {
                 // arrange
                 const result = await sut.execute({
                     body: {
-                        ...validUserRequest,
-                        password: faker.internet.password({ length: 5 }),
+                        ...createUserParams,
+                        password: '12345', // Less than 6 characters
                     },
                 })
 
@@ -182,7 +159,9 @@ describe('CreateUserController', () => {
             // assert
             expect(result.statusCode).toBe(201)
             expect(result.body?.status).toBe('success')
-            expect(result.body?.data).toMatchObject(validUserResponse)
+            expect(result.body?.data).toMatchObject(
+                createUserControllerResponse,
+            )
         })
 
         it('should call CreateUserService with correct parameters', async () => {

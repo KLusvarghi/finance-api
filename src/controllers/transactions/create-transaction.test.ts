@@ -4,13 +4,14 @@ import {
     TransactionRepositoryResponse,
 } from '@/shared'
 import { CreateTransactionController } from './create-transaction'
-import { faker } from '@faker-js/faker'
-import { Prisma } from '@prisma/client'
 import {
     invalidAmount,
     invalidDate,
     invalidType,
     invalidUUID,
+    createTransactionParams,
+    createTransactionControllerResponse,
+    createTransactionBaseHttpRequest,
 } from '@/test'
 
 describe('CreateTransactionController', () => {
@@ -22,7 +23,7 @@ describe('CreateTransactionController', () => {
 
     class CreateTransactionServiceStub {
         async execute(
-          _params: CreateTransactionParams,
+            _params: CreateTransactionParams,
         ): Promise<TransactionRepositoryResponse> {
             return Promise.resolve(validTransactionResponse)
         }
@@ -35,38 +36,16 @@ describe('CreateTransactionController', () => {
     }
 
     beforeEach(() => {
-        // Setup executado antes de cada teste, tendo que especificar o que cada um é, controller e service
+        // Setup executado antes de cada teste, usando fixtures padronizadas
         const { sut: controller, createTransactionService: service } = makeSut()
 
         sut = controller
         createTransactionService = service
 
-        // Request válido (entrada do controller)
-        validTransactionRequest = {
-            user_id: faker.string.uuid(),
-            name: faker.commerce.productName(),
-            date: faker.date.anytime().toISOString(),
-            type: faker.helpers.arrayElement([
-                'EARNING',
-                'EXPENSE',
-                'INVESTMENT',
-            ]),
-            amount: Number(faker.finance.amount()),
-        }
-
-        // Resposta válida do serviço/repositório
-        validTransactionResponse = {
-            id: faker.string.uuid(),
-            user_id: validTransactionRequest.user_id,
-            name: validTransactionRequest.name,
-            amount: new Prisma.Decimal(Number(faker.finance.amount())),
-            date: faker.date.anytime(),
-            type: validTransactionRequest.type,
-        }
-
-        baseHttpRequest = {
-            body: validTransactionRequest,
-        }
+        // Dados válidos usando fixtures
+        validTransactionRequest = createTransactionParams
+        validTransactionResponse = createTransactionControllerResponse
+        baseHttpRequest = createTransactionBaseHttpRequest
     })
 
     afterEach(() => {

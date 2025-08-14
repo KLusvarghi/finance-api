@@ -4,13 +4,14 @@ import {
     UpdateTransactionParams,
 } from '@/shared'
 import { UpdateTransactionController } from './update-transaction'
-import { faker } from '@faker-js/faker'
-import { Prisma } from '@prisma/client'
 import {
     invalidUUID,
     invalidDate,
     invalidType,
     invalidAmount,
+    transactionId,
+    updateTransactionControllerResponse,
+    updateTransactionBaseHttpRequest,
 } from '@/test'
 
 describe('UpdateTransactionController', () => {
@@ -42,28 +43,10 @@ describe('UpdateTransactionController', () => {
         sut = controller
         updateTransactionService = service
 
-        validTransactionId = faker.string.uuid()
-
-        validUpdateResponse = {
-            id: validTransactionId,
-            user_id: faker.string.uuid(),
-            name: faker.commerce.productName(),
-            amount: new Prisma.Decimal(Number(faker.finance.amount())),
-            date: faker.date.anytime(),
-            type: 'EARNING',
-        }
-
-        baseHttpRequest = {
-            params: {
-                transactionId: validTransactionId,
-            },
-            body: {
-                name: faker.commerce.productName(),
-                amount: Number(faker.finance.amount()),
-                date: faker.date.anytime().toISOString(),
-                type: 'EARNING',
-            },
-        }
+        // Dados válidos usando fixtures
+        validTransactionId = transactionId
+        validUpdateResponse = updateTransactionControllerResponse
+        baseHttpRequest = updateTransactionBaseHttpRequest
     })
 
     afterEach(() => {

@@ -1,19 +1,20 @@
 import { HttpRequest, UserBalanceRepositoryResponse } from '@/shared'
-import { faker } from '@faker-js/faker'
 import { GetUserBalanceController } from './get-user-balance'
-import { Prisma } from '@prisma/client'
 import { UserNotFoundError } from '@/errors/user'
+import {
+    userId,
+    userBalanceResponse,
+    getUserBalanceBaseHttpRequest as baseHttpRequest,
+    invalidUUID,
+} from '@/test'
 
 describe('GetUserBalanceController', () => {
     let sut: GetUserBalanceController
     let getUserBalanceService: GetUserBalanceServiceStub
-    let validUserId: string
-    let validBalanceResponse: UserBalanceRepositoryResponse
-    let baseHttpRequest: HttpRequest
 
     class GetUserBalanceServiceStub {
         execute(_userId: string): Promise<UserBalanceRepositoryResponse> {
-            return Promise.resolve(validBalanceResponse)
+            return Promise.resolve(userBalanceResponse)
         }
     }
 
@@ -29,18 +30,6 @@ describe('GetUserBalanceController', () => {
         const { sut: controller, getUserBalanceService: service } = makeSut()
         sut = controller
         getUserBalanceService = service
-
-        // Dados válidos sempre disponíveis
-        validUserId = faker.string.uuid()
-        validBalanceResponse = {
-            earnings: faker.number.float(),
-            expenses: faker.number.float(),
-            investments: faker.number.float(),
-            balance: new Prisma.Decimal(faker.number.float()),
-        }
-        baseHttpRequest = {
-            params: { userId: validUserId },
-        }
     })
 
     afterEach(() => {
@@ -64,7 +53,7 @@ describe('GetUserBalanceController', () => {
 
         it('should return 404 if GetUserBalanceService throws UserNotFoundError', async () => {
             jest.spyOn(getUserBalanceService, 'execute').mockRejectedValueOnce(
-                new UserNotFoundError(validUserId),
+                new UserNotFoundError(userId),
             )
 
             const result = await sut.execute(baseHttpRequest)
@@ -72,21 +61,38 @@ describe('GetUserBalanceController', () => {
             expect(result.statusCode).toBe(404)
             expect(result.body?.status).toBe('error')
             expect(result.body?.message).toBeTruthy()
-            expect(result.body?.message).toContain(validUserId)
+            expect(result.body?.message).toContain(userId)
         })
     })
 
     describe('validations', () => {
         describe('userId', () => {
-            it('should return 400 when userId is invalid', async () => {
+            it('should return 400 if userId is not provided', async () => {
                 const result = await sut.execute({
-                    params: { userId: 'invalid_id' },
+                    params: { userId: undefined },
                 })
 
                 expect(result.statusCode).toBe(400)
                 expect(result.body?.status).toBe('error')
-                expect(result.body?.message).toBeTruthy()
+                expect(result.body?.message).toBe('Missing param: userId')
             })
+
+            it.each(invalidUUID)(
+                'should return 400 if userId is $description',
+                async ({ id }) => {
+                    // arrange
+                    const result = await sut.execute({
+                        params: { userId: id },
+                    })
+
+                    // assert
+                    expect(result.statusCode).toBe(400)
+                    expect(result.body?.status).toBe('error')
+                    expect(result.body?.message).toBe(
+                        'The provider id is not valid.',
+                    )
+                },
+            )
         })
     })
 
@@ -97,7 +103,7 @@ describe('GetUserBalanceController', () => {
             expect(result.statusCode).toBe(200)
             expect(result.body?.status).toBe('success')
             expect(result.body?.message).toBeTruthy()
-            expect(result.body?.data).toEqual(validBalanceResponse)
+            expect(result.body?.data).toEqual(userBalanceResponse)
             expect(result.body?.data?.earnings).toBeDefined()
             expect(result.body?.data?.expenses).toBeDefined()
             expect(result.body?.data?.investments).toBeDefined()

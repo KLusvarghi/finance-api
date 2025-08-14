@@ -1,9 +1,12 @@
 import { HttpRequest, TransactionRepositoryResponse } from '@/shared'
 import { DeleteTransactionController } from './delete-transaction'
-import { faker } from '@faker-js/faker'
-import { Prisma } from '@prisma/client'
-import { invalidUUID } from '@/test'
 import { TransactionNotFoundError } from '@/errors/user'
+import {
+    invalidUUID,
+    transactionId,
+    deleteTransactionControllerResponse,
+    deleteTransactionBaseHttpRequest,
+} from '@/test'
 
 describe('DeleteTransactionController', () => {
     let sut: DeleteTransactionController
@@ -33,22 +36,10 @@ describe('DeleteTransactionController', () => {
         sut = controller
         deleteTransactionService = service
 
-        validTransactionId = faker.string.uuid()
-
-        validTransactionResponse = {
-            id: validTransactionId,
-            user_id: faker.string.uuid(),
-            name: faker.commerce.productName(),
-            amount: new Prisma.Decimal(Number(faker.finance.amount())),
-            date: faker.date.anytime(),
-            type: 'EARNING',
-        }
-
-        baseHttpRequest = {
-            params: {
-                transactionId: validTransactionId,
-            },
-        }
+        // Dados válidos usando fixtures
+        validTransactionId = transactionId
+        validTransactionResponse = deleteTransactionControllerResponse
+        baseHttpRequest = deleteTransactionBaseHttpRequest
     })
 
     afterEach(() => {
