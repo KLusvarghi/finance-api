@@ -1,24 +1,26 @@
-# Finance App API
+# Finance App API ![status](https://img.shields.io/badge/status-beta-yellow)
 
 > **Status:** Em desenvolvimento (v1.0.0 – _beta_)
 
 ## Sumário
 
 1. [Visão Geral](#visão-geral)
-2. [Arquitetura](#arquitetura)
-3. [Tecnologias & Justificativa](#tecnologias--justificativa)
-4. [Como Rodar](#como-rodar)
-5. [Estrutura de Pastas](#estrutura-de-pastas)
-6. [Padrões de Código & Qualidade](#padrões-de-código--qualidade)
-7. [Domínio & Banco de Dados](#domínio--banco-de-dados)
-8. [API](#api)
-9. [Segurança](#segurança)
-10. [Observabilidade](#observabilidade)
-11. [Testes](#testes)
-12. [CI/CD](#cicd)
-13. [Roadmap](#roadmap)
-14. [Licença](#licença)
-15. [Links Úteis](#links-úteis)
+2. [Key Features](#key-features)
+3. [Arquitetura](#arquitetura)
+4. [Tecnologias & Justificativa](#tecnologias--justificativa)
+5. [Como Rodar](#como-rodar)
+6. [Configuration](#configuration)
+7. [Estrutura de Pastas](#estrutura-de-pastas)
+8. [Padrões de Código & Qualidade](#padrões-de-código--qualidade)
+9. [Domínio & Banco de Dados](#domínio--banco-de-dados)
+10. [API](#api)
+11. [Segurança](#segurança)
+12. [Observabilidade](#observabilidade)
+13. [Testes](#testes)
+14. [CI/CD](#cicd)
+15. [Roadmap](#roadmap)
+16. [Licença](#licença)
+17. [Links Úteis](#links-úteis)
 
 ---
 
@@ -29,6 +31,17 @@ API REST para gerenciamento financeiro pessoal, permitindo que usuários registr
 - **Escopo:** CRUD de usuários e transações financeiras.
 - **Público-alvo:** Desenvolvedores de aplicativos web/mobile que necessitam de um backend financeiro simples.
 - **Screenshot / GIF:** _TBD_
+
+## Key Features
+
+- API REST modular (Controllers → Services → Repositories)
+- Validação com Zod + DTOs tipados
+- TypeScript estrito (noImplicitAny, strictNullChecks)
+- PostgreSQL 15 + Prisma 6 (migrations, seed)
+- Scripts de DX: lint, test, typecheck, db:migrate
+- Docker Compose para ambiente local
+- Padrão uniforme de respostas HTTP (`ok`, `created`, `badRequest` etc.)
+- Roadmap: JWT, Pino logger, Observabilidade (OTel)
 
 ---
 
@@ -63,6 +76,12 @@ flowchart TD
 | 3   | Express 5                    | Fastify, NestJS    | + Simplicidade, - Sem REST helpers nativos      |
 | 4   | UUID v4 como PK              | Auto-incremento    | + Distribuído, - String maior                   |
 | 5   | Bcrypt para hash de senha    | Argon2             | + Popular, suporte nativo, - Argon2 mais seguro |
+
+### Modos de Execução
+
+- **Local (dev):** `npm run start:dev` + Docker Compose opcional.
+- **Test:** `.env.test` + Docker Compose (service `postgres-test`).
+- **Produção:** Build (`npm run build`) + variável `NODE_ENV=production`.
 
 ---
 
@@ -116,6 +135,21 @@ $ npm run start:dev
 | `npm run build`         | Compila TS para JS (`dist/`)          |
 | `npm test`              | Executa testes com dotenv `.env.test` |
 | `npm run test:coverage` | Cobertura Jest                        |
+
+---
+
+## Configuration
+
+### Variáveis de Ambiente
+
+| Variável     | Descrição                    | Exemplo                                               |
+| ------------ | ---------------------------- | ----------------------------------------------------- |
+| DATABASE_URL | URL de conexão ao Postgres   | postgresql://root:password@localhost:5432/finance-app |
+| PORT         | Porta HTTP da API            | 3001                                                  |
+| NODE_ENV     | Ambiente de execução         | development                                           |
+| JWT_SECRET   | Segredo criptográfico do JWT | TBD                                                   |
+
+> Copie `.env.example` para `.env` e ajuste conforme seu ambiente.
 
 ---
 
