@@ -10,7 +10,7 @@ export const transactionId = faker.string.uuid()
 
 export const createTransactionParams = {
     user_id: faker.string.uuid(),
-    name: faker.finance.transactionDescription(),
+    name: faker.lorem.words(3),
     amount: faker.number.int({ min: 1, max: 1000 }),
     date: faker.date.recent().toISOString(),
     type: faker.helpers.arrayElement(['EARNING', 'EXPENSE', 'INVESTMENT']),
@@ -111,19 +111,19 @@ export const updateTransactionControllerResponse = updateTransactionResponse
 // BASE HTTP REQUEST
 // ============================================================================
 
-export const createTransactionBaseHttpRequest = {
+export const createTransactionHttpRequest = {
     body: createTransactionParams,
 }
 
-export const deleteTransactionBaseHttpRequest = {
+export const deleteTransactionHttpRequest = {
     params: { transactionId },
 }
 
-export const getTransactionsByUserIdBaseHttpRequest = {
+export const getTransactionsByUserIdHttpRequest = {
     query: { userId },
 }
 
-export const updateTransactionBaseHttpRequest = {
+export const updateTransactionHttpRequest = {
     params: { transactionId },
     body: updateTransactionParams,
 }

@@ -115,23 +115,23 @@ export const updateUserControllerResponse = updateUserResponse
 // BASE HTTP REQUEST
 // ============================================================================
 
-export const createUserBaseHttpRequest = {
+export const createUserHttpRequest = {
     body: createUserParams,
 }
 
-export const deleteUserBaseHttpRequest = {
+export const deleteUserHttpRequest = {
     params: { userId },
 }
 
-export const getUserBalanceBaseHttpRequest = {
+export const getUserBalanceHttpRequest = {
     params: { userId },
 }
 
-export const getUserByIdBaseHttpRequest = {
+export const getUserByIdHttpRequest = {
     params: { userId },
 }
 
-export const updateUserBaseHttpRequest = {
+export const updateUserHttpRequest = {
     params: { userId },
     body: updateUserParams,
 }
