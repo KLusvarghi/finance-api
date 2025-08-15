@@ -1,0 +1,235 @@
+---
+globs: *ts
+alwaysApply: false
+---
+
+## 2. Async/Await
+
+### Core Principles
+
+- **ALWAYS** use `async/await` for asynchronous code
+- **AVOID** `.then()` chains
+- **ALWAYS** type return as `Promise<T>`
+
+### Examples
+
+**✅ Correct:**
+
+```typescript
+const fetchUserData = async (id: string): Promise<User> => {
+    const res = await fetch(`/api/users/${id}`)
+    return await res.json()
+}
+```
+
+**❌ Avoid:**
+
+```typescript
+fetch(`/api/users/${id}`)
+    .then((res) => res.json())
+    .then(callback)
+```
+
+---
+
+## 3. Variable Declarations
+
+### Core Principles
+
+- **USE** `const` whenever possible
+- **USE** `let` only when necessary
+- **NEVER** use `var`
+
+### Examples
+
+**✅ Correct:**
+
+```typescript
+const users = ['Alice', 'Bob']
+let currentIndex = 0
+```
+
+**❌ Avoid:**
+
+```typescript
+var users = ['Alice', 'Bob']
+let users = ['Alice', 'Bob'] // Re-declaration
+```
+
+---
+
+## 4. Classes
+
+### Core Principles
+
+- **MAKE** properties `private` or `protected` by default
+- **USE** `readonly` when values won't change after constructor
+- **AVOID** exposing internal implementation details
+
+### Examples
+
+**✅ Correct:**
+
+```typescript
+class UserService {
+    private readonly repository: UserRepository
+    protected logger: Logger
+
+    constructor(repository: UserRepository) {
+        this.repository = repository
+    }
+}
+```
+
+**❌ Avoid:**
+
+```typescript
+class UserService {
+    public repository: UserRepository // Exposes implementation details
+    logger: Logger // Implicitly public
+}
+```
+
+---
+
+## 5. Array Manipulation
+
+### Core Principles
+
+- **PREFER** functional methods: `map`, `filter`, `reduce`
+- **AVOID** manual loops like `for`, `forEach` for accumulations
+- **USE** immutable operations
+
+### Examples
+
+**✅ Correct:**
+
+```typescript
+const activeUsers = users.filter((u) => u.isActive)
+const total = users.reduce((sum, u) => sum + u.age, 0)
+```
+
+**❌ Avoid:**
+
+```typescript
+const active = []
+for (let i = 0; i < users.length; i++) {
+    if (users[i].isActive) active.push(users[i])
+}
+```
+
+---
+
+## 6. Imports/Exports
+
+### Core Principles
+
+- **USE** ES Modules only
+- **PREFER** named exports
+- **AVOID** default exports
+
+### Examples
+
+**✅ Correct:**
+
+```typescript
+export function doSomething(): void {}
+export class UserService {}
+export interface User {}
+```
+
+**❌ Avoid:**
+
+```typescript
+export default function () {}
+export default class UserService {}
+```
+
+---
+
+## 7. DTOs & Schemas
+
+### Core Principles
+
+- **USE** `z.infer` to type DTOs from Zod schemas
+- **VALIDATE** all external inputs before use
+- **DEFINE** clear input/output contracts
+
+### Examples
+
+**✅ Correct:**
+
+```typescript
+const createUserSchema = z.object({
+    name: z.string().min(1),
+    email: z.string().email(),
+})
+
+type CreateUserDTO = z.infer<typeof createUserSchema>
+```
+
+---
+
+## 8. Architecture & Conventions
+
+### Core Principles
+
+- **ONE** file = **ONE** responsibility
+- **USE** clear suffixes: `.controller.ts`, `.service.ts`, `.schema.ts`, `.types.ts`
+- **KEEP** Prisma types internal; don't leak to HTTP responses
+
+### File Structure
+
+```
+src/
+├── controllers/     # Request handling
+├── services/        # Business logic
+├── repositories/    # Data access
+├── schemas/         # Validation schemas
+└── types/          # Type definitions
+```
+
+---
+
+## 9. Error Handling
+
+### Core Principles
+
+- **USE** custom error classes
+- **NEVER** expose internal errors to clients
+- **ALWAYS** type error responses
+
+### Examples
+
+**✅ Correct:**
+
+```typescript
+class AppError extends Error {
+    constructor(
+        public readonly code: string,
+        public readonly statusCode: number,
+        message: string,
+    ) {
+        super(message)
+        this.name = 'AppError'
+    }
+}
+
+// Usage
+throw new AppError('USER_NOT_FOUND', 404, 'User not found')
+```
+
+---
+
+## Quick Reference
+
+| Pattern    | ✅ Use                    | ❌ Avoid            |
+| ---------- | ------------------------- | ------------------- |
+| Types      | `interface`, `type`       | `any`               |
+| Async      | `async/await`             | `.then()` chains    |
+| Variables  | `const`, `let`            | `var`               |
+| Classes    | `private`, `readonly`     | `public` by default |
+| Arrays     | `map`, `filter`, `reduce` | `for` loops         |
+| Exports    | Named exports             | Default exports     |
+| Validation | Zod schemas               | Manual validation   |
+| Errors     | Custom error classes      | Generic errors      |
