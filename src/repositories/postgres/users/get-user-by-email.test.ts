@@ -1,4 +1,4 @@
-import { createUserRepositoryResponse as fakeUser } from '@/test'
+import { createTestUser, createUserRepositoryResponse as fakeUser } from '@/test'
 import { prisma } from '../../../../prisma/prisma'
 import { PostgresGetUserByEmailRepository } from './get-user-by-email'
 
@@ -19,9 +19,7 @@ describe('PostgresGetUserByEmailRepository', () => {
     })
     describe('success', () => {
         it('should get user by email on database successfully', async () => {
-            const user = await prisma.user.create({
-                data: fakeUser,
-            })
+            const user = await createTestUser()
 
             const response = await sut.execute(fakeUser.email)
 

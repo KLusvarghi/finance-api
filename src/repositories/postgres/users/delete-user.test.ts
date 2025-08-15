@@ -1,4 +1,4 @@
-import { createUserRepositoryResponse as fakeUser, userId } from '@/test'
+import { createTestUser, createUserRepositoryResponse as fakeUser, userId } from '@/test'
 import { PostgresDeleteUserRepository } from './delete-user'
 import { prisma } from '../../../../prisma/prisma'
 
@@ -8,9 +8,7 @@ describe('PostgresDeleteUserRepository', () => {
     describe('success', () => {
         it('should delete a user on database successfully', async () => {
             // precisamos criar um usuário antes de querer deletar
-            await prisma.user.create({
-                data: fakeUser,
-            })
+            await createTestUser()
 
             const response = await sut.execute(fakeUser.id)
 
@@ -21,9 +19,7 @@ describe('PostgresDeleteUserRepository', () => {
     describe('validations', () => {
         it('should call Prisma with correct params', async () => {
             // Criar um usuário antes de testar a validação
-            await prisma.user.create({
-                data: fakeUser,
-            })
+            await createTestUser()
 
             const prismaSpy = jest.spyOn(prisma.user, 'delete')
 

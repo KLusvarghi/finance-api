@@ -1,4 +1,4 @@
-import { createUserRepositoryResponse as fakeUser } from '@/test'
+import { createTestUser, createUserRepositoryResponse as fakeUser } from '@/test'
 import { PostgresGetUserBalanceRepository } from './get-user-balance'
 import { prisma } from '../../../../prisma/prisma'
 import { faker } from '@faker-js/faker'
@@ -29,9 +29,7 @@ describe('PostgresGetUserBalanceRepository', () => {
             const from = new Date('2024-01-01')
             const to = new Date('2024-01-31')
             // precisamos criar um usuário antes de querer deletar
-            await prisma.user.create({
-                data: fakeUser,
-            })
+            await createTestUser()
 
             await prisma.transaction.createMany({
                 data: [

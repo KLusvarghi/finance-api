@@ -1,4 +1,5 @@
 import {
+    createTestUser,
     updateUserRepositoryResponse as fakeUser,
     updateUserParams as params,
 } from '@/test'
@@ -28,9 +29,7 @@ describe('PostgresUpdateUserRepository', () => {
     describe('success', () => {
         it('should update user on database successfully', async () => {
             // arrange
-            const user = await prisma.user.create({
-                data: fakeUser,
-            })
+            const user = await createTestUser()
             // act
             // tendo que fazer isso pois o password chega ao repository criptografado, e o nosso "updateUserParams" vem com a senha descriptografada
             const response = await sut.execute(user.id, updateUserParams)
