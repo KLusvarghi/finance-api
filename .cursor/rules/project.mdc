@@ -1,0 +1,162 @@
+You are an expert in back-end development with **Node.js 20**, **Express 5**, **TypeScript (strict)**, **Prisma/PostgreSQL**, **Zod**, and **Jest**, specialized in building **financial APIs** with high reliability, maintainability, and clarity.
+
+## Core Principles
+
+- Code **must be in English**.
+- Comments **must be in English**.
+- **Always** follow **Clean Architecture**: `Controllers` → `Services` → `Repositories`.
+- **Always** apply **SOLID** and **DRY** principles.
+- **Never** access the database directly from controllers.
+- **Never** use the `any` type – **always** use precise TypeScript types or Zod schemas.
+- **Always** use centralized helpers for HTTP responses, error handling, and logging.
+
+---
+
+## Tech Stack & Scope
+
+- **Node.js**: v20+
+- **Framework**: Express 5
+- **Language**: TypeScript (**strict mode** is mandatory)
+- **ORM**: Prisma
+- **Database**: PostgreSQL
+- **Validation**: Zod
+- **Testing**: Jest
+- **Scope**: Financial API for B2B/B2C integrations.
+- **ESLint**, **Prettier**, **Husky** for linting and formatting
+- **Mandatory** use of **ESM modules**.
+
+---
+
+## Directory Structure
+
+- **Clean Architecture**: separation of responsibilities is **mandatory**:
+    - `src/controllers`: **Only** for request parsing, validation, and service calls.
+    - `src/services`: **All** business logic.
+    - `src/repositories`: **Uniquely** for database access via Prisma.
+    - `src/utils`: Hosts shared helpers (HTTP, logging, etc.).
+    - `src/adapters`: Interfaces for external services (e.g., hashing).
+
+# Naming Conventions and Structure
+
+- **Variables/Functions**: `camelCase`
+- **Classes/Types/Interfaces**: `PascalCase`
+- **File Names**: `kebab-case` (e.g., `user-service.ts`)
+- **Path Aliases**: **Always** use `@/*` as configured in `tsconfig.json`.
+- **Always** use `named exports`.
+- **Do not include** logic directly in `index` files – use them **only** for re-exporting.
+
+# Architecture Principles
+
+- **SOLID Principles**: **strictly respect** single responsibility, dependency inversion, etc.
+- **DRY Principle**: **actively avoid** code duplication.
+
+---
+
+## HTTP Response Pattern
+
+**Always** use centralized helpers for all HTTP responses.
+
+- **Helper Functions**:
+
+    ```ts
+    successResponse(res, data, message?);
+    errorResponse(res, errorCode, message, details?);
+    ```
+
+- **Default Response Shape**:
+    ```json
+    {
+        "success": true,
+        "message": "Operation successful",
+        "data": {},
+        "errors": []
+    }
+    ```
+
+---
+
+## ❌ Error Handling & Messaging
+
+- **Always** use custom error classes (e.g., `AppError`).
+- **Never** leak internal error details or stack traces to clients.
+- **Always** use standardized, centralized error messages.
+- **Example**:
+    ```ts
+    throw new AppError(ERRORS.USER_NOT_FOUND, 404)
+    ```
+
+---
+
+## Logging Standard
+
+- **Mandatory** use of a centralized logger.
+- **Log Levels**: `info`, `warn`, `error`, `debug`.
+- **Per-Request Logging**: **Always** log `method`, `path`, `userId` (if authenticated), and `duration`.
+- **Error Logging**: **Always** include `stack trace` (for internal logs) and a `correlation ID`.
+
+---
+
+## Pagination & Sorting Standard
+
+- **Query Parameters**: `page`, `limit`, `sortBy`, `order` (`asc` | `desc`).
+- **Defaults**: `page=1`, `limit=20`.
+- **Validation**: **Always** validate pagination parameters with Zod.
+- **Prisma Implementation**:
+    ```ts
+    const items = await prisma.user.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { [sortBy]: order },
+    })
+    ```
+
+---
+
+## Testing Guidelines
+
+- **Unit Tests**: For services and utility functions.
+- **Integration Tests**: For controllers and API endpoints.
+- **Mocks**: **Always** mock all external dependencies.
+- **Coverage**: **Maintain** high test coverage, **especially** for financial logic.
+- **Always** use **fixtures** from `src/test/fixtures/` and `@faker-js/faker`.
+
+# DOs
+
+- **Always** follow **Clean Architecture** principles.
+- **Always** use **SOLID** principles for code quality.
+- **Always** use **DRY** principles for code reuse.
+- **Always** validate **all** inputs with Zod schemas.
+- **Structure** logic following **Clean Architecture strictly**.
+- **Always** use standardized HTTP helpers in **all** controllers.
+- **Always** use dependency injection for services and repositories.
+- **Always** handle known error cases explicitly.
+
+# DON'Ts
+
+- **NEVER** access Prisma directly in controllers or services — **only** through repositories.
+- **NEVER** use `any`.
+- **DO NOT mix** responsibilities across layers.
+- **DO NOT write** logic with weak or missing typing.
+- **DO NOT hardcode** error messages or status codes — **use helpers and constants**.
+
+---
+
+# Formatting & Linting
+
+- **Use TypeScript** for type checking and autocompletion.
+- **Use Prettier** for code formatting.
+- **Enforced** via ESLint with Prettier.
+- **Auto-sorting** imports using `simple-import-sort`.
+- **Use** `early returns` to avoid deep nesting.
+- Code **must pass** lint checks and pre-commit hooks (husky).
+
+# Project Conventions
+
+- **Use** `.env` and `.env.test` for configuration separation.
+- **Use** UUIDs as primary keys in **all** tables.
+- **Prefer** pure functions, **avoid** side effects.
+- **Avoid** deep object mutations – **favor** immutability when possible.
+
+- **Use** UUIDs como chaves primárias em **todas** as tabelas.
+- **Prefira** funções puras, **evite** efeitos colaterais.
+- **Evite** mutações profundas em objetos – **favoreça** a imutabilidade quando possível.
