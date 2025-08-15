@@ -1,0 +1,47 @@
+{
+    "mcpServers": {
+        "context7": {
+            "type": "http",
+            "url": "https://mcp.context7.com/mcp"
+        },
+        "perplexity": {
+            "command": "uvx",
+            "args": ["perplexity-mcp"],
+            "env": {
+                "PERPLEXITY_API_KEY": "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",
+                "PERPLEXITY_MODEL": "sonar"
+            }
+        },
+        "zen": {
+            "command": "sh",
+            "args": [
+                "-c",
+                "exec $(which uvx || echo uvx) --from git+https://github.com/BeehiveInnovations/zen-mcp-server.git zen-mcp-server"
+            ],
+            "env": {
+                "PATH": "/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin:~/.local/bin",
+                "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+                "GEMINI_API_KEY": "${GEMINI_API_KEY}"
+            }
+        },
+        "github": {
+            "type": "http",
+            "url": "https://api.githubcopilot.com/mcp/"
+        },
+        "vercel": {
+            "url": "https://mcp.vercel.com"
+        },
+        "figma-dev-mode": {
+            "type": "http",
+            "url": "http://127.0.0.1:3845/mcp"
+        },
+        "sentry": {
+            "type": "http",
+            "url": "https://mcp.sentry.dev/mcp"
+        },
+        "linear": {
+            "type": "sse",
+            "url": "https://mcp.linear.app/sse"
+        }
+    }
+}
