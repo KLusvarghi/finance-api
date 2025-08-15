@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker'
 import { Prisma } from '@prisma/client'
+import { prisma } from '../../../prisma/prisma'
 
 export const userId = faker.string.uuid()
 
@@ -44,7 +45,7 @@ export const userBalanceResponse = {
 // ============================================================================
 
 export const createUserRepositoryResponse = {
-    id: faker.string.uuid(),
+    id: userId,
     ...createUserParams,
     password: 'valid_hash',
 }
@@ -134,4 +135,22 @@ export const getUserByIdHttpRequest = {
 export const updateUserHttpRequest = {
     params: { userId },
     body: updateUserParams,
+}
+
+// ============================================================================
+// TEST HELPERS
+// ============================================================================
+
+/**
+ * Cria um usuário no banco de dados para testes
+ * @param customData - Dados customizados para sobrescrever os padrões
+ * @returns Promise com o usuário criado
+ */
+export const createTestUser = async (customData?: Partial<typeof createUserRepositoryResponse>) => {
+  return await prisma.user.create({
+      data: {
+          ...createUserRepositoryResponse,
+          ...customData,
+      },
+  })
 }
