@@ -1,0 +1,115 @@
+---
+globs: *.test.ts
+alwaysApply: false
+---
+
+## 1. Testing Philosophy
+
+### Core Principles
+
+- **ENSURE** every new feature or bugfix comes with corresponding automated tests.
+- **PREFER** unit tests for services, use cases, and utility functions.
+- **USE** integration tests for controllers and HTTP endpoints, including input validation and database interactions.
+- **STRUCTURE** tests following the feature layout in `src/`, using `.test.ts` co-located or mirrored in `tests/` when needed.
+
+---
+
+## 2. Test Coverage and Structure
+
+### Core Principles
+
+- **ALWAYS** write tests for happy paths and error cases in services.
+- **VALIDATE** domain logic using Zod schemas in tests.
+- **COVER** HTTP responses and error handling in controllers.
+- **TARGET** 90%+ test coverage.
+- **AVOID** overuse of Jest snapshots; only use them for stable output or public APIs.
+- **FAVOR** explicit assertions and `expect` statements for readability.
+
+---
+
+## 3. Test Setup and Environment
+
+### Core Principles
+
+- **USE** `.env.test` for test runs to isolate the environment.
+- **ISOLATE** the test database using Docker Compose (`postgres-test` service).
+- **TEARDOWN** the database after each test suite to avoid side effects.
+- **RUN** migrations via `prisma migrate deploy` during global setup (`jest.global-setup.ts`).
+- **INCLUDE** necessary hooks and utilities in `jest.setup-after-env.ts`.
+
+---
+
+## 4. Factories and Fixtures
+
+### Core Principles
+
+- **USE** `@faker-js/faker` to generate dynamic and realistic test data.
+- **MAINTAIN** reusable test objects in `src/test/fixtures/`.
+- **AVOID** hardcoded data by using factories or helper functions.
+
+---
+
+## 5. Best Practices
+
+### Core Principles
+
+- **USE** descriptive test names that clearly express the expected behavior.
+- **GROUP** tests logically using `describe()` blocks per method or scenario.
+- **MOCK** external services in unit tests.
+- **AVOID** mocking the database in integration tests; use the real test DB.
+- **USE** `ts-jest` with ESM support as configured in the project.
+- **RUN** tests with `--runInBand` for consistency and test isolation.
+
+---
+
+## 6. Linting and Standards
+
+### Core Principles
+
+- **FOLLOW** all Jest-specific ESLint rules configured in `eslint.config.js`.
+- **PAY ATTENTION** to warnings like `jest/no-disabled-tests` and `jest/no-focused-tests`.
+
+---
+
+## 7. Directories to Include
+
+### Core Principles
+
+- **LOCATE** test files in `src/**/*.test.ts` and `tests/**/*.test.ts`.
+- **ENSURE** source files in `src/**/*.ts` are covered by tests unless explicitly excluded.
+
+---
+
+## 8. Test Types Summary
+
+### Core Principles
+
+- **UNIT-TEST** services and utilities (`src/services/`, `src/utils/`).
+- **INTEGRATION-TEST** controllers, routes, and HTTP layers (`src/controllers/`).
+- **DB-TEST** repositories against the real test database (`src/repositories/`).
+
+---
+
+## 9. General Principles
+
+### Core Principles
+
+- **MOCK** external dependencies.
+- **TEST** business logic in isolation.
+- **USE** type-safe test utilities.
+
+### Examples
+
+**✅ Correct:**
+
+```typescript
+describe('UserService', () => {
+    it('should create user with hashed password', async () => {
+        const mockHasher = { hash: jest.fn().mockResolvedValue('hashed') }
+        const service = new UserService(mockRepository, mockHasher)
+
+        const result = await service.createUser({ password: 'plain' })
+        expect(result.password).toBe('hashed')
+    })
+})
+```
