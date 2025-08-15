@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { Prisma } from '@prisma/client'
 import { userId } from './user'
+import { prisma } from '../../../prisma/prisma'
 
 export const transactionId = faker.string.uuid()
 
@@ -126,4 +127,22 @@ export const getTransactionsByUserIdHttpRequest = {
 export const updateTransactionHttpRequest = {
     params: { transactionId },
     body: updateTransactionParams,
+}
+
+// ============================================================================
+// TEST HELPERS
+// ============================================================================
+
+/**
+ * Cria uma transação no banco de dados para testes
+ * @param customData - Dados customizados para sobrescrever os padrões
+ * @returns Promise com a transação criada
+ */
+export const createTestTransaction = async (customData?: Partial<typeof createTransactionRepositoryResponse>) => {
+  return await prisma.transaction.create({
+      data: {
+          ...createTransactionRepositoryResponse,
+          ...customData,
+      },
+  })
 }
