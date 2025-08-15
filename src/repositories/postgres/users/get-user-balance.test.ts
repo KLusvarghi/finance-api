@@ -7,18 +7,22 @@ import { TransactionType } from '@prisma/client'
 describe('PostgresGetUserBalanceRepository', () => {
     let sut = new PostgresGetUserBalanceRepository()
 
-    describe('error handling', () => {
-      it('should throw an error if Prisma throws', async () => {
-          // arrange
-          jest.spyOn(prisma.transaction, 'aggregate').mockRejectedValueOnce(
-              new Error('Prisma error'),
-          )
-          // act
-          const promise = sut.execute(fakeUser.id)
+    afterEach(() => {
+        jest.restoreAllMocks()
+    })
 
-          expect(promise).rejects.toThrow(new Error('Prisma error'))
-      })
-  })
+    describe('error handling', () => {
+        it('should throw an error if Prisma throws', async () => {
+            // arrange
+            jest.spyOn(prisma.transaction, 'aggregate').mockRejectedValueOnce(
+                new Error('Prisma error'),
+            )
+            // act
+            const promise = sut.execute(fakeUser.id)
+
+            expect(promise).rejects.toThrow(new Error('Prisma error'))
+        })
+    })
 
     describe('success', () => {
         it('should get user balance on database successfully', async () => {
@@ -94,6 +98,7 @@ describe('PostgresGetUserBalanceRepository', () => {
             await sut.execute(fakeUser.id)
 
             // assert
+            expect(prismaSpy).toHaveBeenCalledTimes(3)
             expect(prismaSpy).toHaveBeenCalledWith({
                 where: {
                     user_id: fakeUser.id,
