@@ -1,15 +1,18 @@
 ---
-globs: *ts
+globs: *.ts
 alwaysApply: false
 ---
 
-## 2. Async/Await
+
+You are an expert in back-end development with **Node.js 20**, **Express 5**, **TypeScript (strict)**, **Prisma/PostgreSQL**, **Zod**, and **Jest**, specialized in building **financial APIs** with high reliability, maintainability, and clarity. Your focus is on writing clean, type-safe, and efficient TypeScript code.
+
+## 1. Async/Await
 
 ### Core Principles
 
-- **ALWAYS** use `async/await` for asynchronous code
-- **AVOID** `.then()` chains
-- **ALWAYS** type return as `Promise<T>`
+- **ALWAYS** use `async/await` for asynchronous code.
+- **AVOID** `.then()` chains for flow control.
+- **ALWAYS** type function returns as `Promise<T>`.
 
 ### Examples
 
@@ -17,8 +20,8 @@ alwaysApply: false
 
 ```typescript
 const fetchUserData = async (id: string): Promise<User> => {
-    const res = await fetch(`/api/users/${id}`)
-    return await res.json()
+    const res = await fetch(`/api/users/${id}`);
+    return await res.json();
 }
 ```
 
@@ -27,44 +30,39 @@ const fetchUserData = async (id: string): Promise<User> => {
 ```typescript
 fetch(`/api/users/${id}`)
     .then((res) => res.json())
-    .then(callback)
+    .then(callback);
 ```
 
----
-
-## 3. Variable Declarations
+## 2. Variable Declarations
 
 ### Core Principles
 
-- **USE** `const` whenever possible
-- **USE** `let` only when necessary
-- **NEVER** use `var`
+- **ALWAYS** use `const` by default.
+- **USE** `let` only when a variable must be reassigned.
+- **NEVER** use `var`.
 
 ### Examples
 
 **✅ Correct:**
 
 ```typescript
-const users = ['Alice', 'Bob']
-let currentIndex = 0
+const users = ['Alice', 'Bob'];
+let currentIndex = 0;
 ```
 
 **❌ Avoid:**
 
 ```typescript
-var users = ['Alice', 'Bob']
-let users = ['Alice', 'Bob'] // Re-declaration
+var users = ['Alice', 'Bob'];
 ```
 
----
-
-## 4. Classes
+## 3. Classes
 
 ### Core Principles
 
-- **MAKE** properties `private` or `protected` by default
-- **USE** `readonly` when values won't change after constructor
-- **AVOID** exposing internal implementation details
+- **PREFER** class properties to be `private` or `protected`.
+- **USE** `readonly` for properties that are not modified after initialization.
+- **AVOID** exposing internal implementation details.
 
 ### Examples
 
@@ -72,11 +70,12 @@ let users = ['Alice', 'Bob'] // Re-declaration
 
 ```typescript
 class UserService {
-    private readonly repository: UserRepository
-    protected logger: Logger
+    private readonly userRepository: UserRepository;
+    protected logger: Logger;
 
-    constructor(repository: UserRepository) {
-        this.repository = repository
+    constructor(userRepository: UserRepository, logger: Logger) {
+        this.userRepository = userRepository;
+        this.logger = logger;
     }
 }
 ```
@@ -85,119 +84,129 @@ class UserService {
 
 ```typescript
 class UserService {
-    public repository: UserRepository // Exposes implementation details
-    logger: Logger // Implicitly public
+    // Properties are implicitly public, exposing implementation details.
+    userRepository: UserRepository;
+    logger: Logger;
 }
 ```
 
----
-
-## 5. Array Manipulation
+## 4. Array Manipulation
 
 ### Core Principles
 
-- **PREFER** functional methods: `map`, `filter`, `reduce`
-- **AVOID** manual loops like `for`, `forEach` for accumulations
-- **USE** immutable operations
+- **PREFER** functional methods like `map`, `filter`, and `reduce` for data transformation.
+- **AVOID** manual `for` loops for tasks that can be done functionally.
+- **PREFER** immutable operations that return new arrays instead of modifying the original.
 
 ### Examples
 
 **✅ Correct:**
 
 ```typescript
-const activeUsers = users.filter((u) => u.isActive)
-const total = users.reduce((sum, u) => sum + u.age, 0)
+const activeUsers = users.filter((u) => u.isActive);
+const userNames = users.map((u) => u.name);
 ```
 
 **❌ Avoid:**
 
 ```typescript
-const active = []
+const active = [];
 for (let i = 0; i < users.length; i++) {
-    if (users[i].isActive) active.push(users[i])
+    if (users[i].isActive) {
+        active.push(users[i]);
+    }
 }
 ```
 
----
-
-## 6. Imports/Exports
+## 5. Imports & Exports
 
 ### Core Principles
 
-- **USE** ES Modules only
-- **PREFER** named exports
-- **AVOID** default exports
+- **ALWAYS** use **ES Modules** (`import`/`export`).
+- **PREFER** named exports to facilitate tree-shaking and clearer dependencies.
+- **AVOID** default exports.
 
 ### Examples
 
 **✅ Correct:**
 
 ```typescript
-export function doSomething(): void {}
-export class UserService {}
-export interface User {}
+export class UserService { /* ... */ }
+export function formatCurrency(value: number) { /* ... */ }
 ```
 
 **❌ Avoid:**
 
 ```typescript
-export default function () {}
-export default class UserService {}
+export default class UserService { /* ... */ }
 ```
 
----
-
-## 7. DTOs & Schemas
+## 6. DTOs & Schemas
 
 ### Core Principles
 
-- **USE** `z.infer` to type DTOs from Zod schemas
-- **VALIDATE** all external inputs before use
-- **DEFINE** clear input/output contracts
+- **ALWAYS** use `z.infer` to derive TypeScript types from **Zod** schemas.
+- **ALWAYS** validate all external inputs (e.g., API request bodies) with a schema.
+- **ALWAYS** define clear data contracts for inputs and outputs.
 
 ### Examples
 
 **✅ Correct:**
 
 ```typescript
-const createUserSchema = z.object({
+import { z } from 'zod';
+
+const CreateUserSchema = z.object({
     name: z.string().min(1),
     email: z.string().email(),
-})
+});
 
-type CreateUserDTO = z.infer<typeof createUserSchema>
+type CreateUserDTO = z.infer<typeof CreateUserSchema>;
 ```
 
----
-
-## 8. Architecture & Conventions
+## 7. Architecture & Conventions
 
 ### Core Principles
 
-- **ONE** file = **ONE** responsibility
-- **USE** clear suffixes: `.controller.ts`, `.service.ts`, `.schema.ts`, `.types.ts`
-- **KEEP** Prisma types internal; don't leak to HTTP responses
+- **ALWAYS** follow the **Single Responsibility Principle**: one file should have one primary purpose.
+- **ALWAYS** use descriptive suffixes for files (e.g., `.service.ts`, `.controller.ts`, `.schema.ts`).
+- **NEVER** leak **Prisma** model types directly in API responses. Use DTOs instead.
 
-### File Structure
+### Examples
 
+**❌ Avoid (Leaking Prisma Model):**
+
+```typescript
+// In a controller
+const user = await userService.findById(id);
+// This leaks the entire User model, which might include sensitive data like password hashes.
+return res.json(user);
 ```
-src/
-├── controllers/     # Request handling
-├── services/        # Business logic
-├── repositories/    # Data access
-├── schemas/         # Validation schemas
-└── types/          # Type definitions
+
+**✅ Correct (Using a DTO):**
+
+```typescript
+// user.dto.ts
+export class UserProfileDTO {
+    id: string;
+    firstName: string;
+    email: string;
+}
+
+// In a controller
+const user = await userService.findById(id);
+// A mapper function transforms the Prisma model to a safe DTO.
+const userProfile = mapUserToProfileDTO(user);
+return res.json(userProfile);
 ```
 
----
-
-## 9. Error Handling
+## 8. Error Handling
 
 ### Core Principles
 
-- **USE** custom error classes
-- **NEVER** expose internal errors to clients
-- **ALWAYS** type error responses
+- **ALWAYS** use custom error classes that extend `Error` for application-specific errors.
+- **NEVER** expose raw database or internal errors to the client.
+- **ALWAYS** define a consistent error response shape.
 
 ### Examples
 
@@ -206,30 +215,15 @@ src/
 ```typescript
 class AppError extends Error {
     constructor(
-        public readonly code: string,
-        public readonly statusCode: number,
-        message: string,
+        public readonly message: string,
+        public readonly statusCode: number = 400,
+        public readonly code?: string,
     ) {
-        super(message)
-        this.name = 'AppError'
+        super(message);
     }
 }
 
-// Usage
-throw new AppError('USER_NOT_FOUND', 404, 'User not found')
-```
-
----
-
-## Quick Reference
-
-| Pattern    | ✅ Use                    | ❌ Avoid            |
-| ---------- | ------------------------- | ------------------- |
-| Types      | `interface`, `type`       | `any`               |
-| Async      | `async/await`             | `.then()` chains    |
-| Variables  | `const`, `let`            | `var`               |
-| Classes    | `private`, `readonly`     | `public` by default |
-| Arrays     | `map`, `filter`, `reduce` | `for` loops         |
-| Exports    | Named exports             | Default exports     |
-| Validation | Zod schemas               | Manual validation   |
-| Errors     | Custom error classes      | Generic errors      |
+// Usage in a service
+if (!user) {
+    throw new AppError('User not found', 404, 'USER_NOT_FOUND');
+}

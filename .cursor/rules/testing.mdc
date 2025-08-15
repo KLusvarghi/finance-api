@@ -1,16 +1,17 @@
 ---
-globs: *.test.ts
+globs: *.test.ts,*.spec.ts
 alwaysApply: false
 ---
+You are an expert in back-end development with **Node.js 20**, **Express 5**, **TypeScript (strict)**, **Prisma/PostgreSQL**, **Zod**, and **Jest**, specialized in building **financial APIs** with high reliability, maintainability, and clarity. Your focus is on creating robust, readable, and effective automated tests.
 
 ## 1. Testing Philosophy
 
 ### Core Principles
 
-- **ENSURE** every new feature or bugfix comes with corresponding automated tests.
-- **PREFER** unit tests for services, use cases, and utility functions.
-- **USE** integration tests for controllers and HTTP endpoints, including input validation and database interactions.
-- **STRUCTURE** tests following the feature layout in `src/`, using `.test.ts` co-located or mirrored in `tests/` when needed.
+- **MUST** ensure every new feature or bugfix is accompanied by corresponding automated tests.
+- **PREFER** unit tests for isolated business logic (services, utils).
+- **USE** integration tests for controllers, API endpoints, and database interactions.
+- **ALWAYS** structure test files to mirror the feature layout in the `src/` directory.
 
 ---
 
@@ -18,12 +19,10 @@ alwaysApply: false
 
 ### Core Principles
 
-- **ALWAYS** write tests for happy paths and error cases in services.
-- **VALIDATE** domain logic using Zod schemas in tests.
-- **COVER** HTTP responses and error handling in controllers.
-- **TARGET** 90%+ test coverage.
-- **AVOID** overuse of Jest snapshots; only use them for stable output or public APIs.
-- **FAVOR** explicit assertions and `expect` statements for readability.
+- **ALWAYS** write tests for both successful "happy paths" and expected error cases.
+- **ALWAYS** validate business logic against **Zod** schemas within tests where applicable.
+- **MUST** target a high level of test coverage (e.g., 90%+), especially for critical financial logic.
+- **AVOID** overusing **Jest** snapshots. **PREFER** explicit `expect` assertions for clarity and stability.
 
 ---
 
@@ -31,11 +30,10 @@ alwaysApply: false
 
 ### Core Principles
 
-- **USE** `.env.test` for test runs to isolate the environment.
-- **ISOLATE** the test database using Docker Compose (`postgres-test` service).
-- **TEARDOWN** the database after each test suite to avoid side effects.
-- **RUN** migrations via `prisma migrate deploy` during global setup (`jest.global-setup.ts`).
-- **INCLUDE** necessary hooks and utilities in `jest.setup-after-env.ts`.
+- **ALWAYS** use the `.env.test` file for test runs to ensure a completely isolated environment.
+- **ALWAYS** use a separate test database, managed via **Docker Compose** (e.g., a `postgres-test` service).
+- **ALWAYS** tear down and reset the database state between test suites to prevent side effects.
+- **MUST** run database migrations during the global test setup (e.g., `jest.global-setup.ts`).
 
 ---
 
@@ -43,9 +41,9 @@ alwaysApply: false
 
 ### Core Principles
 
-- **USE** `@faker-js/faker` to generate dynamic and realistic test data.
-- **MAINTAIN** reusable test objects in `src/test/fixtures/`.
-- **AVOID** hardcoded data by using factories or helper functions.
+- **ALWAYS** use libraries like `@faker-js/faker` to generate dynamic and realistic test data.
+- **MAINTAIN** reusable test objects and builders in a shared `src/test/fixtures/` directory.
+- **AVOID** hardcoding static data directly in tests; use factories or fixtures instead.
 
 ---
 
@@ -53,12 +51,12 @@ alwaysApply: false
 
 ### Core Principles
 
-- **USE** descriptive test names that clearly express the expected behavior.
-- **GROUP** tests logically using `describe()` blocks per method or scenario.
-- **MOCK** external services in unit tests.
-- **AVOID** mocking the database in integration tests; use the real test DB.
-- **USE** `ts-jest` with ESM support as configured in the project.
-- **RUN** tests with `--runInBand` for consistency and test isolation.
+- **ALWAYS** use descriptive test names that clearly state what is being tested and the expected outcome.
+    - **✅ Correct:** `it('should return a 404 error if the requested user does not exist')`
+    - **❌ Avoid:** `it('tests user not found')`
+- **ALWAYS** group related tests within `describe()` blocks, organized by function or feature.
+- **ALWAYS** mock external dependencies (e.g., payment gateways, email services) in unit tests.
+- **AVOID** mocking the database in integration tests; **ALWAYS** interact with the real test database.
 
 ---
 
@@ -66,50 +64,42 @@ alwaysApply: false
 
 ### Core Principles
 
-- **FOLLOW** all Jest-specific ESLint rules configured in `eslint.config.js`.
-- **PAY ATTENTION** to warnings like `jest/no-disabled-tests` and `jest/no-focused-tests`.
+- **MUST** adhere to all **Jest**-specific **ESLint** rules configured in the project.
+- **MUST** resolve or address all linter warnings, such as `jest/no-disabled-tests` or `jest/no-focused-tests`, before merging code.
 
 ---
 
-## 7. Directories to Include
+## 7. Test Types Summary
 
 ### Core Principles
 
-- **LOCATE** test files in `src/**/*.test.ts` and `tests/**/*.test.ts`.
-- **ENSURE** source files in `src/**/*.ts` are covered by tests unless explicitly excluded.
+- **Unit Tests:** For services (`/services`), utilities (`/utils`), and adapters (`/adapters`). Test logic in complete isolation.
+- **Integration Tests:** For controllers (`/controllers`) and API routes. Test how components work together, including database interaction.
+- **Repository Tests:** For repositories (`/repositories`). Test database queries and logic against the real test database.
 
----
-
-## 8. Test Types Summary
-
-### Core Principles
-
-- **UNIT-TEST** services and utilities (`src/services/`, `src/utils/`).
-- **INTEGRATION-TEST** controllers, routes, and HTTP layers (`src/controllers/`).
-- **DB-TEST** repositories against the real test database (`src/repositories/`).
-
----
-
-## 9. General Principles
-
-### Core Principles
-
-- **MOCK** external dependencies.
-- **TEST** business logic in isolation.
-- **USE** type-safe test utilities.
-
-### Examples
+### Example: Mocking a Dependency
 
 **✅ Correct:**
 
 ```typescript
-describe('UserService', () => {
-    it('should create user with hashed password', async () => {
-        const mockHasher = { hash: jest.fn().mockResolvedValue('hashed') }
-        const service = new UserService(mockRepository, mockHasher)
+import { UserService } from '../user.service';
+import { IPasswordHasher } from '../../adapters/password-hasher.interface';
 
-        const result = await service.createUser({ password: 'plain' })
-        expect(result.password).toBe('hashed')
-    })
-})
-```
+describe('UserService', () => {
+    it('should create a user with a correctly hashed password', async () => {
+        // Mock the password hasher adapter
+        const mockHasher: IPasswordHasher = {
+            hash: jest.fn().mockResolvedValue('hashed_password'),
+            compare: jest.fn(),
+        };
+        
+        const mockRepository = { /* ... mock repository methods ... */ };
+        const userService = new UserService(mockRepository, mockHasher);
+
+        const result = await userService.create({ email: 'test@test.com', password: 'plain_password' });
+
+        // Assert that the hash method was called and the result is correct
+        expect(mockHasher.hash).toHaveBeenCalledWith('plain_password');
+        expect(result.password).toBe('hashed_password');
+    });
+});
