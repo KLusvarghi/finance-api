@@ -8,7 +8,7 @@
             "command": "uvx",
             "args": ["perplexity-mcp"],
             "env": {
-                "PERPLEXITY_API_KEY": "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",
+                "PERPLEXITY_API_KEY": "",
                 "PERPLEXITY_MODEL": "sonar"
             }
         },
