@@ -4,90 +4,62 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
-### Core Development
-- **Start dev server**: `npm run start:dev` (uses tsx with hot-reload)
-- **Build**: `npm run build` (compiles TypeScript to dist/)
-- **Tests**: `npm test` (runs with .env.test environment)
-- **Test with coverage**: `npm run test:coverage`
-- **Watch tests**: `npm run test:watch`
+### Core Commands
+- `npm run start:dev` - Start development server with hot-reload using tsx
+- `npm run build` - Compile TypeScript to JavaScript (outputs to `dist/`)
+- `npm test` - Run tests using Jest with .env.test configuration
+- `npm run test:watch` - Run tests in watch mode
+- `npm run test:coverage` - Run tests with coverage report
 
-### Database Operations
-- **Generate Prisma client**: `npx prisma generate`
-- **Run migrations**: `npx prisma migrate deploy`
-- **Start local PostgreSQL**: `docker compose up -d postgres`
-- **Start test PostgreSQL**: `docker compose up -d postgres-test`
-
-### Code Quality
-- **Lint check**: Run ESLint manually via `npx eslint .`
-- **Format**: Prettier is configured but run via `npx prettier --write .`
+### Database Commands
+- `npx prisma migrate deploy` - Run database migrations
+- `npx prisma generate` - Generate Prisma client
+- `npx prisma studio` - Open Prisma Studio database GUI
+- `docker compose up -d postgres` - Start PostgreSQL development database
+- `docker compose up -d postgres-test` - Start PostgreSQL test database
 
 ## Architecture Overview
 
-This is a layered REST API following clean architecture principles:
+This is a Node.js REST API for personal finance management built with a clean architecture pattern:
 
 ### Layer Structure
-1. **Controllers** (`src/controllers/`): HTTP request handling, input validation, response formatting
-2. **Services** (`src/services/`): Business logic and use cases
-3. **Repositories** (`src/repositories/postgres/`): Data persistence via Prisma
-4. **Adapters** (`src/adapters/`): External service abstractions (password hashing, ID generation)
+- **Controllers** (`src/controllers/`) - HTTP request handling, validation, response formatting
+- **Services** (`src/services/`) - Business logic and use cases
+- **Repositories** (`src/repositories/`) - Data persistence layer using Prisma ORM
+- **Adapters** (`src/adapters/`) - External service abstractions (password hashing, ID generation)
 
 ### Key Patterns
+- Factory pattern for dependency injection (see `src/factories/`)
+- Standardized HTTP responses using helper functions (`src/controllers/_helpers/http.ts`)
+- Comprehensive TypeScript interfaces in `src/shared/types.ts`
+- Zod schemas for validation (`src/schemas/`)
 
-**HTTP Response Pattern**: All controllers use standardized response helpers from `src/controllers/_helpers/http.ts`:
-- `ok(data)` - 200 success
-- `created(data)` - 201 created  
-- `badRequest(message, data)` - 400 error
-- `notFound(message)` - 404 error
-- `serverError(message)` - 500 error
+### Database
+- PostgreSQL with Prisma ORM
+- Two main entities: Users and Transactions
+- Transaction types: EARNING, EXPENSE, INVESTMENT
+- UUID primary keys for all entities
 
-**Validation**: Zod schemas in `src/schemas/` validate all inputs before processing.
+## Testing Strategy
 
-**Database**: PostgreSQL with Prisma ORM. All repositories follow the same pattern - one class per entity with CRUD operations.
+- Tests are co-located with source files (`.test.ts` files)
+- Uses Jest with custom configuration for ESM support
+- Test fixtures in `src/test/fixtures/` for common test data
+- Separate test database using Docker Compose
+- Coverage reports generated in `coverage/` directory
 
-### Domain Model
-- **Users**: Basic user management with bcrypt password hashing
-- **Transactions**: Financial transactions linked to users with types (EARNING, EXPENSE, INVESTMENT)
-- UUIDs used as primary keys throughout
+## Environment Setup
 
-### Testing Strategy
-- Unit tests for services and repositories
-- Integration tests for controllers (with test database)
-- Fixtures in `src/test/fixtures/` for test data generation
-- Uses `@faker-js/faker` for generating test data
-- Test database configured via `.env.test` and Docker Compose
+1. Copy `.env.example` to `.env` and configure:
+   - `DATABASE_URL` for main database
+   - `PORT` for API server (defaults to 3001)
 
-### Environment Configuration
-- **Development**: `.env` with local database
-- **Testing**: `.env.test` with separate test database  
-- **Database URL**: PostgreSQL connection string required
-- **Port**: API runs on PORT environment variable (default in code varies)
+2. For testing, ensure `.env.test` is configured for test database
 
-## Important Implementation Details
+## Code Quality Tools
 
-### Database Schema
-- Users have first_name, last_name, email (unique), password (bcrypt hashed)
-- Transactions have user_id (FK), name, amount (Decimal), date, type (enum)
-- Prisma schema at `prisma/schema.prisma` with migrations in `prisma/migrations/`
-
-### Error Handling
-- Controllers catch service errors and return appropriate HTTP responses
-- Validation errors from Zod schemas are handled uniformly
-- Database constraint violations (like duplicate email) are caught and returned as bad requests
-
-### Code Organization
-- Each feature (users, transactions) has parallel structure across all layers
-- Index files in each directory export all related functionality
-- Test files are co-located with source files using `.test.ts` suffix
-
-### Development Workflow
-1. Start database: `docker compose up -d postgres`
-2. Run migrations: `npx prisma migrate deploy`  
-3. Start dev server: `npm run start:dev`
-4. Run tests: `npm test` (automatically uses test database)
-
-### Special Notes
-- TypeScript strict mode enabled
-- ESM modules used throughout (type: "module" in package.json)
-- Husky pre-commit hooks for code quality
-- Jest configured for ESM with ts-jest preset
-- No authentication implemented yet (marked as roadmap item)
+- ESLint with TypeScript support and Jest rules
+- Prettier for code formatting
+- Husky for pre-commit hooks
+- Simple import sorting plugin
+- Git commit message linting
