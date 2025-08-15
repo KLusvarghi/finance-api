@@ -26,17 +26,8 @@
         "github": {
             "url": "https://api.githubcopilot.com/mcp/"
         },
-        "vercel": {
-            "url": "${VERCEL_MCP_URL}"
-        },
-        "figma": {
-            "url": "http://127.0.0.1:3845/mcp"
-        },
         "sentry": {
             "url": "https://mcp.sentry.dev/mcp"
-        },
-        "linear": {
-            "url": "https://mcp.linear.app/sse"
         }
     }
 }
