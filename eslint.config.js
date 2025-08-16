@@ -59,4 +59,10 @@ export default defineConfig([
       "jest/no-focused-tests": "error",
     },
   },
+
+  // === Configuração para ignorar arquivos Markdown ===
+  {
+    files: ["**/*.{md,mdc}"],
+    ignores: ["**/*.{md,mdc}"],
+  },
 ]);
