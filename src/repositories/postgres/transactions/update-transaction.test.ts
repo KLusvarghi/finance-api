@@ -11,17 +11,17 @@ import { Decimal } from '@prisma/client/runtime/library'
 describe('PostgresUpdateTransactionRepository', () => {
     let sut = new PostgresUpdateTransactionRepository()
 
-    // describe('error handling', () => {
-    //     it('should throw an error if Prisma throws', async () => {
-    //         // arrange
-    //         jest.spyOn(prisma.transaction, 'findMany').mockRejectedValueOnce(
-    //             new Error('Prisma error'),
-    //         )
-    //         // act
-    //         const promise = sut.execute('any_user_id')
-    //         expect(promise).rejects.toThrow(new Error('Prisma error'))
-    //     })
-    // })
+    describe('error handling', () => {
+        it('should throw an error if Prisma throws', async () => {
+            // arrange
+            jest.spyOn(prisma.transaction, 'update').mockRejectedValueOnce(
+                new Error('Prisma error'),
+            )
+            // act
+            const promise = sut.execute('any_transaction_id', params)
+            expect(promise).rejects.toThrow(new Error('Prisma error'))
+        })
+    })
 
     describe('success', () => {
         it('should update a transaction on database successfully', async () => {
