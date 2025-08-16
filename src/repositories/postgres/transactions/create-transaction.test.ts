@@ -13,10 +13,6 @@ describe('PostgresCreateTransactionRepository', () => {
 
     describe('error handling', () => {
         it('should throw an error if Prisma throws', async () => {
-            const user = await createTestUser({
-                id: createTransactionParams.user_id,
-            })
-
             // arrange
             jest.spyOn(prisma.transaction, 'create').mockRejectedValueOnce(
                 new Error('Prisma error'),
