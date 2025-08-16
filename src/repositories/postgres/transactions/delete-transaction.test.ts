@@ -6,6 +6,8 @@ import {
 } from '@/test'
 import { PostgresDeleteTransactionRepository } from './delete-transaction'
 import dayjs from 'dayjs'
+import { prisma } from '../../../../prisma/prisma'
+
 
 describe('PostgresDeleteTransactionRepository', () => {
     let sut = new PostgresDeleteTransactionRepository()
@@ -36,6 +38,28 @@ describe('PostgresDeleteTransactionRepository', () => {
             expect(dayjs(response?.date).year()).toBe(
                 dayjs(transaction.date).year(),
             )
+        })
+    })
+
+    describe('validations', () => {
+        it('should call Prisma with correct params', async () => {
+            // arrange
+            const user = await createTestUser()
+            const transaction = await createTestTransaction({
+                user_id: user.id,
+            })
+
+            const prismaSpy = jest.spyOn(prisma.transaction, 'delete')
+
+            // act
+            await sut.execute(transaction.id)
+
+            // assert
+            expect(prismaSpy).toHaveBeenCalledWith({
+                where: {
+                    id: transaction.id,
+                },
+            })
         })
     })
 })
