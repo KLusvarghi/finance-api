@@ -1,8 +1,11 @@
 {
     "mcpServers": {
         "context7": {
-            "type": "http",
-            "url": "https://mcp.context7.com/mcp"
+            "command": "npx",
+            "args": ["-y", "@upstash/context7-mcp@1.0.14"],
+            "env": {
+                "UPSTASH_CONTEXT7_API_KEY": "${UPSTASH_CONTEXT7_API_KEY}"
+            }
         },
         "perplexity": {
             "command": "uvx",
@@ -25,12 +28,26 @@
             }
         },
         "github": {
-            "type": "http",
-            "url": "https://api.githubcopilot.com/mcp/"
+            "command": "docker",
+            "args": [
+                "run",
+                "-i",
+                "--rm",
+                "-e",
+                "GITHUB_PERSONAL_ACCESS_TOKEN",
+                "ghcr.io/github/github-mcp-server"
+            ],
+            "env": {
+                "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PAT}",
+                "GITHUB_TOOLSETS": "repos,issues,pull_requests,actions"
+            }
         },
-        "sentry": {
-            "type": "http",
-            "url": "https://mcp.sentry.dev/mcp"
+        "brave-search": {
+            "command": "npx",
+            "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+            "env": {
+                "BRAVE_API_KEY": "${BRAVE_API_KEY}"
+            }
         }
     }
 }
