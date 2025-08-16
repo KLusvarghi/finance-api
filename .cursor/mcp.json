@@ -1,7 +1,11 @@
 {
     "mcpServers": {
         "context7": {
-            "url": "https://mcp.context7.com/mcp"
+            "command": "npx",
+            "args": ["-y", "@upstash/context7-mcp@1.0.14"],
+            "env": {
+                "UPSTASH_CONTEXT7_API_KEY": "${UPSTASH_CONTEXT7_API_KEY}"
+            }
         },
         "perplexity": {
             "command": "uvx",
@@ -19,15 +23,16 @@
             ],
             "env": {
                 "PATH": "/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin:~/.local/bin",
-                "OPENAI_API_KEY": "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",
-                "GEMINI_API_KEY": "AIzaSyD-9tSrke72PjbySxLgc6S-HjcPyKc-9dY"
+                "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+                "GEMINI_API_KEY": "${GEMINI_API_KEY}"
             }
         },
-        "github": {
-            "url": "https://api.githubcopilot.com/mcp/"
-        },
-        "sentry": {
-            "url": "https://mcp.sentry.dev/mcp"
+        "brave-search": {
+            "command": "npx",
+            "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+            "env": {
+                "BRAVE_API_KEY": "${BRAVE_API_KEY}"
+            }
         }
     }
 }
