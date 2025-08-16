@@ -5,6 +5,7 @@ import {
     transactionId,
 } from '@/test'
 import dayjs from 'dayjs'
+import { prisma } from '../../../../prisma/prisma'
 
 describe('PostgresCreateTransactionRepository', () => {
     let sut = new PostgresCreateTransactionRepository()
@@ -51,12 +52,22 @@ describe('PostgresCreateTransactionRepository', () => {
     })
 
     describe('validations', () => {
-        // it('should call Prisma with correct params', async () => {
-        //     const prismaSpy = jest.spyOn(prisma.user, 'create')
-        //     await sut.execute(fakeUser)
-        //     expect(prismaSpy).toHaveBeenCalledWith({
-        //         data: fakeUser,
-        //     })
-        // })
+        it('should call Prisma with correct params', async () => {
+          const user = await createTestUser()
+
+            const prismaSpy = jest.spyOn(prisma.transaction, 'create')
+            await sut.execute({
+                ...createTransactionParams,
+                user_id: user.id,
+                id: transactionId,
+            })
+            expect(prismaSpy).toHaveBeenCalledWith({
+                data: {
+                    ...createTransactionParams,
+                    user_id: user.id,
+                    id: transactionId,
+                },
+            })
+        })
     })
 })
