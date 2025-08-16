@@ -8,21 +8,20 @@ import { PostgresDeleteTransactionRepository } from './delete-transaction'
 import dayjs from 'dayjs'
 import { prisma } from '../../../../prisma/prisma'
 
-
 describe('PostgresDeleteTransactionRepository', () => {
     let sut = new PostgresDeleteTransactionRepository()
 
     describe('error handling', () => {
-      it('should throw an error if Prisma throws', async () => {
-          // arrange
-          jest.spyOn(prisma.transaction, 'delete').mockRejectedValueOnce(
-              new Error('Prisma error'),
-          )
-          // act
-          const promise = sut.execute(transactionId)
-          expect(promise).rejects.toThrow(new Error('Prisma error'))
-      })
-  })
+        it('should throw an error if Prisma throws', async () => {
+            // arrange
+            jest.spyOn(prisma.transaction, 'delete').mockRejectedValueOnce(
+                new Error('Prisma error'),
+            )
+            // act
+            const promise = sut.execute(transactionId)
+            expect(promise).rejects.toThrow(new Error('Prisma error'))
+        })
+    })
 
     describe('success', () => {
         it('should delete a transaction on database successfully', async () => {
