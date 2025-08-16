@@ -1,6 +1,10 @@
-import { prisma } from '../../../../prisma/prisma'
 import { PostgresCreateTransactionRepository } from './create-transaction'
-import { createTestTransaction, createTestUser, createTransactionParams, createTransactionServiceResponse } from '@/test'
+import {
+    createTestUser,
+    createTransactionParams,
+    transactionId,
+} from '@/test'
+import dayjs from 'dayjs'
 
 describe('PostgresCreateTransactionRepository', () => {
     let sut = new PostgresCreateTransactionRepository()
@@ -13,7 +17,6 @@ describe('PostgresCreateTransactionRepository', () => {
         //     )
         //     // act
         //     const promise = sut.execute(fakeUser)
-
         //     expect(promise).rejects.toThrow(new Error('Prisma error'))
         // })
     })
@@ -21,22 +24,36 @@ describe('PostgresCreateTransactionRepository', () => {
     describe('success', () => {
         it('should create a transaction on database', async () => {
             const user = await createTestUser()
+
             const response = await sut.execute({
                 ...createTransactionParams,
-                id: user.id,
+                user_id: user.id,
+                id: transactionId,
             })
 
             expect(response).not.toBeNull()
-            // expect(response).toStrictEqual(createTransactionServiceResponse)
+            expect(response.name).toBe(createTransactionParams.name)
+            expect(response.type).toBe(createTransactionParams.type)
+            expect(response.user_id).toBe(user.id)
+            expect(String(response.amount)).toBe(
+                String(createTransactionParams.amount),
+            )
+            expect(dayjs(response.date).daysInMonth()).toBe(
+                dayjs(createTransactionParams.date).daysInMonth(),
+            )
+            expect(dayjs(response.date).month()).toBe(
+                dayjs(createTransactionParams.date).month(),
+            )
+            expect(dayjs(response.date).year()).toBe(
+                dayjs(createTransactionParams.date).year(),
+            )
         })
     })
 
     describe('validations', () => {
         // it('should call Prisma with correct params', async () => {
         //     const prismaSpy = jest.spyOn(prisma.user, 'create')
-
         //     await sut.execute(fakeUser)
-
         //     expect(prismaSpy).toHaveBeenCalledWith({
         //         data: fakeUser,
         //     })
