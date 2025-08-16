@@ -6,6 +6,18 @@ import { prisma } from '../../../../prisma/prisma'
 describe('PostgresGetTransactionsByUserIdRepository', () => {
     let sut = new PostgresGetTransactionsByUserIdRepository()
 
+    describe('error handling', () => {
+        it('should throw an error if Prisma throws', async () => {
+            // arrange
+            jest.spyOn(prisma.transaction, 'findMany').mockRejectedValueOnce(
+                new Error('Prisma error'),
+            )
+            // act
+            const promise = sut.execute('any_user_id')
+            expect(promise).rejects.toThrow(new Error('Prisma error'))
+        })
+    })
+
     describe('success', () => {
         it('should get transactions by user id on database', async () => {
             const user = await createTestUser()
