@@ -1,4 +1,5 @@
 import { checkIfIdIsValid, invalidIdResponse, userBadRequestResponse, userNotFoundResponse, } from '../_helpers/index';
+import { UserNotFoundError } from '@/errors/user';
 import { serverError, ok } from '@/shared';
 export class DeleteUserController {
     deletedUserService;
@@ -15,13 +16,15 @@ export class DeleteUserController {
             if (!isIdValid)
                 return invalidIdResponse();
             const deletedUser = await this.deletedUserService.execute(userId);
-            if (!deletedUser)
-                return userNotFoundResponse();
             return ok(deletedUser);
         }
         catch (error) {
             console.error(error);
+            if (error instanceof UserNotFoundError) {
+                return userNotFoundResponse();
+            }
             return serverError();
         }
     }
 }
+//# sourceMappingURL=delete-user.js.map

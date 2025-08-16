@@ -1,19 +1,19 @@
 import { UserNotFoundError } from '@/errors/user';
-import { v4 as uuidv4 } from 'uuid';
 export class CreateTransactionService {
     createTransactionRepository;
     getUserByIdRepository;
-    constructor(createTransactionRepository, getUserByIdRepository) {
+    idGenerator;
+    constructor(createTransactionRepository, getUserByIdRepository, idGenerator) {
         this.createTransactionRepository = createTransactionRepository;
         this.getUserByIdRepository = getUserByIdRepository;
+        this.idGenerator = idGenerator;
     }
     async execute(params) {
-        const userId = params.user_id;
-        const user = await this.getUserByIdRepository.execute(userId);
+        const user = await this.getUserByIdRepository.execute(params.user_id);
         if (!user) {
-            throw new UserNotFoundError();
+            throw new UserNotFoundError(params.user_id);
         }
-        const transactionId = uuidv4();
+        const transactionId = this.idGenerator.execute();
         const transaction = await this.createTransactionRepository.execute({
             ...params,
             id: transactionId,
@@ -21,3 +21,4 @@ export class CreateTransactionService {
         return transaction;
     }
 }
+//# sourceMappingURL=create-transaction.js.map

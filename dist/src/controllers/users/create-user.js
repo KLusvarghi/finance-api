@@ -1,6 +1,7 @@
 import { EmailAlreadyExistsError } from '@/errors/user';
+import { createUserSchema } from '@/schemas';
 import { serverError, badRequest, created } from '@/shared';
-import z, { ZodError } from 'zod';
+import { ZodError } from 'zod';
 export class CreateUserController {
     createUserService;
     constructor(createUserService) {
@@ -8,12 +9,6 @@ export class CreateUserController {
     }
     async execute(httpRequest) {
         try {
-            const createUserSchema = z.object({
-                first_name: z.string().trim().min(2),
-                last_name: z.string().trim().min(2),
-                email: z.string().email().trim(),
-                password: z.string().min(6),
-            });
             // validar a requisição (campos obrigatório, email e tamenho de senha)
             const params = httpRequest.body;
             // validando o schema de forma asyncrona
@@ -35,3 +30,4 @@ export class CreateUserController {
         }
     }
 }
+//# sourceMappingURL=create-user.js.map

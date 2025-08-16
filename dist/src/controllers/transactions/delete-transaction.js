@@ -1,3 +1,4 @@
+import { TransactionNotFoundError } from '@/errors/user';
 import { checkIfIdIsValid, invalidIdResponse, ok, serverError, transactionNotFoundResponse, } from '../_helpers';
 export class DeleteTransactionController {
     deleteTransactionService;
@@ -11,14 +12,15 @@ export class DeleteTransactionController {
                 return invalidIdResponse();
             }
             const deletedTransaction = await this.deleteTransactionService.execute(transactionId);
-            if (!deletedTransaction) {
-                return transactionNotFoundResponse();
-            }
-            return ok(deletedTransaction);
+            return ok(deletedTransaction, 'Transaction deleted successfully');
         }
         catch (error) {
             console.error(error);
-            serverError();
+            if (error instanceof TransactionNotFoundError) {
+                return transactionNotFoundResponse();
+            }
+            return serverError();
         }
     }
 }
+//# sourceMappingURL=delete-transaction.js.map

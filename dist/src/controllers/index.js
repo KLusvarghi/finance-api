@@ -9,3 +9,4 @@ export * from './transactions/create-transaction';
 export * from './transactions/get-transactions-by-user-id';
 export * from './transactions/update-transaction';
 export * from './transactions/delete-transaction';
+//# sourceMappingURL=index.js.map

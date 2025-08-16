@@ -1,4 +1,4 @@
-import { UserNotFoundError } from "@/errors/user";
+import { UserNotFoundError } from '@/errors/user';
 export class GetUserBalanceService {
     getUserByIdRepository;
     getUserBalanceRepository;
@@ -6,12 +6,13 @@ export class GetUserBalanceService {
         this.getUserByIdRepository = getUserByIdRepository;
         this.getUserBalanceRepository = getUserBalanceRepository;
     }
-    async execute(params) {
-        const user = await this.getUserByIdRepository.execute(params.userId);
+    async execute(userId) {
+        const user = await this.getUserByIdRepository.execute(userId);
         if (!user) {
-            throw new UserNotFoundError();
+            throw new UserNotFoundError(userId);
         }
-        const userBalance = await this.getUserBalanceRepository.execute(params.userId);
+        const userBalance = await this.getUserBalanceRepository.execute(userId);
         return userBalance;
     }
 }
+//# sourceMappingURL=get-user-balance.js.map

@@ -5,12 +5,12 @@ export class GetTransactionsByUserIdController {
     constructor(getTransactionByUserIdService) {
         this.getTransactionByUserIdService = getTransactionByUserIdService;
     }
-    async execute(httpRequst) {
+    async execute(httpRequest) {
         try {
             // para que possamos pegar um valor que é passsado por uma query na url e não como um parametro no body, fazemos assim:
-            const userId = httpRequst.query.userId;
+            const userId = httpRequest.query.userId;
             if (!userId) {
-                return requiredFieldMissingResponse('userId is required');
+                return requiredFieldMissingResponse('userId');
             }
             if (!checkIfIdIsValid(userId)) {
                 return invalidIdResponse();
@@ -20,10 +20,11 @@ export class GetTransactionsByUserIdController {
         }
         catch (error) {
             if (error instanceof UserNotFoundError) {
-                return userNotFoundResponse();
+                return userNotFoundResponse(error.message);
             }
             console.error(error);
             return serverError();
         }
     }
 }
+//# sourceMappingURL=get-transactions-by-user-id.js.map

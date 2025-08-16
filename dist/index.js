@@ -18,6 +18,12 @@ app.get('/api/users/:userId', async (request, response) => {
     const { statusCode, body } = await getUserByIdController.execute(request);
     response.status(statusCode).send(body);
 });
+// get balance
+app.get('/api/users/:userId/balance', async (request, response) => {
+    const getUserBalanceController = makeGetUserBalanceController();
+    const { statusCode, body } = await getUserBalanceController.execute(request);
+    response.status(statusCode).send(body);
+});
 // udpate user
 app.patch('/api/users/:userId', async (request, response) => {
     const updateUserController = makeUpdateUserController();
@@ -28,12 +34,6 @@ app.patch('/api/users/:userId', async (request, response) => {
 app.delete('/api/users/:userId', async (request, response) => {
     const deleteUserController = makeDeleteUserController();
     const { statusCode, body } = await deleteUserController.execute(request);
-    response.status(statusCode).send(body);
-});
-// get balance
-app.get('/api/users/:userId/balance', async (request, response) => {
-    const getUserBalanceController = makeGetUserBalanceController();
-    const { statusCode, body } = await getUserBalanceController.execute(request);
     response.status(statusCode).send(body);
 });
 app.post('/api/transactions', async (request, response) => {
@@ -59,3 +59,4 @@ app.delete('/api/transactions/:transactionId', async (request, response) => {
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
+//# sourceMappingURL=index.js.map

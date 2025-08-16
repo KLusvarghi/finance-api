@@ -1,3 +1,4 @@
+import { IdGeneratorAdapter, PasswordHasherAdapter } from '@/adapters';
 import { CreateUserController, DeleteUserController, GetUserBalanceController, GetUserByIdController, UpdateUserController, } from '@/controllers';
 import { PostgresCreateUserRepository, PostgresDeleteUserRepository, PostgresGetUserBalanceRepository, PostgresGetUserByEmailRepository, PostgresGetUserByIdRepository, PostgresUpdateUserRepository, } from '@/repositories/postgres';
 import { CreateUserService, DeleteUserService, GetUserBalanceService, GetUserByIdService, UpdateUserService, } from '@/services';
@@ -10,14 +11,18 @@ export const makeGetUserByIdController = () => {
 export const makeCreateUserController = () => {
     const getUserByEmailRepository = new PostgresGetUserByEmailRepository();
     const createUserRepository = new PostgresCreateUserRepository();
-    const createUserService = new CreateUserService(createUserRepository, getUserByEmailRepository);
+    const idGenerator = new IdGeneratorAdapter();
+    const passwordHasher = new PasswordHasherAdapter();
+    const createUserService = new CreateUserService(createUserRepository, getUserByEmailRepository, idGenerator, passwordHasher);
     const createUserController = new CreateUserController(createUserService);
     return createUserController;
 };
 export const makeUpdateUserController = () => {
     const getUserByEmailRepository = new PostgresGetUserByEmailRepository();
     const updateUserRepository = new PostgresUpdateUserRepository();
-    const updateUserService = new UpdateUserService(getUserByEmailRepository, updateUserRepository);
+    const getUserByIdRepository = new PostgresGetUserByIdRepository();
+    const passwordHasher = new PasswordHasherAdapter();
+    const updateUserService = new UpdateUserService(getUserByEmailRepository, updateUserRepository, passwordHasher, getUserByIdRepository);
     const updateUserController = new UpdateUserController(updateUserService);
     return updateUserController;
 };
@@ -34,3 +39,4 @@ export const makeGetUserBalanceController = () => {
     const getUserBalanceController = new GetUserBalanceController(getUserBalanceService);
     return getUserBalanceController;
 };
+//# sourceMappingURL=user.js.map

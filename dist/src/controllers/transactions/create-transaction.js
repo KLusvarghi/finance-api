@@ -1,4 +1,6 @@
-import { checkAmoutIsValid, checkIfIdIsValid, checkIsTypeValid, created, invalidAmoutResponse, invalidIdResponse, invalidTypeResponse, requiredFieldMissingResponse, serverError, validateRequiredFields, } from '../_helpers';
+import { badRequest, created, serverError } from '../_helpers';
+import { createTransactionSchema } from '@/schemas';
+import { ZodError } from 'zod';
 export class CreateTransactionController {
     createTransactionService;
     constructor(createTransactionService) {
@@ -7,33 +9,19 @@ export class CreateTransactionController {
     async execute(httpRequest) {
         try {
             const params = httpRequest.body;
-            const requiredFields = ['user_id', 'name', 'date', 'amount', 'type'];
-            const { ok: requiredFieldsWereProvider, missingField } = validateRequiredFields(params, requiredFields);
-            if (!requiredFieldsWereProvider) {
-                return requiredFieldMissingResponse(missingField);
-            }
-            const userIdIsValid = checkIfIdIsValid(params.user_id);
-            if (!userIdIsValid) {
-                return invalidIdResponse();
-            }
-            if (!checkAmoutIsValid(params.amount)) {
-                return invalidAmoutResponse();
-            }
-            const type = params.type.trim().toUpperCase();
-            const typeIsValid = checkIsTypeValid(type);
-            if (!typeIsValid) {
-                return invalidTypeResponse;
-            }
-            const createdTransaction = await this.createTransactionService.execute({
-                ...params,
-                amount: params.amount,
-                type, // passando o type dnv porque nós tranformamos ele
-            });
+            // usando o "safeParseAsync" é uma forma de tratar os erros de forma mais segura e eveitar que de um throw e caia no catch e consigamos tratar o erro aqui ainda
+            // await createTransactionSchema.safeParseAsync(params)
+            await createTransactionSchema.parseAsync(params);
+            const createdTransaction = await this.createTransactionService.execute(params);
             return created(createdTransaction);
         }
         catch (error) {
+            if (error instanceof ZodError) {
+                return badRequest(error.issues[0].message);
+            }
             console.error(error);
             return serverError();
         }
     }
 }
+//# sourceMappingURL=create-transaction.js.map

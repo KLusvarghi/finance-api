@@ -1,24 +1,24 @@
-import { v4 as uuidv4 } from 'uuid';
-import bcrypt from 'bcrypt';
 import { EmailAlreadyExistsError } from '@/errors/user';
 export class CreateUserService {
     createUserRepository;
     getUserByEmailRepository;
-    constructor(createUserRepository, getUserByEmailRepository) {
+    idGenerator;
+    passwordHasher;
+    constructor(createUserRepository, getUserByEmailRepository, idGenerator, passwordHasher) {
         this.createUserRepository = createUserRepository;
         this.getUserByEmailRepository = getUserByEmailRepository;
+        this.idGenerator = idGenerator;
+        this.passwordHasher = passwordHasher;
     }
     async execute(createUserParams) {
-        // verificar se o e-mail já está cadastrado no banco
         const userWithProviderEmail = await this.getUserByEmailRepository.execute(createUserParams.email);
         if (userWithProviderEmail) {
             throw new EmailAlreadyExistsError(createUserParams.email);
         }
-        // gerar o UUID
-        const userId = uuidv4();
+        const userId = this.idGenerator.execute();
         // criptografdar a senha
         // sendo o "10" o "Salt", que é o nível de criptografia
-        const hashPassword = await bcrypt.hash(createUserParams.password, 10);
+        const hashPassword = await this.passwordHasher.execute(createUserParams.password);
         const user = {
             // dessestruturando o que a gente recebe como parametrp
             ...createUserParams,
@@ -26,10 +26,8 @@ export class CreateUserService {
             // e colocando o password no final para ele sobrescrever o que está sendo desestruturado acima
             password: hashPassword,
         };
-        // inserir o user no db
-        // chamar o repository
-        // 1º maneira de fazer isso
-        return await this.createUserRepository.execute(user);
-        // 2º maneira de fazer isso é injetar como dependencia no constructor
+        const { password: _password, ...userWithoutPassword } = await this.createUserRepository.execute(user);
+        return userWithoutPassword;
     }
 }
+//# sourceMappingURL=create-user.js.map

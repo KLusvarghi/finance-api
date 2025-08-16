@@ -1,16 +1,15 @@
-import { TransactionNotFoundError } from "@/errors/user";
+import { TransactionNotFoundError } from '@/errors/user';
 export class UpdateTransactionService {
     updateTransactionRepository;
-    getUserByIdRepository;
-    constructor(updateTransactionRepository, getUserByIdRepository) {
+    constructor(updateTransactionRepository) {
         this.updateTransactionRepository = updateTransactionRepository;
-        this.getUserByIdRepository = getUserByIdRepository;
     }
     async execute(transactionId, params) {
         const transaction = await this.updateTransactionRepository.execute(transactionId, params);
-        if (!transactionId) {
-            return TransactionNotFoundError;
+        if (!transaction) {
+            throw new TransactionNotFoundError(transactionId);
         }
         return transaction;
     }
 }
+//# sourceMappingURL=update-transaction.js.map

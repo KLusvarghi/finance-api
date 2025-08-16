@@ -1,3 +1,4 @@
+import { UserNotFoundError } from '@/errors/user';
 export class GetUserByIdService {
     getUserByIdRepository;
     constructor(getUserByIdRepository) {
@@ -5,6 +6,11 @@ export class GetUserByIdService {
     }
     async execute(userId) {
         const user = await this.getUserByIdRepository.execute(userId);
-        return user;
+        if (!user) {
+            throw new UserNotFoundError(userId);
+        }
+        const { password: _password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
     }
 }
+//# sourceMappingURL=get-user-by-id.js.map
