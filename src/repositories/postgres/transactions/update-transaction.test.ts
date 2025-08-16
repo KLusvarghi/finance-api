@@ -48,25 +48,26 @@ describe('PostgresUpdateTransactionRepository', () => {
             expect(dayjs(response?.date).year()).toBe(dayjs(transaction.date).year())
         })
     })
-    // describe('validations', () => {
-    //     it('should call Prisma with correct params', async () => {
-    //         // arrange
-    //         const user = await createTestUser()
-    //         const transaction = await createTestTransaction({
-    //             user_id: user.id,
-    //         })
+    describe('validations', () => {
+        it('should call Prisma with correct params', async () => {
+            // arrange
+            const user = await createTestUser()
+            const transaction = await createTestTransaction({
+                user_id: user.id,
+            })
 
-    //         const prismaSpy = jest.spyOn(prisma.transaction, 'findMany')
+            const prismaSpy = jest.spyOn(prisma.transaction, 'update')
 
-    //         // act
-    //         await sut.execute(user.id)
+            // act
+            await sut.execute(transaction.id, params)
 
-    //         // assert
-    //         expect(prismaSpy).toHaveBeenCalledWith({
-    //             where: {
-    //                 user_id: user.id,
-    //             },
-    //         })
-    //     })
-    // })
+            // assert
+            expect(prismaSpy).toHaveBeenCalledWith({
+                where: {
+                    id: transaction.id,
+                },
+                data: params,
+            })
+        })
+    })
 })
