@@ -10,6 +10,7 @@ export class PostgresDeleteTransactionRepository {
         })
 
         if (!transaction) {
+            // TODO: retornar um erro de transação não encontrada (criar essa classe)
             return null
         }
 
