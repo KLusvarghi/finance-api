@@ -14,7 +14,8 @@ export class GetTransactionsByUserIdService {
         getTransactionsByUserIdRepository: GetTransactionsByUserIdRepository,
     ) {
         this.getUserByIdRepository = getUserByIdRepository
-        this.getTransactionsByUserIdRepository = getTransactionsByUserIdRepository
+        this.getTransactionsByUserIdRepository =
+            getTransactionsByUserIdRepository
     }
 
     async execute(userId: string): Promise<TransactionPublicResponse[]> {
@@ -27,6 +28,6 @@ export class GetTransactionsByUserIdService {
         const transactions =
             await this.getTransactionsByUserIdRepository.execute(userId)
 
-        return transactions
+        return transactions || []
     }
 }
