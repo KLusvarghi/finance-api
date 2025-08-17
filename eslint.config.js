@@ -1,11 +1,13 @@
 import globals from "globals";
 import tseslint from "typescript-eslint";
-import jestPlugin from "eslint-plugin-jest";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import { defineConfig } from "eslint/config";
 
 export default defineConfig([
-  // Regra geral para código fonte
+  // Regras de TS via @typescript-eslint (vem primeiro)
+  tseslint.configs.recommended,
+
+  // Regra geral para código fonte (vem depois para sobrescrever)
   {
     files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
     plugins: {
@@ -18,7 +20,26 @@ export default defineConfig([
     },
     rules: {
       "no-unused-vars": "off",
-      "simple-import-sort/imports": "error",
+      // Desabilitar a regra de variáveis não utilizadas do TypeScript
+      "@typescript-eslint/no-unused-vars": "off",
+      // Configuração completa do simple-import-sort
+      "simple-import-sort/imports": [
+        "error",
+        {
+          groups: [
+            // Node.js built-ins
+            ["^node:"],
+            // Dependências externas
+            ["^[a-zA-Z]"],
+            // Imports relativos
+            ["^\\."],
+            // Imports absolutos com @
+            ["^@"],
+            // Imports de tipos TypeScript
+            ["^@types/"],
+          ]
+        }
+      ],
       "simple-import-sort/exports": "error",
       // Proíbe imports diretos de subdiretórios específicos, forçando uso do barrel
       "no-restricted-imports": [
@@ -36,33 +57,6 @@ export default defineConfig([
           ]
         }
       ],
-    },
-  },
-
-  // Regras de TS via @typescript-eslint
-  tseslint.configs.recommended,
-
-  // === Novo bloco para testes Jest ===
-  {
-    // só aplica em arquivos .test.ts/.spec.ts
-    files: ["**/*.test.ts", "**/*.spec.ts"],
-    plugins: {
-      jest: jestPlugin,
-      "simple-import-sort": simpleImportSort,
-    },
-    extends: [
-      "plugin:jest/recommended",     // habilita linter de regras Jest
-      "plugin:jest/style",           // regras de estilo Jest
-    ],
-    env: {
-      jest: true,                    // habilita globals do Jest
-      node: true,
-    },
-    rules: {
-      // Aqui você pode customizar regras específicas de teste, ex:
-      "jest/expect-expect": "error",
-      "jest/no-disabled-tests": "warn",
-      "jest/no-focused-tests": "error",
     },
   },
 
