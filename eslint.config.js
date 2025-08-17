@@ -1,4 +1,3 @@
-import js from "@eslint/js";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 import jestPlugin from "eslint-plugin-jest";
@@ -10,26 +9,33 @@ export default defineConfig([
   {
     files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
     plugins: {
-      js,
       "simple-import-sort": simpleImportSort,
     },
-    extends: ["js/recommended", "prettier"],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "module",
+      globals: globals.browser,
+    },
     rules: {
       "no-unused-vars": "off",
       "simple-import-sort/imports": "error",
       "simple-import-sort/exports": "error",
-    },
-    parserOptions: {
-      ecmaVersion: "es2022",
-      sourceType: "module",
-    },
-  },
-
-  // Globals de browser (se ainda precisar em algum contexto)
-  {
-    files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
-    languageOptions: {
-      globals: globals.browser,
+      // Proíbe imports diretos de subdiretórios específicos, forçando uso do barrel
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/shared/types", "@/shared/response-messagens"],
+              message: "Use o barrel '@/shared' em vez de importar diretamente de subdiretórios específicos."
+            },
+            {
+              group: ["@/errors/user", "@/errors/transaction"],
+              message: "Use o barrel '@/errors' em vez de importar diretamente de subdiretórios específicos."
+            }
+          ]
+        }
+      ],
     },
   },
 
