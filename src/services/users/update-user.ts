@@ -13,10 +13,15 @@ import {
     UserPublicResponse,
 } from '@/shared'
 
-// export class UpdateUserService
-//     implements
-//         ServiceWithMultipleParams<string, UpdateUserParams, unknown, UserPublicResponse>
-export class UpdateUserService {
+export class UpdateUserService
+    implements
+        ServiceWithMultipleParams<
+            string,
+            UpdateUserParams,
+            unknown,
+            UserPublicResponse
+        >
+{
     private getUserByEmailRepository: GetUserByEmailRepository
     private updateUserRepository: UpdateUserRepository
     private passwordHasher: PasswordHasherAdapter
