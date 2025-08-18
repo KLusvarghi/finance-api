@@ -6,11 +6,12 @@ import {
     UpdateTransactionController,
 } from '@/controllers'
 import {
-    PostgresGetUserByIdRepository,
     PostgresCreateTransactionRepository,
-    PostgresGetTransactionsByUserIdRepository,
-    PostgresUpdateTransactionRepository,
     PostgresDeleteTransactionRepository,
+    PostgresGetTransactionByIdRepository,
+    PostgresGetTransactionsByUserIdRepository,
+    PostgresGetUserByIdRepository,
+    PostgresUpdateTransactionRepository,
 } from '@/repositories/postgres'
 import {
     CreateTransactionService,
@@ -27,7 +28,7 @@ export const makeCreateTransactionController = () => {
     const createTransactionService = new CreateTransactionService(
         createTransactionRepository,
         getUserByIdRepository,
-        idGenerator
+        idGenerator,
     )
 
     const createTransactionController = new CreateTransactionController(
@@ -56,8 +57,11 @@ export const makeGetTransactionsByUserIdController = () => {
 export const makeUpdateTransactionController = () => {
     const updateTransactionRepository =
         new PostgresUpdateTransactionRepository()
+    const getTransactionByIdRepository =
+        new PostgresGetTransactionByIdRepository()
 
     const updateTransactionService = new UpdateTransactionService(
+        getTransactionByIdRepository,
         updateTransactionRepository,
     )
 
@@ -71,9 +75,12 @@ export const makeUpdateTransactionController = () => {
 export const makeDeleteTransactionController = () => {
     const deleteTransactionRepository =
         new PostgresDeleteTransactionRepository()
+    const getTransactionByIdRepository =
+        new PostgresGetTransactionByIdRepository()
 
     const deleteTransactionService = new DeleteTransactionService(
         deleteTransactionRepository,
+        getTransactionByIdRepository,
     )
 
     const deleteTransactionController = new DeleteTransactionController(
