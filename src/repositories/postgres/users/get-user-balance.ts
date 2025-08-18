@@ -1,9 +1,14 @@
 import { prisma } from '../../../../prisma/prisma'
 
-import { UserBalanceRepositoryResponse } from '@/shared'
+import {
+    GetUserBalanceRepository,
+    UserBalanceRepositoryResponse,
+} from '@/shared'
 import { Prisma, TransactionType } from '@prisma/client'
 
-export class PostgresGetUserBalanceRepository {
+export class PostgresGetUserBalanceRepository
+    implements GetUserBalanceRepository
+{
     async execute(userId: string): Promise<UserBalanceRepositoryResponse> {
         // para que a gente consiga fazer essa query, ao invés de usar uma function que abstraia a query, vamos usar aggragation: https://www.prisma.io/docs/orm/prisma-client/queries/aggregation-grouping-summarizing
 
