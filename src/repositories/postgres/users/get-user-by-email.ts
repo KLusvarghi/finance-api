@@ -1,5 +1,6 @@
-import { UserRepositoryResponse } from '@/shared/types'
 import { prisma } from '../../../../prisma/prisma'
+
+import { UserRepositoryResponse } from '@/shared'
 
 export class PostgresGetUserByEmailRepository {
     async execute(email: string): Promise<UserRepositoryResponse | null> {

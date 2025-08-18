@@ -1,6 +1,7 @@
-import { Prisma, TransactionType } from '@prisma/client'
 import { prisma } from '../../../../prisma/prisma'
-import { UserBalanceRepositoryResponse } from '@/shared/types'
+
+import { UserBalanceRepositoryResponse } from '@/shared'
+import { Prisma, TransactionType } from '@prisma/client'
 
 export class PostgresGetUserBalanceRepository {
     async execute(userId: string): Promise<UserBalanceRepositoryResponse> {
