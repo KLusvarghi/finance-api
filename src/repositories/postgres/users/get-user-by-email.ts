@@ -1,8 +1,8 @@
 import { prisma } from '../../../../prisma/prisma'
 
-import { UserRepositoryResponse } from '@/shared'
+import { GetUserByEmailRepository, UserRepositoryResponse } from '@/shared'
 
-export class PostgresGetUserByEmailRepository {
+export class PostgresGetUserByEmailRepository implements GetUserByEmailRepository {
     async execute(email: string): Promise<UserRepositoryResponse | null> {
         return await prisma.user.findUnique({
             where: {
