@@ -1,19 +1,26 @@
-import { TransactionNotFoundError } from '@/errors/user'
 import {
     checkIfIdIsValid,
     invalidIdResponse,
     ok,
     serverError,
     transactionNotFoundResponse,
+    unauthorized,
 } from '../_helpers'
-import {
-    DeleteTransactionService,
-    TransactionRepositoryResponse,
-    HttpResponse,
-    HttpRequest,
-} from '@/shared/types'
 
-export class DeleteTransactionController {
+import { ForbiddenError, TransactionNotFoundError } from '@/errors'
+import {
+    Controller,
+    DeleteTransactionRequest,
+    DeleteTransactionService,
+    HttpRequest,
+    HttpResponse,
+    ResponseMessage,
+    TransactionPublicResponse,
+} from '@/shared'
+
+export class DeleteTransactionController
+    // implements Controller<DeleteTransactionRequest, TransactionPublicResponse>
+{
     private deleteTransactionService: DeleteTransactionService
 
     constructor(deleteTransactionService: DeleteTransactionService) {
@@ -22,23 +29,41 @@ export class DeleteTransactionController {
 
     async execute(
         httpRequest: HttpRequest,
-    ): Promise<HttpResponse<TransactionRepositoryResponse>> {
+    ): Promise<HttpResponse<TransactionPublicResponse>> {
         try {
-            const transactionId = httpRequest.params.transactionId
+            const transactionId = httpRequest.params.transactionId as string
+            // const { transactionId, userId } = httpRequest.params as {
+            //     transactionId: string
+            //     userId: string
+            // }
+
 
             if (!checkIfIdIsValid(transactionId)) {
                 return invalidIdResponse()
             }
 
-            const deletedTransaction =
-                await this.deleteTransactionService.execute(transactionId)
+            // if (!userId) {
+            //     return unauthorized('User ID is required')
+            // }
 
-            return ok(deletedTransaction, 'Transaction deleted successfully')
+            const deletedTransaction: TransactionPublicResponse =
+                await this.deleteTransactionService.execute(
+                    transactionId,
+                    // userId,
+                )
+
+            return ok(deletedTransaction, ResponseMessage.TRANSACTION_DELETED)
         } catch (error) {
             console.error(error)
 
             if (error instanceof TransactionNotFoundError) {
-                return transactionNotFoundResponse()
+                return transactionNotFoundResponse(error.message)
+            }
+
+            if (error instanceof ForbiddenError) {
+                return unauthorized(
+                    'You do not have permission to delete this transaction',
+                )
             }
 
             return serverError()

@@ -1,14 +1,26 @@
-import { badRequest, created, serverError } from '../_helpers'
-import { createTransactionSchema } from '@/schemas'
 import { ZodError } from 'zod'
-import {
-    CreateTransactionService,
-    HttpResponse,
-    HttpRequest,
-    TransactionPublicResponse,
-} from '@/shared/types'
 
-export class CreateTransactionController {
+import {
+    badRequest,
+    created,
+    handleZodValidationError,
+    serverError,
+} from '../_helpers'
+
+import { createTransactionSchema } from '@/schemas'
+import {
+    Controller,
+    CreateTransactionRequest,
+    CreateTransactionService,
+    HttpRequest,
+    HttpResponse,
+    ResponseMessage,
+    TransactionPublicResponse,
+} from '@/shared'
+
+export class CreateTransactionController
+    // implements Controller<CreateTransactionRequest, TransactionPublicResponse>
+{
     private createTransactionService: CreateTransactionService
 
     constructor(createTransactionService: CreateTransactionService) {
@@ -23,15 +35,19 @@ export class CreateTransactionController {
 
             // usando o "safeParseAsync" é uma forma de tratar os erros de forma mais segura e eveitar que de um throw e caia no catch e consigamos tratar o erro aqui ainda
             // await createTransactionSchema.safeParseAsync(params)
-            await createTransactionSchema.parseAsync(params)
+            const validatedParams =
+                await createTransactionSchema.parseAsync(params)
 
             const createdTransaction =
-                await this.createTransactionService.execute(params)
+                await this.createTransactionService.execute(validatedParams)
 
-            return created(createdTransaction)
+            return created(
+                createdTransaction,
+                ResponseMessage.TRANSACTION_CREATED,
+            )
         } catch (error) {
             if (error instanceof ZodError) {
-                return badRequest(error.issues[0].message)
+                return handleZodValidationError(error)
             }
             console.error(error)
             return serverError()

@@ -1,4 +1,3 @@
-import { UserNotFoundError } from '@/errors/user'
 import {
     checkIfIdIsValid,
     invalidIdResponse,
@@ -7,14 +6,21 @@ import {
     serverError,
     userNotFoundResponse,
 } from '../_helpers'
+
+import { UserNotFoundError } from '@/errors'
 import {
+    Controller,
+    GetTransactionsByUserIdRequest,
     GetTransactionsByUserIdService,
-    TransactionRepositoryResponse,
-    HttpResponse,
     HttpRequest,
-} from '@/shared/types'
+    HttpResponse,
+    ResponseMessage,
+    TransactionPublicResponse,
+} from '@/shared'
 
 export class GetTransactionsByUserIdController {
+    // implements
+    //     Controller<GetTransactionsByUserIdRequest, TransactionPublicResponse[]>
     private getTransactionByUserIdService: GetTransactionsByUserIdService
 
     constructor(getTransactionByUserIdService: GetTransactionsByUserIdService) {
@@ -23,13 +29,15 @@ export class GetTransactionsByUserIdController {
 
     async execute(
         httpRequest: HttpRequest,
-    ): Promise<HttpResponse<TransactionRepositoryResponse[] | null>> {
+    ): Promise<HttpResponse<TransactionPublicResponse[]>> {
         try {
             // para que possamos pegar um valor que é passsado por uma query na url e não como um parametro no body, fazemos assim:
-            const userId = httpRequest.query.userId
+            const userId = (httpRequest.query as { userId: string }).userId
 
             if (!userId) {
-                return requiredFieldMissingResponse('userId')
+                return requiredFieldMissingResponse(
+                    ResponseMessage.USER_ID_MISSING,
+                )
             }
 
             if (!checkIfIdIsValid(userId)) {
@@ -41,10 +49,10 @@ export class GetTransactionsByUserIdController {
 
             return ok(transactions)
         } catch (error) {
+            console.error(error)
             if (error instanceof UserNotFoundError) {
                 return userNotFoundResponse(error.message)
             }
-            console.error(error)
             return serverError()
         }
     }
