@@ -1,10 +1,10 @@
 import { prisma } from '../../../../prisma/prisma'
 
 import { TransactionNotFoundError } from '@/errors'
-import { TransactionRepositoryResponse } from '@/shared'
+import { DeleteTransactionRepository, TransactionRepositoryResponse } from '@/shared'
 import { Prisma } from '@prisma/client'
 
-export class PostgresDeleteTransactionRepository {
+export class PostgresDeleteTransactionRepository implements DeleteTransactionRepository {
     async execute(
         transactionId: string,
     ): Promise<TransactionRepositoryResponse> {
