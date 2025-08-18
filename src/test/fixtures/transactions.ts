@@ -1,7 +1,8 @@
+import { prisma } from '../../../prisma/prisma'
+import { userId } from './user'
+
 import { faker } from '@faker-js/faker'
 import { Prisma } from '@prisma/client'
-import { userId } from './user'
-import { prisma } from '../../../prisma/prisma'
 
 export const transactionId = faker.string.uuid()
 

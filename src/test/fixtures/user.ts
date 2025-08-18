@@ -1,6 +1,7 @@
+import { prisma } from '../../../prisma/prisma'
+
 import { faker } from '@faker-js/faker'
 import { Prisma } from '@prisma/client'
-import { prisma } from '../../../prisma/prisma'
 
 export const userId = faker.string.uuid()
 
