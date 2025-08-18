@@ -1,17 +1,23 @@
 import isUUID from 'validator/lib/isUUID'
-import { badRequest } from './http'
 import { ZodError } from 'zod'
 
-export const checkIfIdIsValid = (id: string) => isUUID(id)
+import { badRequest } from './http'
+
+import { ErrorCode } from '@/errors'
+import { ResponseMessage } from '@/shared'
+
+export const checkIfIdIsValid = (id: string): boolean => isUUID(id)
 
 export const invalidIdResponse = () =>
-    badRequest('The provider id is not valid.')
+    badRequest(ResponseMessage.INVALID_ID, ErrorCode.INVALID_ID)
 
-export const requiredFieldMissingResponse = (
-    missingField: string | undefined,
-) => badRequest(`The field ${missingField} is required.`)
+export const requiredFieldMissingResponse = (message: string) =>
+    badRequest(
+        message,
+        ErrorCode.MISSING_FIELD,
+    )
 
 export const handleZodValidationError = (error: ZodError) => {
-    const firstMessage = error.issues?.[0]?.message ?? 'Bad Request'
-    return badRequest(firstMessage)
+    const message = error.issues?.[0]?.message ?? ResponseMessage.BAD_REQUEST
+    return badRequest(message, ErrorCode.BAD_REQUEST)
 }
