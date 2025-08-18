@@ -1,11 +1,11 @@
-import { UserPublicResponse } from '@/shared'
-import { GetUserByIdController } from './get-user-by-id'
-import { UserNotFoundError } from '@/errors/user'
+import { GetUserByIdController } from '@/controllers'
+import { UserNotFoundError } from '@/errors'
+import { ResponseMessage, UserPublicResponse } from '@/shared'
 import {
-    userId,
-    getUserByIdServiceResponse,
     getUserByIdHttpRequest as baseHttpRequest,
+    getUserByIdServiceResponse,
     invalidUUID,
+    userId,
 } from '@/test'
 
 describe('GetUserByIdController', () => {
@@ -47,13 +47,12 @@ describe('GetUserByIdController', () => {
                 new UserNotFoundError(userId),
             )
 
-            const result = await sut.execute(baseHttpRequest)
+            const response = await sut.execute(baseHttpRequest)
 
-            expect(result.statusCode).toBe(404)
-            expect(result.body?.status).toBe('error')
-            expect(result.body?.message).toBeTruthy()
-            expect(result.body?.message).toContain(userId)
-            expect(result.body?.message).toBe(
+            expect(response.statusCode).toBe(404)
+            expect(response.body?.message).toBeTruthy()
+            expect(response.body?.message).toContain(userId)
+            expect(response.body?.message).toBe(
                 `User with id ${userId} not found`,
             )
         })
@@ -62,40 +61,37 @@ describe('GetUserByIdController', () => {
                 new Error(),
             )
 
-            const result = await sut.execute(baseHttpRequest)
+            const response = await sut.execute(baseHttpRequest)
 
-            expect(result.statusCode).toBe(500)
-            expect(result.body?.status).toBe('error')
-            expect(result.body?.message).toBeTruthy()
+            expect(response.statusCode).toBe(500)
+            expect(response.body?.message).toBeTruthy()
         })
     })
 
     describe('validations', () => {
         describe('userId', () => {
             it('should return 400 if userId is not provided', async () => {
-                const result = await sut.execute({
+                const response = await sut.execute({
                     params: { userId: undefined },
                 })
 
-                expect(result.statusCode).toBe(400)
-                expect(result.body?.status).toBe('error')
-                expect(result.body?.message).toBe('Missing param: userId')
+                expect(response.statusCode).toBe(400)
+                expect(response.body?.message).toBe(
+                    ResponseMessage.USER_ID_MISSING,
+                )
             })
 
             it.each(invalidUUID)(
                 'should return 400 if userId is $description',
-                async ({ id }) => {
+                async ({ id, expectedMessage }) => {
                     // arrange
-                    const result = await sut.execute({
+                    const response = await sut.execute({
                         params: { userId: id },
                     })
 
                     // assert
-                    expect(result.statusCode).toBe(400)
-                    expect(result.body?.status).toBe('error')
-                    expect(result.body?.message).toBe(
-                        'The provider id is not valid.',
-                    )
+                    expect(response.statusCode).toBe(400)
+                    expect(response.body?.message).toBe(expectedMessage)
                 },
             )
         })
@@ -103,17 +99,16 @@ describe('GetUserByIdController', () => {
 
     describe('success cases', () => {
         it('should return 200 if user is found successfully', async () => {
-            const result = await sut.execute(baseHttpRequest)
+            const response = await sut.execute(baseHttpRequest)
 
-            expect(result.statusCode).toBe(200)
-            expect(result.body?.status).toBe('success')
-            expect(result.body?.message).toBeTruthy()
-            expect(result.body?.data).toBeTruthy()
-            expect(result.body?.data?.id).toBeTruthy()
-            expect(result.body?.data?.first_name).toBeTruthy()
-            expect(result.body?.data?.last_name).toBeTruthy()
-            expect(result.body?.data?.email).toBeTruthy()
-            expect(result.body?.data).not.toHaveProperty('password')
+            expect(response.statusCode).toBe(200)
+            expect(response.body?.message).toBeTruthy()
+            expect(response.body?.data).toBeTruthy()
+            expect(response.body?.data?.id).toBeTruthy()
+            expect(response.body?.data?.first_name).toBeTruthy()
+            expect(response.body?.data?.last_name).toBeTruthy()
+            expect(response.body?.data?.email).toBeTruthy()
+            expect(response.body?.data).not.toHaveProperty('password')
         })
 
         it('should call GetUserByIdService with correct parameters', async () => {

@@ -1,10 +1,10 @@
-import { EmailAlreadyExistsError } from '@/errors/user'
-import { CreateUserController } from './create-user'
+import { CreateUserController } from '@/controllers'
+import { EmailAlreadyExistsError } from '@/errors'
 import { CreateUserParams, UserPublicResponse } from '@/shared'
 import {
-    createUserParams as params,
     createUserControllerResponse,
     createUserHttpRequest as baseHttpRequest,
+    createUserParams as params,
 } from '@/test'
 
 describe('CreateUserController', () => {
@@ -44,11 +44,10 @@ describe('CreateUserController', () => {
             )
 
             // act
-            const result = await sut.execute(baseHttpRequest)
+            const response = await sut.execute(baseHttpRequest)
 
             // assert
-            expect(result.statusCode).toBe(500)
-            expect(result.body?.status).toBe('error')
+            expect(response.statusCode).toBe(500)
         })
 
         it('should return 400 if CreateUserService throws EmailAlreadyExistsError', async () => {
@@ -58,11 +57,11 @@ describe('CreateUserController', () => {
             )
 
             // act
-            const result = await sut.execute(baseHttpRequest)
+            const response = await sut.execute(baseHttpRequest)
 
             // assert
-            expect(result.statusCode).toBe(400)
-            expect(result.body?.message).toContain(params.email)
+            expect(response.statusCode).toBe(400)
+            expect(response.body?.message).toContain(params.email)
         })
     })
 
@@ -70,75 +69,74 @@ describe('CreateUserController', () => {
         describe('first_name', () => {
             it('should return 400 if first_name is not provided', async () => {
                 // arrange
-                const result = await sut.execute({
+                const response = await sut.execute({
                     body: { ...params, first_name: undefined },
                 })
 
                 // assert
-                expect(result.statusCode).toBe(400)
-                expect(result.body?.status).toBe('error')
-                expect(result.body?.message).toBeTruthy()
+                expect(response.statusCode).toBe(400)
+                expect(response.body?.message).toBeTruthy()
             })
 
             it('should return 400 if first_name is too short', async () => {
                 // arrange
-                const result = await sut.execute({
+                const response = await sut.execute({
                     body: { ...params, first_name: 'A' },
                 })
 
                 // assert
-                expect(result.statusCode).toBe(400)
+                expect(response.statusCode).toBe(400)
             })
         })
 
         describe('last_name', () => {
             it('should return 400 if last_name is not provided', async () => {
                 // arrange
-                const result = await sut.execute({
+                const response = await sut.execute({
                     body: { ...params, last_name: undefined },
                 })
 
                 // assert
-                expect(result.statusCode).toBe(400)
+                expect(response.statusCode).toBe(400)
             })
         })
 
         describe('email', () => {
             it('should return 400 if email is not provided', async () => {
                 // arrange
-                const result = await sut.execute({
+                const response = await sut.execute({
                     body: { ...params, email: undefined },
                 })
 
                 // assert
-                expect(result.statusCode).toBe(400)
+                expect(response.statusCode).toBe(400)
             })
 
             it('should return 400 if email is invalid', async () => {
                 // arrange
-                const result = await sut.execute({
+                const response = await sut.execute({
                     body: { ...params, email: 'invalid' },
                 })
 
                 // assert
-                expect(result.statusCode).toBe(400)
+                expect(response.statusCode).toBe(400)
             })
         })
 
         describe('password', () => {
             it('should return 400 if password is not provided', async () => {
                 // arrange
-                const result = await sut.execute({
+                const response = await sut.execute({
                     body: { ...params, password: undefined },
                 })
 
                 // assert
-                expect(result.statusCode).toBe(400)
+                expect(response.statusCode).toBe(400)
             })
 
             it('should return 400 if password is less than 6 characters', async () => {
                 // arrange
-                const result = await sut.execute({
+                const response = await sut.execute({
                     body: {
                         ...params,
                         password: '12345', // Less than 6 characters
@@ -146,7 +144,7 @@ describe('CreateUserController', () => {
                 })
 
                 // assert
-                expect(result.statusCode).toBe(400)
+                expect(response.statusCode).toBe(400)
             })
         })
     })
@@ -154,12 +152,11 @@ describe('CreateUserController', () => {
     describe('success cases', () => {
         it('should create a new user successfully and return 201', async () => {
             // arrange
-            const result = await sut.execute(baseHttpRequest)
+            const response = await sut.execute(baseHttpRequest)
 
             // assert
-            expect(result.statusCode).toBe(201)
-            expect(result.body?.status).toBe('success')
-            expect(result.body?.data).toMatchObject(
+            expect(response.statusCode).toBe(201)
+            expect(response.body?.data).toMatchObject(
                 createUserControllerResponse,
             )
         })

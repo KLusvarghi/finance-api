@@ -1,11 +1,11 @@
-import { UserRepositoryResponse } from '@/shared'
-import { DeleteUserController } from './delete-user'
-import { UserNotFoundError } from '@/errors/user'
+import { DeleteUserController } from '@/controllers'
+import { UserNotFoundError } from '@/errors'
+import { ResponseMessage, UserRepositoryResponse } from '@/shared'
 import {
-    userId,
-    deleteUserRepositoryResponse,
     deleteUserHttpRequest as baseHttpRequest,
+    deleteUserRepositoryResponse,
     invalidUUID,
+    userId,
 } from '@/test'
 
 describe('DeleteUserController', () => {
@@ -46,11 +46,12 @@ describe('DeleteUserController', () => {
                 },
             )
 
-            const result = await sut.execute(baseHttpRequest)
+            const response = await sut.execute(baseHttpRequest)
 
-            expect(result.statusCode).toBe(404)
-            expect(result.body?.status).toBe('error')
-            expect(result.body?.message).toBeTruthy()
+            expect(response.statusCode).toBe(404)
+            expect(response.body?.message).toBe(
+                `User with id ${userId} not found`,
+            )
         })
 
         it('should return 500 if DeleteUserService throws', async () => {
@@ -60,41 +61,37 @@ describe('DeleteUserController', () => {
                 },
             )
 
-            const result = await sut.execute(baseHttpRequest)
+            const response = await sut.execute(baseHttpRequest)
 
-            expect(result.statusCode).toBe(500)
-            expect(result.body?.status).toBe('error')
-            expect(result.body?.message).toBeTruthy()
+            expect(response.statusCode).toBe(500)
+            expect(response.body?.message).toBe(ResponseMessage.SERVER_ERROR)
         })
     })
 
     describe('validations', () => {
         describe('userId', () => {
             it('should return 400 if userId is not provided', async () => {
-                const result = await sut.execute({
+                const response = await sut.execute({
                     params: { userId: undefined },
                 })
 
-                expect(result.statusCode).toBe(400)
-                expect(result.body?.status).toBe('error')
-                expect(result.body?.message).toBeTruthy()
-                expect(result.body?.message).toBe('Missing param: userId')
+                expect(response.statusCode).toBe(400)
+                expect(response.body?.message).toBe(
+                    ResponseMessage.USER_ID_MISSING,
+                )
             })
 
             it.each(invalidUUID)(
                 'should return 400 if userId is $description',
-                async ({ id }) => {
+                async ({ id, expectedMessage }) => {
                     // arrange
-                    const result = await sut.execute({
+                    const response = await sut.execute({
                         params: { userId: id },
                     })
 
                     // assert
-                    expect(result.statusCode).toBe(400)
-                    expect(result.body?.status).toBe('error')
-                    expect(result.body?.message).toBe(
-                        'The provider id is not valid.',
-                    )
+                    expect(response.statusCode).toBe(400)
+                    expect(response.body?.message).toBe(expectedMessage)
                 },
             )
         })
@@ -102,12 +99,11 @@ describe('DeleteUserController', () => {
 
     describe('success cases', () => {
         it('should return 200 if user is deleted successfully', async () => {
-            const result = await sut.execute(baseHttpRequest)
+            const response = await sut.execute(baseHttpRequest)
 
-            expect(result.statusCode).toBe(200)
-            expect(result.body?.status).toBe('success')
-            expect(result.body?.message).toBeTruthy()
-            expect(result.body?.data).toEqual(deleteUserRepositoryResponse)
+            expect(response.statusCode).toBe(200)
+            expect(response.body?.message).toBe(ResponseMessage.USER_DELETED)
+            expect(response.body?.data).toEqual(deleteUserRepositoryResponse)
         })
 
         it('should call DeleteUserService with correct parameters', async () => {

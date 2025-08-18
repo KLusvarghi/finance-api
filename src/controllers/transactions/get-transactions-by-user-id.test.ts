@@ -1,11 +1,11 @@
-import { HttpRequest, TransactionRepositoryResponse } from '@/shared'
-import { GetTransactionsByUserIdController } from './get-transactions-by-user-id'
-import { UserNotFoundError } from '@/errors/user'
+import { GetTransactionsByUserIdController } from '@/controllers'
+import { UserNotFoundError } from '@/errors'
+import { HttpRequest, ResponseMessage, TransactionPublicResponse, TransactionRepositoryResponse } from '@/shared'
 import {
-    invalidUUID,
-    userId,
     getTransactionsByUserIdControllerResponse,
     getTransactionsByUserIdHttpRequest as baseHttpRequest,
+    invalidUUID,
+    userId,
 } from '@/test'
 
 describe('GetTransactionsByUserIdController', () => {
@@ -13,7 +13,7 @@ describe('GetTransactionsByUserIdController', () => {
     let getTransactionByUserIdService: GetTransactionsByUserIdServiceStub
 
     class GetTransactionsByUserIdServiceStub {
-        execute(_userId: string): Promise<TransactionRepositoryResponse[]> {
+        execute(_userId: string): Promise<TransactionPublicResponse[]> {
             return Promise.resolve(getTransactionsByUserIdControllerResponse)
         }
     }
@@ -49,13 +49,13 @@ describe('GetTransactionsByUserIdController', () => {
                 'execute',
             ).mockRejectedValueOnce(new Error())
             // act
-            const response = await sut.execute(
-                baseHttpRequest,
-            )
+            const response = await sut.execute(baseHttpRequest)
 
             // assert
             expect(response.statusCode).toBe(500)
-            expect(response.body?.message).toBe('Internal server error')
+            expect(response.body?.message).toBe(
+                ResponseMessage.SERVER_ERROR,
+            )
         })
 
         it('should return 404 if GetTransactionsByUserIdService throws UserNotFoundError', async () => {
@@ -65,9 +65,7 @@ describe('GetTransactionsByUserIdController', () => {
                 'execute',
             ).mockRejectedValueOnce(new UserNotFoundError(userId))
             // act
-            const response = await sut.execute(
-                baseHttpRequest,
-            )
+            const response = await sut.execute(baseHttpRequest)
 
             // assert
             expect(response.statusCode).toBe(404)
@@ -84,7 +82,7 @@ describe('GetTransactionsByUserIdController', () => {
 
             // assert
             expect(response.statusCode).toBe(400)
-            expect(response.body?.message).toBe('The field userId is required.')
+            expect(response.body?.message).toBe(ResponseMessage.USER_ID_MISSING)
         })
 
         it.each(invalidUUID)(
@@ -98,7 +96,7 @@ describe('GetTransactionsByUserIdController', () => {
                 // assert
                 expect(response.statusCode).toBe(400)
                 expect(response.body?.message).toBe(
-                    'The provider id is not valid.',
+                    ResponseMessage.INVALID_ID,
                 )
             },
         )
@@ -127,7 +125,9 @@ describe('GetTransactionsByUserIdController', () => {
             await sut.execute(baseHttpRequest)
 
             // assert
-            expect(executeSpy).toHaveBeenCalledWith(baseHttpRequest.query.userId)
+            expect(executeSpy).toHaveBeenCalledWith(
+                baseHttpRequest.query.userId,
+            )
             expect(executeSpy).toHaveBeenCalledTimes(1)
         })
     })

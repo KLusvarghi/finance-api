@@ -1,11 +1,11 @@
-import { HttpRequest, UserBalanceRepositoryResponse } from '@/shared'
-import { GetUserBalanceController } from './get-user-balance'
-import { UserNotFoundError } from '@/errors/user'
+import { GetUserBalanceController } from '@/controllers'
+import { UserNotFoundError } from '@/errors'
+import { ResponseMessage, UserBalanceRepositoryResponse } from '@/shared'
 import {
-    userId,
-    userBalanceResponse,
     getUserBalanceHttpRequest as baseHttpRequest,
     invalidUUID,
+    userBalanceResponse,
+    userId,
 } from '@/test'
 
 describe('GetUserBalanceController', () => {
@@ -44,11 +44,10 @@ describe('GetUserBalanceController', () => {
                 new Error(),
             )
 
-            const result = await sut.execute(baseHttpRequest)
+            const response = await sut.execute(baseHttpRequest)
 
-            expect(result.statusCode).toBe(500)
-            expect(result.body?.status).toBe('error')
-            expect(result.body?.message).toBeTruthy()
+            expect(response.statusCode).toBe(500)
+            expect(response.body?.message).toBeTruthy()
         })
 
         it('should return 404 if GetUserBalanceService throws UserNotFoundError', async () => {
@@ -56,41 +55,38 @@ describe('GetUserBalanceController', () => {
                 new UserNotFoundError(userId),
             )
 
-            const result = await sut.execute(baseHttpRequest)
+            const response = await sut.execute(baseHttpRequest)
 
-            expect(result.statusCode).toBe(404)
-            expect(result.body?.status).toBe('error')
-            expect(result.body?.message).toBeTruthy()
-            expect(result.body?.message).toContain(userId)
+            expect(response.statusCode).toBe(404)
+            expect(response.body?.message).toBeTruthy()
+            expect(response.body?.message).toContain(userId)
         })
     })
 
     describe('validations', () => {
         describe('userId', () => {
             it('should return 400 if userId is not provided', async () => {
-                const result = await sut.execute({
+                const response = await sut.execute({
                     params: { userId: undefined },
                 })
 
-                expect(result.statusCode).toBe(400)
-                expect(result.body?.status).toBe('error')
-                expect(result.body?.message).toBe('Missing param: userId')
+                expect(response.statusCode).toBe(400)
+                expect(response.body?.message).toBe(
+                    ResponseMessage.USER_ID_MISSING,
+                  )
             })
 
             it.each(invalidUUID)(
                 'should return 400 if userId is $description',
-                async ({ id }) => {
+                async ({ id, expectedMessage }) => {
                     // arrange
-                    const result = await sut.execute({
+                    const response = await sut.execute({
                         params: { userId: id },
                     })
 
                     // assert
-                    expect(result.statusCode).toBe(400)
-                    expect(result.body?.status).toBe('error')
-                    expect(result.body?.message).toBe(
-                        'The provider id is not valid.',
-                    )
+                    expect(response.statusCode).toBe(400)
+                    expect(response.body?.message).toBe(expectedMessage)
                 },
             )
         })
@@ -98,19 +94,18 @@ describe('GetUserBalanceController', () => {
 
     describe('success cases', () => {
         it('should return 200 when getting user balance successfully', async () => {
-            const result = await sut.execute(baseHttpRequest)
+            const response = await sut.execute(baseHttpRequest)
 
-            expect(result.statusCode).toBe(200)
-            expect(result.body?.status).toBe('success')
-            expect(result.body?.message).toBeTruthy()
-            expect(result.body?.data).toEqual(userBalanceResponse)
-            expect(result.body?.data?.earnings).toBeDefined()
-            expect(result.body?.data?.expenses).toBeDefined()
-            expect(result.body?.data?.investments).toBeDefined()
-            expect(result.body?.data?.balance).toBeDefined()
-            expect(typeof result.body?.data?.earnings).toBe('number')
-            expect(typeof result.body?.data?.expenses).toBe('number')
-            expect(typeof result.body?.data?.investments).toBe('number')
+            expect(response.statusCode).toBe(200)
+            expect(response.body?.message).toBeTruthy()
+            expect(response.body?.data).toEqual(userBalanceResponse)
+            expect(response.body?.data?.earnings).toBeDefined()
+            expect(response.body?.data?.expenses).toBeDefined()
+            expect(response.body?.data?.investments).toBeDefined()
+            expect(response.body?.data?.balance).toBeDefined()
+            expect(typeof response.body?.data?.earnings).toBe('number')
+            expect(typeof response.body?.data?.expenses).toBe('number')
+            expect(typeof response.body?.data?.investments).toBe('number')
         })
 
         it('should call GetUserBalanceService with correct parameters', async () => {

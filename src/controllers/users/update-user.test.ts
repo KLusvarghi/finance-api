@@ -1,16 +1,20 @@
-import { UpdateUserController } from './update-user'
-import { UpdateUserParams, UserRepositoryResponse } from '@/shared'
+import { UpdateUserController } from '@/controllers'
 import {
     EmailAlreadyExistsError,
     UpdateUserFailedError,
     UserNotFoundError,
-} from '@/errors/user'
+} from '@/errors'
 import {
-    userId,
+    ResponseMessage,
+    UpdateUserParams,
+    UserRepositoryResponse,
+} from '@/shared'
+import {
+    invalidUUID,
+    updateUserHttpRequest as baseHttpRequest,
     updateUserParams,
     updateUserRepositoryResponse,
-    updateUserHttpRequest as baseHttpRequest,
-    invalidUUID,
+    userId,
 } from '@/test'
 
 describe('UpdateUserController', () => {
@@ -55,11 +59,10 @@ describe('UpdateUserController', () => {
                 new Error(),
             )
 
-            const result = await sut.execute(baseHttpRequest)
+            const response = await sut.execute(baseHttpRequest)
 
-            expect(result.statusCode).toBe(500)
-            expect(result.body?.status).toBe('error')
-            expect(result.body?.message).toBeTruthy()
+            expect(response.statusCode).toBe(500)
+            expect(response.body?.message).toBeTruthy()
         })
 
         it('should return 400 when UpdateUserService throws EmailAlreadyExistsError', async () => {
@@ -67,13 +70,12 @@ describe('UpdateUserController', () => {
                 new EmailAlreadyExistsError(baseHttpRequest.body.email),
             )
 
-            const result = await sut.execute(baseHttpRequest)
+            const response = await sut.execute(baseHttpRequest)
 
-            expect(result.statusCode).toBe(400)
-            expect(result.body?.status).toBe('error')
-            expect(result.body?.message).toBeTruthy()
-            expect(result.body?.message).toContain(baseHttpRequest.body.email)
-            expect(result.body?.message).toContain('already in use')
+            expect(response.statusCode).toBe(400)
+            expect(response.body?.message).toBeTruthy()
+            expect(response.body?.message).toContain(baseHttpRequest.body.email)
+            expect(response.body?.message).toContain('already in use')
         })
 
         it('should return 404 when UpdateUserService throws UserNotFoundError', async () => {
@@ -81,12 +83,11 @@ describe('UpdateUserController', () => {
                 new UserNotFoundError(baseHttpRequest.params.userId),
             )
 
-            const result = await sut.execute(baseHttpRequest)
+            const response = await sut.execute(baseHttpRequest)
 
-            expect(result.statusCode).toBe(404)
-            expect(result.body?.status).toBe('error')
-            expect(result.body?.message).toBeTruthy()
-            expect(result.body?.message).toContain(
+            expect(response.statusCode).toBe(404)
+            expect(response.body?.message).toBeTruthy()
+            expect(response.body?.message).toContain(
                 baseHttpRequest.params.userId,
             )
         })
@@ -96,31 +97,29 @@ describe('UpdateUserController', () => {
                 new UpdateUserFailedError(),
             )
 
-            const result = await sut.execute(baseHttpRequest)
+            const response = await sut.execute(baseHttpRequest)
 
-            expect(result.statusCode).toBe(500)
-            expect(result.body?.status).toBe('error')
-            expect(result.body?.message).toBeTruthy()
+            expect(response.statusCode).toBe(500)
+            expect(response.body?.message).toBeTruthy()
         })
     })
 
     describe('validations', () => {
         describe('email', () => {
             it('should return 400 when invalid email is provided', async () => {
-                const result = await sut.execute({
+                const response = await sut.execute({
                     params: { userId: userId },
                     body: { ...updateUserParams, email: 'invalid_email' },
                 })
 
-                expect(result.statusCode).toBe(400)
-                expect(result.body?.status).toBe('error')
-                expect(result.body?.message).toBeTruthy()
+                expect(response.statusCode).toBe(400)
+                expect(response.body?.message).toBeTruthy()
             })
         })
 
         describe('password', () => {
             it('should return 400 when invalid password is provided', async () => {
-                const result = await sut.execute({
+                const response = await sut.execute({
                     params: { userId: userId },
                     body: {
                         ...updateUserParams,
@@ -128,47 +127,44 @@ describe('UpdateUserController', () => {
                     },
                 })
 
-                expect(result.statusCode).toBe(400)
-                expect(result.body?.status).toBe('error')
-                expect(result.body?.message).toBeTruthy()
+                expect(response.statusCode).toBe(400)
+                expect(response.body?.message).toBeTruthy()
             })
         })
 
         describe('userId', () => {
             it('should return 400 when userId is not provided', async () => {
-                const result = await sut.execute({
+                const response = await sut.execute({
                     params: { userId: undefined },
                     body: updateUserParams,
                 })
 
-                expect(result.statusCode).toBe(400)
-                expect(result.body?.status).toBe('error')
-                expect(result.body?.message).toBeTruthy()
-                expect(result.body?.message).toBe('Missing param: userId')
+                expect(response.statusCode).toBe(400)
+                expect(response.body?.message).toBeTruthy()
+                expect(response.body?.message).toBe(
+                    ResponseMessage.USER_ID_MISSING,
+                )
             })
 
             it.each(invalidUUID)(
                 'should return 400 if userId is $description',
-                async ({ id }) => {
+                async ({ id, expectedMessage }) => {
                     // arrange
-                    const result = await sut.execute({
+                    const response = await sut.execute({
                         params: { userId: id },
                         body: updateUserParams,
                     })
 
                     // assert
-                    expect(result.statusCode).toBe(400)
-                    expect(result.body?.status).toBe('error')
-                    expect(result.body?.message).toBe(
-                        'The provider id is not valid.',
-                    )
+                    expect(response.statusCode).toBe(400)
+                    expect(response.body?.message).toBe(expectedMessage)
                 },
             )
         })
 
         describe('disallowed fields', () => {
             it('should return 400 when disallowed field is provided', async () => {
-                const result = await sut.execute({
+                const response = await sut.execute({
                     params: { userId: userId },
                     body: {
                         ...updateUserParams,
@@ -176,21 +172,19 @@ describe('UpdateUserController', () => {
                     },
                 })
 
-                expect(result.statusCode).toBe(400)
-                expect(result.body?.status).toBe('error')
-                expect(result.body?.message).toBeTruthy()
+                expect(response.statusCode).toBe(400)
+                expect(response.body?.message).toBeTruthy()
             })
         })
     })
 
     describe('success cases', () => {
         it('should return 200 when updating user successfully', async () => {
-            const result = await sut.execute(baseHttpRequest)
+            const response = await sut.execute(baseHttpRequest)
 
-            expect(result.statusCode).toBe(200)
-            expect(result.body?.status).toBe('success')
-            expect(result.body?.message).toBeTruthy()
-            expect(result.body?.data).toEqual(updateUserRepositoryResponse)
+            expect(response.statusCode).toBe(200)
+            expect(response.body?.message).toBeTruthy()
+            expect(response.body?.data).toEqual(updateUserRepositoryResponse)
         })
 
         it('should call UpdateUserService with correct parameters', async () => {
