@@ -1,10 +1,10 @@
 import { prisma } from '../../../../prisma/prisma'
 
 import { UserNotFoundError } from '@/errors'
-import { UserRepositoryResponse } from '@/shared'
+import { DeleteUserRepository, UserRepositoryResponse } from '@/shared'
 import { Prisma } from '@prisma/client'
 
-export class PostgresDeleteUserRepository {
+export class PostgresDeleteUserRepository implements DeleteUserRepository {
     async execute(userId: string): Promise<UserRepositoryResponse> {
         try {
             return prisma.user.delete({ where: { id: userId } })
