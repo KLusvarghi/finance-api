@@ -6,9 +6,9 @@ import {
     UserBalanceRepositoryResponse,
 } from '@/shared'
 
-// export class GetUserBalanceService
-//     implements SimpleService<string, UserBalanceRepositoryResponse>
-export class GetUserBalanceService {
+export class GetUserBalanceService
+    implements SimpleService<string, UserBalanceRepositoryResponse>
+{
     private getUserByIdRepository: GetUserByIdRepository
     private getUserBalanceRepository: GetUserBalanceRepository
 
