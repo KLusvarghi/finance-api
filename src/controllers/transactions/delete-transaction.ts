@@ -19,7 +19,7 @@ import {
 } from '@/shared'
 
 export class DeleteTransactionController
-    // implements Controller<DeleteTransactionRequest, TransactionPublicResponse>
+    implements Controller<DeleteTransactionRequest, TransactionPublicResponse>
 {
     private deleteTransactionService: DeleteTransactionService
 
