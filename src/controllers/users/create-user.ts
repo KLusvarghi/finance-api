@@ -20,7 +20,7 @@ import {
 } from '@/shared'
 
 export class CreateUserController
-    // implements Controller<CreateUserParams, UserPublicResponse>
+    implements Controller<CreateUserParams, UserPublicResponse>
 {
     private createUserService: CreateUserService
 
