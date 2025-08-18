@@ -1,11 +1,15 @@
-import { createTestUser, createUserRepositoryResponse as fakeUser } from '@/test'
-import { PostgresGetUserBalanceRepository } from './get-user-balance'
 import { prisma } from '../../../../prisma/prisma'
+
+import { PostgresGetUserBalanceRepository } from '@/repositories/postgres'
+import {
+    createTestUser,
+    createUserRepositoryResponse as fakeUser,
+} from '@/test'
 import { faker } from '@faker-js/faker'
 import { TransactionType } from '@prisma/client'
 
 describe('PostgresGetUserBalanceRepository', () => {
-    let sut = new PostgresGetUserBalanceRepository()
+    const sut = new PostgresGetUserBalanceRepository()
 
     afterEach(() => {
         jest.restoreAllMocks()

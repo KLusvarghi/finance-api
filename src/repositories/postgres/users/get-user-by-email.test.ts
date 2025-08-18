@@ -1,9 +1,13 @@
-import { createTestUser, createUserRepositoryResponse as fakeUser } from '@/test'
 import { prisma } from '../../../../prisma/prisma'
-import { PostgresGetUserByEmailRepository } from './get-user-by-email'
+
+import { PostgresGetUserByEmailRepository } from '@/repositories/postgres'
+import {
+    createTestUser,
+    createUserRepositoryResponse as fakeUser,
+} from '@/test'
 
 describe('PostgresGetUserByEmailRepository', () => {
-    let sut = new PostgresGetUserByEmailRepository()
+    const sut = new PostgresGetUserByEmailRepository()
 
     describe('error handling', () => {
         it('should throw an error if Prisma throws', async () => {
@@ -43,5 +47,16 @@ describe('PostgresGetUserByEmailRepository', () => {
                 },
             })
         })
+
+        it('should return null if user does not exist', async () => {
+          // arrange
+          jest.spyOn(prisma.user, 'findUnique').mockResolvedValueOnce(null)
+
+          // act
+          const response = await sut.execute(fakeUser.email)
+
+          // assert
+          expect(response).toBeNull()
+      })
     })
 })

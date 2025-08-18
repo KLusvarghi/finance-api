@@ -1,9 +1,10 @@
-import { createUserRepositoryResponse as fakeUser } from '@/test'
-import { PostgresCreateUserRepository } from './create-user'
 import { prisma } from '../../../../prisma/prisma'
 
+import { PostgresCreateUserRepository } from '@/repositories/postgres'
+import { createUserRepositoryResponse as fakeUser } from '@/test'
+
 describe('PostgresCreateUserRepository', () => {
-    let sut = new PostgresCreateUserRepository()
+    const sut = new PostgresCreateUserRepository()
 
     describe('error handling', () => {
         it('should throw an error if Prisma throws', async () => {

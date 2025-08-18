@@ -1,15 +1,17 @@
-import { PostgresCreateTransactionRepository } from './create-transaction'
+import dayjs from 'dayjs'
+
+import { prisma } from '../../../../prisma/prisma'
+
+import { PostgresCreateTransactionRepository } from '@/repositories/postgres'
 import {
     createTestUser,
     createTransactionParams,
-    transactionId,
     createTransactionRepositoryResponse as fakeTransaction,
+    transactionId,
 } from '@/test'
-import dayjs from 'dayjs'
-import { prisma } from '../../../../prisma/prisma'
 
 describe('PostgresCreateTransactionRepository', () => {
-    let sut = new PostgresCreateTransactionRepository()
+    const sut = new PostgresCreateTransactionRepository()
 
     describe('error handling', () => {
         it('should throw an error if Prisma throws', async () => {

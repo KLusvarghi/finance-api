@@ -1,9 +1,41 @@
-import { createTestUser, createUserRepositoryResponse as fakeUser, userId } from '@/test'
-import { PostgresDeleteUserRepository } from './delete-user'
 import { prisma } from '../../../../prisma/prisma'
 
+import { UserNotFoundError } from '@/errors'
+import { PostgresDeleteUserRepository } from '@/repositories/postgres'
+import {
+    createTestUser,
+    createUserRepositoryResponse as fakeUser,
+    userId,
+} from '@/test'
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
+
 describe('PostgresDeleteUserRepository', () => {
-    let sut = new PostgresDeleteUserRepository()
+    const sut = new PostgresDeleteUserRepository()
+
+    describe('error handling', () => {
+        it('should throw UserNotFoundError if user is not found', async () => {
+            jest.spyOn(prisma.user, 'delete').mockImplementationOnce(() => {
+                throw new PrismaClientKnownRequestError('User not found', {
+                    code: 'P2025',
+                    clientVersion: '0.0.0',
+                })
+            })
+
+            const promise = sut.execute(userId)
+
+            expect(promise).rejects.toBeInstanceOf(UserNotFoundError)
+        })
+
+        it('should throw an error if Prisma throws', async () => {
+            jest.spyOn(prisma.user, 'delete').mockImplementationOnce(() => {
+                throw new Error('Prisma error')
+            })
+
+            const promise = sut.execute(userId)
+
+            await expect(promise).rejects.toThrow('Prisma error')
+        })
+    })
 
     describe('success', () => {
         it('should delete a user on database successfully', async () => {
@@ -30,13 +62,6 @@ describe('PostgresDeleteUserRepository', () => {
                     id: fakeUser.id,
                 },
             })
-        })
-
-        it('should return null if user does not exist', async () => {
-            // como não tem usuário no banco, ele retorna null
-            const response = await sut.execute(userId)
-
-            expect(response).toBeNull()
         })
     })
 })

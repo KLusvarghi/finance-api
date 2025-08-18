@@ -1,22 +1,26 @@
-import { createTestUser, createUserRepositoryResponse as fakeUser } from '@/test'
 import { prisma } from '../../../../prisma/prisma'
-import { PostgresGetUserByIdRepository } from './get-user-by-id'
+
+import { PostgresGetUserByIdRepository } from '@/repositories/postgres'
+import {
+    createTestUser,
+    createUserRepositoryResponse as fakeUser,
+} from '@/test'
 
 describe('PostgresGetUserByIdRepository', () => {
-    let sut = new PostgresGetUserByIdRepository()
+    const sut = new PostgresGetUserByIdRepository()
 
     describe('error handling', () => {
-      it('should throw an error if Prisma throws', async () => {
-          // arrange
-          jest.spyOn(prisma.user, 'findUnique').mockRejectedValueOnce(
-              new Error('Prisma error'),
-          )
-          // act
-          const promise = sut.execute(fakeUser.id)
+        it('should throw an error if Prisma throws', async () => {
+            // arrange
+            jest.spyOn(prisma.user, 'findUnique').mockRejectedValueOnce(
+                new Error('Prisma error'),
+            )
+            // act
+            const promise = sut.execute(fakeUser.id)
 
-          expect(promise).rejects.toThrow(new Error('Prisma error'))
-      })
-  })
+            expect(promise).rejects.toThrow(new Error('Prisma error'))
+        })
+    })
 
     describe('success', () => {
         it('should get user by id on database successfully', async () => {
@@ -42,6 +46,17 @@ describe('PostgresGetUserByIdRepository', () => {
                     id: fakeUser.id,
                 },
             })
+        })
+
+        it('should return null if user does not exist', async () => {
+            // arrange
+            jest.spyOn(prisma.user, 'findUnique').mockResolvedValueOnce(null)
+
+            // act
+            const response = await sut.execute(fakeUser.id)
+
+            // assert
+            expect(response).toBeNull()
         })
     })
 })

@@ -1,15 +1,22 @@
+import dayjs from 'dayjs'
+
+import { prisma } from '../../../../prisma/prisma'
+
+import { TransactionNotFoundError } from '@/errors'
+import { PostgresUpdateTransactionRepository } from '@/repositories/postgres'
 import {
     createTestTransaction,
     createTestUser,
     updateTransactionParams as params,
+    userId,
 } from '@/test'
-import { PostgresUpdateTransactionRepository } from './update-transaction'
-import dayjs from 'dayjs'
-import { prisma } from '../../../../prisma/prisma'
-import { Decimal } from '@prisma/client/runtime/library'
+import {
+    Decimal,
+    PrismaClientKnownRequestError,
+} from '@prisma/client/runtime/library'
 
 describe('PostgresUpdateTransactionRepository', () => {
-    let sut = new PostgresUpdateTransactionRepository()
+    const sut = new PostgresUpdateTransactionRepository()
 
     describe('error handling', () => {
         it('should throw an error if Prisma throws', async () => {
@@ -20,6 +27,20 @@ describe('PostgresUpdateTransactionRepository', () => {
             // act
             const promise = sut.execute('any_transaction_id', params)
             expect(promise).rejects.toThrow(new Error('Prisma error'))
+        })
+
+        it('should throw TransactionNotFoundError if transaction is not found', async () => {
+            // arrange
+            jest.spyOn(prisma.transaction, 'update').mockRejectedValueOnce(
+                new PrismaClientKnownRequestError('Transaction not found', {
+                    code: 'P2025',
+                    clientVersion: '0.0.0',
+                }),
+            )
+            // act
+            const promise = sut.execute(userId, params)
+
+            expect(promise).rejects.toBeInstanceOf(TransactionNotFoundError)
         })
     })
 
@@ -45,7 +66,9 @@ describe('PostgresUpdateTransactionRepository', () => {
             expect(dayjs(response?.date).month()).toBe(
                 dayjs(transaction.date).month(),
             )
-            expect(dayjs(response?.date).year()).toBe(dayjs(transaction.date).year())
+            expect(dayjs(response?.date).year()).toBe(
+                dayjs(transaction.date).year(),
+            )
         })
     })
     describe('validations', () => {

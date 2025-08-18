@@ -2,58 +2,47 @@ import dayjs from 'dayjs'
 
 import { prisma } from '../../../../prisma/prisma'
 
-import { TransactionNotFoundError } from '@/errors'
-import { PostgresDeleteTransactionRepository } from '@/repositories/postgres'
-import { createTestTransaction, createTestUser, transactionId } from '@/test'
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
+import { PostgresGetTransactionByIdRepository } from '@/repositories/postgres'
+import { createTestTransaction, createTestUser } from '@/test'
 
-describe('PostgresDeleteTransactionRepository', () => {
-    const sut = new PostgresDeleteTransactionRepository()
+describe('PostgresGetTransactionByIdRepository', () => {
+    const sut = new PostgresGetTransactionByIdRepository()
 
     describe('error handling', () => {
-        it('should throw TransactionNotFoundError if transaction is not found', async () => {
-            jest.spyOn(prisma.transaction, 'delete').mockImplementationOnce(
-                () => {
-                    throw new PrismaClientKnownRequestError(
-                        'Transaction not found',
-                        {
-                            code: 'P2025',
-                            clientVersion: '0.0.0',
-                        },
-                    )
-                },
-            )
-
-            const promise = sut.execute(transactionId)
-
-            expect(promise).rejects.toBeInstanceOf(TransactionNotFoundError)
-        })
-
         it('should throw an error if Prisma throws', async () => {
             // arrange
-            jest.spyOn(prisma.transaction, 'delete').mockRejectedValueOnce(
+            jest.spyOn(prisma.transaction, 'findUnique').mockRejectedValueOnce(
                 new Error('Prisma error'),
             )
             // act
-            const promise = sut.execute(transactionId)
+            const promise = sut.execute('any_transaction_id')
+            expect(promise).rejects.toThrow(new Error('Prisma error'))
+        })
+
+        it('should return null if transaction is not found', async () => {
+            // arrange
+            jest.spyOn(prisma.transaction, 'findUnique').mockResolvedValueOnce(
+                null,
+            )
+
+            // act
+            const response = await sut.execute('any_transaction_id')
 
             // assert
-            expect(promise).rejects.toThrow(new Error('Prisma error'))
+            expect(response).toBeNull()
         })
     })
 
     describe('success', () => {
-        it('should delete a transaction on database successfully', async () => {
-            // arrange
+        it('should get transaction by id on database', async () => {
             const user = await createTestUser()
+
             const transaction = await createTestTransaction({
                 user_id: user.id,
             })
 
-            // act
             const response = await sut.execute(transaction.id)
 
-            // assert
             expect(response).not.toBeNull()
             expect(response?.name).toBe(transaction.name)
             expect(response?.type).toBe(transaction.type)
@@ -70,7 +59,6 @@ describe('PostgresDeleteTransactionRepository', () => {
             )
         })
     })
-
     describe('validations', () => {
         it('should call Prisma with correct params', async () => {
             // arrange
@@ -78,8 +66,7 @@ describe('PostgresDeleteTransactionRepository', () => {
             const transaction = await createTestTransaction({
                 user_id: user.id,
             })
-
-            const prismaSpy = jest.spyOn(prisma.transaction, 'delete')
+            const prismaSpy = jest.spyOn(prisma.transaction, 'findUnique')
 
             // act
             await sut.execute(transaction.id)

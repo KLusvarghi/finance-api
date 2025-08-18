@@ -1,30 +1,47 @@
+import { prisma } from '../../../../prisma/prisma'
+
+import { UserNotFoundError } from '@/errors'
+import { PostgresUpdateUserRepository } from '@/repositories/postgres'
 import {
     createTestUser,
-    updateUserRepositoryResponse as fakeUser,
     updateUserParams as params,
+    updateUserRepositoryResponse as fakeUser,
+    userId,
 } from '@/test'
-import { prisma } from '../../../../prisma/prisma'
-import { PostgresUpdateUserRepository } from './update-user'
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 
 describe('PostgresUpdateUserRepository', () => {
-    let sut = new PostgresUpdateUserRepository()
-    let updateUserParams = {
+    const sut = new PostgresUpdateUserRepository()
+    const updateUserParams = {
         ...params,
         password: 'valid_hash',
     }
 
     describe('error handling', () => {
-      it('should throw an error if Prisma throws', async () => {
-          // arrange
-          jest.spyOn(prisma.user, 'update').mockRejectedValueOnce(
-              new Error('Prisma error'),
-          )
-          // act
-          const promise = sut.execute(fakeUser.id, updateUserParams)
+        it('should throw error intance of PrismaClientKnownRequestError if user is not found', async () => {
+            jest.spyOn(prisma.user, 'update').mockImplementationOnce(() => {
+                throw new PrismaClientKnownRequestError('User not found', {
+                    code: 'P2025',
+                    clientVersion: '0.0.0',
+                })
+            })
 
-          expect(promise).rejects.toThrow(new Error('Prisma error'))
-      })
-  })
+            const promise = sut.execute(userId, updateUserParams)
+
+            expect(promise).rejects.toBeInstanceOf(UserNotFoundError)
+        })
+
+        it('should throw an error if Prisma throws', async () => {
+            // arrange
+            jest.spyOn(prisma.user, 'update').mockRejectedValueOnce(
+                new Error('Prisma error'),
+            )
+            // act
+            const promise = sut.execute(fakeUser.id, updateUserParams)
+
+            expect(promise).rejects.toThrow(new Error('Prisma error'))
+        })
+    })
 
     describe('success', () => {
         it('should update user on database successfully', async () => {

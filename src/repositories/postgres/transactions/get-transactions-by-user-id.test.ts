@@ -1,10 +1,12 @@
-import { createTestTransaction, createTestUser } from '@/test'
-import { PostgresGetTransactionsByUserIdRepository } from './get-transactions-by-user-id'
 import dayjs from 'dayjs'
+
 import { prisma } from '../../../../prisma/prisma'
 
+import { PostgresGetTransactionsByUserIdRepository } from '@/repositories/postgres'
+import { createTestTransaction, createTestUser } from '@/test'
+
 describe('PostgresGetTransactionsByUserIdRepository', () => {
-    let sut = new PostgresGetTransactionsByUserIdRepository()
+    const sut = new PostgresGetTransactionsByUserIdRepository()
 
     describe('error handling', () => {
         it('should throw an error if Prisma throws', async () => {
@@ -65,6 +67,17 @@ describe('PostgresGetTransactionsByUserIdRepository', () => {
                     user_id: user.id,
                 },
             })
+        })
+
+        it('should return an empty array if user has no transactions', async () => {
+            // arrange
+            const user = await createTestUser()
+
+            // act
+            const response = await sut.execute(user.id)
+
+            // assert
+            expect(response).toEqual([])
         })
     })
 })
