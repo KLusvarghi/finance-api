@@ -24,8 +24,9 @@ import {
     UpdateTransactionService,
 } from '@/shared'
 
-export class UpdateTransactionController {
-    // implements Controller<UpdateTransactionRequest, TransactionPublicResponse>
+export class UpdateTransactionController
+    implements Controller<UpdateTransactionRequest, TransactionPublicResponse>
+{
     private updateTransactionService: UpdateTransactionService
 
     constructor(updateTransactionService: UpdateTransactionService) {
