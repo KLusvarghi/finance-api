@@ -3,8 +3,9 @@ import { UserNotFoundError } from '@/errors'
 import { CreateTransactionParams, Service, TransactionPublicResponse } from '@/shared'
 import { CreateTransactionRepository, GetUserByIdRepository } from '@/shared'
 
-// export class CreateTransactionService implements Service<CreateTransactionParams, TransactionPublicResponse> {
-export class CreateTransactionService {
+export class CreateTransactionService
+    implements Service<CreateTransactionParams, TransactionPublicResponse>
+{
     private createTransactionRepository: CreateTransactionRepository
     private getUserByIdRepository: GetUserByIdRepository
     private idGenerator: IdGeneratorAdapter
