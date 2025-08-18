@@ -1,6 +1,7 @@
-import { UserNotFoundError } from '@/errors/user'
-import { GetUserByIdRepository, UserPublicResponse } from '@/shared/types'
+import { UserNotFoundError } from '@/errors'
+import { GetUserByIdRepository, SimpleService, UserPublicResponse } from '@/shared'
 
+// export class GetUserByIdService implements SimpleService<string, UserPublicResponse> {
 export class GetUserByIdService {
     private getUserByIdRepository: GetUserByIdRepository
 

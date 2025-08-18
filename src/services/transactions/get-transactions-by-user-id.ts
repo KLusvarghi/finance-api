@@ -1,11 +1,13 @@
-import { UserNotFoundError } from '@/errors/user'
+import { UserNotFoundError } from '@/errors'
 import {
-    GetUserByIdRepository,
     GetTransactionsByUserIdRepository,
+    GetUserByIdRepository,
+    SimpleService,
     TransactionPublicResponse,
-} from '@/shared/types'
+  } from '@/shared'
 
-export class GetTransactionsByUserIdService {
+  // export class GetTransactionsByUserIdService implements SimpleService<string, TransactionPublicResponse[]> {
+  export class GetTransactionsByUserIdService {
     private getUserByIdRepository: GetUserByIdRepository
     private getTransactionsByUserIdRepository: GetTransactionsByUserIdRepository
 
@@ -28,6 +30,17 @@ export class GetTransactionsByUserIdService {
         const transactions =
             await this.getTransactionsByUserIdRepository.execute(userId)
 
-        return transactions || []
+        // Garantir que sempre retornamos um array, mesmo se o repository retornar null
+        const transactionsArray = transactions ?? []
+
+        // Converter TransactionRepositoryResponse[] para TransactionPublicResponse[]
+        return transactionsArray.map((transaction) => ({
+            id: transaction.id,
+            user_id: transaction.user_id,
+            name: transaction.name,
+            amount: transaction.amount,
+            date: transaction.date,
+            type: transaction.type,
+        }))
     }
 }

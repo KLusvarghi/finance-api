@@ -1,14 +1,9 @@
-import {
-    CreateTransactionParams,
-    TransactionPublicResponse,
-} from '@/shared/types'
-import { UserNotFoundError } from '@/errors/user'
-import {
-    CreateTransactionRepository,
-    GetUserByIdRepository,
-} from '@/shared/types'
 import { IdGeneratorAdapter } from '@/adapters'
+import { UserNotFoundError } from '@/errors'
+import { CreateTransactionParams, Service, TransactionPublicResponse } from '@/shared'
+import { CreateTransactionRepository, GetUserByIdRepository } from '@/shared'
 
+// export class CreateTransactionService implements Service<CreateTransactionParams, TransactionPublicResponse> {
 export class CreateTransactionService {
     private createTransactionRepository: CreateTransactionRepository
     private getUserByIdRepository: GetUserByIdRepository

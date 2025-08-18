@@ -1,18 +1,21 @@
+import { PasswordHasherAdapter } from '@/adapters'
 import {
     EmailAlreadyExistsError,
     UpdateUserFailedError,
     UserNotFoundError,
-} from '@/errors/user'
+} from '@/errors'
 import {
-    UpdateUserParams,
     GetUserByEmailRepository,
-    UpdateUserRepository,
-    UserRepositoryResponse,
-    UserPublicResponse,
     GetUserByIdRepository,
-} from '@/shared/types'
-import { PasswordHasherAdapter } from '@/adapters'
+    ServiceWithMultipleParams,
+    UpdateUserParams,
+    UpdateUserRepository,
+    UserPublicResponse,
+} from '@/shared'
 
+// export class UpdateUserService
+//     implements
+//         ServiceWithMultipleParams<string, UpdateUserParams, unknown, UserPublicResponse>
 export class UpdateUserService {
     private getUserByEmailRepository: GetUserByEmailRepository
     private updateUserRepository: UpdateUserRepository

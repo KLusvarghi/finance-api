@@ -1,10 +1,13 @@
-import { UserNotFoundError } from '@/errors/user'
+import { UserNotFoundError } from '@/errors'
 import {
-    GetUserByIdRepository,
     GetUserBalanceRepository,
+    GetUserByIdRepository,
+    SimpleService,
     UserBalanceRepositoryResponse,
-} from '@/shared/types'
+} from '@/shared'
 
+// export class GetUserBalanceService
+//     implements SimpleService<string, UserBalanceRepositoryResponse>
 export class GetUserBalanceService {
     private getUserByIdRepository: GetUserByIdRepository
     private getUserBalanceRepository: GetUserBalanceRepository
@@ -17,18 +20,14 @@ export class GetUserBalanceService {
         this.getUserBalanceRepository = getUserBalanceRepository
     }
 
-    async execute(
-        userId: string,
-    ): Promise<UserBalanceRepositoryResponse> {
+    async execute(userId: string): Promise<UserBalanceRepositoryResponse> {
         const user = await this.getUserByIdRepository.execute(userId)
 
         if (!user) {
             throw new UserNotFoundError(userId)
         }
 
-        const userBalance = await this.getUserBalanceRepository.execute(
-            userId,
-        )
+        const userBalance = await this.getUserBalanceRepository.execute(userId)
 
         return userBalance
     }

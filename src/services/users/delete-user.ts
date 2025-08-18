@@ -1,6 +1,7 @@
-import { UserNotFoundError } from '@/errors/user'
-import { DeleteUserRepository, UserPublicResponse } from '@/shared/types'
+import { UserNotFoundError } from '@/errors'
+import { DeleteUserRepository, Service, UserPublicResponse } from '@/shared'
 
+// export class DeleteUserService implements Service<string, UserPublicResponse> {
 export class DeleteUserService {
     private deletedUserRepository: DeleteUserRepository
 

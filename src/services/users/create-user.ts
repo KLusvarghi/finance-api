@@ -1,12 +1,15 @@
+import { IdGeneratorAdapter, PasswordHasherAdapter } from '@/adapters'
+import { EmailAlreadyExistsError } from '@/errors'
 import {
     CreateUserParams,
     CreateUserRepository,
     GetUserByEmailRepository,
+    Service,
     UserPublicResponse,
-} from '@/shared/types'
-import { EmailAlreadyExistsError } from '@/errors/user'
-import { IdGeneratorAdapter, PasswordHasherAdapter } from '@/adapters'
+} from '@/shared'
 
+// export class CreateUserService
+//     implements Service<CreateUserParams, UserPublicResponse>
 export class CreateUserService {
     private createUserRepository: CreateUserRepository
     private getUserByEmailRepository: GetUserByEmailRepository
@@ -51,7 +54,8 @@ export class CreateUserService {
             password: hashPassword,
         }
 
-        const { password: _password, ...userWithoutPassword } = await this.createUserRepository.execute(user)
+        const { password: _password, ...userWithoutPassword } =
+            await this.createUserRepository.execute(user)
 
         return userWithoutPassword
     }
