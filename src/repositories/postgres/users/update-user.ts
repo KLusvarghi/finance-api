@@ -1,10 +1,14 @@
 import { prisma } from '../../../../prisma/prisma'
 
 import { UserNotFoundError } from '@/errors'
-import { UpdateUserParams, UserRepositoryResponse } from '@/shared'
+import {
+    UpdateUserParams,
+    UpdateUserRepository,
+    UserRepositoryResponse,
+} from '@/shared'
 import { Prisma } from '@prisma/client'
 
-export class PostgresUpdateUserRepository {
+export class PostgresUpdateUserRepository implements UpdateUserRepository {
     async execute(
         userId: string,
         updateParams: UpdateUserParams,
