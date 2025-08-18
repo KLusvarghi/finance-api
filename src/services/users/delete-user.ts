@@ -1,8 +1,7 @@
 import { UserNotFoundError } from '@/errors'
 import { DeleteUserRepository, Service, UserPublicResponse } from '@/shared'
 
-// export class DeleteUserService implements Service<string, UserPublicResponse> {
-export class DeleteUserService {
+export class DeleteUserService implements Service<string, UserPublicResponse> {
     private deletedUserRepository: DeleteUserRepository
 
     constructor(deletedUserRepository: DeleteUserRepository) {
