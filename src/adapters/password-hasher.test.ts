@@ -1,5 +1,6 @@
-import { faker } from '@faker-js/faker'
 import { PasswordHasherAdapter } from './password-hasher'
+
+import { faker } from '@faker-js/faker'
 
 describe('PasswordHasherAdapter', () => {
     it('should return a hash of the password', async () => {
