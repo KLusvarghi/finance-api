@@ -1,9 +1,12 @@
 import { prisma } from '../../../../prisma/prisma'
 
-import { CreateUserParams,UserRepositoryResponse } from '@/shared'
+import {
+    CreateUserParams,
+    CreateUserRepository,
+    UserRepositoryResponse,
+} from '@/shared'
 
-export class PostgresCreateUserRepository {
-    // como nomenclatura, podemos usar execute, handle ou até create
+export class PostgresCreateUserRepository implements CreateUserRepository {
     async execute(
         createUserParams: CreateUserParams & { id: string; password: string },
     ): Promise<UserRepositoryResponse> {
