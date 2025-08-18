@@ -18,7 +18,7 @@ import {
 } from '@/shared'
 
 export class GetUserBalanceController
-    // implements Controller<GetUserBalanceRequest, UserBalanceRepositoryResponse>
+    implements Controller<GetUserBalanceRequest, UserBalanceRepositoryResponse>
 {
     private getUserBalanceService: GetUserBalanceService
 
