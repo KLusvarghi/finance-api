@@ -1,18 +1,16 @@
 import express from 'express'
-import 'dotenv/config'
-import {
-    makeCreateUserController,
-    makeDeleteUserController,
-    makeGetUserBalanceController,
-    makeGetUserByIdController,
-    makeUpdateUserController,
-} from '@/factories/controllers/user'
+
 import {
     makeCreateTransactionController,
+    makeCreateUserController,
     makeDeleteTransactionController,
+    makeDeleteUserController,
     makeGetTransactionsByUserIdController,
+    makeGetUserBalanceController,
+    makeGetUserByIdController,
     makeUpdateTransactionController,
-} from '@/factories/controllers/transactions'
+    makeUpdateUserController,
+} from '@/factories/controllers'
 
 const app = express()
 const port = process.env.PORT || 3001
@@ -38,14 +36,13 @@ app.get('/api/users/:userId', async (request, response) => {
     response.status(statusCode).send(body)
 })
 
-
 // get balance
 app.get('/api/users/:userId/balance', async (request, response) => {
-  const getUserBalanceController = makeGetUserBalanceController()
+    const getUserBalanceController = makeGetUserBalanceController()
 
-  const { statusCode, body } = await getUserBalanceController.execute(request)
+    const { statusCode, body } = await getUserBalanceController.execute(request)
 
-  response.status(statusCode).send(body)
+    response.status(statusCode).send(body)
 })
 
 // udpate user
@@ -65,7 +62,6 @@ app.delete('/api/users/:userId', async (request, response) => {
 
     response.status(statusCode).send(body)
 })
-
 
 app.post('/api/transactions', async (request, response) => {
     const createTransactionController = makeCreateTransactionController()
