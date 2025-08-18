@@ -7,8 +7,8 @@ import {
 } from '@/shared'
 
 export class DeleteTransactionService
-    // implements
-    //     ServiceWithMultipleParams<string, unknown, TransactionPublicResponse>
+    implements
+        ServiceWithMultipleParams<string, unknown, TransactionPublicResponse>
 {
     private deleteTransactionRepository: DeleteTransactionRepository
     private getTransactionByIdRepository: GetTransactionByUserIdRepository
