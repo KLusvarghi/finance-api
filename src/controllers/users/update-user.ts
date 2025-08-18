@@ -27,7 +27,7 @@ import {
 } from '@/shared'
 
 export class UpdateUserController
-    // implements Controller<UpdateUserRequest, UserPublicResponse>
+    implements Controller<UpdateUserRequest, UserPublicResponse>
 {
     private updateUserService: UpdateUserService
 
