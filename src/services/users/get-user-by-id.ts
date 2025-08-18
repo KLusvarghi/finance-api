@@ -1,8 +1,13 @@
 import { UserNotFoundError } from '@/errors'
-import { GetUserByIdRepository, SimpleService, UserPublicResponse } from '@/shared'
+import {
+    GetUserByIdRepository,
+    SimpleService,
+    UserPublicResponse,
+} from '@/shared'
 
-// export class GetUserByIdService implements SimpleService<string, UserPublicResponse> {
-export class GetUserByIdService {
+export class GetUserByIdService
+    implements SimpleService<string, UserPublicResponse>
+{
     private getUserByIdRepository: GetUserByIdRepository
 
     constructor(getUserByIdRepository: GetUserByIdRepository) {
