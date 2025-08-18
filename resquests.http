@@ -1,15 +1,15 @@
 # ### USERS
 
 # # Create User
-# POST http://localhost:3001/api/users
-# Content-Type: application/json
+POST http://localhost:3001/api/users
+Content-Type: application/json
 
-# {
-#   "first_name": "John",
-#   "last_name": "Doe",
-#   "email": "john.doe@example.com",
-#   "password": "password123"
-# }
+{
+  "first_name": "John",
+  "last_name": "Doe", 
+  "email": "johna.doe@example.com",
+  "password": "password123"
+}
 
 # ###
 
@@ -41,39 +41,39 @@
 
 # ---
 
-# ### TRANSACTIONS
+### TRANSACTIONS
 
 # # Create Transaction
-# POST http://localhost:3001/api/transactions
-# Content-Type: application/json
+POST http://localhost:3001/api/transactions
+Content-Type: application/json
 
-# {
-#   "user_id": "{{userId}}",
-#   "name": "Salary",
-#   "amount": 5000,
-#   "date": "2024-06-01",
-#   "type": "EARNING"
-# }
+{
+  "user_id": "14e197b3-3648-49bf-9629-c1fee4fe5fac",
+  "name": "Salary",
+  "amount": 5000,
+  "date": "2024-06-01T00:00:00.000Z",
+  "type": "EARNING"
+}
 
 # ###
 
 # # Get Transactions By User Id (query param)
 # GET http://localhost:3001/api/transactions?userId={{userId}}
 
-# ###
+###
 
 # # Update Transaction
-# PATCH http://localhost:3001/api/transactions/{{transactionId}}
-# Content-Type: application/json
+PATCH http://localhost:3001/api/transactions/3667ef61-6229-405b-b905-6720d7a8f158
+Content-Type: application/json
+userId: 06548667-6ae0-4639-8ecc-5a9d940562bf
 
-# {
-#   "name": "Updated Transaction Name",
-#   "amount": 6000,
-#   "date": "2024-06-02",
-#   "type": "EXPENSE"
-# }
+{
+  "amount": 6000,
+  "date": "2025-08-02T00:00:00.000Z",
+  "type": "EXPENSE"
+}
 
-# ###
+###
 
-# # Delete Transaction
-# DELETE http://localhost:3001/api/transactions/{{transactionId}}
+# Delete Transaction
+DELETE http://localhost:3001/api/transactions/f1e45a03-cd9e-4301-83e7-cc0735a86932?userId=14e197b3-3648-49bf-9629-c1fee4fe5fac
