@@ -1,9 +1,14 @@
+import { defineConfig } from "eslint/config";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
 import globals from "globals";
 import tseslint from "typescript-eslint";
-import simpleImportSort from "eslint-plugin-simple-import-sort";
-import { defineConfig } from "eslint/config";
 
 export default defineConfig([
+  // Ignorar arquivos Markdown completamente
+  {
+    ignores: ["**/*.{md,mdc}"],
+  },
+
   // Regras de TS via @typescript-eslint (vem primeiro)
   tseslint.configs.recommended,
 
@@ -22,6 +27,7 @@ export default defineConfig([
       "no-unused-vars": "off",
       // Desabilitar a regra de variáveis não utilizadas do TypeScript
       "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-explicit-any": "off",
       // Configuração completa do simple-import-sort
       "simple-import-sort/imports": [
         "error",
@@ -58,11 +64,5 @@ export default defineConfig([
         }
       ],
     },
-  },
-
-  // === Configuração para ignorar arquivos Markdown ===
-  {
-    files: ["**/*.{md,mdc}"],
-    ignores: ["**/*.{md,mdc}"],
   },
 ]);
