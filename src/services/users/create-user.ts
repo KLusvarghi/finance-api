@@ -8,9 +8,9 @@ import {
     UserPublicResponse,
 } from '@/shared'
 
-// export class CreateUserService
-//     implements Service<CreateUserParams, UserPublicResponse>
-export class CreateUserService {
+export class CreateUserService
+    implements Service<CreateUserParams, UserPublicResponse>
+{
     private createUserRepository: CreateUserRepository
     private getUserByEmailRepository: GetUserByEmailRepository
     private idGenerator: IdGeneratorAdapter
