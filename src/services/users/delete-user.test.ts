@@ -1,10 +1,10 @@
+import { UserNotFoundError } from '@/errors'
+import { DeleteUserService } from '@/services'
 import { UserRepositoryResponse } from '@/shared'
-import { DeleteUserService } from './delete-user'
-import { UserNotFoundError } from '@/errors/user'
 import {
-    userId,
-    deleteUserServiceResponse,
     deleteUserRepositoryResponse,
+    deleteUserServiceResponse,
+    userId,
 } from '@/test'
 
 describe('DeleteUserService', () => {

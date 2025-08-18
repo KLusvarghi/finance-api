@@ -1,14 +1,14 @@
+import { UserNotFoundError } from '@/errors'
+import { CreateTransactionService } from '@/services'
 import {
     CreateTransactionParams,
     TransactionRepositoryResponse,
     UserRepositoryResponse,
-} from '@/shared/types'
-import { CreateTransactionService } from './create-transaction'
-import { UserNotFoundError } from '@/errors/user'
+} from '@/shared'
 import {
     createTransactionParams,
-    createTransactionServiceResponse,
     createTransactionRepositoryResponse,
+    createTransactionServiceResponse,
     getUserByIdRepositoryResponse,
 } from '@/test'
 

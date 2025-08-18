@@ -1,14 +1,14 @@
+import { TransactionNotFoundError } from '@/errors'
+import { UpdateTransactionService } from '@/services'
 import {
     TransactionRepositoryResponse,
     UpdateTransactionParams,
 } from '@/shared'
-import { UpdateTransactionService } from './update-transaction'
-import { TransactionNotFoundError } from '@/errors/user'
 import {
     transactionId,
     updateTransactionParams,
-    updateTransactionServiceResponse,
     updateTransactionRepositoryResponse,
+    updateTransactionServiceResponse,
 } from '@/test'
 
 describe('UpdateTransactionService', () => {
@@ -23,11 +23,23 @@ describe('UpdateTransactionService', () => {
             return Promise.resolve(updateTransactionRepositoryResponse)
         }
     }
+    class GetTransactionByIdRepositoryStub {
+        async execute(
+            _transactionId: string,
+        ): Promise<TransactionRepositoryResponse | null> {
+            return Promise.resolve(updateTransactionRepositoryResponse)
+        }
+    }
 
     const makeSut = () => {
         const updateTransactionRepository =
             new UpdateTransactionRepositoryStub()
-        const sut = new UpdateTransactionService(updateTransactionRepository)
+        const getTransactionByIdRepository =
+            new GetTransactionByIdRepositoryStub()
+        const sut = new UpdateTransactionService(
+            updateTransactionRepository,
+            getTransactionByIdRepository,
+        )
 
         return {
             sut,
@@ -52,12 +64,12 @@ describe('UpdateTransactionService', () => {
     })
 
     describe('error handling', () => {
-        it('should throw TransactionNotFoundError if updateTransactionRepository return null', () => {
+        it('should throw UserNotFoundError if getUserByIdRepository return null', () => {
             // arrange
             jest.spyOn(
                 updateTransactionRepository,
                 'execute',
-            ).mockResolvedValueOnce(null as any)
+            ).mockResolvedValueOnce(null as unknown as TransactionRepositoryResponse)
 
             // act
             const promise = sut.execute(transactionId, updateTransactionParams)

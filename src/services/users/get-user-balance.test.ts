@@ -1,13 +1,10 @@
+import { UserNotFoundError } from '@/errors'
+import { GetUserBalanceService } from '@/services'
+import { UserBalanceRepositoryResponse, UserRepositoryResponse } from '@/shared'
 import {
-    UserBalanceRepositoryResponse,
-    UserRepositoryResponse,
-} from '@/shared/types'
-import { UserNotFoundError } from '@/errors/user'
-import { GetUserBalanceService } from './get-user-balance'
-import {
-    userId,
     getUserBalanceServiceResponse,
     getUserByIdRepositoryResponse,
+    userId,
 } from '@/test'
 
 describe('GetUserBalanceService', () => {

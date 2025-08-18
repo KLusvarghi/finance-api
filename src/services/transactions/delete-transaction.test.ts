@@ -1,10 +1,11 @@
-import { DeleteTransactionService } from './delete-transaction'
+import { TransactionNotFoundError } from '@/errors'
+import { DeleteTransactionService } from '@/services'
 import { TransactionRepositoryResponse } from '@/shared'
-import { TransactionNotFoundError } from '@/errors/user'
 import {
-    transactionId,
-    deleteTransactionServiceResponse,
     deleteTransactionRepositoryResponse,
+    deleteTransactionServiceResponse,
+    transactionId,
+    updateTransactionRepositoryResponse,
 } from '@/test'
 
 describe('DeleteTransactionService', () => {
@@ -19,10 +20,23 @@ describe('DeleteTransactionService', () => {
         }
     }
 
+    class GetTransactionByIdRepositoryStub {
+        async execute(
+            _transactionId: string,
+        ): Promise<TransactionRepositoryResponse | null> {
+            return Promise.resolve(updateTransactionRepositoryResponse)
+        }
+    }
+
     const makeSut = () => {
         const deleteTransactionRepository =
             new DeleteTransactionRepositoryStub()
-        const sut = new DeleteTransactionService(deleteTransactionRepository)
+        const getTransactionByIdRepository =
+            new GetTransactionByIdRepositoryStub()
+        const sut = new DeleteTransactionService(
+            deleteTransactionRepository,
+            getTransactionByIdRepository,
+        )
 
         return {
             sut,

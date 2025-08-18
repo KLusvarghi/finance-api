@@ -1,10 +1,10 @@
+import { UserNotFoundError } from '@/errors'
+import { GetUserByIdService } from '@/services'
 import { UserRepositoryResponse } from '@/shared'
-import { UserNotFoundError } from '@/errors/user'
-import { GetUserByIdService } from './get-user-by-id'
 import {
-    userId,
-    getUserByIdServiceResponse,
     getUserByIdRepositoryResponse,
+    getUserByIdServiceResponse,
+    userId,
 } from '@/test'
 
 describe('GetUserByIdService', () => {

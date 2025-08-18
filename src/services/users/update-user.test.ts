@@ -1,15 +1,15 @@
-import { UpdateUserParams, UserRepositoryResponse } from '@/shared'
-import { UpdateUserService } from './update-user'
 import {
     EmailAlreadyExistsError,
     UpdateUserFailedError,
     UserNotFoundError,
-} from '@/errors/user'
+} from '@/errors'
+import { UpdateUserService } from '@/services'
+import { UpdateUserParams, UserRepositoryResponse } from '@/shared'
 import {
-    userId,
     updateUserParams,
-    updateUserServiceResponse,
     updateUserRepositoryResponse,
+    updateUserServiceResponse,
+    userId,
 } from '@/test'
 
 describe('UpdateUserService', () => {

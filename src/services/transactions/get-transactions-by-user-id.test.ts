@@ -1,9 +1,9 @@
+import { UserNotFoundError } from '@/errors'
+import { GetTransactionsByUserIdService } from '@/services'
 import { TransactionRepositoryResponse, UserRepositoryResponse } from '@/shared'
-import { GetTransactionsByUserIdService } from './get-transactions-by-user-id'
-import { UserNotFoundError } from '@/errors/user'
 import {
-    getTransactionByUserIdServiceResponse,
     getTransactionByUserIdRepositoryResponse,
+    getTransactionByUserIdServiceResponse,
     getUserByIdRepositoryResponse,
     userId,
 } from '@/test'

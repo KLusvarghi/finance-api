@@ -1,10 +1,10 @@
-import { EmailAlreadyExistsError } from '@/errors/user'
-import { CreateUserService } from './create-user'
+import { EmailAlreadyExistsError } from '@/errors'
+import { CreateUserService } from '@/services'
 import { CreateUserParams, UserRepositoryResponse } from '@/shared'
 import {
     createUserParams,
-    createUserServiceResponse,
     createUserRepositoryResponse,
+    createUserServiceResponse,
 } from '@/test'
 
 describe('CreateUserService', () => {
