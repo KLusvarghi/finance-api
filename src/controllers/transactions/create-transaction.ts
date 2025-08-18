@@ -19,7 +19,7 @@ import {
 } from '@/shared'
 
 export class CreateTransactionController
-    // implements Controller<CreateTransactionRequest, TransactionPublicResponse>
+    implements Controller<CreateTransactionRequest, TransactionPublicResponse>
 {
     private createTransactionService: CreateTransactionService
 
