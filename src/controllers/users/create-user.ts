@@ -1,15 +1,27 @@
-import { EmailAlreadyExistsError } from '@/errors/user'
-import { createUserSchema } from '@/schemas'
-import { serverError, badRequest, created } from '@/shared'
 import { ZodError } from 'zod'
-import {
-    CreateUserService,
-    HttpResponse,
-    HttpRequest,
-    UserPublicResponse,
-} from '@/shared/types'
 
-export class CreateUserController {
+import {
+    created,
+    emailAlreadyExistsResponse,
+    handleZodValidationError,
+    serverError,
+} from '../_helpers'
+
+import { EmailAlreadyExistsError } from '@/errors'
+import { createUserSchema } from '@/schemas'
+import {
+    Controller,
+    CreateUserParams,
+    CreateUserService,
+    HttpRequest,
+    HttpResponse,
+    ResponseMessage,
+    UserPublicResponse,
+} from '@/shared'
+
+export class CreateUserController
+    // implements Controller<CreateUserParams, UserPublicResponse>
+{
     private createUserService: CreateUserService
 
     constructor(createUserService: CreateUserService) {
@@ -24,20 +36,20 @@ export class CreateUserController {
             const params = httpRequest.body
 
             // validando o schema de forma asyncrona
-            await createUserSchema.parseAsync(params)
+            await createUserSchema.parseAsync(params as CreateUserParams)
 
             // rxecutamos nossa regra de negocio
             const createdUser = await this.createUserService.execute(params)
 
             // retornar a resposta para o user (status code)
-            return created(createdUser)
+            return created(createdUser, ResponseMessage.USER_CREATED)
         } catch (error) {
             if (error instanceof ZodError) {
-                return badRequest(error.issues[0].message)
+                return handleZodValidationError(error)
             }
 
             if (error instanceof EmailAlreadyExistsError) {
-                return badRequest(error.message)
+                return emailAlreadyExistsResponse(error.message)
             }
             console.error(error)
             return serverError()

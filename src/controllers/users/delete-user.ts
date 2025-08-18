@@ -1,20 +1,26 @@
 import {
     checkIfIdIsValid,
     invalidIdResponse,
-    userBadRequestResponse,
+    ok,
+    serverError,
+    userIdMissingResponse,
     userNotFoundResponse,
-} from '../_helpers/index'
-import { UserNotFoundError } from '@/errors/user'
+} from '../_helpers'
 
-import { serverError, ok } from '@/shared'
+import { UserNotFoundError } from '@/errors'
 import {
+    Controller,
+    DeleteUserRequest,
     DeleteUserService,
-    HttpResponse,
     HttpRequest,
+    HttpResponse,
+    ResponseMessage,
     UserPublicResponse,
-} from '@/shared/types'
+} from '@/shared'
 
-export class DeleteUserController {
+export class DeleteUserController
+    // implements Controller<DeleteUserRequest, UserPublicResponse>
+{
     private deletedUserService: DeleteUserService
 
     constructor(deletedUserService: DeleteUserService) {
@@ -25,10 +31,10 @@ export class DeleteUserController {
         httpRequest: HttpRequest,
     ): Promise<HttpResponse<UserPublicResponse>> {
         try {
-            const userId = httpRequest.params.userId
+            const userId = (httpRequest.params as { userId: string }).userId
 
             if (!userId) {
-                return userBadRequestResponse()
+                return userIdMissingResponse()
             }
 
             const isIdValid = checkIfIdIsValid(userId)
@@ -36,12 +42,12 @@ export class DeleteUserController {
 
             const deletedUser = await this.deletedUserService.execute(userId)
 
-            return ok(deletedUser)
+            return ok(deletedUser, ResponseMessage.USER_DELETED)
         } catch (error) {
             console.error(error)
 
             if (error instanceof UserNotFoundError) {
-                return userNotFoundResponse()
+                return userNotFoundResponse(error.message)
             }
 
             return serverError()

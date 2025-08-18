@@ -1,20 +1,25 @@
-import { UserNotFoundError } from '@/errors/user'
 import {
     checkIfIdIsValid,
     invalidIdResponse,
     ok,
     serverError,
-    userBadRequestResponse,
+    userIdMissingResponse,
     userNotFoundResponse,
 } from '../_helpers'
-import {
-    GetUserBalanceService,
-    UserBalanceRepositoryResponse,
-    HttpResponse,
-    HttpRequest,
-} from '@/shared/types'
 
-export class GetUserBalanceController {
+import { UserNotFoundError } from '@/errors'
+import {
+    Controller,
+    GetUserBalanceRequest,
+    GetUserBalanceService,
+    HttpRequest,
+    HttpResponse,
+    UserBalanceRepositoryResponse,
+} from '@/shared'
+
+export class GetUserBalanceController
+    // implements Controller<GetUserBalanceRequest, UserBalanceRepositoryResponse>
+{
     private getUserBalanceService: GetUserBalanceService
 
     constructor(getUserBalanceService: GetUserBalanceService) {
@@ -25,9 +30,9 @@ export class GetUserBalanceController {
         httpRequest: HttpRequest,
     ): Promise<HttpResponse<UserBalanceRepositoryResponse>> {
         try {
-            const userId = httpRequest.params.userId
+            const userId = (httpRequest.params as { userId: string }).userId
             if (!userId) {
-                return userBadRequestResponse()
+                return userIdMissingResponse()
             }
 
             if (!checkIfIdIsValid(userId)) {

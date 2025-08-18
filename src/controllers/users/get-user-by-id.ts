@@ -1,19 +1,25 @@
-import { serverError, ok } from '@/shared'
-import {
-    GetUserByIdService,
-    HttpResponse,
-    HttpRequest,
-    UserPublicResponse,
-} from '@/shared/types'
 import {
     checkIfIdIsValid,
     invalidIdResponse,
+    ok,
+    serverError,
+    userIdMissingResponse,
     userNotFoundResponse,
-    userBadRequestResponse,
-} from '../_helpers/index'
-import { UserNotFoundError } from '@/errors/user'
+} from '../_helpers'
 
-export class GetUserByIdController {
+import { UserNotFoundError } from '@/errors'
+import {
+    Controller,
+    GetUserByIdRequest,
+    GetUserByIdService,
+    HttpRequest,
+    HttpResponse,
+    UserPublicResponse,
+} from '@/shared'
+
+export class GetUserByIdController
+    // implements Controller<GetUserByIdRequest, UserPublicResponse>
+{
     private getUserByIdService: GetUserByIdService
 
     constructor(getUserByIdService: GetUserByIdService) {
@@ -24,10 +30,10 @@ export class GetUserByIdController {
         httpRequest: HttpRequest,
     ): Promise<HttpResponse<UserPublicResponse>> {
         try {
-            const userId = httpRequest.params.userId
+            const userId = (httpRequest.params as { userId: string }).userId
 
             if (!userId) {
-                return userBadRequestResponse()
+                return userIdMissingResponse()
             }
 
             const isIdValid = checkIfIdIsValid(userId)
