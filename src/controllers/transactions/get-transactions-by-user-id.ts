@@ -18,9 +18,10 @@ import {
     TransactionPublicResponse,
 } from '@/shared'
 
-export class GetTransactionsByUserIdController {
-    // implements
-    //     Controller<GetTransactionsByUserIdRequest, TransactionPublicResponse[]>
+export class GetTransactionsByUserIdController
+    implements
+        Controller<GetTransactionsByUserIdRequest, TransactionPublicResponse[]>
+{
     private getTransactionByUserIdService: GetTransactionsByUserIdService
 
     constructor(getTransactionByUserIdService: GetTransactionsByUserIdService) {
