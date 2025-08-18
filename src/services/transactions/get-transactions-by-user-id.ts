@@ -4,10 +4,11 @@ import {
     GetUserByIdRepository,
     SimpleService,
     TransactionPublicResponse,
-  } from '@/shared'
+} from '@/shared'
 
-  // export class GetTransactionsByUserIdService implements SimpleService<string, TransactionPublicResponse[]> {
-  export class GetTransactionsByUserIdService {
+export class GetTransactionsByUserIdService
+    implements SimpleService<string, TransactionPublicResponse[]>
+{
     private getUserByIdRepository: GetUserByIdRepository
     private getTransactionsByUserIdRepository: GetTransactionsByUserIdRepository
 
