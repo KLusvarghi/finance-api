@@ -4,10 +4,13 @@ import { TransactionNotFoundError } from '@/errors'
 import {
     TransactionRepositoryResponse,
     UpdateTransactionParams,
+    UpdateTransactionRepository,
 } from '@/shared'
 import { Prisma } from '@prisma/client'
 
-export class PostgresUpdateTransactionRepository {
+export class PostgresUpdateTransactionRepository
+    implements UpdateTransactionRepository
+{
     async execute(
         transactionId: string,
         updateParams: UpdateTransactionParams,
