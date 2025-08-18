@@ -1,65 +1,80 @@
-import { HttpResponse } from '../../shared/types'
+import { HttpResponse, ResponseMessage } from '@/shared'
 
-export const ok = <T = any>(data: T, message = 'Success'): HttpResponse<T> => ({
+export const ok = <T = any>(
+    data: T,
+    message: string = ResponseMessage.SUCCESS,
+): HttpResponse<T> => ({
     statusCode: 200,
     body: {
-        status: 'success',
         message,
-        data,
+        data: data ?? null,
     },
 })
 
 export const created = <T = any>(
     data: T,
-    message = 'Created successfully',
+    message: string = ResponseMessage.SUCCESS,
 ): HttpResponse<T> => ({
     statusCode: 201,
     body: {
-        status: 'success',
         message,
-        data,
+        data: data ?? null,
     },
 })
 
-export const noContent = (): HttpResponse => ({
+export const noContent = (): HttpResponse<null> => ({
     statusCode: 204,
     body: null,
 })
 
-export const badRequest = (
-    message = 'Bad Request',
-    data: any = null,
-): HttpResponse => ({
+export const badRequest = <T = any>(
+    message: string = ResponseMessage.BAD_REQUEST,
+    code?: string,
+    data?: T,
+): HttpResponse<T> => ({
     statusCode: 400,
     body: {
-        status: 'error',
         message,
-        data: data ?? undefined,
+        code,
+        data: data ?? null,
     },
 })
 
-export const unauthorized = (message = 'Unauthorized'): HttpResponse => ({
+export const unauthorized = <T = any>(
+    message: string = ResponseMessage.ERROR,
+    code?: string,
+    data?: T,
+): HttpResponse<T> => ({
     statusCode: 401,
     body: {
-        status: 'error',
         message,
+        code,
+        data: data ?? null,
     },
 })
 
-export const notFound = (message = 'Not Found'): HttpResponse => ({
+export const notFound = <T = any>(
+    message: string = ResponseMessage.ERROR,
+    code?: string,
+    data?: T,
+): HttpResponse<T> => ({
     statusCode: 404,
     body: {
-        status: 'error',
         message,
+        code,
+        data: data ?? null,
     },
 })
 
-export const serverError = (
-    message = 'Internal server error',
-): HttpResponse => ({
+export const serverError = <T = any>(
+    message: string = ResponseMessage.SERVER_ERROR,
+    code?: string,
+    data?: T,
+): HttpResponse<T> => ({
     statusCode: 500,
     body: {
-        status: 'error',
         message,
+        code,
+        data: data ?? null,
     },
 })
