@@ -1,27 +1,29 @@
-export class EmailAlreadyExistsError extends Error {
+import { ErrorCode } from './index'
+import { AppError } from './index'
+
+export class EmailAlreadyExistsError extends AppError {
     constructor(email: string) {
-        super(`The e-mail ${email} is already in use`)
-        this.name = 'EmailAlreadyExistsError' // assim a gente deixa mais claro o name do error
+        super(
+            `The e-mail ${email} is already in use`,
+            ErrorCode.EMAIL_ALREADY_EXISTS,
+        )
     }
 }
 
-export class UserNotFoundError extends Error {
+export class UserNotFoundError extends AppError {
     constructor(userId: string) {
-        super(`User with id ${userId} not found`)
-        this.name = 'UserNotFoundError'
+        super(`User with id ${userId} not found`, ErrorCode.USER_NOT_FOUND)
     }
 }
 
-export class TransactionNotFoundError extends Error {
-    constructor(transactionId: string) {
-        super(`Transaction with id ${transactionId} not found`)
-        this.name = 'TransactionNotFoundError'
+export class UpdateUserFailedError extends AppError {
+    constructor(msg = 'Failed to update user.') {
+        super(msg, ErrorCode.USER_UPDATE_FAILED)
     }
 }
 
-export class UpdateUserFailedError extends Error {
-  constructor (msg = 'Failed to update user.') {
-    super(msg)
-    this.name = 'UpdateUserFailedError'
-  }
+export class ForbiddenError extends AppError {
+    constructor() {
+        super('Forbidden', ErrorCode.FORBIDDEN)
+    }
 }
