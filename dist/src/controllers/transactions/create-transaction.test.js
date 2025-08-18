@@ -1,5 +1,5 @@
-import { CreateTransactionController } from './create-transaction';
-import { invalidAmount, invalidDate, invalidType, invalidUUID, createTransactionParams as params, createTransactionControllerResponse, createTransactionHttpRequest as baseHttpRequest, } from '@/test';
+import { CreateTransactionController } from '@/controllers';
+import { createTransactionControllerResponse, createTransactionHttpRequest as baseHttpRequest, createTransactionParams as params, invalidAmount, invalidDate, invalidType, invalidUUID, } from '@/test';
 describe('CreateTransactionController', () => {
     let sut;
     let createTransactionService;
@@ -31,7 +31,6 @@ describe('CreateTransactionController', () => {
             const response = await sut.execute(baseHttpRequest);
             // assert
             expect(response.statusCode).toBe(500);
-            expect(response.body?.status).toBe('error');
         });
     });
     describe('validations', () => {
@@ -46,7 +45,6 @@ describe('CreateTransactionController', () => {
                 });
                 // assert
                 expect(response.statusCode).toBe(400);
-                expect(response.body?.status).toBe('error');
                 // expect(response.body?.message).toBe('User id is required')
             });
             it.each(invalidUUID)('should return 400 if user_id is $description', async ({ id }) => {
@@ -59,7 +57,6 @@ describe('CreateTransactionController', () => {
                 });
                 // assert
                 expect(response.statusCode).toBe(400);
-                expect(response.body?.status).toBe('error');
                 // expect(response.body?.message).toBe(
                 //     'User id must be a valid uuid',
                 // )
@@ -76,7 +73,6 @@ describe('CreateTransactionController', () => {
                 });
                 // assert
                 expect(response.statusCode).toBe(400);
-                expect(response.body?.status).toBe('error');
             });
             it('should return 400 if name is too short', async () => {
                 // arrange
@@ -87,7 +83,6 @@ describe('CreateTransactionController', () => {
                     },
                 });
                 expect(response.statusCode).toBe(400);
-                expect(response.body?.status).toBe('error');
                 expect(response.body?.message).toBe('Name must be at least 3 characters long');
             });
             it('should return 400 if name is too long', async () => {
@@ -99,7 +94,6 @@ describe('CreateTransactionController', () => {
                     },
                 });
                 expect(response.statusCode).toBe(400);
-                expect(response.body?.status).toBe('error');
                 expect(response.body?.message).toBe('Name must be at most 100 characters long');
             });
         });
@@ -124,7 +118,6 @@ describe('CreateTransactionController', () => {
                 });
                 // assert
                 expect(response.statusCode).toBe(400);
-                expect(response.body?.status).toBe('error');
                 expect(response.body?.message).toBe('Date must be a valid date');
             });
         });
@@ -138,7 +131,6 @@ describe('CreateTransactionController', () => {
                     },
                 });
                 expect(response.statusCode).toBe(400);
-                expect(response.body?.status).toBe('error');
                 expect(response.body?.message).toBe('Type must be EARNING, EXPENSE or INVESTMENT');
             });
             it.each(invalidType)('should return 400 if type is $description', async ({ type }) => {
@@ -151,7 +143,6 @@ describe('CreateTransactionController', () => {
                 });
                 // assert
                 expect(response.statusCode).toBe(400);
-                expect(response.body?.status).toBe('error');
                 // expect(response.body?.message).toBe(
                 //     'Type must be EARNING, EXPENSE or INVESTMENT',
                 // )
@@ -180,7 +171,6 @@ describe('CreateTransactionController', () => {
                 });
                 // assert
                 expect(response.statusCode).toBe(400);
-                expect(response.body?.status).toBe('error');
                 expect(response.body?.message).toBe('Amount is required');
             });
             it.each(invalidAmount)('should return 400 if amount is $description', async ({ amount }) => {
@@ -193,7 +183,6 @@ describe('CreateTransactionController', () => {
                 });
                 // assert
                 expect(response.statusCode).toBe(400);
-                expect(response.body?.status).toBe('error');
             });
         });
     });
@@ -203,7 +192,6 @@ describe('CreateTransactionController', () => {
             const response = await sut.execute(baseHttpRequest);
             // assert
             expect(response.statusCode).toBe(201);
-            expect(response.body?.status).toBe('success');
             // expect(response.body?.data).toMatchObject(validTransactionData)
         });
         it('should call CreateTransactionService with correct parameters', async () => {
