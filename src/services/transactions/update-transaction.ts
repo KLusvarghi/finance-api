@@ -7,15 +7,15 @@ import {
     UpdateTransactionRepository,
 } from '@/shared'
 
-// export class UpdateTransactionService
-//     implements
-//         ServiceWithMultipleParams<
-//             string,
-//             UpdateTransactionParams,
-//             unknown,
-//             TransactionPublicResponse
-//         >
-export class UpdateTransactionService {
+export class UpdateTransactionService
+    implements
+        ServiceWithMultipleParams<
+            string,
+            UpdateTransactionParams,
+            unknown,
+            TransactionPublicResponse
+        >
+{
     private updateTransactionRepository: UpdateTransactionRepository
     private getTransactionByIdRepository: GetTransactionByIdRepository
 
