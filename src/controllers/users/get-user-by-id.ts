@@ -18,7 +18,7 @@ import {
 } from '@/shared'
 
 export class GetUserByIdController
-    // implements Controller<GetUserByIdRequest, UserPublicResponse>
+    implements Controller<GetUserByIdRequest, UserPublicResponse>
 {
     private getUserByIdService: GetUserByIdService
 
