@@ -70,10 +70,10 @@ export class PostgresGetUserBalanceRepository
         // )
 
         return {
-            earnings: totalEarnings,
-            expenses: totalExpenses,
-            investments: totalInvestments,
-            balance,
+            earnings: totalEarnings.toString(),
+            expenses: totalExpenses.toString(),
+            investments: totalInvestments.toString(),
+            balance: balance.toString(),
         }
     }
 }
