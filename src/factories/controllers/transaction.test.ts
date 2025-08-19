@@ -2,16 +2,26 @@
 // não testamos se o que o controller faz é realmente o que deveria fazer
 // isso é responsabilidade do teste de integração
 
-import { makeCreateTransactionController } from './transactions'
+import {
+    makeCreateTransactionController,
+    makeGetTransactionsByUserIdController,
+} from './transactions'
 
-import { CreateTransactionController } from '@/controllers'
+import {
+    CreateTransactionController,
+    GetTransactionsByUserIdController,
+} from '@/controllers'
 
 describe('Transaction Controller Factories', () => {
-    describe('createTransaction', () => {
-        it('should return a valid CreateTransactionController instance', () => {
-            expect(makeCreateTransactionController()).toBeInstanceOf(
-                CreateTransactionController,
-            )
-        })
+    it('should return a valid CreateTransactionController instance', () => {
+        expect(makeCreateTransactionController()).toBeInstanceOf(
+            CreateTransactionController,
+        )
+    })
+
+    it('should return a valid GetTransactionsByUserIdController instance', () => {
+        expect(makeGetTransactionsByUserIdController()).toBeInstanceOf(
+            GetTransactionsByUserIdController,
+        )
     })
 })
