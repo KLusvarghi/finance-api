@@ -1,2 +1,2 @@
-export * from './response-messagens'
+export * from './response-messages'
 export * from './types'
