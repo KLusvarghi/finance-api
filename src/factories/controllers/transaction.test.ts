@@ -5,11 +5,13 @@
 import {
     makeCreateTransactionController,
     makeGetTransactionsByUserIdController,
+    makeUpdateTransactionController,
 } from './transactions'
 
 import {
     CreateTransactionController,
     GetTransactionsByUserIdController,
+    UpdateTransactionController,
 } from '@/controllers'
 
 describe('Transaction Controller Factories', () => {
@@ -22,6 +24,12 @@ describe('Transaction Controller Factories', () => {
     it('should return a valid GetTransactionsByUserIdController instance', () => {
         expect(makeGetTransactionsByUserIdController()).toBeInstanceOf(
             GetTransactionsByUserIdController,
+        )
+    })
+
+    it('should return a valid UpdateTransactionController instance', () => {
+        expect(makeUpdateTransactionController()).toBeInstanceOf(
+            UpdateTransactionController,
         )
     })
 })
