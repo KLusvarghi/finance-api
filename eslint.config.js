@@ -64,6 +64,7 @@ export default defineConfig([
                 "@/schemas/*",
                 "@/test/*",
                 "@/adapters/*",
+                "@/routes/*",
               ],
               message:
                 "Use o barrel em vez de importar diretamente de subdiretórios específicos.",
