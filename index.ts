@@ -2,7 +2,7 @@ import express from 'express'
 
 import { transactionsRouter, usersRouter } from './src/routes'
 
-const app = express()
+export const app = express()
 const port = process.env.PORT || 3001
 
 // por padrão, o express não suporta json, então temos que especificar aqui que toda requisição que recebe um req que contem um content-type do tipo JSON, ele adapte para receber
