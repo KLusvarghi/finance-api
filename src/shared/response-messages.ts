@@ -34,6 +34,22 @@ export const ResponseZodMessages = {
         minLength: 'Name must be at least 3 characters long',
         maxLength: 'Name must be at most 100 characters long',
     },
+    first_name: {
+        required: 'First name is required',
+        minLength: 'First name must have at least 2 characters',
+    },
+    last_name: {
+        required: 'Last name is required',
+        minLength: 'Last name must have at least 2 characters',
+    },
+    password: {
+        required: 'Password is required',
+        minLength: 'Password must have at least 6 characters',
+    },
+    email: {
+        required: 'Email is required',
+        invalid: 'Please provide a valid email',
+    },
     date: {
         required: 'Date is required',
         invalid: 'Date must be a valid date',
