@@ -117,6 +117,22 @@ describe('User Routes E2E Tests', () => {
             })
             expect(responseBody.message).toBe(ResponseMessage.USER_CREATED)
         })
+
+        it('should return 400 when Email already exists', async () => {
+            const { body: user1 } = await request(app)
+                .post(`/api/users`)
+                .send(createUserParams)
+                .expect(201) // was 400
+
+            const { body: responseBody } = await request(app)
+                .post(`/api/users`)
+                .send({ ...createUserParams, email: user1.data.email })
+                .expect(400)
+
+            expect(responseBody.message).toBe(
+                `The e-mail ${user1.data.email} is already in use`,
+            )
+        })
     })
 
     describe('PATCH /api/users/:userId', () => {
