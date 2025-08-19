@@ -94,14 +94,14 @@ describe('User Routes E2E Tests', () => {
         })
 
         it('should return 404 when user is not found', async () => {
-          const { body: responseBody } = await request(app)
-              .get(`/api/users/${userId}/balance`)
-              .expect(404)
+            const { body: responseBody } = await request(app)
+                .get(`/api/users/${userId}/balance`)
+                .expect(404)
 
-          expect(responseBody.message).toBe(
-              `User with id ${userId} not found`,
-          )
-      })
+            expect(responseBody.message).toBe(
+                `User with id ${userId} not found`,
+            )
+        })
     })
 
     describe('POST /api/users', () => {
@@ -138,6 +138,17 @@ describe('User Routes E2E Tests', () => {
             })
             expect(responseBody.data).not.toHaveProperty('password')
             expect(responseBody.message).toBe(ResponseMessage.USER_UPDATED)
+        })
+
+        it('should return 404 when user is not found', async () => {
+            const { body: responseBody } = await request(app)
+                .patch(`/api/users/${userId}`)
+                .send(updateUserParams)
+                .expect(404)
+
+            expect(responseBody.message).toBe(
+                `User with id ${userId} not found`,
+            )
         })
     })
 
