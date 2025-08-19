@@ -14,6 +14,7 @@ import {
     GetUserByIdService,
     HttpRequest,
     HttpResponse,
+    ResponseMessage,
     UserPublicResponse,
 } from '@/shared'
 
