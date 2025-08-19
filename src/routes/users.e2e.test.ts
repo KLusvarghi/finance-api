@@ -92,6 +92,16 @@ describe('User Routes E2E Tests', () => {
             })
             expect(responseBody.message).toBe(ResponseMessage.SUCCESS)
         })
+
+        it('should return 404 when user is not found', async () => {
+          const { body: responseBody } = await request(app)
+              .get(`/api/users/${userId}/balance`)
+              .expect(404)
+
+          expect(responseBody.message).toBe(
+              `User with id ${userId} not found`,
+          )
+      })
     })
 
     describe('POST /api/users', () => {
