@@ -7,7 +7,7 @@ export const createUserSchema = z.object({
         })
         .trim()
         .min(2, {
-            message: 'First name must have at least 6 characters',
+            message: 'First name must have at least 2 characters',
         }),
     last_name: z
         .string({
@@ -15,7 +15,7 @@ export const createUserSchema = z.object({
         })
         .trim()
         .min(2, {
-            message: 'Last name must have at least 6 characters',
+            message: 'Last name must have at least 2 characters',
         }),
     email: z
         .string({
