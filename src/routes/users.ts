@@ -8,7 +8,7 @@ import {
     makeUpdateUserController,
 } from '@/factories/controllers/'
 
-const usersRouter = Router()
+export const usersRouter = Router()
 
 usersRouter.get('/:userId', async (request, response) => {
     const getUserByIdController = makeGetUserByIdController()
@@ -49,5 +49,3 @@ usersRouter.delete('/:userId', async (request, response) => {
 
     response.status(statusCode).send(body)
 })
-
-export { usersRouter }
