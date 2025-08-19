@@ -21,6 +21,7 @@ import {
     Controller,
     HttpRequest,
     HttpResponse,
+    ResponseMessage,
     UpdateUserRequest,
     UpdateUserService,
     UserPublicResponse,
@@ -54,7 +55,7 @@ export class UpdateUserController
             )
 
             // após chamar o service, já retornamos o status code, porque caso, dê algo errado no service ou no repositpry, eles vão instanciar um Error, e isso fará com que caia no catch
-            return ok(updatedUser)
+            return ok(updatedUser, ResponseMessage.USER_UPDATED)
         } catch (error) {
             console.error(error)
 
