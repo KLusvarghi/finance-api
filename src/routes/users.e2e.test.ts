@@ -81,4 +81,19 @@ describe('User Routes E2E Tests', () => {
             expect(responseBody.message).toBe(ResponseMessage.SUCCESS)
         })
     })
+
+    describe('DELETE /api/users/:userId', () => {
+        it('should return 200 when user is deleted', async () => {
+            const { body: createdUser } = await request(app)
+                .post(`/api/users`)
+                .send(createUserParams)
+                .expect(201)
+
+            const { body: responseBody } = await request(app)
+                .delete(`/api/users/${createdUser.data.id}`)
+                .expect(200)
+
+            expect(responseBody.message).toBe(ResponseMessage.USER_DELETED)
+        })
+    })
 })
