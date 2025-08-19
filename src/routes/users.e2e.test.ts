@@ -1,7 +1,7 @@
 import request from 'supertest'
 
 import { app } from '../app'
-import { ResponseMessage } from '../shared'
+import { ResponseMessage, ResponseZodMessages } from '../shared'
 
 import {
     createUserParams,
@@ -122,7 +122,7 @@ describe('User Routes E2E Tests', () => {
             const { body: user1 } = await request(app)
                 .post(`/api/users`)
                 .send(createUserParams)
-                .expect(201) // was 400
+                .expect(201)
 
             const { body: responseBody } = await request(app)
                 .post(`/api/users`)
@@ -133,6 +133,15 @@ describe('User Routes E2E Tests', () => {
                 `The e-mail ${user1.data.email} is already in use`,
             )
         })
+
+        it('should return 400 when password is not strong enough', async () => {
+          const { body: responseBody } = await request(app)
+              .post(`/api/users`)
+              .send({...createUserParams, password: '123'})
+              .expect(400)
+
+          expect(responseBody.message).toBe(ResponseZodMessages.password.minLength)
+      })
     })
 
     describe('PATCH /api/users/:userId', () => {
