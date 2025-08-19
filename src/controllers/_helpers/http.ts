@@ -54,7 +54,7 @@ export const unauthorized = <T = any>(
 })
 
 export const notFound = <T = any>(
-    message: string = ResponseMessage.ERROR,
+    message: string = ResponseMessage.NOT_FOUND,
     code?: string,
     data?: T,
 ): HttpResponse<T> => ({
