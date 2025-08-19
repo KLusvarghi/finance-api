@@ -7,7 +7,7 @@ import { Prisma } from '@prisma/client'
 export class PostgresDeleteUserRepository implements DeleteUserRepository {
     async execute(userId: string): Promise<UserRepositoryResponse> {
         try {
-            return prisma.user.delete({ where: { id: userId } })
+            return await prisma.user.delete({ where: { id: userId } })
         } catch (error) {
             if (
                 error instanceof Prisma.PrismaClientKnownRequestError &&
