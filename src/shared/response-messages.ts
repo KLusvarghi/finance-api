@@ -16,6 +16,7 @@ export const ResponseMessage = {
     // Genéricas
     SUCCESS: 'Operation completed successfully',
     ERROR: 'error',
+    NOT_FOUND: 'Resource not found',
     SERVER_ERROR: 'Internal server error',
     BAD_REQUEST: 'Bad request',
     INVALID_ID: 'The provider id is not valid',
