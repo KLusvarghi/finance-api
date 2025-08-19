@@ -53,15 +53,23 @@ export default defineConfig([
         {
           patterns: [
             {
-              group: ["@/shared/types", "@/shared/response-messagens"],
-              message: "Use o barrel '@/shared' em vez de importar diretamente de subdiretórios específicos."
+              group: [
+                "@/shared/*",
+                "@/errors/*",
+                "@/repositories/postgres/*",
+                "@/factories/controllers/*",
+                "@/services/*",
+                "@/controllers/_helpers/*",
+                "@/controllers/*",
+                "@/schemas/*",
+                "@/test/*",
+                "@/adapters/*",
+              ],
+              message:
+                "Use o barrel em vez de importar diretamente de subdiretórios específicos.",
             },
-            {
-              group: ["@/errors/user", "@/errors/transaction"],
-              message: "Use o barrel '@/errors' em vez de importar diretamente de subdiretórios específicos."
-            }
-          ]
-        }
+          ],
+        },
       ],
     },
   },
