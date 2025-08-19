@@ -4,7 +4,7 @@
     "main": "index.js",
     "type": "module",
     "scripts": {
-        "test": "dotenv -e .env.test -- jest --silent --passWithNoTests --runInBand",
+        "test": "dotenv -e .env.test -- jest --silent --passWithNoTests --runInBand --detectOpenHandles --forceExit",
         "test:watch": "npm run test -- --watch",
         "test:coverage": "npm run test -- --coverage",
         "prepare": "husky install && prisma generate",
@@ -23,6 +23,7 @@
         "@types/jest": "^30.0.0",
         "@types/node": "^24.0.14",
         "@types/pg": "^8.15.4",
+        "@types/supertest": "^6.0.3",
         "eslint": "^9.31.0",
         "eslint-config-prettier": "^10.1.5",
         "eslint-plugin-jest": "^29.0.1",
