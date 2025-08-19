@@ -4,6 +4,8 @@ import { app } from '../app'
 import { ResponseMessage } from '../shared'
 
 import { createUserParams, updateUserParams, userResponse } from '@/test'
+import { faker } from '@faker-js/faker'
+import { TransactionType } from '@prisma/client'
 
 // Ao invpes de chamar a rota, poderiamos chamar direto o Prisma, mas dessa forma chamando nossas rotas, conseguimos testar o fluxo completo, desde a requisição até a resposta
 
@@ -68,15 +70,47 @@ describe('User Routes E2E Tests', () => {
                 .send(createUserParams)
                 .expect(201)
 
+            const userData = createdUser.data
+
+            await request(app)
+                .post(`/api/transactions`)
+                .send({
+                    user_id: userData.id,
+                    name: faker.lorem.words(3),
+                    date: faker.date.recent().toISOString(),
+                    amount: 10000,
+                    type: TransactionType.EARNING,
+                })
+
+            await request(app)
+                .post(`/api/transactions`)
+                .send({
+                    user_id: userData.id,
+                    name: faker.lorem.words(3),
+                    date: faker.date.recent().toISOString(),
+                    amount: 2000,
+                    type: TransactionType.INVESTMENT,
+                })
+
+            await request(app)
+                .post(`/api/transactions`)
+                .send({
+                    user_id: userData.id,
+                    name: faker.lorem.words(3),
+                    date: faker.date.recent().toISOString(),
+                    amount: 2000,
+                    type: TransactionType.EXPENSE,
+                })
+
             const { body: responseBody } = await request(app)
-                .get(`/api/users/${createdUser.data.id}/balance`)
+                .get(`/api/users/${userData.id}/balance`)
                 .expect(200)
 
             expect(responseBody.data).toEqual({
-                balance: '0',
-                earnings: '0',
-                expenses: '0',
-                investments: '0',
+                earnings: '10000',
+                expenses: '2000',
+                investments: '2000',
+                balance: '6000',
             })
             expect(responseBody.message).toBe(ResponseMessage.SUCCESS)
         })
