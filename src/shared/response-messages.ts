@@ -14,7 +14,7 @@ export const ResponseMessage = {
     TRANSACTION_ID_MISSING: 'Transaction id is required',
 
     // Genéricas
-    SUCCESS: 'success',
+    SUCCESS: 'Operation completed successfully',
     ERROR: 'error',
     SERVER_ERROR: 'Internal server error',
     BAD_REQUEST: 'Bad request',
