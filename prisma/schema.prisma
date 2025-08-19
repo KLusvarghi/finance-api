@@ -15,19 +15,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-  // https://www.prisma.io/docs/orm/prisma-client/special-fields-and-types
-  // https://www.prisma.io/docs/orm/reference/prisma-schema-reference
-  // dentro do "model" é onde definimos nossa tabela
+// https://www.prisma.io/docs/orm/prisma-client/special-fields-and-types
+// https://www.prisma.io/docs/orm/reference/prisma-schema-reference
+// dentro do "model" é onde definimos nossa tabela
 model User {
   // o @id diz que é um capo PK (primary key)
   // o @default irá dizer que o por padrão teremos um uuid caso não seja preenchido
-  id String @id @default(uuid())
+  id         String @id @default(uuid())
   // Se a gente coloca apenas "String" ele por padrão coloca como "text" (que nã otem limite de caracteres)
   first_name String @db.VarChar(50)
-  last_name String @db.VarChar(50)
+  last_name  String @db.VarChar(50)
   // definimos que ele é unico com @unique
-  email String @db.VarChar(100) @unique
-  password String @db.VarChar(100)
+  email      String @unique @db.VarChar(100)
+  password   String @db.VarChar(100)
 
   // e para que o campo "id" ou qualquer outro consiga ser referenciado em outra tabela, precisamos dizer dizer que "User", pode ter várias transactions:
   // 1:N -> Um usuári pode ter várias transaction
@@ -35,18 +35,18 @@ model User {
 }
 
 model Transaction {
-  id String @id @default(uuid())
+  id      String          @id @default(uuid())
   // para fazer uma relação no prisma, temos que primeiro instanciar a coluna apenas com o tipo dela
   // N:1 -> Varias transaction só pode ter um usuário
   user_id String
   // e depois dize "user" é do tipo "User" (tabela) e relacionamo o field dessa tabela "user_id" faz referencia com o campo "id" da coluna de user 
-  user User @relation(fields: [user_id], references: [id])
-  name String @db.VarChar(100)
-  amount  Decimal @db.Decimal(10, 2)
+  user    User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  name    String          @db.VarChar(100)
+  amount  Decimal         @db.Decimal(10, 2)
   // se deixar apenas "DateTime" ele vai criar uma coluna do tipo timestamp
   // para especificar é só colocar @db.Date
-  date DateTime @db.Date
-  type TransactionType
+  date    DateTime        @db.Date
+  type    TransactionType
 }
 
 enum TransactionType {
