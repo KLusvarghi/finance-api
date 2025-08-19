@@ -165,5 +165,15 @@ describe('User Routes E2E Tests', () => {
 
             expect(responseBody.message).toBe(ResponseMessage.USER_DELETED)
         })
+
+        it('should return 404 when user is not found', async () => {
+            const { body: responseBody } = await request(app)
+                .delete(`/api/users/${userId}`)
+                .expect(404)
+
+            expect(responseBody.message).toBe(
+                `User with id ${userId} not found`,
+            )
+        })
     })
 })
