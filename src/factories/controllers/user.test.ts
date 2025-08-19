@@ -29,5 +29,7 @@ describe('User Controller Factories', () => {
         expect(makeUpdateUserController()).toBeInstanceOf(UpdateUserController)
     })
 
-    
+    it('should return a valid DeleteUserController instance', () => {
+        expect(makeDeleteUserController()).toBeInstanceOf(DeleteUserController)
+    })
 })
