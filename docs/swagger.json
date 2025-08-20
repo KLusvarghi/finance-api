@@ -1,0 +1,10 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Finance App API",
+    "description": "API documentation for the Finance App. This API allows users to manage users and transactions.",
+    "version": "1.0.0"
+  },
+  "paths": {},
+  "components": {}
+}
