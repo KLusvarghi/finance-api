@@ -361,6 +361,67 @@
                     }
                 }
             }
+        },
+        "/api/transactions/{transactionId}": {
+          "patch": {
+            "summary": "Update a transaction by id",
+            "description": "Update a transaction by id",
+            "tags": ["Transaction"],
+            "parameters": [
+              {
+                "name": "transactionId",
+                "description": "The id of the transaction to update",
+                "in": "path",
+                "required": true,
+                "schema": {
+                    "type": "string",
+                    "format": "uuid"
+                }
+              }
+            ],
+            "requestBody": {
+              "required": true,
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/CreateTransactionParams"
+                  }
+                }
+              }
+            },
+            "responses": {
+                    "200": {
+                        "description": "Transaction updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Transaction"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Transaction not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvalidParamResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InternalServerErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+          }
         }
     },
     "components": {
