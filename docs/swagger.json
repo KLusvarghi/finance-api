@@ -260,6 +260,55 @@
                     }
                 }
             }
+        },
+        "/api/transactions": {
+            "post": {
+                "summary": "Create a new transaction",
+                "description": "Create a new transaction",
+                "tags": ["Transaction"],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateTransactionParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Transaction created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Transaction"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid params",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvalidParamResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InternalServerErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -330,6 +379,67 @@
                         "type": "string",
                         "example": "password",
                         "minLength": 6
+                    }
+                }
+            },
+            "Transaction": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "005ffce9-14d1-489c-b746-cab9c5efedd3"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Pizza"
+                    },
+                    "user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "005ffce9-14d1-489c-b746-cab9c5efedd3"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": ["EXPENSE", "EARNING", "INVESTMENT"]
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-08-02T21:19:00Z"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "example": "33.33"
+                    }
+                }
+            },
+            "CreateTransactionParams": {
+                "type": "object",
+                "required": ["name", "user_id", "type", "amount"],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Pizza"
+                    },
+                    "user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "005ffce9-14d1-489c-b746-cab9c5efedd3"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": ["EXPENSE", "EARNING", "INVESTMENT"]
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-08-02T21:19:00Z",
+                        "default": "2025-08-02T21:19:00Z"
+                    },
+                    "amount": {
+                        "type": "number",
+                        "example": 33.33
                     }
                 }
             },
