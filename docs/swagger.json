@@ -103,6 +103,54 @@
                         }
                     }
                 }
+            },
+            "delete": {
+                "summary": "Delete a user by id",
+                "description": "Delete a user by id",
+                "tags": ["User"],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "description": "The id of the user to delete",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InternalServerErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvalidParamResponse"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     },
