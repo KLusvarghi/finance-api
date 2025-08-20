@@ -65,7 +65,11 @@
                         "name": "userId",
                         "description": "The id of the user to get the balance",
                         "in": "path",
-                        "required": true
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
                     }
                 ],
                 "responses": {
