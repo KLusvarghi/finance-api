@@ -42,6 +42,16 @@
                             }
                         }
                     },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserNotFoundResponse"
+                                }
+                            }
+                        }
+                    },
                     "500": {
                         "description": "Internal server error",
                         "content": {
@@ -83,12 +93,22 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "Invalid params",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvalidParamResponse"
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "User not found",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InvalidParamResponse"
+                                    "$ref": "#/components/schemas/UserNotFoundResponse"
                                 }
                             }
                         }
@@ -134,12 +154,22 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "Invalid params",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvalidParamResponse"
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "User not found",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InvalidParamResponse"
+                                    "$ref": "#/components/schemas/UserNotFoundResponse"
                                 }
                             }
                         }
@@ -183,12 +213,22 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "Invalid params",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvalidParamResponse"
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "User not found",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InvalidParamResponse"
+                                    "$ref": "#/components/schemas/UserNotFoundResponse"
                                 }
                             }
                         }
@@ -226,7 +266,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/CreateUserParams"
+                                "$ref": "#/components/schemas/UpdateUserParams"
                             }
                         }
                     }
@@ -242,12 +282,22 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "Invalid params",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvalidParamResponse"
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "User not found",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InvalidParamResponse"
+                                    "$ref": "#/components/schemas/UserNotFoundResponse"
                                 }
                             }
                         }
@@ -301,6 +351,16 @@
                             }
                         }
                     },
+                    "404": {
+                        "description": "Transaction not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TransactionNotFoundResponse"
+                                }
+                            }
+                        }
+                    },
                     "500": {
                         "description": "Internal server error",
                         "content": {
@@ -343,12 +403,22 @@
                             }
                         }
                     },
-                    "404": {
-                        "description": "User not found",
+                    "400": {
+                        "description": "Invalid params",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/InvalidParamResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Transaction not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TransactionNotFoundResponse"
                                 }
                             }
                         }
@@ -367,33 +437,33 @@
             }
         },
         "/api/transactions/{transactionId}": {
-          "patch": {
-            "summary": "Update a transaction by id",
-            "description": "Update a transaction by id",
-            "tags": ["Transaction"],
-            "parameters": [
-              {
-                "name": "transactionId",
-                "description": "The id of the transaction to update",
-                "in": "path",
-                "required": true,
-                "schema": {
-                    "type": "string",
-                    "format": "uuid"
-                }
-              }
-            ],
-            "requestBody": {
-              "required": true,
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/CreateTransactionParams"
-                  }
-                }
-              }
-            },
-            "responses": {
+            "patch": {
+                "summary": "Update a transaction by id",
+                "description": "Update a transaction by id",
+                "tags": ["Transaction"],
+                "parameters": [
+                    {
+                        "name": "transactionId",
+                        "description": "The id of the transaction to update",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateTransactionParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
                     "200": {
                         "description": "Transaction updated successfully",
                         "content": {
@@ -404,12 +474,22 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "Invalid params",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvalidParamResponse"
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "Transaction not found",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InvalidParamResponse"
+                                    "$ref": "#/components/schemas/TransactionNotFoundResponse"
                                 }
                             }
                         }
@@ -425,24 +505,24 @@
                         }
                     }
                 }
-          },
-          "delete": {
-            "summary": "Delete a transaction by id",
-            "description": "Delete a transaction by id",
-            "tags": ["Transaction"],
-            "parameters": [
-              {
-                "name": "transactionId",
-                "description": "The id of the transaction to delete",
-                "in": "path",
-                "required": true,
-                "schema": {
-                    "type": "string",
-                    "format": "uuid"
-                }
-              }
-            ],
-            "responses": {
+            },
+            "delete": {
+                "summary": "Delete a transaction by id",
+                "description": "Delete a transaction by id",
+                "tags": ["Transaction"],
+                "parameters": [
+                    {
+                        "name": "transactionId",
+                        "description": "The id of the transaction to delete",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
                     "200": {
                         "description": "Transaction deleted successfully",
                         "content": {
@@ -453,12 +533,22 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "Invalid params",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvalidParamResponse"
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "Transaction not found",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InvalidParamResponse"
+                                    "$ref": "#/components/schemas/TransactionNotFoundResponse"
                                 }
                             }
                         }
@@ -474,7 +564,7 @@
                         }
                     }
                 }
-          }
+            }
         }
     },
     "components": {
@@ -548,6 +638,26 @@
                     }
                 }
             },
+            "UpdateUserParams": {
+                "type": "object",
+                "properties": {
+                    "first_name": {
+                        "type": "string",
+                        "example": "John",
+                        "minLength": 2
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "example": "Doe",
+                        "minLength": 2
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "john@doe.com"
+                    }
+                }
+            },
             "Transaction": {
                 "type": "object",
                 "properties": {
@@ -582,7 +692,7 @@
             },
             "CreateTransactionParams": {
                 "type": "object",
-                "required": ["name", "user_id", "type", "amount"],
+                "required": ["name", "user_id", "type", "date", "amount"],
                 "properties": {
                     "name": {
                         "type": "string",
@@ -606,6 +716,49 @@
                     "amount": {
                         "type": "number",
                         "example": 33.33
+                    }
+                }
+            },
+            "UpdateTransactionParams": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Pizza"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": ["EXPENSE", "EARNING", "INVESTMENT"]
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-08-02T21:19:00Z",
+                        "default": "2025-08-02T21:19:00Z"
+                    },
+                    "amount": {
+                        "type": "number",
+                        "example": 33.33
+                    }
+                }
+            },
+            "UserNotFoundResponse": {
+                "type": "object",
+                "format": "uuid",
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "User not found"
+                    }
+                }
+            },
+            "TransactionNotFoundResponse": {
+                "type": "object",
+                "format": "uuid",
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "Transaction not found"
                     }
                 }
             },
