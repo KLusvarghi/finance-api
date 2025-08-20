@@ -30,7 +30,18 @@ describe('Transactions Routes E2E Tests', () => {
             expect(responseBody.message).toBe(ResponseMessage.SUCCESS)
         })
 
-        
+        it('should return 404 when transaction is not found', async () => {
+            const { body: createdUser } = await request(app)
+                .post(`/api/users`)
+                .send(createUserParams)
+
+            const { body: responseBody } = await request(app)
+                .get(`/api/transactions/?userId=${createdUser.data.id}`)
+                .expect(200)
+
+            expect(responseBody.data.length).toBe(0)
+            expect(responseBody.message).toBe(ResponseMessage.SUCCESS)
+        })
     })
 
     describe('POST /api/transactions', () => {
