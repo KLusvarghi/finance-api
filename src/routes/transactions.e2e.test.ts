@@ -7,6 +7,7 @@ import {
     createTransactionParams,
     createUserParams,
     updateTransactionParams,
+    userId,
 } from '@/test'
 import { TransactionType } from '@prisma/client'
 
@@ -89,6 +90,18 @@ describe('Transactions Routes E2E Tests', () => {
                 .patch(`/api/transactions/${createdTransaction.data.id}`)
                 .send(updateTransactionParams)
                 .expect(200)
+        })
+
+        it('should return 404 when transaction is not found', async () => {
+            const { body: responseBody } = await request(app)
+                .patch(`/api/transactions/${userId}`)
+                .send(updateTransactionParams)
+                .expect(404)
+
+            expect(responseBody.data).toBeNull()
+            expect(responseBody.message).toBe(
+                `Transaction with id ${userId} not found`,
+            )
         })
     })
 })
