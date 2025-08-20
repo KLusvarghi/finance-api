@@ -127,5 +127,16 @@ describe('Transactions Routes E2E Tests', () => {
                 ResponseMessage.TRANSACTION_DELETED,
             )
         })
+
+        it('should return 404 when transaction is not found', async () => {
+            const { body: responseBody } = await request(app)
+                .delete(`/api/transactions/${userId}`)
+                .expect(404)
+
+            expect(responseBody.data).toBeNull()
+            expect(responseBody.message).toBe(
+                `Transaction with id ${userId} not found`,
+            )
+        })
     })
 })
