@@ -55,6 +55,53 @@
                 }
             }
         },
+        "/api/users/{userId}/balance": {
+            "get": {
+                "summary": "Get a user balance by user ID",
+                "description": "Get a user balance by user ID",
+                "tags": ["User"],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "description": "The id of the user to get the balance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User balance found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserBalance"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvalidParamResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InternalServerErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/users/{userId}": {
             "get": {
                 "summary": "Get a user by id",
@@ -236,6 +283,27 @@
                     "email": {
                         "type": "string",
                         "example": "john@doe.com"
+                    }
+                }
+            },
+            "UserBalance": {
+                "type": "object",
+                "properties": {
+                    "earnings": {
+                        "type": "string",
+                        "example": "10000"
+                    },
+                    "expenses": {
+                        "type": "string",
+                        "example": "2000"
+                    },
+                    "investments": {
+                        "type": "string",
+                        "example": "2000"
+                    },
+                    "balance": {
+                        "type": "string",
+                        "example": "6000"
                     }
                 }
             },
