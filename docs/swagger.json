@@ -67,7 +67,8 @@
                         "in": "path",
                         "required": true,
                         "schema": {
-                            "$ref": "#/components/schemas/uuid"
+                            "type": "string",
+                            "format": "uuid"
                         }
                     }
                 ],
@@ -115,7 +116,8 @@
                         "in": "path",
                         "required": true,
                         "schema": {
-                            "$ref": "#/components/schemas/uuid"
+                            "type": "string",
+                            "format": "uuid"
                         }
                     }
                 ],
@@ -130,12 +132,61 @@
                             }
                         }
                     },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvalidParamResponse"
+                                }
+                            }
+                        }
+                    },
                     "500": {
                         "description": "Internal server error",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/InternalServerErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "summary": "Update a user by id",
+                "description": "Update a user by id",
+                "tags": ["User"],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "description": "The id of the user to update",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateUserParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
                                 }
                             }
                         }
@@ -146,6 +197,16 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/InvalidParamResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InternalServerErrorResponse"
                                 }
                             }
                         }
@@ -160,7 +221,9 @@
                 "type": "object",
                 "properties": {
                     "id": {
-                        "$ref": "#/components/schemas/uuid"
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "e29ef739-ffae-45a8-a582-fb56f9660a12"
                     },
                     "first_name": {
                         "type": "string",
@@ -175,11 +238,6 @@
                         "example": "john@doe.com"
                     }
                 }
-            },
-            "uuid": {
-                "type": "string",
-                "format": "uuid",
-                "example": "e29ef739-ffae-45a8-a582-fb56f9660a12"
             },
             "CreateUserParams": {
                 "type": "object",
