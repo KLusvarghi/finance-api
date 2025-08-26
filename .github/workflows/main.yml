@@ -70,4 +70,4 @@ jobs:
                   envkey_DATABASE_URL: ${{ secrets.DATABASE_URL }}
               # por fim rodamos as migration em deploy
             - name: Run migrations
-              run: npm run migrate deploy
+              run: npx prismamigrate deploy
