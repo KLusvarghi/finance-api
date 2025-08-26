@@ -73,7 +73,7 @@ describe('GetUserBalanceController', () => {
                 expect(response.statusCode).toBe(400)
                 expect(response.body?.message).toBe(
                     ResponseMessage.USER_ID_MISSING,
-                  )
+                )
             })
 
             it.each(invalidUUID)(
@@ -103,9 +103,10 @@ describe('GetUserBalanceController', () => {
             expect(response.body?.data?.expenses).toBeDefined()
             expect(response.body?.data?.investments).toBeDefined()
             expect(response.body?.data?.balance).toBeDefined()
-            expect(typeof response.body?.data?.earnings).toBe('number')
-            expect(typeof response.body?.data?.expenses).toBe('number')
-            expect(typeof response.body?.data?.investments).toBe('number')
+            expect(typeof response.body?.data?.earnings).toBe('string')
+            expect(typeof response.body?.data?.expenses).toBe('string')
+            expect(typeof response.body?.data?.investments).toBe('string')
+            expect(typeof response.body?.data?.balance).toBe('string')
         })
 
         it('should call GetUserBalanceService with correct parameters', async () => {

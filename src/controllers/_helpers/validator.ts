@@ -12,10 +12,7 @@ export const invalidIdResponse = () =>
     badRequest(ResponseMessage.INVALID_ID, ErrorCode.INVALID_ID)
 
 export const requiredFieldMissingResponse = (message: string) =>
-    badRequest(
-        message,
-        ErrorCode.MISSING_FIELD,
-    )
+    badRequest(message, ErrorCode.MISSING_FIELD)
 
 export const handleZodValidationError = (error: ZodError) => {
     const message = error.issues?.[0]?.message ?? ResponseMessage.BAD_REQUEST

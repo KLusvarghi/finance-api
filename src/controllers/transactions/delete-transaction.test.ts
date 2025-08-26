@@ -86,9 +86,7 @@ describe('DeleteTransactionController', () => {
 
                 // assert
                 expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBe(
-                    ResponseMessage.INVALID_ID,
-                )
+                expect(response.body?.message).toBe(ResponseMessage.INVALID_ID)
             },
         )
     })

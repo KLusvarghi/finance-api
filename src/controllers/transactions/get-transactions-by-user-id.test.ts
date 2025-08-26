@@ -1,6 +1,11 @@
 import { GetTransactionsByUserIdController } from '@/controllers'
 import { UserNotFoundError } from '@/errors'
-import { HttpRequest, ResponseMessage, TransactionPublicResponse, TransactionRepositoryResponse } from '@/shared'
+import {
+    HttpRequest,
+    ResponseMessage,
+    TransactionPublicResponse,
+    TransactionRepositoryResponse,
+} from '@/shared'
 import {
     getTransactionsByUserIdControllerResponse,
     getTransactionsByUserIdHttpRequest as baseHttpRequest,
@@ -53,9 +58,7 @@ describe('GetTransactionsByUserIdController', () => {
 
             // assert
             expect(response.statusCode).toBe(500)
-            expect(response.body?.message).toBe(
-                ResponseMessage.SERVER_ERROR,
-            )
+            expect(response.body?.message).toBe(ResponseMessage.SERVER_ERROR)
         })
 
         it('should return 404 if GetTransactionsByUserIdService throws UserNotFoundError', async () => {
@@ -95,9 +98,7 @@ describe('GetTransactionsByUserIdController', () => {
 
                 // assert
                 expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBe(
-                    ResponseMessage.INVALID_ID,
-                )
+                expect(response.body?.message).toBe(ResponseMessage.INVALID_ID)
             },
         )
     })

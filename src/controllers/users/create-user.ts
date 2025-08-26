@@ -39,7 +39,9 @@ export class CreateUserController
             await createUserSchema.parseAsync(params as CreateUserParams)
 
             // rxecutamos nossa regra de negocio
-            const createdUser = await this.createUserService.execute(params)
+            const createdUser = await this.createUserService.execute(
+                params as CreateUserParams,
+            )
 
             // retornar a resposta para o user (status code)
             return created(createdUser, ResponseMessage.USER_CREATED)

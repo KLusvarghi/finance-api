@@ -1,7 +1,6 @@
 import { prisma } from '../../../prisma/prisma'
 
 import { faker } from '@faker-js/faker'
-import { Prisma } from '@prisma/client'
 
 export const userId = faker.string.uuid()
 
@@ -35,10 +34,10 @@ export const userResponse = {
 }
 
 export const userBalanceResponse = {
-    earnings: faker.number.float(),
-    expenses: faker.number.float(),
-    investments: faker.number.float(),
-    balance: new Prisma.Decimal(faker.number.float()),
+    earnings: String(faker.number.float()),
+    expenses: String(faker.number.float()),
+    investments: String(faker.number.float()),
+    balance: String(faker.number.float()),
 }
 
 // ============================================================================
@@ -147,11 +146,13 @@ export const updateUserHttpRequest = {
  * @param customData - Dados customizados para sobrescrever os padrões
  * @returns Promise com o usuário criado
  */
-export const createTestUser = async (customData?: Partial<typeof createUserRepositoryResponse>) => {
-  return await prisma.user.create({
-      data: {
-          ...createUserRepositoryResponse,
-          ...customData,
-      },
-  })
+export const createTestUser = async (
+    customData?: Partial<typeof createUserRepositoryResponse>,
+) => {
+    return await prisma.user.create({
+        data: {
+            ...createUserRepositoryResponse,
+            ...customData,
+        },
+    })
 }

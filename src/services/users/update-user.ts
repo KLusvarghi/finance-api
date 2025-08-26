@@ -15,12 +15,7 @@ import {
 
 export class UpdateUserService
     implements
-        ServiceWithMultipleParams<
-            string,
-            UpdateUserParams,
-            unknown,
-            UserPublicResponse
-        >
+        ServiceWithMultipleParams<string, UpdateUserParams, UserPublicResponse>
 {
     private getUserByEmailRepository: GetUserByEmailRepository
     private updateUserRepository: UpdateUserRepository

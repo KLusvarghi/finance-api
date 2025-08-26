@@ -139,11 +139,13 @@ export const updateTransactionHttpRequest = {
  * @param customData - Dados customizados para sobrescrever os padrões
  * @returns Promise com a transação criada
  */
-export const createTestTransaction = async (customData?: Partial<typeof createTransactionRepositoryResponse>) => {
-  return await prisma.transaction.create({
-      data: {
-          ...createTransactionRepositoryResponse,
-          ...customData,
-      },
-  })
+export const createTestTransaction = async (
+    customData?: Partial<typeof createTransactionRepositoryResponse>,
+) => {
+    return await prisma.transaction.create({
+        data: {
+            ...createTransactionRepositoryResponse,
+            ...customData,
+        },
+    })
 }

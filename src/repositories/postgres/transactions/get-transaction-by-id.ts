@@ -1,8 +1,13 @@
 import { prisma } from '../../../../prisma/prisma'
 
-import { GetTransactionByIdRepository, TransactionRepositoryResponse } from '@/shared'
+import {
+    GetTransactionByIdRepository,
+    TransactionRepositoryResponse,
+} from '@/shared'
 
-export class PostgresGetTransactionByIdRepository implements GetTransactionByIdRepository {
+export class PostgresGetTransactionByIdRepository
+    implements GetTransactionByIdRepository
+{
     async execute(
         transactionId: string,
     ): Promise<TransactionRepositoryResponse | null> {

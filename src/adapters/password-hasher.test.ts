@@ -10,10 +10,10 @@ describe('PasswordHasherAdapter', () => {
 
         // act
         const response = await sut.execute(password)
-    
+
         // asset
         expect(response).toBeTruthy()
         expect(typeof response).toBe('string')
         expect(response).not.toBe(password)
-      })
+    })
 })

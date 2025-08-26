@@ -90,6 +90,11 @@ describe('Transactions Routes E2E Tests', () => {
                 .patch(`/api/transactions/${createdTransaction.data.id}`)
                 .send(updateTransactionParams)
                 .expect(200)
+
+            expect(responseBody.data).not.toBeNull()
+            expect(responseBody.message).toBe(
+                ResponseMessage.TRANSACTION_UPDATED,
+            )
         })
 
         it('should return 404 when transaction is not found', async () => {

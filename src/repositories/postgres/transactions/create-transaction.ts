@@ -6,7 +6,9 @@ import {
     TransactionRepositoryResponse,
 } from '@/shared'
 
-export class PostgresCreateTransactionRepository implements CreateTransactionRepository {
+export class PostgresCreateTransactionRepository
+    implements CreateTransactionRepository
+{
     async execute(
         createTransactionParams: CreateTransactionParams & { id: string },
     ): Promise<TransactionRepositoryResponse> {

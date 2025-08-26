@@ -12,7 +12,6 @@ export class UpdateTransactionService
         ServiceWithMultipleParams<
             string,
             UpdateTransactionParams,
-            unknown,
             TransactionPublicResponse
         >
 {

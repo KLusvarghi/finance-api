@@ -69,7 +69,9 @@ describe('UpdateTransactionService', () => {
             jest.spyOn(
                 updateTransactionRepository,
                 'execute',
-            ).mockResolvedValueOnce(null as unknown as TransactionRepositoryResponse)
+            ).mockResolvedValueOnce(
+                null as unknown as TransactionRepositoryResponse,
+            )
 
             // act
             const promise = sut.execute(transactionId, updateTransactionParams)

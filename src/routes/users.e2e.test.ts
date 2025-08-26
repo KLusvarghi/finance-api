@@ -135,13 +135,15 @@ describe('User Routes E2E Tests', () => {
         })
 
         it('should return 400 when password is not strong enough', async () => {
-          const { body: responseBody } = await request(app)
-              .post(`/api/users`)
-              .send({...createUserParams, password: '123'})
-              .expect(400)
+            const { body: responseBody } = await request(app)
+                .post(`/api/users`)
+                .send({ ...createUserParams, password: '123' })
+                .expect(400)
 
-          expect(responseBody.message).toBe(ResponseZodMessages.password.minLength)
-      })
+            expect(responseBody.message).toBe(
+                ResponseZodMessages.password.minLength,
+            )
+        })
     })
 
     describe('PATCH /api/users/:userId', () => {

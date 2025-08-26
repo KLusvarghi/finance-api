@@ -49,14 +49,14 @@ describe('PostgresGetUserByEmailRepository', () => {
         })
 
         it('should return null if user does not exist', async () => {
-          // arrange
-          jest.spyOn(prisma.user, 'findUnique').mockResolvedValueOnce(null)
+            // arrange
+            jest.spyOn(prisma.user, 'findUnique').mockResolvedValueOnce(null)
 
-          // act
-          const response = await sut.execute(fakeUser.email)
+            // act
+            const response = await sut.execute(fakeUser.email)
 
-          // assert
-          expect(response).toBeNull()
-      })
+            // assert
+            expect(response).toBeNull()
+        })
     })
 })

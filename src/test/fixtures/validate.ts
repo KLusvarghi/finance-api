@@ -1,4 +1,4 @@
-import { ResponseMessage, ResponseZodMessages } from "@/shared"
+import { ResponseMessage, ResponseZodMessages } from '@/shared'
 
 export const invalidUUID = [
     {

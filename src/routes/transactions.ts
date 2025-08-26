@@ -45,4 +45,3 @@ transactionsRouter.delete('/:transactionId', async (request, response) => {
 
     response.status(statusCode).send(body)
 })
-

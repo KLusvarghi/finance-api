@@ -31,12 +31,13 @@ export class DeleteTransactionController
         httpRequest: HttpRequest,
     ): Promise<HttpResponse<TransactionPublicResponse>> {
         try {
-            const transactionId = httpRequest.params.transactionId as string
+            const transactionId = (
+                httpRequest.params as { transactionId: string }
+            ).transactionId
             // const { transactionId, userId } = httpRequest.params as {
             //     transactionId: string
             //     userId: string
             // }
-
 
             if (!checkIfIdIsValid(transactionId)) {
                 return invalidIdResponse()
