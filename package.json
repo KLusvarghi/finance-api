@@ -9,6 +9,7 @@
         "test:coverage": "npm run test -- --coverage",
         "prepare": "husky install && prisma generate",
         "start:dev": "npx tsx watch index.ts",
+        "start": "npx tsx index.ts",
         "build": "tsc",
         "ts:check": "npx tsc --noEmit --project tsconfig.json",
         "eslint:check": "eslint src/**/*.ts",
