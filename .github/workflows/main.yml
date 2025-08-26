@@ -1,0 +1,45 @@
+name: Deploy
+
+on:
+    push:
+        # eu coloco a branch que eu quero que o workflow seja executado
+        branches:
+            - main
+
+# defino os jobs
+jobs:
+    # defino o nome do job (check)
+    check:
+        # defino o ambiente que a step vai rodar
+        # https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2204-Readme.md
+        runs-on: ubuntu-latest
+        steps:
+            # defino o nome da step (check)
+            - name: Checkout code
+              # quando eu utilizo uma action que existe (o gh é a provedora dessa action) eu uso o prefixo "uses"
+              # https://github.com/actions/checkout na docs tem mais sobre as actions disponiveis para usar
+              uses: actions/checkout@v3
+
+            - name: Use Node.js
+              # https://github.com/actions/setup-node na docs tem mais propriedades que eu posso usar
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 20
+                  cache: 'npm'
+
+              # Para que conseguimos rodar os tests, quando ele iniciar o docker compose, ele precisa da database url, e assim criamos um arquivo .env.test
+            - name: Create .env.test file
+              run: echo "DATABASE_URL=postgresql://root:password@localhost:5433/finance-app-test" >> .env.test
+
+            # defino o nome da step (install dependencies), e o que ela vai fazer, no caso, instala as dependências do projeto antes de rodar o projeto
+            - name: Install dependencies
+              run: npm install
+
+            - name: ESLint
+              run: npm run eslint:check
+
+            - name: Prettier
+              run: npm run prettier:check
+
+            - name: Test
+              run: npm run test
