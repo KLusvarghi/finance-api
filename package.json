@@ -10,7 +10,11 @@
         "prepare": "husky install && prisma generate",
         "start:dev": "npx tsx watch index.ts",
         "build": "tsc",
-        "ts:check": "npx tsc --noEmit --project tsconfig.json"
+        "ts:check": "npx tsc --noEmit --project tsconfig.json",
+        "eslint:check": "eslint src/**/*.ts",
+        "eslint:fix": "eslint src/**/*.ts --fix",
+        "prettier:check": "prettier --check .",
+        "prettier:fix": "prettier --write ."
     },
     "keywords": [],
     "author": "",
