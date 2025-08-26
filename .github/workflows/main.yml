@@ -25,7 +25,6 @@ jobs:
               uses: actions/setup-node@v3
               with:
                   node-version: 20
-                  cache: 'npm'
 
               # Para que conseguimos rodar os tests, quando ele iniciar o docker compose, ele precisa da database url, e assim criamos um arquivo .env.test
             - name: Create .env.test file
