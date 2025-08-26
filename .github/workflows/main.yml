@@ -71,3 +71,17 @@ jobs:
               # por fim rodamos as migration em deploy
             - name: Run migrations
               run: npx prisma migrate deploy
+
+    deploy:
+        runs-on: ubuntu-latest
+        needs: migrate
+        environment: production
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+              # nao precisamos do npm install, pois no render a gente ja roda esse comando
+            - name: Deploy
+              # rodar um curl é como se fosse rodar um comando no terminal e como se fosse fazer um fetch em uma api
+              run: |
+                  curl "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
