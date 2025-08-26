@@ -14,8 +14,12 @@
         "paths": {
             "@/*": ["./src/*"]
         },
-        "sourceMap": true       // importante para cobertura e debugging
+        "sourceMap": true
     },
-    "include": ["src/**/*.ts", "index.ts", "src/infra/db/postgres/migrations/exec.ts"],
+    "include": [
+        "src/**/*.ts",
+        "index.ts",
+        "src/infra/db/postgres/migrations/exec.ts"
+    ],
     "exclude": ["node_modules", "dist"]
 }
