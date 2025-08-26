@@ -5,45 +5,45 @@ POST http://localhost:3001/api/users
 Content-Type: application/json
 
 {
-  "first_name": "John",
-  "last_name": "Doe", 
-  "email": "johna.doe@example.com",
+  "first_name": "Kayky",
+  "last_name": "Oliveira", 
+  "email": "kayky@example.com",
   "password": "password123"
 }
 
-# ###
+###
 
-# # Get User By Id
-# GET http://localhost:3001/api/users/{{userId}}
+# Get User By Id
+GET http://localhost:3001/api/users/14e197b3-3648-49bf-9629-c1fee4fe5fac
 
-# ###
+###
 
-# # Get User Balance
-# GET http://localhost:3001/api/users/{{userId}}/balance
+# Get User Balance
+GET http://localhost:3001/api/users/14e197b3-3648-49bf-9629-c1fee4fe5fac/balance
 
-# ###
+###
 
-# # Update User
-# PATCH http://localhost:3001/api/users/{{userId}}
-# Content-Type: application/json
+# Update User
+PATCH http://localhost:3001/api/users/14e197b3-3648-49bf-9629-c1fee4fe5fac
+Content-Type: application/json
 
-# {
-#   "first_name": "Jane",
-#   "last_name": "Smith",
-#   "email": "jane.smith@example.com",
-#   "password": "newpassword456"
-# }
+{
+  "first_name": "Jane",
+  "last_name": "Smith",
+  "email": "jane.smith@example.com",
+  "password": "newpassword456"
+}
 
-# ###
+###
 
-# # Delete User
-# DELETE http://localhost:3001/api/users/{{userId}}
+# Delete User
+DELETE http://localhost:3001/api/users/14e197b3-3648-49bf-9629-c1fee4fe5fac
 
-# ---
+---
 
 ### TRANSACTIONS
 
-# # Create Transaction
+# Create Transaction
 POST http://localhost:3001/api/transactions
 Content-Type: application/json
 
@@ -55,17 +55,17 @@ Content-Type: application/json
   "type": "EARNING"
 }
 
-# ###
+###
 
-# # Get Transactions By User Id (query param)
-# GET http://localhost:3001/api/transactions?userId={{userId}}
+# Get Transactions By User Id (query param)
+GET http://localhost:3001/api/transactions?userId=14e197b3-3648-49bf-9629-c1fee4fe5fac
 
 ###
 
-# # Update Transaction
+# Update Transaction
 PATCH http://localhost:3001/api/transactions/3667ef61-6229-405b-b905-6720d7a8f158
 Content-Type: application/json
-userId: 06548667-6ae0-4639-8ecc-5a9d940562bf
+userId: 14e197b3-3648-49bf-9629-c1fee4fe5fac
 
 {
   "amount": 6000,
