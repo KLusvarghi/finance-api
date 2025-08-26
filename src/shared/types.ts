@@ -327,11 +327,17 @@ export interface DeleteTransactionService {
 // HTTP REQUEST TYPES
 // ============================================================================
 
+// Base types for HTTP request components
+export type HttpRequestBody = Record<string, unknown> | unknown
+export type HttpRequestParams = Record<string, string> | unknown
+export type HttpRequestQuery = Record<string, string | string[]> | unknown
+export type HttpRequestHeaders = Record<string, string> | unknown
+
 export interface HttpRequest {
-    body?: any
-    params?: any
-    query?: any
-    headers?: any
+    body?: HttpRequestBody
+    params?: HttpRequestParams
+    query?: HttpRequestQuery
+    headers?: HttpRequestHeaders
 }
 
 // ============================================================================
@@ -344,7 +350,9 @@ export interface HttpRequest {
  * @template TResponse - Tipo dos dados de resposta
  */
 export interface Controller<TRequest = unknown, TResponse = unknown> {
-    execute(httpRequest: HttpRequest): Promise<HttpResponse<TResponse>>
+    execute(
+        httpRequest: HttpRequest & { body: TRequest },
+    ): Promise<HttpResponse<TResponse>>
 }
 
 // ============================================================================
@@ -370,9 +378,8 @@ export interface ServiceWithMultipleParams<
     TInput1 = unknown,
     TInput2 = unknown,
     TOutput = unknown,
-    TOutput2 = unknown,
 > {
-    execute(input1: TInput1, input2: TInput2): Promise<TOutput2>
+    execute(input1: TInput1, input2: TInput2): Promise<TOutput>
 }
 
 /**
