@@ -32,16 +32,16 @@ jobs:
 
             # defino o nome da step (install dependencies), e o que ela vai fazer, no caso, instala as dependências do projeto antes de rodar o projeto
             - name: Install dependencies
-              run: npm install
+              run: pnpm install
 
             - name: ESLint
-              run: npm run eslint:check
+              run: pnpm run eslint:check
 
             - name: Prettier
-              run: npm run prettier:check
+              run: pnpm run prettier:check
 
             - name: Test
-              run: npm run test
+              run: pnpm run test
 
     migrate:
         runs-on: ubuntu-latest
@@ -59,7 +59,7 @@ jobs:
                   node-version: 20
 
             - name: Install dependencies
-              run: npm install
+              run: pnpm install
 
               # usamos outra action para criar o arquivo .env.production, que é o arquivo que contém as variáveis de ambiente para o ambiente de produção
               # essa action é uma action que cria um arquivo .env com as variáveis de ambiente que passamos
@@ -80,7 +80,7 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v3
 
-              # nao precisamos do npm install, pois no render a gente ja roda esse comando
+              # nao precisamos do pnpm install, pois no render a gente ja roda esse comando
             - name: Deploy
               # rodar um curl é como se fosse rodar um comando no terminal e como se fosse fazer um fetch em uma api
               run: |
