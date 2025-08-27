@@ -8,7 +8,7 @@
         "test": "dotenv -e .env.test -- jest --silent --passWithNoTests --runInBand --detectOpenHandles --forceExit",
         "test:watch": "npm run test -- --watch",
         "test:coverage": "npm run test -- --coverage",
-        "prepare": "husky install && prisma generate",
+        "prepare": "husky && prisma generate",
         "start:dev": "npx tsx watch index.ts",
         "start": "npx tsx index.ts",
         "build": "tsc",
