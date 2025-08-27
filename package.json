@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "main": "index.js",
     "type": "module",
+    "packageManager": "pnpm@9.0.0",
     "scripts": {
         "test": "dotenv -e .env.test -- jest --silent --passWithNoTests --runInBand --detectOpenHandles --forceExit",
         "test:watch": "npm run test -- --watch",
