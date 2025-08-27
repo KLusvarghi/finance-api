@@ -101,11 +101,11 @@ Para **cada pacote** listado:
 
 - Use `rg` ou `grep` para encontrar todas as suas ocorrências no projeto.
 - **Investigue:**
-  - Imports (`import`, `require`).
-  - Scripts no `package.json`.
-  - Arquivos de configuração (ex: `eslint.config.js`, `jest.config.ts`, `tsconfig.json`).
-  - Arquivos de CI/CD (ex: `.github/workflows/ci.yml`).
-  - `Dockerfile` ou scripts de build.
+    - Imports (`import`, `require`).
+    - Scripts no `package.json`.
+    - Arquivos de configuração (ex: `eslint.config.js`, `jest.config.ts`, `tsconfig.json`).
+    - Arquivos de CI/CD (ex: `.github/workflows/ci.yml`).
+    - `Dockerfile` ou scripts de build.
 - Liste os caminhos dos arquivos encontrados na seção `Superfície de Contato` do pacote.
 
 ### 5. Coleta de Evidências (Changelogs)
@@ -123,9 +123,9 @@ Este é o passo mais crítico. Siga este processo para cada pacote:
 
 1. Leia as **mudanças** coletadas na etapa 5.
 2. Para **cada mudança individual** (um item do changelog):
-    a. Consulte a **`Superfície de Contato`** mapeada na etapa 4.
-    b. Responda à pergunta-chave: **"O nosso código utiliza diretamente a API, configuração ou comportamento alterado por esta mudança específica?"**
-    c. Documente a resposta na seção `Análise de Mudanças Relevantes`, classificando como `Relevante` ou `Não Aplicável` e fornecendo a justificativa.
+   a. Consulte a **`Superfície de Contato`** mapeada na etapa 4.
+   b. Responda à pergunta-chave: **"O nosso código utiliza diretamente a API, configuração ou comportamento alterado por esta mudança específica?"**
+   c. Documente a resposta na seção `Análise de Mudanças Relevantes`, classificando como `Relevante` ou `Não Aplicável` e fornecendo a justificativa.
 3. Após analisar **todas** as mudanças de um pacote, atribua uma **`Classificação Final`**:
     - **`Upgrade Direto`**: Se **todas** as mudanças foram classificadas como `Não Aplicável`. A atualização é considerada de baixo risco.
     - **`Requer Ajuste`**: Se **pelo menos uma** mudança foi classificada como `Relevante`.
@@ -136,10 +136,10 @@ Este é o passo mais crítico. Siga este processo para cada pacote:
 >
 > - **Superfície de Contato:** `eslint.config.js`, `package.json#scripts.lint`.
 > - **Changelog `v9.1.0`:**
->   - **Mudança 1:** "Correção de bug na regra `no-unused-vars` para casos com `export *`."
->     - **Análise:** `Não Aplicável`. **Justificativa:** Nosso projeto não usa `export *`.
->   - **Mudança 2:** "Adicionada nova opção `checkStrings` à regra `max-lines`."
->     - **Análise:** `Não Aplicável`. **Justificativa:** Não utilizamos a regra `max-lines` em nossa configuração.
+>     - **Mudança 1:** "Correção de bug na regra `no-unused-vars` para casos com `export *`."
+>         - **Análise:** `Não Aplicável`. **Justificativa:** Nosso projeto não usa `export *`.
+>     - **Mudança 2:** "Adicionada nova opção `checkStrings` à regra `max-lines`."
+>         - **Análise:** `Não Aplicável`. **Justificativa:** Não utilizamos a regra `max-lines` em nossa configuração.
 > - **Classificação Final:** `Upgrade Direto`.
 
 ---
