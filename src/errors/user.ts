@@ -32,3 +32,9 @@ export class InvalidPasswordError extends AppError {
         super('Invalid password', ErrorCode.INVALID_PASSWORD)
     }
 }
+
+export class UserIdMissingError extends AppError {
+    constructor() {
+        super('User ID is missing', ErrorCode.USER_ID_MISSING)
+    }
+}
