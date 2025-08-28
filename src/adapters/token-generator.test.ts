@@ -1,25 +1,52 @@
+import jwt from 'jsonwebtoken'
+
 import { TokenGeneratorAdapter } from './token-generator'
 
 import { UserIdMissingError } from '@/errors'
 import { faker } from '@faker-js/faker'
 
+jest.mock('jsonwebtoken')
+
 describe('TokenGeneratorAdapter', () => {
-    let sut: TokenGeneratorAdapter
-    let userId: string
+    const sut = new TokenGeneratorAdapter()
+    const userId = faker.string.uuid()
 
     beforeEach(() => {
-        sut = new TokenGeneratorAdapter()
-        userId = faker.string.uuid()
+        jest.clearAllMocks()
+    })
+
+    describe('errors handling', () => {
+        it('should throw an Error if generate token fails', async () => {
+            ;(jwt.sign as jest.Mock).mockImplementationOnce(() => {
+                throw new Error('Failed to generate tokens')
+            })
+
+            const promise = sut.execute(userId)
+
+            await expect(promise).rejects.toThrow(
+                new Error(
+                    'Failed to generate tokens: Failed to generate tokens',
+                ),
+            )
+        })
     })
 
     describe('success', () => {
         it('should return tokens if valid userId is provided', async () => {
+            // Mock jwt.sign to return different tokens for access and refresh
+            ;(jwt.sign as jest.Mock)
+                .mockReturnValueOnce('access-token-123')
+                .mockReturnValueOnce('refresh-token-456')
+
             const response = await sut.execute(userId)
 
             expect(response).toEqual({
-                accessToken: expect.any(String),
-                refreshToken: expect.any(String),
+                accessToken: 'access-token-123',
+                refreshToken: 'refresh-token-456',
             })
+            expect(response.accessToken).toBeTruthy()
+            expect(response.refreshToken).toBeTruthy()
+            expect(response.accessToken).not.toBe(response.refreshToken)
         })
     })
 
