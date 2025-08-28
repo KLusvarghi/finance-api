@@ -13,17 +13,17 @@ describe('PasswordComparatorAdapter', () => {
     it('should return true when passwords match', async () => {
         ;(bcrypt.compare as jest.Mock).mockResolvedValue(true)
 
-        const result = await sut.execute(password, hashedPassword)
+        const responde = await sut.execute(password, hashedPassword)
 
         expect(bcrypt.compare).toHaveBeenCalledWith(password, hashedPassword)
-        expect(result).toBe(true)
+        expect(responde).toBe(true)
     })
 
     it('should return false when passwords do not match', async () => {
         ;(bcrypt.compare as jest.Mock).mockResolvedValue(false)
 
-        const result = await sut.execute(password, hashedPassword)
+        const responde = await sut.execute(password, hashedPassword)
 
-        expect(result).toBe(false)
+        expect(responde).toBe(false)
     })
 })
