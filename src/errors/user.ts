@@ -1,5 +1,4 @@
-import { ErrorCode } from './index'
-import { AppError } from './index'
+import { AppError, ErrorCode } from './index'
 
 export class EmailAlreadyExistsError extends AppError {
     constructor(email: string) {
@@ -25,5 +24,11 @@ export class UpdateUserFailedError extends AppError {
 export class ForbiddenError extends AppError {
     constructor() {
         super('Forbidden', ErrorCode.FORBIDDEN)
+    }
+}
+
+export class InvalidPasswordError extends AppError {
+    constructor() {
+        super('Invalid password', ErrorCode.INVALID_PASSWORD)
     }
 }
