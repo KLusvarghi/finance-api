@@ -1,0 +1,105 @@
+---
+globs: *.test.ts,*.spec.ts
+alwaysApply: false
+---
+You are an expert in back-end development with **Node.js 20**, **Express 5**, **TypeScript (strict)**, **Prisma/PostgreSQL**, **Zod**, and **Jest**, specialized in building **financial APIs** with high reliability, maintainability, and clarity. Your focus is on creating robust, readable, and effective automated tests.
+
+## 1. Testing Philosophy
+
+### Core Principles
+
+- **MUST** ensure every new feature or bugfix is accompanied by corresponding automated tests.
+- **PREFER** unit tests for isolated business logic (services, utils).
+- **USE** integration tests for controllers, API endpoints, and database interactions.
+- **ALWAYS** structure test files to mirror the feature layout in the `src/` directory.
+
+---
+
+## 2. Test Coverage and Structure
+
+### Core Principles
+
+- **ALWAYS** write tests for both successful "happy paths" and expected error cases.
+- **ALWAYS** validate business logic against **Zod** schemas within tests where applicable.
+- **MUST** target a high level of test coverage (e.g., 90%+), especially for critical financial logic.
+- **AVOID** overusing **Jest** snapshots. **PREFER** explicit `expect` assertions for clarity and stability.
+
+---
+
+## 3. Test Setup and Environment
+
+### Core Principles
+
+- **ALWAYS** use the `.env.test` file for test runs to ensure a completely isolated environment.
+- **ALWAYS** use a separate test database, managed via **Docker Compose** (e.g., a `postgres-test` service).
+- **ALWAYS** tear down and reset the database state between test suites to prevent side effects.
+- **MUST** run database migrations during the global test setup (e.g., `jest.global-setup.ts`).
+
+---
+
+## 4. Factories and Fixtures
+
+### Core Principles
+
+- **ALWAYS** use libraries like `@faker-js/faker` to generate dynamic and realistic test data.
+- **MAINTAIN** reusable test objects and builders in a shared `src/test/fixtures/` directory.
+- **AVOID** hardcoding static data directly in tests; use factories or fixtures instead.
+
+---
+
+## 5. Best Practices
+
+### Core Principles
+
+- **ALWAYS** use descriptive test names that clearly state what is being tested and the expected outcome.
+    - **✅ Correct:** `it('should return a 404 error if the requested user does not exist')`
+    - **❌ Avoid:** `it('tests user not found')`
+- **ALWAYS** group related tests within `describe()` blocks, organized by function or feature.
+- **ALWAYS** mock external dependencies (e.g., payment gateways, email services) in unit tests.
+- **AVOID** mocking the database in integration tests; **ALWAYS** interact with the real test database.
+
+---
+
+## 6. Linting and Standards
+
+### Core Principles
+
+- **MUST** adhere to all **Jest**-specific **ESLint** rules configured in the project.
+- **MUST** resolve or address all linter warnings, such as `jest/no-disabled-tests` or `jest/no-focused-tests`, before merging code.
+
+---
+
+## 7. Test Types Summary
+
+### Core Principles
+
+- **Unit Tests:** For services (`/services`), utilities (`/utils`), and adapters (`/adapters`). Test logic in complete isolation.
+- **Integration Tests:** For controllers (`/controllers`) and API routes. Test how components work together, including database interaction.
+- **Repository Tests:** For repositories (`/repositories`). Test database queries and logic against the real test database.
+
+### Example: Mocking a Dependency
+
+**✅ Correct:**
+
+```typescript
+import { UserService } from '../user.service';
+import { IPasswordHasher } from '../../adapters/password-hasher.interface';
+
+describe('UserService', () => {
+    it('should create a user with a correctly hashed password', async () => {
+        // Mock the password hasher adapter
+        const mockHasher: IPasswordHasher = {
+            hash: jest.fn().mockResolvedValue('hashed_password'),
+            compare: jest.fn(),
+        };
+        
+        const mockRepository = { /* ... mock repository methods ... */ };
+        const userService = new UserService(mockRepository, mockHasher);
+
+        const result = await userService.create({ email: 'test@test.com', password: 'plain_password' });
+
+        // Assert that the hash method was called and the result is correct
+        expect(mockHasher.hash).toHaveBeenCalledWith('plain_password');
+        expect(result.password).toBe('hashed_password');
+    });
+});

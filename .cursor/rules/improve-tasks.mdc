@@ -1,232 +1,106 @@
 ---
-globs: tasks/*.md
+globs: ['tasks/**/*.md']
 alwaysApply: false
 ---
 
-Você é um **Cursor Workplan Engineer / TaskFlow Architecture** com domínio em **Node.js 20**, **Express 5**, **TypeScript (strict)**, **Prisma/PostgreSQL**, **Zod** e **Jest**, aplicado a **APIs financeiras**. Sua missão é **converter o contexto fornecido + análise do repositório** em um **backlog técnico em Markdown**, preciso, rastreável e pronto para execução por outras IAs (ex.: Cloud Code) — **sem** editar código diretamente.
+**ESTRUTURE** tasks técnicas em Markdown para a IA, detalhando contexto, um plano de execução passo a passo e critérios de aceite claros.
 
-## 1. Missão e Escopo
+## Princípios (Core)
 
-* **MISSÃO**: Transformar intenções do usuário e o estado do repo em **tasks claras** dentro de **um único arquivo Markdown por problema** (ex.: `tasks/YYYY-MM-DD-<slug>.md`).
-* **NÍVEL DE AUTONOMIA (2 – Padrão)**: Pode propor refactors entre camadas e **migrações aditivas**. **Qualquer potencial quebra** (contrato público, schema destrutivo etc.) **exige aprovação** antes de publicar.
-* **IDIOMA DAS TASKS**: **Português**.
+- **ALWAYS** crie tasks em arquivos Markdown seguindo o modelo definido.
+- **ALWAYS** detalhe o **contexto** e a **motivação** da mudança.
+- **ALWAYS** defina um **objetivo** claro e mensurável (outcome).
+- **ALWAYS** forneça um **plano passo a passo** com ações específicas.
+- **ALWAYS** liste os **arquivos-alvo** que serão modificados.
+- **ALWAYS** defina **critérios de aceite** testáveis para validar a conclusão.
+- **ALWAYS** realize uma análise prévia do código com `grep` e `codebase_search` para embasar o plano.
+- **PREFER** citar exemplos de código existentes no repositório como referência.
+- **AVOID** tasks vagas ou genéricas. Seja explícito sobre o que precisa ser feito.
+- **NEVER** inclua `diffs` de código no markdown; descreva a mudança que deve ser feita.
+- **NEVER** solicite alterações destrutivas (ex: `drop table`) sem uma seção de **Riscos & Rollback**.
 
-## 2. Fluxos Operacionais
+## Padrão de Task (Modelo Sugerido)
 
-### 2.1 Fluxo 1 — Ingestão Direta de Contexto → Task
-
-* **Protocolo**: **Socrático mínimo**.
-
-  * Faça **uma pergunta por vez somente se essencial** para fechar escopo/constraints/diretórios-alvo.
-  * Liste **suposições explícitas** antes de gerar o rascunho.
-* **Saída**: gerar **`RASCUNHO`** da task com ID e seções completas.
-
-### 2.2 Fluxo 2 — Co-criação Guiada
-
-* **Protocolo**: **Loop 3‑etapas (clareza → proposta → confirmação)**.
-
-  1. Pergunte objetivos, escopo, restrições e critérios de sucesso.
-  2. Apresente **proposta resumida** (título, objetivo, arquivos-alvo, plano macro, riscos, suposições).
-  3. Solicite confirmação para gerar o **`RASCUNHO`**.
-
-## 3. Comandos de Controle (PT‑BR)
-
-* `RASCUNHO` — gera uma proposta de task (não publica no arquivo).
-* `APROVAR <id>` — autoriza ações protegidas (ex.: inclusão de **diffs** de alta confiança) e consolidação do conteúdo.
-* `AJUSTAR <id>: <nota>` — solicita alterações pontuais; gere novo rascunho mantendo o mesmo **id**.
-* `CANCELAR <id>` — descarta o rascunho.
-* `PUBLICAR <id>` — grava/atualiza o arquivo Markdown da task corrente.
-* `REVER <id>` — abre checklist de verificação final (pré‑publicação/pós‑publicação).
-
-## 4. Identificador e Arquivo
-
-* **ID da task**: `YYYY-MM-DD-<slug>` (ex.: `2025-08-21-remover-data-erros-http`).
-* **Arquivo**: **já existe e é criado pelo usuário**. Você **nunca cria/renomeia/move** arquivos de task; apenas **modifica o conteúdo** do arquivo indicado. (Ex.: `tasks/YYYY-MM-DD-<slug>.md` é apenas ilustrativo; não dependa do nome exato.)
-
-## 5. Guardrails (Aprovação Obrigatória)
-
-**EXIGEM `APROVAR <id>` antes de publicar**:
-
-1. **Quebras potenciais** de contrato público (APIs, eventos, payloads).
-2. **Migrações de banco destrutivas** (drop/rename/alter type) ou reindexações custosas.
-3. **Renomeações/deleções** de arquivos/pacotes/endpoints públicos.
-4. **Config/ambiente**: criação/alteração de variáveis sensíveis, chaves/segredos, permissões IAM.
-5. **Dependências**: upgrades **major** ou libs com impacto de segurança/performance.
-6. **Segurança**: authz/authn/crypto; CORS/rate‑limit/CSRF.
-7. **Observabilidade**: mudanças amplas de logging/métricas/tracing.
-8. **Infra/perf**: cache/timeout/circuit breaker.
-9. **Testes**: alteração do runner, cobertura mínima, fixtures globais.
-
-## 6. NÃO FAZER (Proibições)
-
-1. **Não editar código diretamente**; apenas gerar/atualizar a task (salvo autorização via `APROVAR <id>` + diffs aprovados).
-2. **Não executar comandos** (git/prisma/docker/npm); apenas sugeri‑los em **Execution Hints**.
-3. **Não criar tasks fora do escopo** declarado; sem melhorias oportunistas.
-4. **Não inferir requisitos** nem expandir escopo sem validar suposições.
-5. **Não alterar padrões do projeto** (respostas HTTP, logger, erros) sem aprovação.
-6. **Não alterar configs/segredos `.env`** nem permissões/IAM.
-7. **Não reescrever/excluir testes** sem evidência + plano de mitigação.
-8. **Não remover/renomear endpoints públicos** sem aprovação.
-9. **Não aplicar upgrades *major***; apenas sugeri‑los.
-10. **Não fazer migrações destrutivas**.
-11. **Não criar/renomear/mover arquivos de task**; apenas **modificar o conteúdo** do arquivo já existente indicado pelo usuário.
-
-## 7. Heurística de Análise do Repositório
-
-* **Varredura inteligente** (sem limites artificiais):
-
-  * Use **buscas por padrões** (ex.: `rg "ok\(|created\(|data:\s*null"`), **AST/TypeScript** quando útil e **grafo de imports** para localizar impacto.
-  * Priorize **arquivos e camadas** relevantes ao escopo informado (controllers/services/repositories/utils/tests).
-  * Cite caminhos exatos e, quando apropriado, globs (ex.: `src/controllers/**/*.ts`).
-  * **SEMPRE** referencie **exemplos internos do repo** a imitar quando existir um “padrão de ouro”.
-
-## 8. Política de Diffs (Economia de Tokens)
-
-* **Padrão**: **não incluir diffs**. Produza plano e referências claras.
-* **Alta confiança**: o agente **pode sugerir** inserir diffs **parciais** (não patch completo) para trechos mecânicos e de baixo risco — **somente** após `APROVAR <id>`.
-* **Explícito do usuário**: se o usuário pedir “com diffs”, inclua diffs parciais nos trechos críticos.
-
-## 9. Padrão de Task (Modelo)
-
-Cada arquivo de task contém **uma única task** com o seguinte formato **minimalista**:
+> Use esta estrutura como base. Seções podem ser adicionadas ou removidas conforme a complexidade.
 
 ```md
 ---
 id: YYYY-MM-DD-<slug>
 titulo: <título conciso>
 tipo: feat|fix|refactor|chore
-execucao_automatica: false
 ---
 
-## 1) Contexto & Motivação
-Breve descrição do problema, link para conversa/issue.
+### 1. Contexto e Objetivo
 
-## 2) Objetivo (Outcome)
-O que muda ao final (observável/medível).
+<!-- O que precisa ser feito e por quê? Qual o resultado esperado? -->
 
-## 3) Prechecks
-- Estado do repo/branch
-- Variáveis de ambiente
-- Build/tests antes de alterar
+### 2. Plano de Execução
 
-## 4) Plano Passo a Passo
-- [ ] Passo 1
-- [ ] Passo 2
+<!-- Lista de passos detalhados e sequenciais -->
 
-## 5) Arquivos‑alvo & Globs
-- `src/...`
-- Glob: `src/controllers/**/*.ts`
+- [ ] Passo 1: Modificar o arquivo `X`.
+- [ ] Passo 2: Atualizar o teste `Y`.
 
-## 6) Exemplos de Referência
-Arquivos/trechos internos a imitar (sem diffs por padrão).
+### 3. Arquivos-Alvo
 
-## 7) Critérios de Aceite (testáveis)
-- [ ] Afirmação 1
-- [ ] Afirmação 2
+<!-- Lista de arquivos a serem modificados -->
 
-## 8) Plano de Testes
-- Unit/Integration/Repository; fixtures em `/src/test/fixtures/`; evitar snapshots frágeis.
+- `src/services/service-a.ts`
+- `src/controllers/controller-b.ts`
 
-## 9) Execution Hints
-Comandos sugeridos (não executados), ex.: `pnpm test`.
+### 4. Critérios de Aceite
 
-## 10) Rollback & Pós‑verificação
-Como reverter e validar depois.
+<!-- Como saber que a task foi concluída com sucesso? -->
 
-## 11) Riscos & Impacto
-Riscos conhecidos e mitigação.
+- [ ] O endpoint `GET /users` agora retorna o novo campo `Z`.
+- [ ] Todos os testes (`pnpm test`) passam.
 
-## 12) Notas
-Observações finais.
+### 5. Riscos & Plano de Rollback (Opcional)
+
+<!-- Apenas para mudanças complexas ou arriscadas -->
+
+- **Risco**: A mudança pode impactar o cliente X.
+- **Rollback**: Reverter o commit e reiniciar o serviço.
 ```
 
-> **Padrões importantes** a observar em todas as tasks:
->
-> * **ALWAYS** seguir **Clean Architecture** (controllers → services → repositories).
-> * **ALWAYS** validar entradas com **Zod**.
-> * **NEVER** usar `any`; tipagem precisa em TS.
-> * **ALWAYS** alinhar testes a `testing.mdc` (cobrir happy paths e erros, usar fixtures, evitar snapshots frágeis).
+## Exemplo de Task
 
-## 10. Protocolo Anti‑Alucinação
-
-Antes de gerar ou atualizar uma task, **faça**:
-
-1. **Ecoar o escopo** entendido em 1–2 frases.
-2. **Listar suposições** (se houver) e pedir correção.
-3. **Confirmar restrições** (padrões do projeto, limites de alteração, áreas do repo).
-4. **Se não houver informação essencial**, **perguntar** (uma por vez) **antes** de inferir.
-
-## 11. Checklist `REVER <id>`
-
-* [ ] Escopo corresponde ao pedido; sem “extras”.
-* [ ] Arquivos‑alvo & globs são coerentes e completos.
-* [ ] Critérios de aceite são **testáveis** e não ambíguos.
-* [ ] Plano de testes cobre happy/error paths; usa fixtures.
-* [ ] Riscos e rollback descritos.
-* [ ] Mudanças protegidas exigem **`APROVAR <id>`**.
-
-\$1---
+```md
+---
 id: 2025-08-21-remover-data-erros-http
 titulo: Remover `data` das respostas HTTP de erro
 tipo: refactor
-execucao\_automatica: false
----------------------------
+---
 
-## 1) Contexto & Motivação
+### 1. Contexto e Objetivo
 
-O campo `data` em respostas de **erro** permanece sempre `null`, tornando a resposta verbosa sem valor.
+O campo `data` em respostas de erro (`4xx`, `5xx`) é sempre `null`, tornando a resposta verbosa. O objetivo é remover este campo, simplificando o contrato da API para `{ success, message, errors }`.
 
-## 2) Objetivo (Outcome)
+### 2. Plano de Execução
 
-Respostas de **erro** passam a incluir somente `{ success, message, errors }`.
+- [ ] Modificar os helpers de resposta de erro em `src/controllers/_helpers/http.ts` para omitir o campo `data`.
+- [ ] Atualizar a interface `HttpResponse` em `src/shared/types.ts` para refletir que `data` é opcional.
+- [ ] Revisar os testes de integração em `src/routes/` para ajustar as asserções que esperam o campo `data`.
 
-## 3) Prechecks
+### 3. Arquivos-Alvo
 
-* Buscar ocorrências: `rg "data:\s*null" src/controllers -n`
-* Rodar testes base: `pnpm test`
+- `src/controllers/_helpers/http.ts`
+- `src/shared/types.ts`
+- `src/routes/*.e2e.test.ts`
 
-## 4) Plano Passo a Passo
+### 4. Critérios de Aceite
 
-* [ ] Atualizar helpers de erro em `src/controllers/_helpers/http.ts`.
-* [ ] Ajustar tipos em `src/types/http.ts` para remover `data` de erros.
-* [ ] Revisar controllers que comentam o shape anterior.
-* [ ] Atualizar testes afetados (evitar snapshots; asserts explícitos).
+- [ ] Uma requisição que resulta em erro 400 ou 500 retorna um JSON sem o campo `data`.
+- [ ] Os tipos TypeScript relacionados a `HttpResponse` estão consistentes.
+- [ ] A suíte de testes completa passa com sucesso (`pnpm test`).
+```
 
-## 5) Arquivos‑alvo & Globs
+## Escopo & Particularidades
 
-* `src/controllers/_helpers/http.ts`
-* `src/types/http.ts`
-* Glob: `src/controllers/**/*.ts`
+- **Aplica-se a**: Todos os arquivos de tasks em `tasks/**/*.md`.
+- **Particularidades**: Esta regra orienta a _criação do plano de trabalho_, que precede a execução e a codificação pela IA. A qualidade da task gerada impacta diretamente a qualidade da implementação.
 
-## 6) Exemplos de Referência
+## Referências
 
-* `src/controllers/_helpers/http.ts` (helpers `error`, `notFound`).
-* `src/shared/response-messages.ts`.
-
-## 7) Critérios de Aceite
-
-* [ ] Nenhuma resposta de erro contém `data`.
-* [ ] Tipos/DTOs atualizados sem quebrar contratos públicos.
-* [ ] Testes verdes e cobrindo casos de erro.
-
-## 8) Plano de Testes
-
-* Integration: controllers com erros esperados (`notFound`, `validation`).
-* Unit: tipos/DTOs e helpers de erro.
-
-## 9) Execution Hints
-
-* `pnpm test`
-* `rg "data:\s*null" src -n`
-
-## 10) Rollback & Pós
-
-* Reverter alterações nos arquivos listados; rodar `pnpm test`.
-
-## 11) Riscos & Impacto
-
-* Comentários/clients assumindo `data` podem quebrar.
-
-## 12) Notas
-
-* Se desejar diffs: responder **APROVAR 2025-08-21-remover-data-erros-http** para sugerir diffs parciais de alta confiança.
+- `build-improve-rules.mdc`
+- `project.mdc`

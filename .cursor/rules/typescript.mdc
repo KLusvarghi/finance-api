@@ -1,214 +1,260 @@
 ---
-globs: *.ts
-alwaysApply: false
+globs: ['src/**/*.ts']
+alwaysApply: true
 ---
-You are an expert in back-end development with **Node.js 20**, **Express 5**, **TypeScript (strict)**, **Prisma/PostgreSQL**, **Zod**, and **Jest**, specialized in building **financial APIs** with high reliability, maintainability, and clarity. Your focus is on writing clean, type-safe, and efficient TypeScript code.
+
+**ESTABELEÇA** um padrão de código TypeScript robusto e consistente para o back-end, focando em clareza, segurança de tipos e manutenibilidade, e **GUIE** a IA na execução de tarefas de forma planejada.
+
+## Pipeline Proativo de Execução de Tarefas
+
+### Como a IA deve abordar tarefas de codificação TypeScript
+
+1.  **Análise e Decomposição (Planejamento)**
+    - **ALWAYS** quebre a solicitação do usuário em um checklist de tarefas usando a ferramenta de `todo`.
+    - **ALWAYS** identifique todos os arquivos que serão criados ou modificados.
+    - **PREFER** criar tarefas granulares. Ex: "Criar schema Zod para usuário" em vez de "Implementar criação de usuário".
+
+2.  **Definição de Contratos Primeiro (Schema-First)**
+    - **ALWAYS** inicie a implementação pela definição dos schemas Zod para DTOs e validações.
+    - **ALWAYS** derive os tipos TypeScript a partir dos schemas com `z.infer`. Isso garante que o contrato de dados guie a implementação.
+
+3.  **Implementação Focada (SRP)**
+    - **ALWAYS** implemente uma responsabilidade por vez, seguindo a lista de tarefas.
+    - **ALWAYS** aplique os princípios de código desta `RULE` durante a escrita (imutabilidade, `private`/`readonly`, etc.).
+    - **NEVER** vaze tipos do Prisma nas respostas da API. Crie DTOs e mapeadores para separar as camadas.
+
+4.  **Validação e Finalização**
+    - **ALWAYS** ao concluir uma tarefa, marque-a como `completed`.
+    - **PREFER** usar a ferramenta de linter nos arquivos modificados para garantir que não há erros de tipo ou lint.
+    - **NEVER** submeta código com o tipo `any` explícito ou implícito.
+
+---
 
 ## 1. Async/Await
 
-### Core Principles
+### Princípios (Core)
 
-- **ALWAYS** use `async/await` for asynchronous code.
-- **AVOID** `.then()` chains for flow control.
-- **ALWAYS** type function returns as `Promise<T>`.
+- **ALWAYS** utilize `async/await` para código assíncrono.
+- **AVOID** encadear `.then()` para controle de fluxo.
+- **ALWAYS** tipe os retornos de função como `Promise<T>`.
 
-### Examples
+### Exemplos
 
-**✅ Correct:**
+**✅ Correto:**
 
 ```typescript
 const fetchUserData = async (id: string): Promise<User> => {
-    const res = await fetch(`/api/users/${id}`);
-    return await res.json();
+    const res = await fetch(`/api/users/${id}`)
+    return await res.json()
 }
 ```
 
-**❌ Avoid:**
+**❌ Evitar:**
 
 ```typescript
 fetch(`/api/users/${id}`)
     .then((res) => res.json())
-    .then(callback);
+    .then(callback)
 ```
 
-## 2. Variable Declarations
+---
 
-### Core Principles
+## 2. Declarações de Variáveis
 
-- **ALWAYS** use `const` by default.
-- **USE** `let` only when a variable must be reassigned.
-- **NEVER** use `var`.
+### Princípios (Core)
 
-### Examples
+- **ALWAYS** use `const` como padrão.
+- **USE** `let` apenas quando uma variável precisar ser reatribuída.
+- **NEVER** utilize `var`.
 
-**✅ Correct:**
+### Exemplos
+
+**✅ Correto:**
 
 ```typescript
-const users = ['Alice', 'Bob'];
-let currentIndex = 0;
+const users = ['Alice', 'Bob']
+let currentIndex = 0
 ```
 
-**❌ Avoid:**
+**❌ Evitar:**
 
 ```typescript
-var users = ['Alice', 'Bob'];
+var users = ['Alice', 'Bob']
 ```
+
+---
 
 ## 3. Classes
 
-### Core Principles
+### Princípios (Core)
 
-- **PREFER** class properties to be `private` or `protected`.
-- **USE** `readonly` for properties that are not modified after initialization.
-- **AVOID** exposing internal implementation details.
+- **PREFER** que as propriedades da classe sejam `private` ou `protected`.
+- **USE** `readonly` para propriedades que não são modificadas após a inicialização.
+- **AVOID** expor detalhes de implementação interna.
 
-### Examples
+### Exemplos
 
-**✅ Correct:**
+**✅ Correto:**
 
 ```typescript
 class UserService {
-    private readonly userRepository: UserRepository;
-    protected logger: Logger;
+    private readonly userRepository: UserRepository
+    protected logger: Logger
 
     constructor(userRepository: UserRepository, logger: Logger) {
-        this.userRepository = userRepository;
-        this.logger = logger;
+        this.userRepository = userRepository
+        this.logger = logger
     }
 }
 ```
 
-**❌ Avoid:**
+**❌ Evitar:**
 
 ```typescript
 class UserService {
-    // Properties are implicitly public, exposing implementation details.
-    userRepository: UserRepository;
-    logger: Logger;
+    // Propriedades são implicitamente públicas, expondo detalhes da implementação.
+    userRepository: UserRepository
+    logger: Logger
 }
 ```
 
-## 4. Array Manipulation
+---
 
-### Core Principles
+## 4. Manipulação de Arrays
 
-- **PREFER** functional methods like `map`, `filter`, and `reduce` for data transformation.
-- **AVOID** manual `for` loops for tasks that can be done functionally.
-- **PREFER** immutable operations that return new arrays instead of modifying the original.
+### Princípios (Core)
 
-### Examples
+- **PREFER** métodos funcionais como `map`, `filter`, e `reduce` para transformação de dados.
+- **AVOID** laços `for` manuais para tarefas que podem ser feitas funcionalmente.
+- **PREFER** operações imutáveis que retornam novos arrays em vez de modificar o original.
 
-**✅ Correct:**
+### Exemplos
+
+**✅ Correto:**
 
 ```typescript
-const activeUsers = users.filter((u) => u.isActive);
-const userNames = users.map((u) => u.name);
+const activeUsers = users.filter((u) => u.isActive)
+const userNames = users.map((u) => u.name)
 ```
 
-**❌ Avoid:**
+**❌ Evitar:**
 
 ```typescript
-const active = [];
+const active = []
 for (let i = 0; i < users.length; i++) {
     if (users[i].isActive) {
-        active.push(users[i]);
+        active.push(users[i])
     }
 }
 ```
+
+---
 
 ## 5. Imports & Exports
 
-### Core Principles
+### Princípios (Core)
 
 - **ALWAYS** use **ES Modules** (`import`/`export`).
-- **PREFER** named exports to facilitate tree-shaking and clearer dependencies.
-- **AVOID** default exports.
+- **PREFER** exportações nomeadas para facilitar o tree-shaking e ter dependências mais claras.
+- **AVOID** exportações padrão (`export default`).
 
-### Examples
+### Exemplos
 
-**✅ Correct:**
-
-```typescript
-export class UserService { /* ... */ }
-export function formatCurrency(value: number) { /* ... */ }
-```
-
-**❌ Avoid:**
+**✅ Correto:**
 
 ```typescript
-export default class UserService { /* ... */ }
+export class UserService {
+    /* ... */
+}
+export function formatCurrency(value: number) {
+    /* ... */
+}
 ```
+
+**❌ Evitar:**
+
+```typescript
+export default class UserService {
+    /* ... */
+}
+```
+
+---
 
 ## 6. DTOs & Schemas
 
-### Core Principles
+### Princípios (Core)
 
-- **ALWAYS** use `z.infer` to derive TypeScript types from **Zod** schemas.
-- **ALWAYS** validate all external inputs (e.g., API request bodies) with a schema.
-- **ALWAYS** define clear data contracts for inputs and outputs.
+- **ALWAYS** use `z.infer` para derivar tipos TypeScript a partir de schemas **Zod**.
+- **ALWAYS** valide todas as entradas externas (ex: corpo de requisições da API) com um schema.
+- **ALWAYS** defina contratos de dados claros para entradas e saídas.
 
-### Examples
+### Exemplos
 
-**✅ Correct:**
+**✅ Correto:**
 
 ```typescript
-import { z } from 'zod';
+import { z } from 'zod'
 
 const CreateUserSchema = z.object({
     name: z.string().min(1),
     email: z.string().email(),
-});
+})
 
-type CreateUserDTO = z.infer<typeof CreateUserSchema>;
+type CreateUserDTO = z.infer<typeof CreateUserSchema>
 ```
 
-## 7. Architecture & Conventions
+---
 
-### Core Principles
+## 7. Arquitetura & Convenções
 
-- **ALWAYS** follow the **Single Responsibility Principle**: one file should have one primary purpose.
-- **ALWAYS** use descriptive suffixes for files (e.g., `.service.ts`, `.controller.ts`, `.schema.ts`).
-- **NEVER** leak **Prisma** model types directly in API responses. Use DTOs instead.
+### Princípios (Core)
 
-### Examples
+- **ALWAYS** siga o **Princípio da Responsabilidade Única** (SRP): um arquivo deve ter um propósito principal.
+- **ALWAYS** use sufixos descritivos para arquivos (ex: `.service.ts`, `.controller.ts`, `.schema.ts`).
+- **NEVER** vaze tipos de modelo do **Prisma** diretamente nas respostas da API. Use DTOs em seu lugar.
 
-**❌ Avoid (Leaking Prisma Model):**
+### Exemplos
+
+**❌ Evitar (Vazando Modelo Prisma):**
 
 ```typescript
-// In a controller
-const user = await userService.findById(id);
-// This leaks the entire User model, which might include sensitive data like password hashes.
-return res.json(user);
+// Em um controlador
+const user = await userService.findById(id)
+// Isso vaza o modelo User completo, que pode incluir dados sensíveis como hashes de senha.
+return res.json(user)
 ```
 
-**✅ Correct (Using a DTO):**
+**✅ Correto (Usando um DTO):**
 
 ```typescript
 // user.dto.ts
 export class UserProfileDTO {
-    id: string;
-    firstName: string;
-    email: string;
+    id: string
+    firstName: string
+    email: string
 }
 
-// In a controller
-const user = await userService.findById(id);
-// A mapper function transforms the Prisma model to a safe DTO.
-const userProfile = mapUserToProfileDTO(user);
-return res.json(userProfile);
+// Em um controlador
+const user = await userService.findById(id)
+// Uma função de mapeamento transforma o modelo Prisma em um DTO seguro.
+const userProfile = mapUserToProfileDTO(user)
+return res.json(userProfile)
 ```
 
-## 8. Error Handling
+---
 
-### Core Principles
+## 8. Tratamento de Erros
 
-- **ALWAYS** use custom error classes that extend `Error` for application-specific errors.
-- **NEVER** expose raw database or internal errors to the client.
-- **ALWAYS** define a consistent error response shape.
+### Princípios (Core)
 
-### Examples
+- **ALWAYS** use classes de erro personalizadas que estendem `Error` para erros específicos da aplicação.
+- **NEVER** exponha erros brutos de banco de dados ou internos para o cliente.
+- **ALWAYS** defina um formato de resposta de erro consistente.
 
-**✅ Correct:**
+### Exemplos
+
+**✅ Correto:**
 
 ```typescript
 class AppError extends Error {
@@ -217,11 +263,12 @@ class AppError extends Error {
         public readonly statusCode: number = 400,
         public readonly code?: string,
     ) {
-        super(message);
+        super(message)
     }
 }
 
-// Usage in a service
+// Uso em um serviço
 if (!user) {
-    throw new AppError('User not found', 404, 'USER_NOT_FOUND');
+    throw new AppError('User not found', 404, 'USER_NOT_FOUND')
 }
+```

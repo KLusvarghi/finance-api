@@ -1,0 +1,227 @@
+---
+globs: *.ts
+alwaysApply: false
+---
+You are an expert in back-end development with **Node.js 20**, **Express 5**, **TypeScript (strict)**, **Prisma/PostgreSQL**, **Zod**, and **Jest**, specialized in building **financial APIs** with high reliability, maintainability, and clarity. Your focus is on writing clean, type-safe, and efficient TypeScript code.
+
+## 1. Async/Await
+
+### Core Principles
+
+- **ALWAYS** use `async/await` for asynchronous code.
+- **AVOID** `.then()` chains for flow control.
+- **ALWAYS** type function returns as `Promise<T>`.
+
+### Examples
+
+**✅ Correct:**
+
+```typescript
+const fetchUserData = async (id: string): Promise<User> => {
+    const res = await fetch(`/api/users/${id}`);
+    return await res.json();
+}
+```
+
+**❌ Avoid:**
+
+```typescript
+fetch(`/api/users/${id}`)
+    .then((res) => res.json())
+    .then(callback);
+```
+
+## 2. Variable Declarations
+
+### Core Principles
+
+- **ALWAYS** use `const` by default.
+- **USE** `let` only when a variable must be reassigned.
+- **NEVER** use `var`.
+
+### Examples
+
+**✅ Correct:**
+
+```typescript
+const users = ['Alice', 'Bob'];
+let currentIndex = 0;
+```
+
+**❌ Avoid:**
+
+```typescript
+var users = ['Alice', 'Bob'];
+```
+
+## 3. Classes
+
+### Core Principles
+
+- **PREFER** class properties to be `private` or `protected`.
+- **USE** `readonly` for properties that are not modified after initialization.
+- **AVOID** exposing internal implementation details.
+
+### Examples
+
+**✅ Correct:**
+
+```typescript
+class UserService {
+    private readonly userRepository: UserRepository;
+    protected logger: Logger;
+
+    constructor(userRepository: UserRepository, logger: Logger) {
+        this.userRepository = userRepository;
+        this.logger = logger;
+    }
+}
+```
+
+**❌ Avoid:**
+
+```typescript
+class UserService {
+    // Properties are implicitly public, exposing implementation details.
+    userRepository: UserRepository;
+    logger: Logger;
+}
+```
+
+## 4. Array Manipulation
+
+### Core Principles
+
+- **PREFER** functional methods like `map`, `filter`, and `reduce` for data transformation.
+- **AVOID** manual `for` loops for tasks that can be done functionally.
+- **PREFER** immutable operations that return new arrays instead of modifying the original.
+
+### Examples
+
+**✅ Correct:**
+
+```typescript
+const activeUsers = users.filter((u) => u.isActive);
+const userNames = users.map((u) => u.name);
+```
+
+**❌ Avoid:**
+
+```typescript
+const active = [];
+for (let i = 0; i < users.length; i++) {
+    if (users[i].isActive) {
+        active.push(users[i]);
+    }
+}
+```
+
+## 5. Imports & Exports
+
+### Core Principles
+
+- **ALWAYS** use **ES Modules** (`import`/`export`).
+- **PREFER** named exports to facilitate tree-shaking and clearer dependencies.
+- **AVOID** default exports.
+
+### Examples
+
+**✅ Correct:**
+
+```typescript
+export class UserService { /* ... */ }
+export function formatCurrency(value: number) { /* ... */ }
+```
+
+**❌ Avoid:**
+
+```typescript
+export default class UserService { /* ... */ }
+```
+
+## 6. DTOs & Schemas
+
+### Core Principles
+
+- **ALWAYS** use `z.infer` to derive TypeScript types from **Zod** schemas.
+- **ALWAYS** validate all external inputs (e.g., API request bodies) with a schema.
+- **ALWAYS** define clear data contracts for inputs and outputs.
+
+### Examples
+
+**✅ Correct:**
+
+```typescript
+import { z } from 'zod';
+
+const CreateUserSchema = z.object({
+    name: z.string().min(1),
+    email: z.string().email(),
+});
+
+type CreateUserDTO = z.infer<typeof CreateUserSchema>;
+```
+
+## 7. Architecture & Conventions
+
+### Core Principles
+
+- **ALWAYS** follow the **Single Responsibility Principle**: one file should have one primary purpose.
+- **ALWAYS** use descriptive suffixes for files (e.g., `.service.ts`, `.controller.ts`, `.schema.ts`).
+- **NEVER** leak **Prisma** model types directly in API responses. Use DTOs instead.
+
+### Examples
+
+**❌ Avoid (Leaking Prisma Model):**
+
+```typescript
+// In a controller
+const user = await userService.findById(id);
+// This leaks the entire User model, which might include sensitive data like password hashes.
+return res.json(user);
+```
+
+**✅ Correct (Using a DTO):**
+
+```typescript
+// user.dto.ts
+export class UserProfileDTO {
+    id: string;
+    firstName: string;
+    email: string;
+}
+
+// In a controller
+const user = await userService.findById(id);
+// A mapper function transforms the Prisma model to a safe DTO.
+const userProfile = mapUserToProfileDTO(user);
+return res.json(userProfile);
+```
+
+## 8. Error Handling
+
+### Core Principles
+
+- **ALWAYS** use custom error classes that extend `Error` for application-specific errors.
+- **NEVER** expose raw database or internal errors to the client.
+- **ALWAYS** define a consistent error response shape.
+
+### Examples
+
+**✅ Correct:**
+
+```typescript
+class AppError extends Error {
+    constructor(
+        public readonly message: string,
+        public readonly statusCode: number = 400,
+        public readonly code?: string,
+    ) {
+        super(message);
+    }
+}
+
+// Usage in a service
+if (!user) {
+    throw new AppError('User not found', 404, 'USER_NOT_FOUND');
+}

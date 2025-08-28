@@ -1,105 +1,103 @@
 ---
-globs: *.test.ts,*.spec.ts
-alwaysApply: false
----
-You are an expert in back-end development with **Node.js 20**, **Express 5**, **TypeScript (strict)**, **Prisma/PostgreSQL**, **Zod**, and **Jest**, specialized in building **financial APIs** with high reliability, maintainability, and clarity. Your focus is on creating robust, readable, and effective automated tests.
-
-## 1. Testing Philosophy
-
-### Core Principles
-
-- **MUST** ensure every new feature or bugfix is accompanied by corresponding automated tests.
-- **PREFER** unit tests for isolated business logic (services, utils).
-- **USE** integration tests for controllers, API endpoints, and database interactions.
-- **ALWAYS** structure test files to mirror the feature layout in the `src/` directory.
-
+globs: ['*.test.ts', '*.spec.ts', '*.e2e.test.ts']
+alwaysApply: true
 ---
 
-## 2. Test Coverage and Structure
+**ESTRUTURE** testes unitários e de integração de forma clara, descritiva e focada, garantindo cobertura para cenários de sucesso e de erro.
 
-### Core Principles
+## Princípios (Core)
 
-- **ALWAYS** write tests for both successful "happy paths" and expected error cases.
-- **ALWAYS** validate business logic against **Zod** schemas within tests where applicable.
-- **MUST** target a high level of test coverage (e.g., 90%+), especially for critical financial logic.
-- **AVOID** overusing **Jest** snapshots. **PREFER** explicit `expect` assertions for clarity and stability.
+- **ALWAYS** nomeie testes com a estrutura `should <comportamento esperado> if/when <condição>`.
+    - Ex: `it('should return 400 if e-mail is already in use')`.
+- **ALWAYS** organize testes em blocos `describe` aninhados para agrupar cenários relacionados (ex: `describe('error handling', ...)`).
+- **ALWAYS** isole o "System Under Test" (SUT) usando mocks ou stubs para suas dependências em testes unitários.
+- **NEVER** teste múltiplas responsabilidades em um único `it`. Cada teste deve ter um foco e uma asserção principal.
+- **PREFER** asserções explícitas (`expect(result).toBe(...)`) a snapshots (`.toMatchSnapshot()`) para garantir clareza e evitar regressões acidentais.
+- **PREFER** `it.each` para testar a mesma lógica com diferentes entradas (ex: validação de schema), evitando repetição de código.
 
----
+## Exemplos (do repositório)
 
-## 3. Test Setup and Environment
+### ✅ Correto
 
-### Core Principles
-
-- **ALWAYS** use the `.env.test` file for test runs to ensure a completely isolated environment.
-- **ALWAYS** use a separate test database, managed via **Docker Compose** (e.g., a `postgres-test` service).
-- **ALWAYS** tear down and reset the database state between test suites to prevent side effects.
-- **MUST** run database migrations during the global test setup (e.g., `jest.global-setup.ts`).
-
----
-
-## 4. Factories and Fixtures
-
-### Core Principles
-
-- **ALWAYS** use libraries like `@faker-js/faker` to generate dynamic and realistic test data.
-- **MAINTAIN** reusable test objects and builders in a shared `src/test/fixtures/` directory.
-- **AVOID** hardcoding static data directly in tests; use factories or fixtures instead.
-
----
-
-## 5. Best Practices
-
-### Core Principles
-
-- **ALWAYS** use descriptive test names that clearly state what is being tested and the expected outcome.
-    - **✅ Correct:** `it('should return a 404 error if the requested user does not exist')`
-    - **❌ Avoid:** `it('tests user not found')`
-- **ALWAYS** group related tests within `describe()` blocks, organized by function or feature.
-- **ALWAYS** mock external dependencies (e.g., payment gateways, email services) in unit tests.
-- **AVOID** mocking the database in integration tests; **ALWAYS** interact with the real test database.
-
----
-
-## 6. Linting and Standards
-
-### Core Principles
-
-- **MUST** adhere to all **Jest**-specific **ESLint** rules configured in the project.
-- **MUST** resolve or address all linter warnings, such as `jest/no-disabled-tests` or `jest/no-focused-tests`, before merging code.
-
----
-
-## 7. Test Types Summary
-
-### Core Principles
-
-- **Unit Tests:** For services (`/services`), utilities (`/utils`), and adapters (`/adapters`). Test logic in complete isolation.
-- **Integration Tests:** For controllers (`/controllers`) and API routes. Test how components work together, including database interaction.
-- **Repository Tests:** For repositories (`/repositories`). Test database queries and logic against the real test database.
-
-### Example: Mocking a Dependency
-
-**✅ Correct:**
+Um teste de serviço bem estruturado, com nomes descritivos e mocks claros para isolar a unidade.
 
 ```typescript
-import { UserService } from '../user.service';
-import { IPasswordHasher } from '../../adapters/password-hasher.interface';
+// Extraído de: src/services/users/create-user.test.ts
+describe('CreateUserService', () => {
+    // ... setup com stubs para repositórios e adapters ...
 
-describe('UserService', () => {
-    it('should create a user with a correctly hashed password', async () => {
-        // Mock the password hasher adapter
-        const mockHasher: IPasswordHasher = {
-            hash: jest.fn().mockResolvedValue('hashed_password'),
-            compare: jest.fn(),
-        };
-        
-        const mockRepository = { /* ... mock repository methods ... */ };
-        const userService = new UserService(mockRepository, mockHasher);
+    describe('error handling', () => {
+        it('should throw an EmailAlreadyExistsError if getUserByEmailRepository returns a user', () => {
+            // arrange
+            jest.spyOn(
+                getUserByEmailRepository,
+                'execute',
+            ).mockResolvedValueOnce(createUserRepositoryResponse)
 
-        const result = await userService.create({ email: 'test@test.com', password: 'plain_password' });
+            // act
+            const promise = sut.execute(createUserParams)
 
-        // Assert that the hash method was called and the result is correct
-        expect(mockHasher.hash).toHaveBeenCalledWith('plain_password');
-        expect(result.password).toBe('hashed_password');
-    });
-});
+            // assert
+            expect(promise).rejects.toThrow(
+                new EmailAlreadyExistsError(createUserParams.email),
+            )
+        })
+    })
+
+    describe('success', () => {
+        it('should create a user successfully', async () => {
+            // act
+            const response = await sut.execute(createUserParams)
+
+            // assert
+            expect(response).toEqual(createUserServiceResponse)
+        })
+    })
+})
+```
+
+### ❌ Evitar
+
+Testes de validação de schema repetitivos que podem ser consolidados com `it.each`.
+
+```typescript
+// Extraído de: src/controllers/users/create-user.test.ts
+describe('validations', () => {
+    describe('first_name', () => {
+        it('should return 400 if first_name is not provided', async () => {
+            // arrange
+            const response = await sut.execute({
+                body: { ...params, first_name: undefined },
+            })
+            // assert
+            expect(response.statusCode).toBe(400)
+        })
+    })
+
+    describe('last_name', () => {
+        it('should return 400 if last_name is not provided', async () => {
+            // arrange
+            const response = await sut.execute({
+                body: { ...params, last_name: undefined },
+            })
+            // assert
+            expect(response.statusCode).toBe(400)
+        })
+    })
+
+    // ... mais testes repetitivos para email e password ...
+})
+```
+
+## Escopo & Particularidades
+
+- **Aplica-se a**: Todos os arquivos de teste (`.test.ts`, `.e2e.test.ts`).
+- **Não se aplica a**: Lógica de setup de testes (ex: `jest.global-setup.ts`).
+- **Particularidades**:
+    - **Testes Unitários (Serviços, Adapters)**: Foco em isolamento total com mocks/stubs.
+    - **Testes de Integração (Controllers, Repositories)**: Interação com stubs de serviços e/ou banco de dados de teste.
+    - **Testes E2E (Routes)**: Simulam requisições HTTP reais e verificam a resposta de ponta a ponta.
+
+## Referências
+
+- `build-improve-rules.mdc`

@@ -1,173 +1,142 @@
-You are an expert in back-end development with **Node.js 20**, **Express 5**, **TypeScript (strict)**, **Prisma/PostgreSQL**, **Zod**, and **Jest**, specialized in building **financial APIs** with high reliability, maintainability, and clarity.
+---
+globs: 'src/**/*.ts'
+alwaysApply: true
+---
 
-## Core Principles
+**ESTABELEÇA** as convenções e padrões fundamentais do projeto e **GUIE** a IA na execução de tarefas de forma planejada.
 
-- Code **MUST** be in English.
-- Comments **MUST** be in English.
-- **ALWAYS** follow **Clean Architecture**: `Controllers` → `Services` → `Repositories`.
-- **ALWAYS** apply **SOLID** and **DRY** principles.
-- **NEVER** access the database directly from controllers.
-- **NEVER** use the `any` type – **ALWAYS** use precise TypeScript types or **Zod** schemas.
-- **ALWAYS** use centralized helpers for HTTP responses, error handling, and logging.
+## Princípios Fundamentais
+
+- **ALWAYS** escrever código **e comentários** em **Inglês**.
+- **ALWAYS** seguir **Clean Architecture**: `Controllers` → `Services` → `Repositories`.
+- **ALWAYS** aplicar os princípios **SOLID** e **DRY**.
+- **NEVER** acessar o banco de dados diretamente nos controllers – use **Repositories**.
+- **NEVER** usar o tipo `any` – utilize tipos precisos ou **Zod**.
+- **ALWAYS** usar helpers centralizados para respostas HTTP, erros e logs.
 
 ---
 
-## Tech Stack & Scope
+## Stack de Tecnologia & Escopo
 
-- **Node.js**: v20+
+- **Node.js** v20+
 - **Framework**: Express 5
-- **Language**: TypeScript (**strict mode** is mandatory)
-- **ORM**: Prisma
-- **Database**: PostgreSQL
-- **Validation**: Zod
-- **Testing**: Jest
-- **Scope**: Financial API for B2B/B2C integrations.
-- **Tooling**: **ESLint**, **Prettier**, **Husky** for linting and formatting.
-- **Modules**: **MUST** use **ESM modules**.
+- **Linguagem**: TypeScript (modo **strict** obrigatório)
+- **ORM**: Prisma / PostgreSQL
+- **Validação**: Zod
+- **Testes**: Jest
+- **Ferramentas**: ESLint, Prettier, Husky
+- **Módulos**: **ES Modules**
+- **Escopo**: API Financeira B2B/B2C.
 
 ---
 
-## Directory Structure
+## Estrutura de Diretórios
 
-- **Clean Architecture**: Separation of responsibilities is **mandatory**:
-    - `src/controllers`: **ONLY** for request parsing, validation, and service calls.
-    - `src/services`: Contains **ALL** business logic.
-    - `src/repositories`: **UNIQUELY** for database access via **Prisma**.
-    - `src/utils`: Hosts shared helpers (HTTP, logging, etc.).
-    - `src/adapters`: Interfaces for external services (e.g., hashing).
-
----
-
-## Naming Conventions and Structure
-
-- **Variables/Functions**: `camelCase`
-- **Classes/Types/Interfaces**: `PascalCase`
-- **File Names**: `kebab-case` (e.g., `user-service.ts`)
-- **Path Aliases**: **ALWAYS** use `@/*` as configured in `tsconfig.json`.
-- **Exports**: **ALWAYS** use `named exports`.
-- **Index Files**: **NEVER** include logic directly in `index` files – use them **ONLY** for re-exporting.
+- `src/controllers` – parsing, validação e chamadas de serviço.
+- `src/services` – **toda** lógica de negócio.
+- `src/repositories` – acesso ao banco via Prisma.
+- `src/adapters` – integrações externas (hashing, fila, etc.).
+- `src/schemas` – definições **Zod**.
+- `src/shared` – helpers (HTTP, logger, tipos globais).
 
 ---
 
-## Architecture Principles
+## Convenções de Nomeação
 
-- **SOLID Principles**: **MUST** strictly respect single responsibility, dependency inversion, etc.
-- **DRY Principle**: **MUST** actively avoid code duplication.
+- **Variáveis/Funções**: `camelCase`
+- **Classes/Interfaces/Tipos**: `PascalCase`
+- **Arquivos**: `kebab-case` (`user-service.ts`)
+- **Aliases**: `@/*` no `tsconfig.json`.
+- **Exports**: **named exports** (evite `default`).
+- **Arquivos `index.ts`**: apenas re-exports – **NUNCA** lógica.
 
 ---
 
-## HTTP Response Pattern
+## Pipeline Proativo de Execução de Tarefas
 
-**ALWAYS** use centralized helpers for all HTTP responses.
+1. **ALWAYS** criar checklist com a ferramenta `todo` antes de codar.
+2. **ALWAYS** começar por schemas **Zod** (contrato primeiro) e derivar `z.infer`.
+3. **ALWAYS** implementar uma responsabilidade de cada vez (SRP).
+4. **ALWAYS** marcar a tarefa como `completed` e rodar o linter ao finalizar.
 
-- ### Helper Functions:
-    ```ts
-    successResponse(res, data, message?);
-    errorResponse(res, errorCode, message, details?);
-    ```
+---
 
-- ### Default Response Shape:
+## Padrões de Projeto
+
+### Respostas HTTP
+
+- **ALWAYS** usar helpers (`ok`, `created`, `badRequest`, `serverError`).
+- **Shape padrão de sucesso**:
     ```json
     {
         "success": true,
-        "message": "Operation successful",
-        "data": {},
-        "errors": []
+        "message": "Operação bem-sucedida",
+        "data": {}
     }
     ```
 
----
+### Tratamento de Erros
 
-## Error Handling & Messaging
-
-- **ALWAYS** use custom error classes (e.g., `AppError`).
-- **NEVER** leak internal error details or stack traces to clients.
-- **ALWAYS** use standardized, centralized error messages.
-- ### Example:
+- **ALWAYS** lançar erros customizados (`AppError`).
+- **NEVER** expor stack trace para o cliente.
+- Exemplo:
     ```ts
-    throw new AppError(ERRORS.USER_NOT_FOUND, 404)
+    throw new AppError('USER_NOT_FOUND', 404)
     ```
 
----
+### Paginação & Ordenação
 
-## Logging Standard
-
-- **MUST** use a centralized logger.
-- **Log Levels**: `info`, `warn`, `error`, `debug`.
-- **Per-Request Logging**: **ALWAYS** log `method`, `path`, `userId` (if authenticated), and `duration`.
-- **Error Logging**: **ALWAYS** include `stack trace` (for internal logs) and a `correlation ID`.
+- Parâmetros: `page`, `limit`, `sortBy`, `order` (`asc` | `desc`).
+- Defaults: `page=1`, `limit=20`.
+- **ALWAYS** validar com Zod.
 
 ---
 
-## Pagination & Sorting Standard
+## Logging
 
-- **Query Parameters**: `page`, `limit`, `sortBy`, `order` (`asc` | `desc`).
-- **Defaults**: `page=1`, `limit=20`.
-- **Validation**: **ALWAYS** validate pagination parameters with **Zod**.
-- ### Prisma Implementation:
-    ```ts
-    const items = await prisma.user.findMany({
-        skip: (page - 1) * limit,
-        take: limit,
-        orderBy: { [sortBy]: order },
-    })
-    ```
+- **MUST** usar logger centralizado.
+- **ALWAYS** logar `method`, `path`, `userId`, `duration`.
+- **ALWAYS** registrar stack trace em logs internos.
 
 ---
 
-## Testing Guidelines
+## Formatação & Lint
 
-- For all detailed testing rules and guidelines, **ALWAYS** refer to the `testing.mdc` document.
-
----
-
-## DOs & DON'Ts
-
-### DOs
-- **ALWAYS** follow **Clean Architecture** principles.
-- **ALWAYS** use **SOLID** principles for code quality.
-- **ALWAYS** use **DRY** principles for code reuse.
-- **ALWAYS** validate **ALL** inputs with **Zod** schemas.
-- **ALWAYS** use standardized HTTP helpers in **ALL** controllers.
-- **ALWAYS** use dependency injection for services and repositories.
-- **ALWAYS** handle known error cases explicitly.
-
-### DON'Ts
-- **NEVER** access **Prisma** directly in controllers or services — **ONLY** through repositories.
-- **NEVER** use `any`.
-- **NEVER** mix responsibilities across layers.
-- **NEVER** write logic with weak or missing typing.
-- **NEVER** hardcode error messages or status codes — **USE** helpers and constants.
+- **ALWAYS** usar Prettier + ESLint.
+- **ALWAYS** preferir early return para evitar aninhamento profundo.
+- Código **MUST** passar nos hooks do Husky.
 
 ---
 
-## Formatting & Linting
+## Exemplos
 
-- **ALWAYS** use **TypeScript** for type checking and autocompletion.
-- **ALWAYS** use **Prettier** for code formatting.
-- Formatting is **enforced** via **ESLint** with **Prettier**.
-- **ALWAYS** use `early returns` to avoid deep nesting.
-- Code **MUST** pass lint checks and pre-commit hooks (**Husky**).
+### ✅ Correto
 
-## Project Conventions
+```ts
+// user.service.ts
+export class UserService {
+    constructor(private readonly userRepository: UserRepository) {}
 
-- **ALWAYS** use `.env` and `.env.test` for configuration separation.
-- **ALWAYS** use UUIDs as primary keys in **all** tables (as defined in `prisma/schema.prisma`).
-- **PREFER** pure functions and **AVOID** side effects.
-    - A pure function always returns the same output for the same input and has no observable side effects (like modifying external state).
-    - **❌ Avoid (Impure Function with Side Effects):**
-        ```typescript
-        // This function modifies the original transaction object, a side effect.
-        function applyFee(transaction: Transaction, fee: number) {
-            transaction.amount -= fee; // Mutates the input object
-        }
-        ```
-    - **✅ Correct (Pure Function):**
-        ```typescript
-        // This function returns a new object, leaving the original unchanged.
-        const withFee = (transaction: Transaction, fee: number): Transaction => ({
-            ...transaction,
-            amount: transaction.amount - fee,
-        });
-        ```
-- **PREFER** immutability and **AVOID** deep object mutations when possible
+    async create(params: CreateUserDTO): Promise<UserProfileDTO> {
+        const user = await this.userRepository.create(params)
+        return mapUserToProfileDTO(user) // não vaza modelo Prisma
+    }
+}
+```
+
+### ❌ Evitar
+
+```ts
+// user.controller.ts
+const user = await prisma.user.create(req.body) // acesso direto + vazamento de modelo
+return res.json(user) // resposta sem DTO, sem helper
+```
+
+---
+
+## Referências
+
+- `typescript.mdc`
+- `testing.mdc`
+- `controllers-standard.mdc`
+- `build-improve-rules.mdc`

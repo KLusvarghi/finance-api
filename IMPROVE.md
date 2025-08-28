@@ -120,6 +120,51 @@ Com a base sólida, esta fase foca em refatorar o código para ser mais reutiliz
     - **Tarefa Original**: A questão sobre reutilizar a criação de usuários nos testes.
     - **Resposta e Justificativa**: Sua intuição está corretíssima. Criar uma função helper (uma "factory" ou "fixture") em `test/fixtures` para criar um usuário (e outras entidades) é uma prática padrão e recomendada. Isso centraliza a lógica de criação de dados de teste, reduz a duplicação e torna os testes mais limpos.
 
+5.  **[ ] Refatorar Classes para Usar Parameter Properties do TypeScript**
+
+- **Tarefa Original**: Simplificar a declaração de propriedades privadas nas classes usando a feature de Parameter Properties do TypeScript.
+- **Justificativa**: O TypeScript oferece uma sintaxe mais limpa para criar propriedades privadas e readonly diretamente no constructor, eliminando código boilerplate e seguindo as melhores práticas de Clean Architecture.
+- **O que fazer**:
+    - Remover declarações de propriedades privadas antes do constructor
+    - Adicionar `private readonly` nos parâmetros do constructor
+    - Remover linhas de atribuição redundantes dentro do constructor
+- **Exemplo de Refatoração**:
+
+    **Antes (Código Verboso)**:
+
+    ```typescript
+    export class CreateUserService
+        implements Service<CreateUserParams, UserPublicResponse>
+    {
+        private createUserRepository: CreateUserRepository
+
+        constructor(createUserRepository: CreateUserRepository) {
+            this.createUserRepository = createUserRepository
+        }
+    }
+    ```
+
+    **Depois (Código Limpo)**:
+
+    ```typescript
+    export class CreateUserService
+        implements Service<CreateUserParams, UserPublicResponse>
+    {
+        constructor(
+            private readonly createUserRepository: CreateUserRepository,
+        ) {
+            // TypeScript automaticamente cria e inicializa a propriedade
+        }
+    }
+    ```
+
+- **Benefícios**:
+    - ✅ Menos código boilerplate
+    - ✅ Propriedades automaticamente `private` e `readonly`
+    - ✅ Melhor encapsulamento e imutabilidade
+    - ✅ Código mais limpo e legível
+    - ✅ Segue padrões estabelecidos no projeto
+
 ---
 
 ## Fase 4: Lógica de Negócio e Funcionalidades
