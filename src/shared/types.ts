@@ -436,3 +436,22 @@ export interface BodyParamsController<
         httpRequest: HttpRequest & { body: TBody; params: TParams },
     ): Promise<HttpResponse<TResponse>>
 }
+
+// ============================================================================
+// ADAPTER INTERFACE TYPES
+// ============================================================================
+
+export interface TokenGeneratorAdapter {
+    execute(userId: string): Promise<TokenGeneratorAdapterResponse>
+}
+
+export interface TokenGeneratorAdapterResponse {
+    accessToken: string
+    refreshToken: string
+}
+
+// ---
+
+export interface PasswordComparatorAdapter {
+    execute(password: string, hashedPassword: string): Promise<boolean>
+}
