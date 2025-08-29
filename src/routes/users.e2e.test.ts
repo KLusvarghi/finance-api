@@ -146,6 +146,28 @@ describe('User Routes E2E Tests', () => {
         })
     })
 
+    describe('POST /api/users/login', () => {
+        it('should return 200 and tokens when user is logged in', async () => {
+            const { body: createdUser } = await request(app)
+                .post(`/api/users`)
+                .send(createUserParams)
+
+            const { body: responseBody } = await request(app)
+                .post(`/api/users/login`)
+                .send({
+                    email: createdUser.data.email,
+                    password: createUserParams.password,
+                })
+                .expect(200)
+
+            expect(responseBody.message).toBe(
+                ResponseMessage.USER_LOGIN_SUCCESS,
+            )
+            expect(responseBody?.data?.tokens?.accessToken).toBeDefined()
+            expect(responseBody?.data?.tokens?.refreshToken).toBeDefined()
+        })
+    })
+
     describe('PATCH /api/users/:userId', () => {
         it('should return 200 when user is updated', async () => {
             const { body: createdUser } = await request(app)
