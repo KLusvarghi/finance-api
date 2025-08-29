@@ -8,54 +8,80 @@ import {
     makeLoginUserController,
     makeUpdateUserController,
 } from '@/factories/controllers/'
-import { auth } from '@/middlewares/auth'
+import { auth, AuthenticatedRequest } from '@/middlewares/auth'
 
 export const usersRouter = Router()
 
-usersRouter.get('/:userId', auth, async (request, response) => {
+// Rota para buscar o usuário logado
+usersRouter.get('/me', auth, async (req: AuthenticatedRequest, res) => {
     const getUserByIdController = makeGetUserByIdController()
 
-    const { statusCode, body } = await getUserByIdController.execute(request)
+    const { statusCode, body } = await getUserByIdController.execute({
+        ...req,
+        params: {
+            userId: req.userId,
+        },
+    })
 
-    response.status(statusCode).send(body)
+    res.status(statusCode).send(body)
 })
 
-usersRouter.get('/:userId/balance', auth, async (request, response) => {
+// Rota para buscar o saldo do usuário logado
+usersRouter.get('/me/balance', auth, async (req: AuthenticatedRequest, res) => {
     const getUserBalanceController = makeGetUserBalanceController()
 
-    const { statusCode, body } = await getUserBalanceController.execute(request)
+    const { statusCode, body } = await getUserBalanceController.execute({
+        ...req,
+        params: {
+            userId: req.userId,
+        },
+    })
 
-    response.status(statusCode).send(body)
+    res.status(statusCode).send(body)
 })
 
-usersRouter.post('/', async (request, response) => {
+// Rota para criar um novo usuário
+usersRouter.post('/', async (req: AuthenticatedRequest, res) => {
     const createUserController = makeCreateUserController()
 
-    const { statusCode, body } = await createUserController.execute(request)
+    const { statusCode, body } = await createUserController.execute(req)
 
-    response.status(statusCode).send(body)
+    res.status(statusCode).send(body)
 })
 
-usersRouter.patch('/:userId', auth, async (request, response) => {
+// Rota para atualizar um usuário
+usersRouter.patch('/me', auth, async (req: AuthenticatedRequest, res) => {
     const updateUserController = makeUpdateUserController()
 
-    const { statusCode, body } = await updateUserController.execute(request)
+    const { statusCode, body } = await updateUserController.execute({
+        ...req,
+        params: {
+            userId: req.userId,
+        },
+    })
 
-    response.status(statusCode).send(body)
+    res.status(statusCode).send(body)
 })
 
-usersRouter.delete('/:userId', auth, async (request, response) => {
+// Rota para deletar um usuário
+usersRouter.delete('/:userId', auth, async (req: AuthenticatedRequest, res) => {
     const deleteUserController = makeDeleteUserController()
 
-    const { statusCode, body } = await deleteUserController.execute(request)
+    const { statusCode, body } = await deleteUserController.execute({
+        ...req,
+        params: {
+            userId: req.userId,
+        },
+    })
 
-    response.status(statusCode).send(body)
+    res.status(statusCode).send(body)
 })
 
-usersRouter.post('/login', async (request, response) => {
+// Rota para fazer login
+usersRouter.post('/login', async (req: AuthenticatedRequest, res) => {
     const loginUserController = makeLoginUserController()
 
-    const { statusCode, body } = await loginUserController.execute(request)
+    const { statusCode, body } = await loginUserController.execute(req)
 
-    response.status(statusCode).send(body)
+    res.status(statusCode).send(body)
 })
