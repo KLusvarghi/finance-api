@@ -137,6 +137,13 @@ export const updateUserHttpRequest = {
     body: updateUserParams,
 }
 
+export const loginUserHttpRequest = {
+    body: {
+        email: createUserRepositoryResponse.email,
+        password: createUserRepositoryResponse.password,
+    },
+}
+
 // ============================================================================
 // TEST HELPERS
 // ============================================================================
@@ -155,4 +162,16 @@ export const createTestUser = async (
             ...customData,
         },
     })
+}
+
+const generateMockJWT = (): string => {
+    const header = faker.string.alphanumeric(36)
+    const payload = faker.string.alphanumeric(128)
+    const signature = faker.string.alphanumeric(43)
+    return `${header}.${payload}.${signature}`
+}
+
+export const tokenGeneratorAdapterResponse = {
+    accessToken: generateMockJWT(),
+    refreshToken: generateMockJWT(),
 }
