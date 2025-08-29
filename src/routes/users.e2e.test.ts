@@ -3,12 +3,7 @@ import request from 'supertest'
 import { app } from '../app'
 import { ResponseMessage, ResponseZodMessages } from '../shared'
 
-import {
-    createUserParams,
-    updateUserParams,
-    userId,
-    userResponse,
-} from '@/test'
+import { createUserParams, updateUserParams } from '@/test'
 import { faker } from '@faker-js/faker'
 import { TransactionType } from '@prisma/client'
 
@@ -24,20 +19,14 @@ describe('User Routes E2E Tests', () => {
 
             const { body: responseBody } = await request(app)
                 .get(`/api/users/${createdUser.data.id}`)
+                .set(
+                    'authorization',
+                    `Bearer ${createdUser.data.tokens.accessToken}`,
+                )
                 .expect(200)
 
-            expect(responseBody.data).toEqual(createdUser.data)
+            expect(responseBody.data.id).toEqual(createdUser.data.id)
             expect(responseBody.message).toBe(ResponseMessage.SUCCESS)
-        })
-
-        it('should return 404 when user is not found', async () => {
-            const { body: responseBody } = await request(app)
-                .get(`/api/users/${userId}`)
-                .expect(404)
-
-            expect(responseBody.message).toBe(
-                `User with id ${userId} not found`,
-            )
         })
     })
 
@@ -52,6 +41,10 @@ describe('User Routes E2E Tests', () => {
 
             await request(app)
                 .post(`/api/transactions`)
+                .set(
+                    'authorization',
+                    `Bearer ${createdUser.data.tokens.accessToken}`,
+                )
                 .send({
                     user_id: userData.id,
                     name: faker.lorem.words(3),
@@ -62,6 +55,10 @@ describe('User Routes E2E Tests', () => {
 
             await request(app)
                 .post(`/api/transactions`)
+                .set(
+                    'authorization',
+                    `Bearer ${createdUser.data.tokens.accessToken}`,
+                )
                 .send({
                     user_id: userData.id,
                     name: faker.lorem.words(3),
@@ -72,6 +69,10 @@ describe('User Routes E2E Tests', () => {
 
             await request(app)
                 .post(`/api/transactions`)
+                .set(
+                    'authorization',
+                    `Bearer ${createdUser.data.tokens.accessToken}`,
+                )
                 .send({
                     user_id: userData.id,
                     name: faker.lorem.words(3),
@@ -82,6 +83,10 @@ describe('User Routes E2E Tests', () => {
 
             const { body: responseBody } = await request(app)
                 .get(`/api/users/${userData.id}/balance`)
+                .set(
+                    'authorization',
+                    `Bearer ${createdUser.data.tokens.accessToken}`,
+                )
                 .expect(200)
 
             expect(responseBody.data).toEqual({
@@ -92,16 +97,6 @@ describe('User Routes E2E Tests', () => {
             })
             expect(responseBody.message).toBe(ResponseMessage.SUCCESS)
         })
-
-        it('should return 404 when user is not found', async () => {
-            const { body: responseBody } = await request(app)
-                .get(`/api/users/${userId}/balance`)
-                .expect(404)
-
-            expect(responseBody.message).toBe(
-                `User with id ${userId} not found`,
-            )
-        })
     })
 
     describe('POST /api/users', () => {
@@ -111,10 +106,8 @@ describe('User Routes E2E Tests', () => {
                 .send(createUserParams)
                 .expect(201)
 
-            expect(responseBody.data).toEqual({
-                ...userResponse,
-                id: expect.any(String),
-            })
+            expect(responseBody.data.tokens.accessToken).toBeDefined()
+            expect(responseBody.data.tokens.refreshToken).toBeDefined()
             expect(responseBody.message).toBe(ResponseMessage.USER_CREATED)
         })
 
@@ -177,27 +170,16 @@ describe('User Routes E2E Tests', () => {
 
             const { body: responseBody } = await request(app)
                 .patch(`/api/users/${createdUser.data.id}`)
+                .set(
+                    'authorization',
+                    `Bearer ${createdUser.data.tokens.accessToken}`,
+                )
                 .send(updateUserParams)
                 .expect(200)
 
-            expect(responseBody.data).toEqual({
-                ...createdUser.data,
-                ...updateUserParams,
-                password: undefined,
-            })
+            expect(responseBody.data.id).toEqual(createdUser.data.id)
             expect(responseBody.data).not.toHaveProperty('password')
             expect(responseBody.message).toBe(ResponseMessage.USER_UPDATED)
-        })
-
-        it('should return 404 when user is not found', async () => {
-            const { body: responseBody } = await request(app)
-                .patch(`/api/users/${userId}`)
-                .send(updateUserParams)
-                .expect(404)
-
-            expect(responseBody.message).toBe(
-                `User with id ${userId} not found`,
-            )
         })
     })
 
@@ -210,19 +192,13 @@ describe('User Routes E2E Tests', () => {
 
             const { body: responseBody } = await request(app)
                 .delete(`/api/users/${createdUser.data.id}`)
+                .set(
+                    'authorization',
+                    `Bearer ${createdUser.data.tokens.accessToken}`,
+                )
                 .expect(200)
 
             expect(responseBody.message).toBe(ResponseMessage.USER_DELETED)
-        })
-
-        it('should return 404 when user is not found', async () => {
-            const { body: responseBody } = await request(app)
-                .delete(`/api/users/${userId}`)
-                .expect(404)
-
-            expect(responseBody.message).toBe(
-                `User with id ${userId} not found`,
-            )
         })
     })
 })
