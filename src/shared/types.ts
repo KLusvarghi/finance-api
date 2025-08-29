@@ -152,10 +152,10 @@ export interface UpdateTransactionParams {
 }
 
 // ============================================================================
-// SERVICE INTERFACE TYPES
+// REPOSITORY INTERFACE TYPES
 // ============================================================================
 
-// User Repository Interfaces
+// User
 export interface CreateUserRepository {
     execute(
         user: CreateUserParams & { id: string; password: string },
@@ -184,8 +184,7 @@ export interface DeleteUserRepository {
 export interface GetUserBalanceRepository {
     execute(userId: string): Promise<UserBalanceRepositoryResponse>
 }
-
-// Transaction Repository Interfaces
+// Transaction
 export interface CreateTransactionRepository {
     execute(
         params: CreateTransactionParams & { id: string },
@@ -276,10 +275,10 @@ export interface UpdateUserServiceParams {
 // >
 
 // ============================================================================
-// CONTROLLER INTERFACE TYPES
+// SERVICE INTERFACE TYPES
 // ============================================================================
 
-// User Service Interfaces
+// User
 export interface CreateUserService {
     execute(params: CreateUserParams): Promise<UserPublicResponse>
 }
@@ -303,7 +302,16 @@ export interface DeleteUserService {
     execute(userId: string): Promise<UserPublicResponse>
 }
 
-// Transaction Service Interfaces
+export interface LoginUserService {
+    execute(
+        email: string,
+        password: string,
+    ): Promise<
+        UserRepositoryResponse & { tokens: TokenGeneratorAdapterResponse }
+    >
+}
+
+// Transaction
 export interface CreateTransactionService {
     execute(params: CreateTransactionParams): Promise<TransactionPublicResponse>
 }
