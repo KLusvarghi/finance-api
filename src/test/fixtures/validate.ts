@@ -204,6 +204,21 @@ export const invalidAmount = [
 
 export const invalidEmailCases = [
     {
+        description: 'not provided',
+        email: undefined,
+        expectedMessage: ResponseZodMessages.email.required,
+    },
+    {
+        description: 'null value',
+        email: null,
+        expectedMessage: ResponseZodMessages.email.required,
+    },
+    {
+        description: 'empty string with spaces',
+        email: '     ',
+        expectedMessage: ResponseZodMessages.email.invalid,
+    },
+    {
         description: 'empty string',
         email: '',
         expectedMessage: ResponseZodMessages.email.invalid,
