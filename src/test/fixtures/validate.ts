@@ -1,35 +1,40 @@
-import { ResponseMessage, ResponseZodMessages } from '@/shared'
+import { ResponseZodMessages } from '@/shared'
 
-export const invalidUUID = [
+type InvalidIdMessages = {
+    missing: string
+    invalid: string
+}
+
+export const createInvalidIdCases = (messages: InvalidIdMessages) => [
     {
         description: 'not provided',
         id: undefined,
-        expectedMessage: ResponseMessage.USER_ID_MISSING,
+        expectedMessage: messages.missing,
     },
     {
         description: 'too long',
         id: '12345678-1234-1234-1234-123456789012',
-        expectedMessage: ResponseMessage.INVALID_ID,
+        expectedMessage: messages.invalid,
     },
     {
         description: 'too short',
         id: '12345678-1234-1234-1234-12345678901',
-        expectedMessage: ResponseMessage.INVALID_ID,
+        expectedMessage: messages.invalid,
     },
     {
         description: 'with invalid characters',
         id: '12345678-1234-1234-1234-12345678901g',
-        expectedMessage: ResponseMessage.INVALID_ID,
+        expectedMessage: messages.invalid,
     },
     {
         description: 'without hyphens',
         id: '12345678-1234-1234-1234-12345678901',
-        expectedMessage: ResponseMessage.INVALID_ID,
+        expectedMessage: messages.invalid,
     },
     {
         description: 'completely invalid format',
         id: 'not-a-uuid-at-all',
-        expectedMessage: ResponseMessage.INVALID_ID,
+        expectedMessage: messages.invalid,
     },
     // {
     //     description: 'empty string',
@@ -38,7 +43,7 @@ export const invalidUUID = [
     // },
 ]
 
-export const invalidDate = [
+export const invalidDateCases = [
     {
         description: 'common string format',
         date: '25/08/2024',
@@ -91,7 +96,7 @@ export const invalidDate = [
     },
 ]
 
-export const invalidType = [
+export const invalidTypeCases = [
     {
         description: 'lowercase type',
         type: 'earning',
@@ -144,7 +149,7 @@ export const invalidType = [
     },
 ]
 
-export const invalidAmount = [
+export const invalidAmountCases = [
     // {
     //     description: 'zero value',
     //     amount: 0,
