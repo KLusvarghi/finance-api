@@ -1,36 +1,51 @@
 # ### USERS
 
-# # Create User
+# Create User
 POST http://localhost:3001/api/users
 Content-Type: application/json
 
 {
-  "first_name": "Kayky",
-  "last_name": "Oliveira", 
-  "email": "kayky@example.com",
+  "first_name": "kaique",
+  "last_name": "lusvarghi", 
+  "email": "kaiqudade@gmail.com",
+  "password": "password123"
+}
+
+###
+
+
+# Login User
+POST http://localhost:3001/api/users/login
+Content-Type: application/json
+
+{
+  "email": "kaiqudade@gmail.com",
   "password": "password123"
 }
 
 ###
 
 # Get User By Id
-GET http://localhost:3001/api/users/14e197b3-3648-49bf-9629-c1fee4fe5fac
+GET http://localhost:3001/api/users/69df3628-0385-48de-a2de-029574c45b04
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ODU3MjQ5OS0wZGJkLTQ2YWItOWY5NC0xZGVjYWJhZGIxNzkiLCJpYXQiOjE3NTY0ODY3NjYsImV4cCI6MTc1NjQ4NzY2Nn0.ZECnk_LS53J05p_bQG_g8xnFobYkDGOJVOZcjpGVd-0
 
 ###
 
 # Get User Balance
-GET http://localhost:3001/api/users/14e197b3-3648-49bf-9629-c1fee4fe5fac/balance
+GET http://localhost:3001/api/users/dcf1f33f-b707-453c-8204-59dfced6b7e0
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkY2YxZjMzZi1iNzA3LTQ1M2MtODIwNC01OWRmY2VkNmI3ZTAiLCJpYXQiOjE3NTY1MDA2OTIsImV4cCI6MTc1NjUwMTU5Mn0.N9lflTZQHlU3r9VheCc9TcE1UgUM4PZSG6ge868v5HU
 
 ###
 
 # Update User
-PATCH http://localhost:3001/api/users/14e197b3-3648-49bf-9629-c1fee4fe5fac
+PATCH http://localhost:3001/api/users/69df3628-0385-48de-a2de-029574c45b04
 Content-Type: application/json
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ODU3MjQ5OS0wZGJkLTQ2YWItOWY5NC0xZGVjYWJhZGIxNzkiLCJpYXQiOjE3NTY0ODY3NjYsImV4cCI6MTc1NjQ4NzY2Nn0.ZECnk_LS53J05p_bQG_g8xnFobYkDGOJVOZcjpGVd-0
 
 {
   "first_name": "Jane",
   "last_name": "Smith",
-  "email": "jane.smith@example.com",
+  "email": "jaddane.smith@example.com",
   "password": "newpassword456"
 }
 
@@ -38,6 +53,7 @@ Content-Type: application/json
 
 # Delete User
 DELETE http://localhost:3001/api/users/14e197b3-3648-49bf-9629-c1fee4fe5fac
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ODU3MjQ5OS0wZGJkLTQ2YWItOWY5NC0xZGVjYWJhZGIxNzkiLCJpYXQiOjE3NTY0ODY3NjYsImV4cCI6MTc1NjQ4NzY2Nn0.ZECnk_LS53J05p_bQG_g8xnFobYkDGOJVOZcjpGVd-0
 
 ---
 
@@ -46,9 +62,10 @@ DELETE http://localhost:3001/api/users/14e197b3-3648-49bf-9629-c1fee4fe5fac
 # Create Transaction
 POST http://localhost:3001/api/transactions
 Content-Type: application/json
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ODU3MjQ5OS0wZGJkLTQ2YWItOWY5NC0xZGVjYWJhZGIxNzkiLCJpYXQiOjE3NTY0ODY3NjYsImV4cCI6MTc1NjQ4NzY2Nn0.ZECnk_LS53J05p_bQG_g8xnFobYkDGOJVOZcjpGVd-0
 
 {
-  "user_id": "14e197b3-3648-49bf-9629-c1fee4fe5fac",
+  "user_id": "69df3628-0385-48de-a2de-029574c45b04",
   "name": "Salary",
   "amount": 5000,
   "date": "2024-06-01T00:00:00.000Z",
@@ -58,17 +75,19 @@ Content-Type: application/json
 ###
 
 # Get Transactions By User Id (query param)
-GET http://localhost:3001/api/transactions?userId=14e197b3-3648-49bf-9629-c1fee4fe5fac
+GET http://localhost:3001/api/transactions?userId=69df3628-0385-48de-a2de-029574c45b04
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ODU3MjQ5OS0wZGJkLTQ2YWItOWY5NC0xZGVjYWJhZGIxNzkiLCJpYXQiOjE3NTY0ODY3NjYsImV4cCI6MTc1NjQ4NzY2Nn0.ZECnk_LS53J05p_bQG_g8xnFobYkDGOJVOZcjpGVd-0
 
 ###
 
 # Update Transaction
-PATCH http://localhost:3001/api/transactions/3667ef61-6229-405b-b905-6720d7a8f158
+PATCH http://localhost:3001/api/transactions/96acbf67-8b4f-4573-9532-4fb80c81f369
 Content-Type: application/json
-userId: 14e197b3-3648-49bf-9629-c1fee4fe5fac
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ODU3MjQ5OS0wZGJkLTQ2YWItOWY5NC0xZGVjYWJhZGIxNzkiLCJpYXQiOjE3NTY0ODY3NjYsImV4cCI6MTc1NjQ4NzY2Nn0.ZECnk_LS53J05p_bQG_g8xnFobYkDGOJVOZcjpGVd-0
+userId: 69df3628-0385-48de-a2de-029574c45b04
 
 {
-  "amount": 6000,
+  "amount": 126000,
   "date": "2025-08-02T00:00:00.000Z",
   "type": "EXPENSE"
 }
@@ -77,3 +96,4 @@ userId: 14e197b3-3648-49bf-9629-c1fee4fe5fac
 
 # Delete Transaction
 DELETE http://localhost:3001/api/transactions/f1e45a03-cd9e-4301-83e7-cc0735a86932?userId=14e197b3-3648-49bf-9629-c1fee4fe5fac
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ODU3MjQ5OS0wZGJkLTQ2YWItOWY5NC0xZGVjYWJhZGIxNzkiLCJpYXQiOjE3NTY0ODY3NjYsImV4cCI6MTc1NjQ4NzY2Nn0.ZECnk_LS53J05p_bQG_g8xnFobYkDGOJVOZcjpGVd-0
