@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpResponse, ResponseMessage } from '@/shared'
 
 export const ok = <T = any>(
@@ -41,13 +42,12 @@ export const badRequest = <T = any>(
 })
 
 export const unauthorized = <T = any>(
-    message: string = ResponseMessage.ERROR,
     code?: string,
     data?: T,
 ): HttpResponse<T> => ({
     statusCode: 401,
     body: {
-        message,
+        message: ResponseMessage.UNAUTHORIZED,
         code,
         data: data ?? null,
     },
