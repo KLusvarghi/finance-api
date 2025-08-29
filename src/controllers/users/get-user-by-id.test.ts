@@ -4,7 +4,7 @@ import { ResponseMessage, UserPublicResponse } from '@/shared'
 import {
     getUserByIdHttpRequest as baseHttpRequest,
     getUserByIdServiceResponse,
-    invalidUUID,
+    invalidIdCases,
     userId,
 } from '@/test'
 
@@ -81,7 +81,7 @@ describe('GetUserByIdController', () => {
                 )
             })
 
-            it.each(invalidUUID)(
+            it.each(invalidIdCases)(
                 'should return 400 if userId is $description',
                 async ({ id, expectedMessage }) => {
                     // arrange

@@ -3,7 +3,7 @@ import { UserNotFoundError } from '@/errors'
 import { ResponseMessage, UserBalanceRepositoryResponse } from '@/shared'
 import {
     getUserBalanceHttpRequest as baseHttpRequest,
-    invalidUUID,
+    invalidIdCases,
     userBalanceResponse,
     userId,
 } from '@/test'
@@ -76,7 +76,7 @@ describe('GetUserBalanceController', () => {
                 )
             })
 
-            it.each(invalidUUID)(
+            it.each(invalidIdCases)(
                 'should return 400 if userId is $description',
                 async ({ id, expectedMessage }) => {
                     // arrange

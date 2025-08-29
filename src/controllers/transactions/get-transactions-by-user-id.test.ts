@@ -1,15 +1,10 @@
 import { GetTransactionsByUserIdController } from '@/controllers'
 import { UserNotFoundError } from '@/errors'
-import {
-    HttpRequest,
-    ResponseMessage,
-    TransactionPublicResponse,
-    TransactionRepositoryResponse,
-} from '@/shared'
+import { ResponseMessage, TransactionPublicResponse } from '@/shared'
 import {
     getTransactionsByUserIdControllerResponse,
     getTransactionsByUserIdHttpRequest as baseHttpRequest,
-    invalidUUID,
+    invalidIdCases,
     userId,
 } from '@/test'
 
@@ -88,7 +83,7 @@ describe('GetTransactionsByUserIdController', () => {
             expect(response.body?.message).toBe(ResponseMessage.USER_ID_MISSING)
         })
 
-        it.each(invalidUUID)(
+        it.each(invalidIdCases)(
             'should return 400 when userId is $description',
             async ({ id }) => {
                 // act

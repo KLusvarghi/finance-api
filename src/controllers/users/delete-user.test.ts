@@ -4,7 +4,7 @@ import { ResponseMessage, UserRepositoryResponse } from '@/shared'
 import {
     deleteUserHttpRequest as baseHttpRequest,
     deleteUserRepositoryResponse,
-    invalidUUID,
+    invalidIdCases,
     userId,
 } from '@/test'
 
@@ -70,18 +70,7 @@ describe('DeleteUserController', () => {
 
     describe('validations', () => {
         describe('userId', () => {
-            it('should return 400 if userId is not provided', async () => {
-                const response = await sut.execute({
-                    params: { userId: undefined },
-                })
-
-                expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBe(
-                    ResponseMessage.USER_ID_MISSING,
-                )
-            })
-
-            it.each(invalidUUID)(
+            it.each(invalidIdCases)(
                 'should return 400 if userId is $description',
                 async ({ id, expectedMessage }) => {
                     // arrange

@@ -10,7 +10,7 @@ import {
     UserRepositoryResponse,
 } from '@/shared'
 import {
-    invalidUUID,
+    invalidIdCases,
     updateUserHttpRequest as baseHttpRequest,
     updateUserParams,
     updateUserRepositoryResponse,
@@ -146,7 +146,7 @@ describe('UpdateUserController', () => {
                 )
             })
 
-            it.each(invalidUUID)(
+            it.each(invalidIdCases)(
                 'should return 400 if userId is $description',
                 async ({ id, expectedMessage }) => {
                     // arrange

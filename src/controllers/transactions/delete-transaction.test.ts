@@ -4,7 +4,7 @@ import { ResponseMessage, TransactionRepositoryResponse } from '@/shared'
 import {
     deleteTransactionControllerResponse,
     deleteTransactionHttpRequest as baseHttpRequest,
-    invalidUUID,
+    invalidIdCases,
     transactionId,
 } from '@/test'
 
@@ -74,7 +74,7 @@ describe('DeleteTransactionController', () => {
     })
 
     describe('validations', () => {
-        it.each(invalidUUID)(
+        it.each(invalidIdCases)(
             'should return 400 if transactionId is $description',
             async ({ id }) => {
                 // arrange
