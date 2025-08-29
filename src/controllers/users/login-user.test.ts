@@ -1,10 +1,8 @@
-// import { invalidPasswordCases } from '../../test/fixtures/validate'
 import { LoginUserController } from './login-user'
 
 import { InvalidPasswordError, UserNotFoundError } from '@/errors'
 import {
     ResponseMessage,
-    ResponseZodMessages,
     TokenGeneratorAdapterResponse,
     UserRepositoryResponse,
 } from '@/shared'
@@ -12,11 +10,11 @@ import {
     createUserRepositoryResponse,
     createUserServiceResponse,
     invalidEmailCases,
+    invalidPasswordCases,
     loginUserHttpRequest as baseHttpRequest,
     tokenGeneratorAdapterResponse,
     userId,
 } from '@/test'
-import { faker } from '@faker-js/faker'
 
 describe('LoginUserController', () => {
     let sut: LoginUserController
@@ -127,50 +125,22 @@ describe('LoginUserController', () => {
         })
 
         describe('password', () => {
-            it('should return 400 and throws ZodError if password is invalid', async () => {
-                const response = await sut.execute({
-                    ...baseHttpRequest,
-                    body: {
-                        ...baseHttpRequest.body,
-                        password: faker.internet.password({ length: 5 }),
-                    },
-                })
+            it.each(invalidPasswordCases)(
+                'should return 400 and throws ZodError if password is $description',
+                async ({ password, expectedMessage }) => {
+                    // arrange
+                    const response = await sut.execute({
+                        body: {
+                            email: baseHttpRequest.body.email,
+                            password,
+                        },
+                    })
 
-                expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBe(
-                    ResponseZodMessages.password.minLength,
-                )
-            })
-
-            it('should return 400 and throws ZodError if password is empty', async () => {
-                const response = await sut.execute({
-                    ...baseHttpRequest,
-                    body: {
-                        ...baseHttpRequest.body,
-                        password: '',
-                    },
-                })
-
-                expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBe(
-                    ResponseZodMessages.password.minLength,
-                )
-            })
-
-            it('should return 400 and throws ZodError if password is not provided', async () => {
-                const response = await sut.execute({
-                    ...baseHttpRequest,
-                    body: {
-                        ...baseHttpRequest.body,
-                        password: undefined,
-                    },
-                })
-
-                expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBe(
-                    ResponseZodMessages.password.required,
-                )
-            })
+                    // assert
+                    expect(response.statusCode).toBe(400)
+                    expect(response.body?.message).toBe(expectedMessage)
+                },
+            )
         })
     })
 })
