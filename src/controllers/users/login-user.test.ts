@@ -1,3 +1,4 @@
+// import { invalidPasswordCases } from '../../test/fixtures/validate'
 import { LoginUserController } from './login-user'
 
 import { InvalidPasswordError, UserNotFoundError } from '@/errors'
@@ -10,6 +11,7 @@ import {
 import {
     createUserRepositoryResponse,
     createUserServiceResponse,
+    invalidEmailCases,
     loginUserHttpRequest as baseHttpRequest,
     tokenGeneratorAdapterResponse,
     userId,
@@ -106,49 +108,22 @@ describe('LoginUserController', () => {
 
     describe('validations', () => {
         describe('email', () => {
-            it('should return 400 and throws ZodError if email is invalid', async () => {
-                const response = await sut.execute({
-                    ...baseHttpRequest,
-                    body: {
-                        ...baseHttpRequest.body,
-                        email: 'invalid_email',
-                    },
-                })
+            it.each(invalidEmailCases)(
+                'should return 400 and throws ZodError if email is $description',
+                async ({ email, expectedMessage }) => {
+                    // arrange
+                    const response = await sut.execute({
+                        body: {
+                            email,
+                            password: baseHttpRequest.body.password,
+                        },
+                    })
 
-                expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBe(
-                    ResponseZodMessages.email.invalid,
-                )
-            })
-            it('should return 400 and throws ZodError if email is empty', async () => {
-                const response = await sut.execute({
-                    ...baseHttpRequest,
-                    body: {
-                        ...baseHttpRequest.body,
-                        email: '',
-                    },
-                })
-
-                expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBe(
-                    ResponseZodMessages.email.invalid,
-                )
-            })
-
-            it('should return 400 and throws ZodError if email is not provided', async () => {
-                const response = await sut.execute({
-                    ...baseHttpRequest,
-                    body: {
-                        ...baseHttpRequest.body,
-                        email: undefined,
-                    },
-                })
-
-                expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBe(
-                    ResponseZodMessages.email.invalid,
-                )
-            })
+                    // assert
+                    expect(response.statusCode).toBe(400)
+                    expect(response.body?.message).toBe(expectedMessage)
+                },
+            )
         })
 
         describe('password', () => {
