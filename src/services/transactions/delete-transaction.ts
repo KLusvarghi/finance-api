@@ -1,4 +1,4 @@
-import { ForbiddenError, TransactionNotFoundError } from '@/errors'
+import { TransactionNotFoundError } from '@/errors'
 import {
     DeleteTransactionRepository,
     GetTransactionByUserIdRepository,
