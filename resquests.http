@@ -5,9 +5,9 @@ POST http://localhost:3001/api/users
 Content-Type: application/json
 
 {
-  "first_name": "kaique",
-  "last_name": "lusvarghi", 
-  "email": "kaiqudade@gmail.com",
+  "first_name": "piton",
+  "last_name": "delas", 
+  "email": "piton@gmail.com",
   "password": "password123"
 }
 
@@ -26,34 +26,34 @@ Content-Type: application/json
 ###
 
 # Get User By Id
-GET http://localhost:3001/api/users/69df3628-0385-48de-a2de-029574c45b04
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ODU3MjQ5OS0wZGJkLTQ2YWItOWY5NC0xZGVjYWJhZGIxNzkiLCJpYXQiOjE3NTY0ODY3NjYsImV4cCI6MTc1NjQ4NzY2Nn0.ZECnk_LS53J05p_bQG_g8xnFobYkDGOJVOZcjpGVd-0
+GET http://localhost:3001/api/users/me
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkNTA5MzEzMy1mMjg2LTQ3N2YtYWNjNy00MjcxZjc2NDI1MWEiLCJpYXQiOjE3NTY1MDgxMzMsImV4cCI6MTc1NjUwOTAzM30.dEhy5PqAco_Bo9QKm0arFwlvTCViGbUTm-knOauKS-M
 
 ###
 
 # Get User Balance
-GET http://localhost:3001/api/users/dcf1f33f-b707-453c-8204-59dfced6b7e0
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkY2YxZjMzZi1iNzA3LTQ1M2MtODIwNC01OWRmY2VkNmI3ZTAiLCJpYXQiOjE3NTY1MDA2OTIsImV4cCI6MTc1NjUwMTU5Mn0.N9lflTZQHlU3r9VheCc9TcE1UgUM4PZSG6ge868v5HU
+GET http://localhost:3001/api/users/me/balance
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkNTA5MzEzMy1mMjg2LTQ3N2YtYWNjNy00MjcxZjc2NDI1MWEiLCJpYXQiOjE3NTY1MDgxMzMsImV4cCI6MTc1NjUwOTAzM30.dEhy5PqAco_Bo9QKm0arFwlvTCViGbUTm-knOauKS-M
 
 ###
 
 # Update User
-PATCH http://localhost:3001/api/users/69df3628-0385-48de-a2de-029574c45b04
+PATCH http://localhost:3001/api/users/me
 Content-Type: application/json
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ODU3MjQ5OS0wZGJkLTQ2YWItOWY5NC0xZGVjYWJhZGIxNzkiLCJpYXQiOjE3NTY0ODY3NjYsImV4cCI6MTc1NjQ4NzY2Nn0.ZECnk_LS53J05p_bQG_g8xnFobYkDGOJVOZcjpGVd-0
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkNTA5MzEzMy1mMjg2LTQ3N2YtYWNjNy00MjcxZjc2NDI1MWEiLCJpYXQiOjE3NTY1MDgxMzMsImV4cCI6MTc1NjUwOTAzM30.dEhy5PqAco_Bo9QKm0arFwlvTCViGbUTm-knOauKS-M
 
 {
-  "first_name": "Jane",
-  "last_name": "Smith",
-  "email": "jaddane.smith@example.com",
+  "first_name": "piton",
+  "last_name": "delas",
+  "email": "piton2@gmail.com",
   "password": "newpassword456"
 }
 
 ###
 
 # Delete User
-DELETE http://localhost:3001/api/users/14e197b3-3648-49bf-9629-c1fee4fe5fac
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ODU3MjQ5OS0wZGJkLTQ2YWItOWY5NC0xZGVjYWJhZGIxNzkiLCJpYXQiOjE3NTY0ODY3NjYsImV4cCI6MTc1NjQ4NzY2Nn0.ZECnk_LS53J05p_bQG_g8xnFobYkDGOJVOZcjpGVd-0
+DELETE http://localhost:3001/api/users/me
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkNTA5MzEzMy1mMjg2LTQ3N2YtYWNjNy00MjcxZjc2NDI1MWEiLCJpYXQiOjE3NTY1MDgxMzMsImV4cCI6MTc1NjUwOTAzM30.dEhy5PqAco_Bo9QKm0arFwlvTCViGbUTm-knOauKS-M
 
 ---
 
