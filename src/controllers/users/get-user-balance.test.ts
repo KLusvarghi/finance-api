@@ -2,8 +2,8 @@ import { GetUserBalanceController } from '@/controllers'
 import { UserNotFoundError } from '@/errors'
 import { ResponseMessage, UserBalanceRepositoryResponse } from '@/shared'
 import {
+    createInvalidIdCases,
     getUserBalanceHttpRequest as baseHttpRequest,
-    invalidIdCases,
     userBalanceResponse,
     userId,
 } from '@/test'
@@ -65,17 +65,10 @@ describe('GetUserBalanceController', () => {
 
     describe('validations', () => {
         describe('userId', () => {
-            it('should return 400 if userId is not provided', async () => {
-                const response = await sut.execute({
-                    params: { userId: undefined },
-                })
-
-                expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBe(
-                    ResponseMessage.USER_ID_MISSING,
-                )
+            const invalidIdCases = createInvalidIdCases({
+                missing: ResponseMessage.USER_ID_MISSING,
+                invalid: ResponseMessage.USER_INVALID_ID,
             })
-
             it.each(invalidIdCases)(
                 'should return 400 if userId is $description',
                 async ({ id, expectedMessage }) => {

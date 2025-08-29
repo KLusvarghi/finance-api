@@ -5,10 +5,10 @@ import {
     emailAlreadyExistsResponse,
     handleZodValidationError,
     invalidIdResponse,
+    notFoundResponse,
     ok,
+    requiredFieldMissingResponse,
     serverError,
-    userIdMissingResponse,
-    userNotFoundResponse,
 } from '../_helpers'
 
 import {
@@ -41,10 +41,10 @@ export class UpdateUserController
     ): Promise<HttpResponse<UserPublicResponse>> {
         try {
             const userId = (httpRequest.params as { userId: string }).userId
-            if (!userId) return userIdMissingResponse()
+            if (!userId) return requiredFieldMissingResponse('userId')
 
             const isIdValid = checkIfIdIsValid(userId)
-            if (!isIdValid) return invalidIdResponse()
+            if (!isIdValid) return invalidIdResponse('userId')
 
             const params = httpRequest.body
             const validatedParams = await updateUserSchema.parseAsync(params)
@@ -66,7 +66,7 @@ export class UpdateUserController
                 return emailAlreadyExistsResponse(error.message)
             }
             if (error instanceof UserNotFoundError) {
-                return userNotFoundResponse(error.message)
+                return notFoundResponse(error)
             }
             if (error instanceof UpdateUserFailedError) {
                 return serverError(error.message, error.code)

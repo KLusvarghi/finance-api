@@ -1,10 +1,10 @@
 import {
     checkIfIdIsValid,
     invalidIdResponse,
+    notFoundResponse,
     ok,
+    requiredFieldMissingResponse,
     serverError,
-    userIdMissingResponse,
-    userNotFoundResponse,
 } from '../_helpers'
 
 import { UserNotFoundError } from '@/errors'
@@ -34,11 +34,11 @@ export class DeleteUserController
             const userId = (httpRequest.params as { userId: string }).userId
 
             if (!userId) {
-                return userIdMissingResponse()
+                return requiredFieldMissingResponse('userId')
             }
 
             const isIdValid = checkIfIdIsValid(userId)
-            if (!isIdValid) return invalidIdResponse()
+            if (!isIdValid) return invalidIdResponse('userId')
 
             const deletedUser = await this.deletedUserService.execute(userId)
 
@@ -47,7 +47,7 @@ export class DeleteUserController
             console.error(error)
 
             if (error instanceof UserNotFoundError) {
-                return userNotFoundResponse(error.message)
+                return notFoundResponse(error)
             }
 
             return serverError()

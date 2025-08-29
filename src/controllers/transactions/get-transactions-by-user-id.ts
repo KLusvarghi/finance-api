@@ -1,10 +1,10 @@
 import {
     checkIfIdIsValid,
     invalidIdResponse,
+    notFoundResponse,
     ok,
     requiredFieldMissingResponse,
     serverError,
-    userNotFoundResponse,
 } from '../_helpers'
 
 import { UserNotFoundError } from '@/errors'
@@ -14,7 +14,6 @@ import {
     GetTransactionsByUserIdService,
     HttpRequest,
     HttpResponse,
-    ResponseMessage,
     TransactionPublicResponse,
 } from '@/shared'
 
@@ -36,13 +35,11 @@ export class GetTransactionsByUserIdController
             const userId = (httpRequest.query as { userId: string }).userId
 
             if (!userId) {
-                return requiredFieldMissingResponse(
-                    ResponseMessage.USER_ID_MISSING,
-                )
+                return requiredFieldMissingResponse('userId')
             }
 
             if (!checkIfIdIsValid(userId)) {
-                return invalidIdResponse()
+                return invalidIdResponse('userId')
             }
 
             const transactions =
@@ -52,7 +49,7 @@ export class GetTransactionsByUserIdController
         } catch (error) {
             console.error(error)
             if (error instanceof UserNotFoundError) {
-                return userNotFoundResponse(error.message)
+                return notFoundResponse(error)
             }
             return serverError()
         }

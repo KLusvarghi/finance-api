@@ -1,9 +1,10 @@
 import {
     checkIfIdIsValid,
     invalidIdResponse,
+    notFoundResponse,
     ok,
+    requiredFieldMissingResponse,
     serverError,
-    transactionNotFoundResponse,
     unauthorized,
 } from '../_helpers'
 
@@ -39,8 +40,12 @@ export class DeleteTransactionController
             //     userId: string
             // }
 
+            if (!transactionId) {
+                return requiredFieldMissingResponse('transactionId')
+            }
+
             if (!checkIfIdIsValid(transactionId)) {
-                return invalidIdResponse()
+                return invalidIdResponse('transactionId')
             }
 
             // if (!userId) {
@@ -58,7 +63,7 @@ export class DeleteTransactionController
             console.error(error)
 
             if (error instanceof TransactionNotFoundError) {
-                return transactionNotFoundResponse(error.message)
+                return notFoundResponse(error)
             }
 
             if (error instanceof ForbiddenError) {

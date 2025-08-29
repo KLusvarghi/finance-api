@@ -2,9 +2,9 @@ import { GetTransactionsByUserIdController } from '@/controllers'
 import { UserNotFoundError } from '@/errors'
 import { ResponseMessage, TransactionPublicResponse } from '@/shared'
 import {
+    createInvalidIdCases,
     getTransactionsByUserIdControllerResponse,
     getTransactionsByUserIdHttpRequest as baseHttpRequest,
-    invalidIdCases,
     userId,
 } from '@/test'
 
@@ -74,18 +74,13 @@ describe('GetTransactionsByUserIdController', () => {
     })
 
     describe('validations', () => {
-        it('should return 400 when userId is not provided', async () => {
-            // act
-            const response = await sut.execute({ query: { userId: undefined } })
-
-            // assert
-            expect(response.statusCode).toBe(400)
-            expect(response.body?.message).toBe(ResponseMessage.USER_ID_MISSING)
+        const invalidIdCases = createInvalidIdCases({
+            missing: ResponseMessage.USER_ID_MISSING,
+            invalid: ResponseMessage.USER_INVALID_ID,
         })
-
         it.each(invalidIdCases)(
             'should return 400 when userId is $description',
-            async ({ id }) => {
+            async ({ id, expectedMessage }) => {
                 // act
                 const response = await sut.execute({
                     query: { userId: id },
@@ -93,7 +88,7 @@ describe('GetTransactionsByUserIdController', () => {
 
                 // assert
                 expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBe(ResponseMessage.INVALID_ID)
+                expect(response.body?.message).toBe(expectedMessage)
             },
         )
     })

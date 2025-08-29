@@ -2,9 +2,9 @@ import { DeleteTransactionController } from '@/controllers'
 import { TransactionNotFoundError } from '@/errors'
 import { ResponseMessage, TransactionRepositoryResponse } from '@/shared'
 import {
+    createInvalidIdCases,
     deleteTransactionControllerResponse,
     deleteTransactionHttpRequest as baseHttpRequest,
-    invalidIdCases,
     transactionId,
 } from '@/test'
 
@@ -74,9 +74,14 @@ describe('DeleteTransactionController', () => {
     })
 
     describe('validations', () => {
+        const invalidIdCases = createInvalidIdCases({
+            missing: ResponseMessage.TRANSACTION_ID_MISSING,
+            invalid: ResponseMessage.TRANSACTION_INVALID_ID,
+        })
+
         it.each(invalidIdCases)(
             'should return 400 if transactionId is $description',
-            async ({ id }) => {
+            async ({ id, expectedMessage }) => {
                 // arrange
                 const response = await sut.execute({
                     params: {
@@ -86,7 +91,7 @@ describe('DeleteTransactionController', () => {
 
                 // assert
                 expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBe(ResponseMessage.INVALID_ID)
+                expect(response.body?.message).toBe(expectedMessage)
             },
         )
     })

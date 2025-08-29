@@ -1,10 +1,10 @@
 import {
     checkIfIdIsValid,
     invalidIdResponse,
+    notFoundResponse,
     ok,
+    requiredFieldMissingResponse,
     serverError,
-    userIdMissingResponse,
-    userNotFoundResponse,
 } from '../_helpers'
 
 import { UserNotFoundError } from '@/errors'
@@ -33,11 +33,11 @@ export class GetUserByIdController
             const userId = (httpRequest.params as { userId: string }).userId
 
             if (!userId) {
-                return userIdMissingResponse()
+                return requiredFieldMissingResponse('userId')
             }
 
             const isIdValid = checkIfIdIsValid(userId)
-            if (!isIdValid) return invalidIdResponse()
+            if (!isIdValid) return invalidIdResponse('userId')
 
             const user = await this.getUserByIdService.execute(userId)
 
@@ -46,7 +46,7 @@ export class GetUserByIdController
             console.error(error)
 
             if (error instanceof UserNotFoundError) {
-                return userNotFoundResponse(error.message)
+                return notFoundResponse(error)
             }
 
             return serverError()

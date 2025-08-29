@@ -1,10 +1,10 @@
 import {
     checkIfIdIsValid,
     invalidIdResponse,
+    notFoundResponse,
     ok,
+    requiredFieldMissingResponse,
     serverError,
-    userIdMissingResponse,
-    userNotFoundResponse,
 } from '../_helpers'
 
 import { UserNotFoundError } from '@/errors'
@@ -32,11 +32,11 @@ export class GetUserBalanceController
         try {
             const userId = (httpRequest.params as { userId: string }).userId
             if (!userId) {
-                return userIdMissingResponse()
+                return requiredFieldMissingResponse('userId')
             }
 
             if (!checkIfIdIsValid(userId)) {
-                return invalidIdResponse()
+                return invalidIdResponse('userId')
             }
 
             const userBalance = await this.getUserBalanceService.execute(userId)
@@ -44,7 +44,7 @@ export class GetUserBalanceController
             return ok(userBalance)
         } catch (error) {
             if (error instanceof UserNotFoundError) {
-                return userNotFoundResponse(error.message)
+                return notFoundResponse(error)
             }
             console.error(error)
             return serverError()

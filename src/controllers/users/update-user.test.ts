@@ -10,7 +10,7 @@ import {
     UserRepositoryResponse,
 } from '@/shared'
 import {
-    invalidIdCases,
+    createInvalidIdCases,
     updateUserHttpRequest as baseHttpRequest,
     updateUserParams,
     updateUserRepositoryResponse,
@@ -133,17 +133,9 @@ describe('UpdateUserController', () => {
         })
 
         describe('userId', () => {
-            it('should return 400 when userId is not provided', async () => {
-                const response = await sut.execute({
-                    params: { userId: undefined },
-                    body: updateUserParams,
-                })
-
-                expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBeTruthy()
-                expect(response.body?.message).toBe(
-                    ResponseMessage.USER_ID_MISSING,
-                )
+            const invalidIdCases = createInvalidIdCases({
+                missing: ResponseMessage.USER_ID_MISSING,
+                invalid: ResponseMessage.USER_INVALID_ID,
             })
 
             it.each(invalidIdCases)(

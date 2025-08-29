@@ -2,9 +2,9 @@ import { DeleteUserController } from '@/controllers'
 import { UserNotFoundError } from '@/errors'
 import { ResponseMessage, UserRepositoryResponse } from '@/shared'
 import {
+    createInvalidIdCases,
     deleteUserHttpRequest as baseHttpRequest,
     deleteUserRepositoryResponse,
-    invalidIdCases,
     userId,
 } from '@/test'
 
@@ -70,6 +70,11 @@ describe('DeleteUserController', () => {
 
     describe('validations', () => {
         describe('userId', () => {
+            const invalidIdCases = createInvalidIdCases({
+                missing: ResponseMessage.USER_ID_MISSING,
+                invalid: ResponseMessage.USER_INVALID_ID,
+            })
+
             it.each(invalidIdCases)(
                 'should return 400 if userId is $description',
                 async ({ id, expectedMessage }) => {

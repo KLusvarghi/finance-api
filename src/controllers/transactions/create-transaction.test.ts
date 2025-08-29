@@ -1,12 +1,16 @@
 import { CreateTransactionController } from '@/controllers'
-import { CreateTransactionParams, TransactionPublicResponse } from '@/shared'
 import {
+    CreateTransactionParams,
+    ResponseMessage,
+    TransactionPublicResponse,
+} from '@/shared'
+import {
+    createInvalidIdCases,
     createTransactionControllerResponse,
     createTransactionHttpRequest as baseHttpRequest,
     createTransactionParams as params,
     invalidAmountCases,
     invalidDateCases,
-    invalidIdCases,
     invalidTypeCases,
 } from '@/test'
 
@@ -58,23 +62,13 @@ describe('CreateTransactionController', () => {
 
     describe('validations', () => {
         describe('user_id', () => {
-            it('should return 400 if user_id is not provided', async () => {
-                // arrange
-                const response = await sut.execute({
-                    body: {
-                        ...params,
-                        user_id: undefined,
-                    },
-                })
-
-                // assert
-                expect(response.statusCode).toBe(400)
-                // expect(response.body?.message).toBe('User id is required')
+            const invalidIdCases = createInvalidIdCases({
+                missing: ResponseMessage.USER_ID_MISSING,
+                invalid: ResponseMessage.USER_INVALID_ID,
             })
-
             it.each(invalidIdCases)(
                 'should return 400 if user_id is $description',
-                async ({ id }) => {
+                async ({ id, expectedMessage }) => {
                     // arrange
                     const response = await sut.execute({
                         body: {
@@ -85,9 +79,7 @@ describe('CreateTransactionController', () => {
 
                     // assert
                     expect(response.statusCode).toBe(400)
-                    // expect(response.body?.message).toBe(
-                    //     'User id must be a valid uuid',
-                    // )
+                    expect(response.body?.message).toBe(expectedMessage)
                 },
             )
         })

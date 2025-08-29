@@ -6,9 +6,9 @@ import {
     UpdateTransactionParams,
 } from '@/shared'
 import {
+    createInvalidIdCases,
     invalidAmountCases,
     invalidDateCases,
-    invalidIdCases,
     invalidTypeCases,
     updateTransactionControllerResponse,
     updateTransactionHttpRequest as baseHttpRequest,
@@ -62,25 +62,14 @@ describe('UpdateTransactionController', () => {
     })
 
     describe('validations', () => {
-        it('should return 400 when transactionId is not provided', async () => {
-            // act
-            const response = await sut.execute({
-                ...baseHttpRequest,
-                params: {
-                    transactionId: undefined,
-                },
-            })
-
-            // assert
-            expect(response.statusCode).toBe(400)
-            expect(response.body?.message).toBe(
-                ResponseMessage.TRANSACTION_ID_MISSING,
-            )
+        const invalidIdCases = createInvalidIdCases({
+            missing: ResponseMessage.TRANSACTION_ID_MISSING,
+            invalid: ResponseMessage.TRANSACTION_INVALID_ID,
         })
 
         it.each(invalidIdCases)(
-            'should return 400 if trnasactionId is $description',
-            async ({ id }) => {
+            'should return 400 and throws ZodError if transactionId is $description',
+            async ({ id, expectedMessage }) => {
                 // act
                 const response = await sut.execute({
                     ...baseHttpRequest,
@@ -91,7 +80,7 @@ describe('UpdateTransactionController', () => {
 
                 // assert
                 expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBe(ResponseMessage.INVALID_ID)
+                expect(response.body?.message).toBe(expectedMessage)
             },
         )
 

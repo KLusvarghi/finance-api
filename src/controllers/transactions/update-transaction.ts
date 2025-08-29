@@ -4,10 +4,10 @@ import {
     checkIfIdIsValid,
     handleZodValidationError,
     invalidIdResponse,
+    notFoundResponse,
     ok,
     requiredFieldMissingResponse,
     serverError,
-    transactionNotFoundResponse,
     unauthorized,
 } from '../_helpers'
 
@@ -42,13 +42,11 @@ export class UpdateTransactionController
             ).transactionId
 
             if (!transactionId) {
-                return requiredFieldMissingResponse(
-                    ResponseMessage.TRANSACTION_ID_MISSING,
-                )
+                return requiredFieldMissingResponse('transactionId')
             }
 
             if (!checkIfIdIsValid(transactionId)) {
-                return invalidIdResponse()
+                return invalidIdResponse('transactionId')
             }
 
             // if (!userId) {
@@ -69,7 +67,7 @@ export class UpdateTransactionController
         } catch (error) {
             console.error(error)
             if (error instanceof TransactionNotFoundError) {
-                return transactionNotFoundResponse(error.message)
+                return notFoundResponse(error)
             }
             if (error instanceof ForbiddenError) {
                 return unauthorized(

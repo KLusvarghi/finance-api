@@ -3,12 +3,16 @@ import { ZodError } from 'zod'
 import {
     handleZodValidationError,
     invalidPasswordResponse,
+    notFoundResponse,
     ok,
     serverError,
-    userNotFoundResponse,
 } from '../_helpers'
 
-import { InvalidPasswordError, UserNotFoundError } from '@/errors'
+import {
+    InvalidPasswordError,
+    TokenGenerationError,
+    UserNotFoundError,
+} from '@/errors'
 import { loginSchema } from '@/schemas'
 import { HttpRequest, LoginUserService, ResponseMessage } from '@/shared'
 
@@ -37,11 +41,15 @@ export class LoginUserController {
             }
 
             if (error instanceof UserNotFoundError) {
-                return userNotFoundResponse(error.message)
+                return notFoundResponse(error)
             }
 
             if (error instanceof InvalidPasswordError) {
                 return invalidPasswordResponse()
+            }
+
+            if (error instanceof TokenGenerationError) {
+                return serverError(error.message, error.code)
             }
 
             return serverError()
