@@ -1,36 +1,42 @@
-import { IdGeneratorAdapter, PasswordHasherAdapter } from '@/adapters'
+import {
+    IdGeneratorAdapter,
+    PasswordHasherAdapter,
+    TokenGeneratorAdapter,
+} from '@/adapters'
 import { EmailAlreadyExistsError } from '@/errors'
 import {
     CreateUserParams,
     CreateUserRepository,
     GetUserByEmailRepository,
     Service,
+    TokenGeneratorAdapterResponse,
     UserPublicResponse,
 } from '@/shared'
 
 export class CreateUserService
-    implements Service<CreateUserParams, UserPublicResponse>
+    implements
+        Service<
+            CreateUserParams,
+            UserPublicResponse & { tokens: TokenGeneratorAdapterResponse }
+        >
 {
-    private createUserRepository: CreateUserRepository
-    private getUserByEmailRepository: GetUserByEmailRepository
-    private idGenerator: IdGeneratorAdapter
-    private passwordHasher: PasswordHasherAdapter
-
     constructor(
-        createUserRepository: CreateUserRepository,
-        getUserByEmailRepository: GetUserByEmailRepository,
-        idGenerator: IdGeneratorAdapter,
-        passwordHasher: PasswordHasherAdapter,
+        private readonly createUserRepository: CreateUserRepository,
+        private readonly getUserByEmailRepository: GetUserByEmailRepository,
+        private readonly idGenerator: IdGeneratorAdapter,
+        private readonly passwordHasher: PasswordHasherAdapter,
+        private readonly tokenGeneratorAdapter: TokenGeneratorAdapter,
     ) {
         this.createUserRepository = createUserRepository
         this.getUserByEmailRepository = getUserByEmailRepository
         this.idGenerator = idGenerator
         this.passwordHasher = passwordHasher
+        this.tokenGeneratorAdapter = tokenGeneratorAdapter
     }
 
     async execute(
         createUserParams: CreateUserParams,
-    ): Promise<UserPublicResponse> {
+    ): Promise<UserPublicResponse & { tokens: TokenGeneratorAdapterResponse }> {
         const userWithProviderEmail =
             await this.getUserByEmailRepository.execute(createUserParams.email)
 
@@ -53,10 +59,15 @@ export class CreateUserService
             // e colocando o password no final para ele sobrescrever o que está sendo desestruturado acima
             password: hashPassword,
         }
-
+        // eslint-disable-next-line
         const { password: _password, ...userWithoutPassword } =
             await this.createUserRepository.execute(user)
 
-        return userWithoutPassword
+        const tokens = await this.tokenGeneratorAdapter.execute(user.id)
+
+        return {
+            ...userWithoutPassword,
+            tokens,
+        }
     }
 }
