@@ -10,7 +10,7 @@ import { TransactionType } from '@prisma/client'
 // Ao invpes de chamar a rota, poderiamos chamar direto o Prisma, mas dessa forma chamando nossas rotas, conseguimos testar o fluxo completo, desde a requisição até a resposta
 
 describe('User Routes E2E Tests', () => {
-    describe('GET /api/users/:id', () => {
+    describe('GET /api/users/me', () => {
         it('should return 200 when user is found', async () => {
             const { body: createdUser } = await request(app)
                 .post(`/api/users`)
@@ -18,7 +18,7 @@ describe('User Routes E2E Tests', () => {
                 .expect(201)
 
             const { body: responseBody } = await request(app)
-                .get(`/api/users/${createdUser.data.id}`)
+                .get(`/api/users/me`)
                 .set(
                     'authorization',
                     `Bearer ${createdUser.data.tokens.accessToken}`,
@@ -30,7 +30,7 @@ describe('User Routes E2E Tests', () => {
         })
     })
 
-    describe('GET /api/users/:userId/balance', () => {
+    describe('GET /api/users/me/balance', () => {
         it('should return 200 when user balance is found', async () => {
             const { body: createdUser } = await request(app)
                 .post(`/api/users`)
@@ -82,7 +82,7 @@ describe('User Routes E2E Tests', () => {
                 })
 
             const { body: responseBody } = await request(app)
-                .get(`/api/users/${userData.id}/balance`)
+                .get(`/api/users/me/balance`)
                 .set(
                     'authorization',
                     `Bearer ${createdUser.data.tokens.accessToken}`,
@@ -161,7 +161,7 @@ describe('User Routes E2E Tests', () => {
         })
     })
 
-    describe('PATCH /api/users/:userId', () => {
+    describe('PATCH /api/users/me', () => {
         it('should return 200 when user is updated', async () => {
             const { body: createdUser } = await request(app)
                 .post(`/api/users`)
@@ -169,7 +169,7 @@ describe('User Routes E2E Tests', () => {
                 .expect(201)
 
             const { body: responseBody } = await request(app)
-                .patch(`/api/users/${createdUser.data.id}`)
+                .patch(`/api/users/me`)
                 .set(
                     'authorization',
                     `Bearer ${createdUser.data.tokens.accessToken}`,
@@ -183,7 +183,7 @@ describe('User Routes E2E Tests', () => {
         })
     })
 
-    describe('DELETE /api/users/:userId', () => {
+    describe('DELETE /api/users/me', () => {
         it('should return 200 when user is deleted', async () => {
             const { body: createdUser } = await request(app)
                 .post(`/api/users`)
@@ -191,7 +191,7 @@ describe('User Routes E2E Tests', () => {
                 .expect(201)
 
             const { body: responseBody } = await request(app)
-                .delete(`/api/users/${createdUser.data.id}`)
+                .delete(`/api/users/me`)
                 .set(
                     'authorization',
                     `Bearer ${createdUser.data.tokens.accessToken}`,
