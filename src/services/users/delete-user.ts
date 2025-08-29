@@ -14,7 +14,7 @@ export class DeleteUserService implements Service<string, UserPublicResponse> {
         if (!user) {
             throw new UserNotFoundError(userId)
         }
-
+        // eslint-disable-next-line
         const { password: _password, ...userWithoutPassword } = user
         return userWithoutPassword
     }

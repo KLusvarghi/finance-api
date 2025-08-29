@@ -76,7 +76,7 @@ export class UpdateUserService
         if (!updatedUser) {
             throw new UpdateUserFailedError()
         }
-
+        // eslint-disable-next-line
         const { password: _password, ...userWithoutPassword } = updatedUser
         return userWithoutPassword
     }
