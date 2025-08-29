@@ -37,12 +37,15 @@ export class LoginUserService {
         if (!isPasswordValid) {
             throw new InvalidPasswordError()
         }
+        // gerar os tokens JWT
+        const tokens = await this.tokenGeneratorAdapter.execute(user.id)
+
+        // TODO: validar se o token é gerado e o adapter não lança erro
 
         // retornar o token JWT
         return {
             ...user,
-            // gerar os tokens JWT
-            tokens: await this.tokenGeneratorAdapter.execute(user.id),
+            tokens,
         }
     }
 }
