@@ -3,10 +3,10 @@ import {
     createTransactionControllerResponse,
     createTransactionHttpRequest as baseHttpRequest,
     createTransactionParams as params,
-    invalidAmount,
-    invalidDate,
-    invalidType,
-    invalidUUID,
+    invalidAmountCases,
+    invalidDateCases,
+    invalidTypeCases,
+    invalidIdCases,
 } from '@/test'
 describe('CreateTransactionController', () => {
     let sut
@@ -58,7 +58,7 @@ describe('CreateTransactionController', () => {
                 expect(response.statusCode).toBe(400)
                 // expect(response.body?.message).toBe('User id is required')
             })
-            it.each(invalidUUID)(
+            it.each(invalidIdCases)(
                 'should return 400 if user_id is $description',
                 async ({ id }) => {
                     // arrange
@@ -126,7 +126,7 @@ describe('CreateTransactionController', () => {
                 })
                 expect(response.statusCode).toBe(400)
             })
-            it.each(invalidDate)(
+            it.each(invalidDateCases)(
                 'should return 400 if date is $description',
                 async ({ date }) => {
                     // arrange
@@ -158,7 +158,7 @@ describe('CreateTransactionController', () => {
                     'Type must be EARNING, EXPENSE or INVESTMENT',
                 )
             })
-            it.each(invalidType)(
+            it.each(invalidTypeCases)(
                 'should return 400 if type is $description',
                 async ({ type }) => {
                     // arrange
@@ -204,7 +204,7 @@ describe('CreateTransactionController', () => {
                     expect(response.body?.message).toBe('Amount is required')
                 },
             )
-            it.each(invalidAmount)(
+            it.each(invalidAmountCases)(
                 'should return 400 if amount is $description',
                 async ({ amount, expectedMessage }) => {
                     // arrange

@@ -1,5 +1,5 @@
 import { ResponseMessage, ResponseZodMessages } from '@/shared'
-export const invalidUUID = [
+export const invalidIdCases = [
     {
         description: 'too long',
         id: '12345678-1234-1234-1234-123456789012',
@@ -31,7 +31,7 @@ export const invalidUUID = [
     //     expectedMessage: ResponseMessage.,
     // },
 ]
-export const invalidDate = [
+export const invalidDateCases = [
     {
         description: 'common string format',
         date: '25/08/2024',
@@ -83,7 +83,7 @@ export const invalidDate = [
         expectedMessage: ResponseZodMessages.date.invalid,
     },
 ]
-export const invalidType = [
+export const invalidTypeCases = [
     {
         description: 'lowercase type',
         type: 'earning',
@@ -135,7 +135,7 @@ export const invalidType = [
         expectedMessage: ResponseZodMessages.type.invalid,
     },
 ]
-export const invalidAmount = [
+export const invalidAmountCases = [
     // {
     //     description: 'zero value',
     //     amount: 0,

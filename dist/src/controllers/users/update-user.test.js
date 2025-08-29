@@ -6,7 +6,7 @@ import {
 } from '@/errors'
 import { ResponseMessage } from '@/shared'
 import {
-    invalidUUID,
+    invalidIdCases,
     updateUserHttpRequest as baseHttpRequest,
     updateUserParams,
     updateUserRepositoryResponse,
@@ -114,7 +114,7 @@ describe('UpdateUserController', () => {
                     ResponseMessage.USER_ID_MISSING,
                 )
             })
-            it.each(invalidUUID)(
+            it.each(invalidIdCases)(
                 'should return 400 if userId is $description',
                 async ({ id, expectedMessage }) => {
                     // arrange

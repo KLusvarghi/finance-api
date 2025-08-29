@@ -1,10 +1,10 @@
 import { UpdateTransactionController } from '@/controllers'
 import { ResponseMessage, ResponseZodMessages } from '@/shared'
 import {
-    invalidAmount,
-    invalidDate,
-    invalidType,
-    invalidUUID,
+    invalidAmountCases,
+    invalidDateCases,
+    invalidTypeCases,
+    invalidIdCases,
     updateTransactionControllerResponse,
     updateTransactionHttpRequest as baseHttpRequest,
 } from '@/test'
@@ -57,7 +57,7 @@ describe('UpdateTransactionController', () => {
                 ResponseMessage.TRANSACTION_ID_MISSING,
             )
         })
-        it.each(invalidUUID)(
+        it.each(invalidIdCases)(
             'should return 400 if trnasactionId is $description',
             async ({ id }) => {
                 // act
@@ -117,7 +117,7 @@ describe('UpdateTransactionController', () => {
                 })
             })
             describe('date', () => {
-                it.each(invalidDate)(
+                it.each(invalidDateCases)(
                     'should return 400 if date is $description',
                     async ({ date }) => {
                         const response = await sut.execute({
@@ -135,7 +135,7 @@ describe('UpdateTransactionController', () => {
                 )
             })
             describe('type', () => {
-                it.each(invalidType)(
+                it.each(invalidTypeCases)(
                     'should return 400 if type is $description',
                     async ({ type }) => {
                         const response = await sut.execute({
@@ -153,7 +153,7 @@ describe('UpdateTransactionController', () => {
                 )
             })
             describe('amount', () => {
-                it.each(invalidAmount)(
+                it.each(invalidAmountCases)(
                     'should return 400 if amount is $description',
                     async ({ amount, expectedMessage }) => {
                         const response = await sut.execute({

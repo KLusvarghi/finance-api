@@ -4,7 +4,7 @@ import { ResponseMessage } from '@/shared'
 import {
     getUserByIdHttpRequest as baseHttpRequest,
     getUserByIdServiceResponse,
-    invalidUUID,
+    invalidIdCases,
     userId,
 } from '@/test'
 describe('GetUserByIdController', () => {
@@ -67,7 +67,7 @@ describe('GetUserByIdController', () => {
                     ResponseMessage.USER_ID_MISSING,
                 )
             })
-            it.each(invalidUUID)(
+            it.each(invalidIdCases)(
                 'should return 400 if userId is $description',
                 async ({ id, expectedMessage }) => {
                     // arrange
