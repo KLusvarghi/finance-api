@@ -1,10 +1,15 @@
 import { EmailAlreadyExistsError } from '@/errors'
 import { CreateUserService } from '@/services'
-import { CreateUserParams, UserRepositoryResponse } from '@/shared'
+import {
+    CreateUserParams,
+    TokenGeneratorAdapterResponse,
+    UserRepositoryResponse,
+} from '@/shared'
 import {
     createUserParams,
     createUserRepositoryResponse,
     createUserServiceResponse,
+    tokenGeneratorAdapterResponse,
 } from '@/test'
 
 describe('CreateUserService', () => {
@@ -13,7 +18,7 @@ describe('CreateUserService', () => {
     let getUserByEmailRepository: GetUserByEmailRepositoryStub
     let passwordHasherAdapter: PasswordHasherAdapterStub
     let idGeneratorAdapter: IdGeneratorAdapterStub
-
+    let tokenGeneratorAdapter: TokenGeneratorAdapterStub
     class CreateUserRepositoryStub {
         async execute(
             _params: CreateUserParams,
@@ -37,17 +42,24 @@ describe('CreateUserService', () => {
             return createUserServiceResponse.id
         }
     }
+    class TokenGeneratorAdapterStub {
+        async execute(_userId: string): Promise<TokenGeneratorAdapterResponse> {
+            return Promise.resolve(tokenGeneratorAdapterResponse)
+        }
+    }
 
     const makeSut = () => {
         const createUserRepository = new CreateUserRepositoryStub()
         const getUserByEmailRepository = new GetUserByEmailRepositoryStub()
         const passwordHasherAdapter = new PasswordHasherAdapterStub()
         const idGeneratorAdapter = new IdGeneratorAdapterStub()
+        const tokenGeneratorAdapter = new TokenGeneratorAdapterStub()
         const sut = new CreateUserService(
             createUserRepository,
             getUserByEmailRepository,
             idGeneratorAdapter,
             passwordHasherAdapter,
+            tokenGeneratorAdapter,
         )
         return {
             sut,
@@ -55,6 +67,7 @@ describe('CreateUserService', () => {
             getUserByEmailRepository,
             passwordHasherAdapter,
             idGeneratorAdapter,
+            tokenGeneratorAdapter,
         }
     }
 
@@ -65,12 +78,14 @@ describe('CreateUserService', () => {
             getUserByEmailRepository: getUserByEmailRepositoryStub,
             passwordHasherAdapter: passwordHasherAdapterStub,
             idGeneratorAdapter: idGeneratorAdapterStub,
+            tokenGeneratorAdapter: tokenGeneratorAdapterStub,
         } = makeSut()
         sut = service
         createUserRepository = createUserRepositoryStub
         getUserByEmailRepository = getUserByEmailRepositoryStub
         passwordHasherAdapter = passwordHasherAdapterStub
         idGeneratorAdapter = idGeneratorAdapterStub
+        tokenGeneratorAdapter = tokenGeneratorAdapterStub
     })
 
     afterEach(() => {
@@ -163,6 +178,19 @@ describe('CreateUserService', () => {
             // assert
             expect(promise).rejects.toThrow()
         })
+
+        it('should throw if TokenGeneratorAdapter throws', () => {
+            // arrange
+            jest.spyOn(tokenGeneratorAdapter, 'execute').mockRejectedValueOnce(
+                new Error(),
+            )
+
+            // act
+            const promise = sut.execute(createUserParams)
+
+            // assert
+            expect(promise).rejects.toThrow()
+        })
     })
 
     describe('success', () => {
@@ -172,7 +200,12 @@ describe('CreateUserService', () => {
 
             // assert
             expect(response).toBeTruthy()
-            expect(response).toEqual(createUserServiceResponse)
+            expect(response).toStrictEqual({
+                ...createUserServiceResponse,
+                tokens: tokenGeneratorAdapterResponse,
+            })
+            expect(response.tokens.accessToken).toBeDefined()
+            expect(response.tokens.refreshToken).toBeDefined()
         })
     })
 
