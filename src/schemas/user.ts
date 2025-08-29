@@ -42,7 +42,9 @@ export const updateUserSchema = createUserSchema.partial().strict()
 
 export const loginSchema = z.object({
     email: z
-
+        .string({
+            message: 'Email is required',
+        })
         .email({
             message: 'Please provide a valid email',
         })
