@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken'
  * Extends Express `Request` to ensure the `authorization` header
  * is recognised by the TypeScript compiler.
  */
-interface AuthenticatedRequest extends Request {
+export interface AuthenticatedRequest extends Request {
     headers: Request['headers'] & {
         authorization?: string
     }
@@ -19,16 +19,9 @@ export const auth = (
 ) => {
     try {
         // pego o token de acesso do header
-        const authHeader = req.headers.authorization
+        const accessToken = req.headers.authorization?.split('Bearer ')[1]
 
         // No header → 401
-        if (!authHeader) {
-            return res.status(401).send({ message: 'Unauthorized' })
-        }
-
-        const accessToken = authHeader.split(' ')[1]
-
-        // Empty token → 401
         if (!accessToken) {
             return res.status(401).send({ message: 'Unauthorized' })
         }
