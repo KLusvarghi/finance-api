@@ -5,6 +5,7 @@ export const ResponseMessage = {
     USER_DELETED: 'User deleted successfully',
     USER_NOT_FOUND: 'User not found',
     USER_ID_MISSING: 'User id is required',
+    USER_LOGIN_SUCCESS: 'User logged in successfully',
 
     // Transações
     TRANSACTION_CREATED: 'Transaction created successfully',
@@ -20,6 +21,7 @@ export const ResponseMessage = {
     SERVER_ERROR: 'Internal server error',
     BAD_REQUEST: 'Bad request',
     INVALID_ID: 'The provider id is not valid',
+    UNAUTHORIZED: 'Unauthorized',
 } as const
 
 // export type ResponseMessageKey = keyof typeof ResponseMessage
