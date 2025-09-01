@@ -1,10 +1,17 @@
 import { CreateUserController } from '@/controllers'
 import { EmailAlreadyExistsError } from '@/errors'
-import { CreateUserParams, UserPublicResponse } from '@/shared'
 import {
+    CreateUserParams,
+    ResponseZodMessages,
+    UserPublicResponse,
+} from '@/shared'
+import {
+    createInvalidNameCases,
     createUserControllerResponse,
     createUserHttpRequest as baseHttpRequest,
     createUserParams as params,
+    invalidEmailCases,
+    invalidPasswordCases,
 } from '@/test'
 
 describe('CreateUserController', () => {
@@ -67,110 +74,104 @@ describe('CreateUserController', () => {
 
     describe('validations', () => {
         describe('first_name', () => {
-            it('should return 400 if first_name is not provided', async () => {
-                // arrange
-                const response = await sut.execute({
-                    body: { ...params, first_name: undefined },
-                })
-
-                // assert
-                expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBeTruthy()
+            const invalidNameCases = createInvalidNameCases({
+                required: ResponseZodMessages.first_name.required,
+                minLength: ResponseZodMessages.first_name.minLength,
             })
+            it.each(invalidNameCases)(
+                'should return 400 if first_name is $description',
+                async ({ name, expectedMessage }) => {
+                    // arrange
 
-            it('should return 400 if first_name is too short', async () => {
-                // arrange
-                const response = await sut.execute({
-                    body: { ...params, first_name: 'A' },
-                })
+                    const response = await sut.execute({
+                        body: { ...params, first_name: name as string },
+                    })
 
-                // assert
-                expect(response.statusCode).toBe(400)
-            })
-        })
-
-        describe('last_name', () => {
-            it('should return 400 if last_name is not provided', async () => {
-                // arrange
-                const response = await sut.execute({
-                    body: { ...params, last_name: undefined },
-                })
-
-                // assert
-                expect(response.statusCode).toBe(400)
-            })
-        })
-
-        describe('email', () => {
-            it('should return 400 if email is not provided', async () => {
-                // arrange
-                const response = await sut.execute({
-                    body: { ...params, email: undefined },
-                })
-
-                // assert
-                expect(response.statusCode).toBe(400)
-            })
-
-            it('should return 400 if email is invalid', async () => {
-                // arrange
-                const response = await sut.execute({
-                    body: { ...params, email: 'invalid' },
-                })
-
-                // assert
-                expect(response.statusCode).toBe(400)
-            })
-        })
-
-        describe('password', () => {
-            it('should return 400 if password is not provided', async () => {
-                // arrange
-                const response = await sut.execute({
-                    body: { ...params, password: undefined },
-                })
-
-                // assert
-                expect(response.statusCode).toBe(400)
-            })
-
-            it('should return 400 if password is less than 6 characters', async () => {
-                // arrange
-                const response = await sut.execute({
-                    body: {
-                        ...params,
-                        password: '12345', // Less than 6 characters
-                    },
-                })
-
-                // assert
-                expect(response.statusCode).toBe(400)
-            })
-        })
-    })
-
-    describe('success cases', () => {
-        it('should create a new user successfully and return 201', async () => {
-            // arrange
-            const response = await sut.execute(baseHttpRequest)
-
-            // assert
-            expect(response.statusCode).toBe(201)
-            expect(response.body?.data).toMatchObject(
-                createUserControllerResponse,
+                    // assert
+                    expect(response.statusCode).toBe(400)
+                    expect(response.body?.message).toBe(expectedMessage)
+                },
             )
         })
 
-        it('should call CreateUserService with correct parameters', async () => {
-            // arrange
-            const spy = jest.spyOn(createUserService, 'execute')
+        describe('last_name', () => {
+            const invalidNameCases = createInvalidNameCases({
+                required: ResponseZodMessages.last_name.required,
+                minLength: ResponseZodMessages.last_name.minLength,
+            })
+            it.each(invalidNameCases)(
+                'should return 400 if last_name is $description',
+                async ({ name, expectedMessage }) => {
+                    // arrange
 
-            // act
-            await sut.execute(baseHttpRequest)
+                    const response = await sut.execute({
+                        body: { ...params, last_name: name as string },
+                    })
 
-            // assert
-            expect(spy).toHaveBeenCalledWith(baseHttpRequest.body)
-            expect(spy).toHaveBeenCalledTimes(1)
+                    // assert
+                    expect(response.statusCode).toBe(400)
+                    expect(response.body?.message).toBe(expectedMessage)
+                },
+            )
+        })
+
+        describe('email', () => {
+            it.each(invalidEmailCases)(
+                'should return 400 if email is $description',
+                async ({ email, expectedMessage }) => {
+                    // arrange
+
+                    const response = await sut.execute({
+                        body: { ...params, email: email as string },
+                    })
+
+                    // assert
+                    expect(response.statusCode).toBe(400)
+                    expect(response.body?.message).toBe(expectedMessage)
+                },
+            )
+        })
+
+        describe('password', () => {
+            it.each(invalidPasswordCases)(
+                'should return 400 if password is $description',
+                async ({ password, expectedMessage }) => {
+                    // arrange
+
+                    const response = await sut.execute({
+                        body: { ...params, password: password as string },
+                    })
+
+                    // assert
+                    expect(response.statusCode).toBe(400)
+                    expect(response.body?.message).toBe(expectedMessage)
+                },
+            )
+        })
+
+        describe('success cases', () => {
+            it('should create a new user successfully and return 201', async () => {
+                // arrange
+                const response = await sut.execute(baseHttpRequest)
+
+                // assert
+                expect(response.statusCode).toBe(201)
+                expect(response.body?.data).toMatchObject(
+                    createUserControllerResponse,
+                )
+            })
+
+            it('should call CreateUserService with correct parameters', async () => {
+                // arrange
+                const spy = jest.spyOn(createUserService, 'execute')
+
+                // act
+                await sut.execute(baseHttpRequest)
+
+                // assert
+                expect(spy).toHaveBeenCalledWith(baseHttpRequest.body)
+                expect(spy).toHaveBeenCalledTimes(1)
+            })
         })
     })
 })

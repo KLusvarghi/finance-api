@@ -112,7 +112,7 @@ describe('LoginUserController', () => {
                     // arrange
                     const response = await sut.execute({
                         body: {
-                            email,
+                            email: email as string,
                             password: baseHttpRequest.body.password,
                         },
                     })
@@ -132,7 +132,7 @@ describe('LoginUserController', () => {
                     const response = await sut.execute({
                         body: {
                             email: baseHttpRequest.body.email,
-                            password,
+                            password: password as string,
                         },
                     })
 

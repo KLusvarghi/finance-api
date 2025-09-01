@@ -4,13 +4,8 @@ import {
     UpdateUserFailedError,
     UserNotFoundError,
 } from '@/errors'
+import { UpdateUserParams, UserRepositoryResponse } from '@/shared'
 import {
-    ResponseMessage,
-    UpdateUserParams,
-    UserRepositoryResponse,
-} from '@/shared'
-import {
-    createInvalidIdCases,
     updateUserHttpRequest as baseHttpRequest,
     updateUserParams,
     updateUserRepositoryResponse,
@@ -80,7 +75,7 @@ describe('UpdateUserController', () => {
 
         it('should return 404 when UpdateUserService throws UserNotFoundError', async () => {
             jest.spyOn(updateUserService, 'execute').mockRejectedValueOnce(
-                new UserNotFoundError(baseHttpRequest.params.userId),
+                new UserNotFoundError(baseHttpRequest.headers.userId),
             )
 
             const response = await sut.execute(baseHttpRequest)
@@ -88,7 +83,7 @@ describe('UpdateUserController', () => {
             expect(response.statusCode).toBe(404)
             expect(response.body?.message).toBeTruthy()
             expect(response.body?.message).toContain(
-                baseHttpRequest.params.userId,
+                baseHttpRequest.headers.userId,
             )
         })
 
@@ -108,7 +103,7 @@ describe('UpdateUserController', () => {
         describe('email', () => {
             it('should return 400 when invalid email is provided', async () => {
                 const response = await sut.execute({
-                    params: { userId: userId },
+                    headers: { userId: userId },
                     body: { ...updateUserParams, email: 'invalid_email' },
                 })
 
@@ -120,7 +115,7 @@ describe('UpdateUserController', () => {
         describe('password', () => {
             it('should return 400 when invalid password is provided', async () => {
                 const response = await sut.execute({
-                    params: { userId: userId },
+                    headers: { userId: userId },
                     body: {
                         ...updateUserParams,
                         password: '12345', // Less than 6 characters
@@ -132,36 +127,14 @@ describe('UpdateUserController', () => {
             })
         })
 
-        describe('userId', () => {
-            const invalidIdCases = createInvalidIdCases({
-                missing: ResponseMessage.USER_ID_MISSING,
-                invalid: ResponseMessage.USER_INVALID_ID,
-            })
-
-            it.each(invalidIdCases)(
-                'should return 400 if userId is $description',
-                async ({ id, expectedMessage }) => {
-                    // arrange
-                    const response = await sut.execute({
-                        params: { userId: id },
-                        body: updateUserParams,
-                    })
-
-                    // assert
-                    expect(response.statusCode).toBe(400)
-                    expect(response.body?.message).toBe(expectedMessage)
-                },
-            )
-        })
-
         describe('disallowed fields', () => {
             it('should return 400 when disallowed field is provided', async () => {
                 const response = await sut.execute({
-                    params: { userId: userId },
+                    headers: { userId: userId },
                     body: {
                         ...updateUserParams,
                         disallowed_field: 'disallowed_field',
-                    },
+                    } as UpdateUserParams,
                 })
 
                 expect(response.statusCode).toBe(400)
@@ -188,7 +161,7 @@ describe('UpdateUserController', () => {
 
             // assert
             expect(spy).toHaveBeenCalledWith(
-                baseHttpRequest.params.userId,
+                baseHttpRequest.headers.userId,
                 baseHttpRequest.body,
             )
             expect(spy).toHaveBeenCalledTimes(1)

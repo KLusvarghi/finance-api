@@ -1,8 +1,7 @@
 import { GetUserByIdController } from '@/controllers'
 import { UserNotFoundError } from '@/errors'
-import { ResponseMessage, UserPublicResponse } from '@/shared'
+import { UserPublicResponse } from '@/shared'
 import {
-    createInvalidIdCases,
     getUserByIdHttpRequest as baseHttpRequest,
     getUserByIdServiceResponse,
     userId,
@@ -68,32 +67,11 @@ describe('GetUserByIdController', () => {
         })
     })
 
-    describe('validations', () => {
-        describe('userId', () => {
-            const invalidIdCases = createInvalidIdCases({
-                missing: ResponseMessage.USER_ID_MISSING,
-                invalid: ResponseMessage.USER_INVALID_ID,
-            })
-
-            it.each(invalidIdCases)(
-                'should return 400 if userId is $description',
-                async ({ id, expectedMessage }) => {
-                    // arrange
-                    const response = await sut.execute({
-                        params: { userId: id },
-                    })
-
-                    // assert
-                    expect(response.statusCode).toBe(400)
-                    expect(response.body?.message).toBe(expectedMessage)
-                },
-            )
-        })
-    })
-
     describe('success cases', () => {
         it('should return 200 if user is found successfully', async () => {
-            const response = await sut.execute(baseHttpRequest)
+            const response = await sut.execute({
+                headers: { userId },
+            })
 
             expect(response.statusCode).toBe(200)
             expect(response.body?.message).toBeTruthy()
@@ -113,7 +91,7 @@ describe('GetUserByIdController', () => {
             await sut.execute(baseHttpRequest)
 
             // assert
-            expect(spy).toHaveBeenCalledWith(baseHttpRequest.params.userId)
+            expect(spy).toHaveBeenCalledWith(baseHttpRequest.headers.userId)
             expect(spy).toHaveBeenCalledTimes(1)
         })
     })

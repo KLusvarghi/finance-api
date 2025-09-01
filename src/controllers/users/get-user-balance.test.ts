@@ -1,8 +1,7 @@
 import { GetUserBalanceController } from '@/controllers'
 import { UserNotFoundError } from '@/errors'
-import { ResponseMessage, UserBalanceRepositoryResponse } from '@/shared'
+import { UserBalanceRepositoryResponse } from '@/shared'
 import {
-    createInvalidIdCases,
     getUserBalanceHttpRequest as baseHttpRequest,
     userBalanceResponse,
     userId,
@@ -63,28 +62,6 @@ describe('GetUserBalanceController', () => {
         })
     })
 
-    describe('validations', () => {
-        describe('userId', () => {
-            const invalidIdCases = createInvalidIdCases({
-                missing: ResponseMessage.USER_ID_MISSING,
-                invalid: ResponseMessage.USER_INVALID_ID,
-            })
-            it.each(invalidIdCases)(
-                'should return 400 if userId is $description',
-                async ({ id, expectedMessage }) => {
-                    // arrange
-                    const response = await sut.execute({
-                        params: { userId: id },
-                    })
-
-                    // assert
-                    expect(response.statusCode).toBe(400)
-                    expect(response.body?.message).toBe(expectedMessage)
-                },
-            )
-        })
-    })
-
     describe('success cases', () => {
         it('should return 200 when getting user balance successfully', async () => {
             const response = await sut.execute(baseHttpRequest)
@@ -110,7 +87,7 @@ describe('GetUserBalanceController', () => {
             await sut.execute(baseHttpRequest)
 
             // assert
-            expect(spy).toHaveBeenCalledWith(baseHttpRequest.params.userId)
+            expect(spy).toHaveBeenCalledWith(baseHttpRequest.headers.userId)
             expect(spy).toHaveBeenCalledTimes(1)
         })
     })
