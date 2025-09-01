@@ -9,7 +9,6 @@ import {
     ok,
     requiredFieldMissingResponse,
     serverError,
-    unauthorized,
 } from '../_helpers'
 
 import { ForbiddenError, TransactionNotFoundError } from '@/errors'
@@ -55,6 +54,10 @@ export class UpdateTransactionController
                 return invalidIdResponse('transactionId')
             }
 
+            if (!userId) {
+                return requiredFieldMissingResponse('userId')
+            }
+
             const validatedParams = await updateTransactionSchema.parseAsync(
                 httpRequest.body,
             )
@@ -76,11 +79,11 @@ export class UpdateTransactionController
             if (error instanceof TransactionNotFoundError) {
                 return notFoundResponse(error)
             }
-            if (error instanceof ForbiddenError) {
-                return unauthorized(
-                    'You do not have permission to update this transaction',
-                )
-            }
+            // if (error instanceof ForbiddenError) {
+            //     return unauthorized(
+            //         'You do not have permission to update this transaction',
+            //     )
+            // }
             if (error instanceof ZodError) {
                 return handleZodValidationError(error)
             }
