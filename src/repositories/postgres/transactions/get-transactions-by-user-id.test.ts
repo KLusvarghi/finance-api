@@ -24,7 +24,7 @@ describe('PostgresGetTransactionsByUserIdRepository', () => {
         it('should get transactions by user id on database', async () => {
             const user = await createTestUser()
             const transaction = await createTestTransaction({
-                user_id: user.id,
+                userId: user.id,
             })
 
             const response = await sut.execute(user.id)
@@ -33,7 +33,7 @@ describe('PostgresGetTransactionsByUserIdRepository', () => {
             expect(response?.[0]).not.toBeNull()
             expect(response?.[0].name).toBe(transaction.name)
             expect(response?.[0].type).toBe(transaction.type)
-            expect(response?.[0].user_id).toBe(user.id)
+            expect(response?.[0].userId).toBe(user.id)
             expect(String(response?.[0].amount)).toBe(
                 String(transaction.amount),
             )
@@ -52,9 +52,6 @@ describe('PostgresGetTransactionsByUserIdRepository', () => {
         it('should call Prisma with correct params', async () => {
             // arrange
             const user = await createTestUser()
-            const transaction = await createTestTransaction({
-                user_id: user.id,
-            })
 
             const prismaSpy = jest.spyOn(prisma.transaction, 'findMany')
 
@@ -64,7 +61,7 @@ describe('PostgresGetTransactionsByUserIdRepository', () => {
             // assert
             expect(prismaSpy).toHaveBeenCalledWith({
                 where: {
-                    user_id: user.id,
+                    userId: user.id,
                 },
             })
         })

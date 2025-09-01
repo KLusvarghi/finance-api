@@ -48,7 +48,6 @@ describe('PostgresUpdateTransactionRepository', () => {
         it('should update a transaction on database successfully', async () => {
             const user = await createTestUser()
             const transaction = await createTestTransaction({
-                user_id: user.id,
                 ...params,
                 amount: new Decimal(params.amount),
                 date: new Date(params.date),
@@ -58,7 +57,7 @@ describe('PostgresUpdateTransactionRepository', () => {
 
             expect(response?.name).toBe(transaction.name)
             expect(response?.type).toBe(transaction.type)
-            expect(response?.user_id).toBe(user.id)
+            expect(response?.userId).toBe(user.id)
             expect(String(response?.amount)).toBe(String(transaction.amount))
             expect(dayjs(response?.date).daysInMonth()).toBe(
                 dayjs(transaction.date).daysInMonth(),
@@ -76,7 +75,7 @@ describe('PostgresUpdateTransactionRepository', () => {
             // arrange
             const user = await createTestUser()
             const transaction = await createTestTransaction({
-                user_id: user.id,
+                userId: user.id,
             })
 
             const prismaSpy = jest.spyOn(prisma.transaction, 'update')

@@ -47,7 +47,7 @@ describe('PostgresDeleteTransactionRepository', () => {
             // arrange
             const user = await createTestUser()
             const transaction = await createTestTransaction({
-                user_id: user.id,
+                userId: user.id,
             })
 
             // act
@@ -57,7 +57,7 @@ describe('PostgresDeleteTransactionRepository', () => {
             expect(response).not.toBeNull()
             expect(response?.name).toBe(transaction.name)
             expect(response?.type).toBe(transaction.type)
-            expect(response?.user_id).toBe(transaction.user_id)
+            expect(response?.userId).toBe(transaction.userId)
             expect(String(response?.amount)).toBe(String(transaction.amount))
             expect(dayjs(response?.date).daysInMonth()).toBe(
                 dayjs(transaction.date).daysInMonth(),
@@ -76,7 +76,7 @@ describe('PostgresDeleteTransactionRepository', () => {
             // arrange
             const user = await createTestUser()
             const transaction = await createTestTransaction({
-                user_id: user.id,
+                userId: user.id,
             })
 
             const prismaSpy = jest.spyOn(prisma.transaction, 'delete')

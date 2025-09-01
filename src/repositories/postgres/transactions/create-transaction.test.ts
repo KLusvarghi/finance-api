@@ -35,14 +35,14 @@ describe('PostgresCreateTransactionRepository', () => {
 
             const response = await sut.execute({
                 ...createTransactionParams,
-                user_id: user.id,
+                userId: user.id,
                 id: transactionId,
             })
 
             expect(response).not.toBeNull()
             expect(response.name).toBe(createTransactionParams.name)
             expect(response.type).toBe(createTransactionParams.type)
-            expect(response.user_id).toBe(user.id)
+            expect(response.userId).toBe(user.id)
             expect(String(response.amount)).toBe(
                 String(createTransactionParams.amount),
             )
@@ -65,13 +65,13 @@ describe('PostgresCreateTransactionRepository', () => {
             const prismaSpy = jest.spyOn(prisma.transaction, 'create')
             await sut.execute({
                 ...createTransactionParams,
-                user_id: user.id,
+                userId: user.id,
                 id: transactionId,
             })
             expect(prismaSpy).toHaveBeenCalledWith({
                 data: {
                     ...createTransactionParams,
-                    user_id: user.id,
+                    userId: user.id,
                     id: transactionId,
                 },
             })
