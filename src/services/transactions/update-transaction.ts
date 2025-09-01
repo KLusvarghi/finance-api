@@ -1,17 +1,17 @@
-import { TransactionNotFoundError } from '@/errors'
+import { ForbiddenError, TransactionNotFoundError } from '@/errors'
 import {
     GetTransactionByIdRepository,
     ServiceWithMultipleParams,
     TransactionPublicResponse,
-    UpdateTransactionParams,
     UpdateTransactionRepository,
+    UpdateTransactionServiceParams,
 } from '@/shared'
 
 export class UpdateTransactionService
     implements
         ServiceWithMultipleParams<
             string,
-            UpdateTransactionParams,
+            UpdateTransactionServiceParams,
             TransactionPublicResponse
         >
 {
@@ -28,7 +28,7 @@ export class UpdateTransactionService
 
     async execute(
         transactionId: string,
-        params: UpdateTransactionParams,
+        params: UpdateTransactionServiceParams,
     ): Promise<TransactionPublicResponse> {
         const transaction =
             await this.getTransactionByIdRepository.execute(transactionId)
@@ -37,17 +37,17 @@ export class UpdateTransactionService
             throw new TransactionNotFoundError(transactionId)
         }
 
-        // if (params.userId && transaction.user_id !== params.userId) {
-        //     throw new ForbiddenError()
-        // }
-
-        // const { user_id, ...updateParams } = params
+        if (transaction.userId !== params.userId) {
+            throw new ForbiddenError()
+        }
 
         const updatedTransaction =
-            await this.updateTransactionRepository.execute(
-                transactionId,
-                params,
-            )
+            await this.updateTransactionRepository.execute(transactionId, {
+                name: params.name,
+                amount: params.amount,
+                date: params.date,
+                type: params.type,
+            })
 
         if (!updatedTransaction) {
             throw new TransactionNotFoundError(transactionId)
@@ -56,7 +56,7 @@ export class UpdateTransactionService
         // Convert to public response
         return {
             id: updatedTransaction.id,
-            user_id: updatedTransaction.user_id,
+            userId: updatedTransaction.userId,
             name: updatedTransaction.name,
             amount: updatedTransaction.amount,
             date: updatedTransaction.date,

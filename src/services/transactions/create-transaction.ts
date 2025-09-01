@@ -1,14 +1,15 @@
 import { IdGeneratorAdapter } from '@/adapters'
 import { UserNotFoundError } from '@/errors'
 import {
-    CreateTransactionParams,
+    CreateTransactionServiceParams,
     Service,
     TransactionPublicResponse,
 } from '@/shared'
 import { CreateTransactionRepository, GetUserByIdRepository } from '@/shared'
 
 export class CreateTransactionService
-    implements Service<CreateTransactionParams, TransactionPublicResponse>
+    implements
+        Service<CreateTransactionServiceParams, TransactionPublicResponse>
 {
     private createTransactionRepository: CreateTransactionRepository
     private getUserByIdRepository: GetUserByIdRepository
@@ -25,12 +26,12 @@ export class CreateTransactionService
     }
 
     async execute(
-        params: CreateTransactionParams,
+        params: CreateTransactionServiceParams,
     ): Promise<TransactionPublicResponse> {
-        const user = await this.getUserByIdRepository.execute(params.user_id)
+        const user = await this.getUserByIdRepository.execute(params.userId)
 
         if (!user) {
-            throw new UserNotFoundError(params.user_id)
+            throw new UserNotFoundError(params.userId)
         }
 
         const transactionId = this.idGenerator.execute()

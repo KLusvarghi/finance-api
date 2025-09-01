@@ -1,6 +1,7 @@
-import { TransactionNotFoundError } from '@/errors'
+import { ForbiddenError, TransactionNotFoundError } from '@/errors'
 import {
     DeleteTransactionRepository,
+    DeleteTransactionServiceParams,
     GetTransactionByUserIdRepository,
     ServiceWithMultipleParams,
     TransactionPublicResponse,
@@ -8,7 +9,11 @@ import {
 
 export class DeleteTransactionService
     implements
-        ServiceWithMultipleParams<string, unknown, TransactionPublicResponse>
+        ServiceWithMultipleParams<
+            DeleteTransactionServiceParams,
+            unknown,
+            TransactionPublicResponse
+        >
 {
     private deleteTransactionRepository: DeleteTransactionRepository
     private getTransactionByIdRepository: GetTransactionByUserIdRepository
@@ -21,10 +26,10 @@ export class DeleteTransactionService
         this.getTransactionByIdRepository = getTransactionByIdRepository
     }
 
-    async execute(
-        transactionId: string,
-        // userId: string,
-    ): Promise<TransactionPublicResponse> {
+    async execute({
+        transactionId,
+        userId,
+    }: DeleteTransactionServiceParams): Promise<TransactionPublicResponse> {
         const transaction =
             await this.getTransactionByIdRepository.execute(transactionId)
 
@@ -32,9 +37,9 @@ export class DeleteTransactionService
             throw new TransactionNotFoundError(transactionId)
         }
 
-        // if (transaction.user_id !== userId) {
-        //     throw new ForbiddenError()
-        // }
+        if (transaction.userId !== userId) {
+            throw new ForbiddenError()
+        }
 
         const deletedTransaction =
             await this.deleteTransactionRepository.execute(transactionId)
@@ -42,15 +47,6 @@ export class DeleteTransactionService
         if (!deletedTransaction) {
             throw new TransactionNotFoundError(transactionId)
         }
-
-        // Convert to public response
-        return {
-            id: deletedTransaction.id,
-            user_id: deletedTransaction.user_id,
-            name: deletedTransaction.name,
-            amount: deletedTransaction.amount,
-            date: deletedTransaction.date,
-            type: deletedTransaction.type,
-        }
+        return deletedTransaction
     }
 }
