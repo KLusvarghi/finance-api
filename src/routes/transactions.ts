@@ -6,42 +6,73 @@ import {
     makeGetTransactionsByUserIdController,
     makeUpdateTransactionController,
 } from '@/factories/controllers'
+import { auth, AuthenticatedRequest } from '@/middlewares/auth'
 
 export const transactionsRouter = Router()
 
-transactionsRouter.get('/', async (request, response) => {
+// Rota para buscar todas as transações do usuário logado
+transactionsRouter.get('/me', auth, async (req: AuthenticatedRequest, res) => {
     const getTransactionsByUserIdController =
         makeGetTransactionsByUserIdController()
 
     const { statusCode, body } =
-        await getTransactionsByUserIdController.execute(request)
+        await getTransactionsByUserIdController.execute({
+            ...req,
+            headers: {
+                userId: req.userId as string,
+            },
+        })
 
-    response.status(statusCode).send(body)
+    res.status(statusCode).send(body)
 })
 
-transactionsRouter.post('/', async (request, response) => {
+// Rota para criar uma nova transação
+transactionsRouter.post('/me', auth, async (req: AuthenticatedRequest, res) => {
     const createTransactionController = makeCreateTransactionController()
 
-    const { statusCode, body } =
-        await createTransactionController.execute(request)
+    const { statusCode, body } = await createTransactionController.execute({
+        ...req,
+        headers: { userId: req.userId as string },
+    })
 
-    response.status(statusCode).send(body)
+    res.status(statusCode).send(body)
 })
 
-transactionsRouter.patch('/:transactionId', async (request, response) => {
-    const updateTransactionsController = makeUpdateTransactionController()
+// Rota para atualizar uma transação
+transactionsRouter.patch(
+    '/:transactionId',
+    auth,
+    async (req: AuthenticatedRequest, res) => {
+        const updateTransactionsController = makeUpdateTransactionController()
 
-    const { statusCode, body } =
-        await updateTransactionsController.execute(request)
+        const { statusCode, body } = await updateTransactionsController.execute(
+            {
+                body: req.body,
+                params: { transactionId: req.params.transactionId as string },
+                headers: { userId: req.userId as string },
+            },
+        )
 
-    response.status(statusCode).send(body)
-})
+        res.status(statusCode).send(body)
+    },
+)
 
-transactionsRouter.delete('/:transactionId', async (request, response) => {
-    const deleteTransactionsController = makeDeleteTransactionController()
+// Rota para deletar uma transação
+transactionsRouter.delete(
+    '/:transactionId',
+    auth,
+    async (req: AuthenticatedRequest, res) => {
+        const deleteTransactionsController = makeDeleteTransactionController()
 
-    const { statusCode, body } =
-        await deleteTransactionsController.execute(request)
+        const { statusCode, body } = await deleteTransactionsController.execute(
+            {
+                params: {
+                    transactionId: req.params.transactionId,
+                },
+                headers: { userId: req.userId as string },
+            },
+        )
 
-    response.status(statusCode).send(body)
-})
+        res.status(statusCode).send(body)
+    },
+)
