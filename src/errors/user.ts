@@ -9,6 +9,12 @@ export class EmailAlreadyExistsError extends AppError {
     }
 }
 
+export class LoginFailedError extends AppError {
+    constructor() {
+        super(`Password or email is incorrect`, ErrorCode.LOGIN_FAILED)
+    }
+}
+
 export class UserNotFoundError extends AppError {
     constructor(userId: string) {
         super(`User with id ${userId} not found`, ErrorCode.USER_NOT_FOUND)
