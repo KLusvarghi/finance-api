@@ -10,35 +10,35 @@ import {
 
 import { ForbiddenError, TransactionNotFoundError } from '@/errors'
 import {
-    Controller,
+    DeleteTransactionParams,
     DeleteTransactionRequest,
     DeleteTransactionService,
-    HttpRequest,
+    DeleteTransactionServiceParams,
     HttpResponse,
+    ParamsHeadersController,
     ResponseMessage,
     TransactionPublicResponse,
+    UserIdRequestParams,
 } from '@/shared'
 
 export class DeleteTransactionController
-    implements Controller<DeleteTransactionRequest, TransactionPublicResponse>
+    implements
+        ParamsHeadersController<
+            DeleteTransactionParams,
+            UserIdRequestParams,
+            TransactionPublicResponse
+        >
 {
-    private deleteTransactionService: DeleteTransactionService
-
-    constructor(deleteTransactionService: DeleteTransactionService) {
-        this.deleteTransactionService = deleteTransactionService
-    }
+    constructor(
+        private readonly deleteTransactionService: DeleteTransactionService,
+    ) {}
 
     async execute(
-        httpRequest: HttpRequest,
+        httpRequest: DeleteTransactionRequest,
     ): Promise<HttpResponse<TransactionPublicResponse>> {
         try {
-            const transactionId = (
-                httpRequest.params as { transactionId: string }
-            ).transactionId
-            // const { transactionId, userId } = httpRequest.params as {
-            //     transactionId: string
-            //     userId: string
-            // }
+            const { transactionId } = httpRequest.params
+            const { userId } = httpRequest.headers
 
             if (!transactionId) {
                 return requiredFieldMissingResponse('transactionId')
@@ -48,15 +48,13 @@ export class DeleteTransactionController
                 return invalidIdResponse('transactionId')
             }
 
-            // if (!userId) {
-            //     return unauthorized('User ID is required')
-            // }
+            const serviceParams: DeleteTransactionServiceParams = {
+                transactionId,
+                userId,
+            }
 
             const deletedTransaction: TransactionPublicResponse =
-                await this.deleteTransactionService.execute(
-                    transactionId,
-                    // userId,
-                )
+                await this.deleteTransactionService.execute(serviceParams)
 
             return ok(deletedTransaction, ResponseMessage.TRANSACTION_DELETED)
         } catch (error) {

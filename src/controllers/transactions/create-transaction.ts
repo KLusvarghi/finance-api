@@ -4,37 +4,49 @@ import { created, handleZodValidationError, serverError } from '../_helpers'
 
 import { createTransactionSchema } from '@/schemas'
 import {
-    Controller,
+    BodyHeadersController,
+    CreateTransactionParams,
     CreateTransactionRequest,
     CreateTransactionService,
-    HttpRequest,
+    CreateTransactionServiceParams,
     HttpResponse,
     ResponseMessage,
     TransactionPublicResponse,
+    UserIdRequestParams,
 } from '@/shared'
 
 export class CreateTransactionController
-    implements Controller<CreateTransactionRequest, TransactionPublicResponse>
+    implements
+        BodyHeadersController<
+            CreateTransactionParams,
+            UserIdRequestParams,
+            TransactionPublicResponse
+        >
 {
-    private createTransactionService: CreateTransactionService
-
-    constructor(createTransactionService: CreateTransactionService) {
-        this.createTransactionService = createTransactionService
-    }
+    constructor(
+        private readonly createTransactionService: CreateTransactionService,
+    ) {}
 
     async execute(
-        httpRequest: HttpRequest,
+        httpRequest: CreateTransactionRequest,
     ): Promise<HttpResponse<TransactionPublicResponse>> {
         try {
-            const params = httpRequest.body
+            const createTransactionParams = httpRequest.body
+            const { userId } = httpRequest.headers
 
             // usando o "safeParseAsync" é uma forma de tratar os erros de forma mais segura e eveitar que de um throw e caia no catch e consigamos tratar o erro aqui ainda
             // await createTransactionSchema.safeParseAsync(params)
-            const validatedParams =
-                await createTransactionSchema.parseAsync(params)
+            const validatedParams = await createTransactionSchema.parseAsync(
+                createTransactionParams,
+            )
+
+            const serviceParams: CreateTransactionServiceParams = {
+                ...validatedParams,
+                userId,
+            }
 
             const createdTransaction =
-                await this.createTransactionService.execute(validatedParams)
+                await this.createTransactionService.execute(serviceParams)
 
             return created(
                 createdTransaction,

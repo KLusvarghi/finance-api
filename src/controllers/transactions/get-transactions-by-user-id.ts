@@ -1,46 +1,29 @@
-import {
-    checkIfIdIsValid,
-    invalidIdResponse,
-    notFoundResponse,
-    ok,
-    requiredFieldMissingResponse,
-    serverError,
-} from '../_helpers'
+import { notFoundResponse, ok, serverError } from '../_helpers'
 
 import { UserNotFoundError } from '@/errors'
 import {
-    Controller,
     GetTransactionsByUserIdRequest,
     GetTransactionsByUserIdService,
-    HttpRequest,
+    HeadersController,
     HttpResponse,
     TransactionPublicResponse,
+    UserIdRequestParams,
 } from '@/shared'
 
 export class GetTransactionsByUserIdController
     implements
-        Controller<GetTransactionsByUserIdRequest, TransactionPublicResponse[]>
+        HeadersController<UserIdRequestParams, TransactionPublicResponse[]>
 {
-    private getTransactionByUserIdService: GetTransactionsByUserIdService
-
-    constructor(getTransactionByUserIdService: GetTransactionsByUserIdService) {
-        this.getTransactionByUserIdService = getTransactionByUserIdService
-    }
+    constructor(
+        private readonly getTransactionByUserIdService: GetTransactionsByUserIdService,
+    ) {}
 
     async execute(
-        httpRequest: HttpRequest,
+        httpRequest: GetTransactionsByUserIdRequest,
     ): Promise<HttpResponse<TransactionPublicResponse[]>> {
         try {
             // para que possamos pegar um valor que é passsado por uma query na url e não como um parametro no body, fazemos assim:
-            const userId = (httpRequest.query as { userId: string }).userId
-
-            if (!userId) {
-                return requiredFieldMissingResponse('userId')
-            }
-
-            if (!checkIfIdIsValid(userId)) {
-                return invalidIdResponse('userId')
-            }
+            const { userId } = httpRequest.headers
 
             const transactions =
                 await this.getTransactionByUserIdService.execute(userId)

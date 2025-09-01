@@ -2,6 +2,7 @@ import { ZodError } from 'zod'
 
 import {
     checkIfIdIsValid,
+    forbidden,
     handleZodValidationError,
     invalidIdResponse,
     notFoundResponse,
@@ -14,32 +15,37 @@ import {
 import { ForbiddenError, TransactionNotFoundError } from '@/errors'
 import { updateTransactionSchema } from '@/schemas'
 import {
-    Controller,
-    HttpRequest,
+    BodyParamsHeadersController,
     HttpResponse,
     ResponseMessage,
+    TransactionIdRequestParams,
     TransactionPublicResponse,
     UpdateTransactionParams,
     UpdateTransactionRequest,
     UpdateTransactionService,
+    UpdateTransactionServiceParams,
+    UserIdRequestParams,
 } from '@/shared'
 
 export class UpdateTransactionController
-    implements Controller<UpdateTransactionRequest, TransactionPublicResponse>
+    implements
+        BodyParamsHeadersController<
+            UpdateTransactionParams,
+            TransactionIdRequestParams,
+            UserIdRequestParams,
+            TransactionPublicResponse
+        >
 {
-    private updateTransactionService: UpdateTransactionService
-
-    constructor(updateTransactionService: UpdateTransactionService) {
-        this.updateTransactionService = updateTransactionService
-    }
+    constructor(
+        private readonly updateTransactionService: UpdateTransactionService,
+    ) {}
 
     async execute(
-        httpRequest: HttpRequest,
+        httpRequest: UpdateTransactionRequest,
     ): Promise<HttpResponse<TransactionPublicResponse>> {
         try {
-            const transactionId = (
-                httpRequest.params as { transactionId: string }
-            ).transactionId
+            const { transactionId } = httpRequest.params
+            const { userId } = httpRequest.headers
 
             if (!transactionId) {
                 return requiredFieldMissingResponse('transactionId')
@@ -49,19 +55,20 @@ export class UpdateTransactionController
                 return invalidIdResponse('transactionId')
             }
 
-            // if (!userId) {
-            //     return unauthorized('User ID is required')
-            // }
+            const validatedParams = await updateTransactionSchema.parseAsync(
+                httpRequest.body,
+            )
 
-            const params = httpRequest.body as UpdateTransactionParams
-
-            const validatedParams =
-                await updateTransactionSchema.parseAsync(params)
+            const serviceParams: UpdateTransactionServiceParams = {
+                ...validatedParams,
+                userId,
+            }
 
             const updatedTransaction =
-                await this.updateTransactionService.execute(transactionId, {
-                    ...validatedParams,
-                })
+                await this.updateTransactionService.execute(
+                    transactionId,
+                    serviceParams,
+                )
 
             return ok(updatedTransaction, ResponseMessage.TRANSACTION_UPDATED)
         } catch (error) {
@@ -76,6 +83,10 @@ export class UpdateTransactionController
             }
             if (error instanceof ZodError) {
                 return handleZodValidationError(error)
+            }
+
+            if (error instanceof ForbiddenError) {
+                return forbidden()
             }
             return serverError()
         }
