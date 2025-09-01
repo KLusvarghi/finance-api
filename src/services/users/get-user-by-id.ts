@@ -20,7 +20,7 @@ export class GetUserByIdService
         if (!user) {
             throw new UserNotFoundError(userId)
         }
-
+        // eslint-disable-next-line
         const { password: _password, ...userWithoutPassword } = user
         return userWithoutPassword
     }

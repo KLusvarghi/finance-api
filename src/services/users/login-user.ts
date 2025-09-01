@@ -1,5 +1,5 @@
 import { PasswordComparatorAdapter, TokenGeneratorAdapter } from '@/adapters'
-import { InvalidPasswordError, UserNotFoundError } from '@/errors'
+import { InvalidPasswordError, LoginFailedError } from '@/errors'
 import {
     GetUserByEmailRepository,
     TokenGeneratorAdapterResponse,
@@ -25,7 +25,7 @@ export class LoginUserService {
         // verificar se o e-mail válido (se não houver usuério com esse e-amil lançamos uma exceção)
         const user = await this.getUserByEmailRepository.execute(email)
         if (!user) {
-            throw new UserNotFoundError(email)
+            throw new LoginFailedError()
         }
 
         // verificar se a senha é válida (se não estiver lançamos uma exceção)
