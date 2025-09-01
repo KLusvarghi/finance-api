@@ -38,9 +38,9 @@ model Transaction {
   id      String          @id @default(uuid())
   // para fazer uma relação no prisma, temos que primeiro instanciar a coluna apenas com o tipo dela
   // N:1 -> Varias transaction só pode ter um usuário
-  user_id String
-  // e depois dize "user" é do tipo "User" (tabela) e relacionamo o field dessa tabela "user_id" faz referencia com o campo "id" da coluna de user 
-  user    User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  userId String
+  // e depois dize "user" é do tipo "User" (tabela) e relacionamo o field dessa tabela "user" faz referencia com o campo "id" da coluna de user 
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   name    String          @db.VarChar(100)
   amount  Decimal         @db.Decimal(10, 2)
   // se deixar apenas "DateTime" ele vai criar uma coluna do tipo timestamp
