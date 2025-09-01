@@ -1,6 +1,10 @@
 import { DeleteTransactionController } from '@/controllers'
 import { TransactionNotFoundError } from '@/errors'
-import { ResponseMessage, TransactionRepositoryResponse } from '@/shared'
+import {
+    DeleteTransactionServiceParams,
+    ResponseMessage,
+    TransactionRepositoryResponse,
+} from '@/shared'
 import {
     createInvalidIdCases,
     deleteTransactionControllerResponse,
@@ -14,7 +18,7 @@ describe('DeleteTransactionController', () => {
 
     class DeleteTransactionServiceStub {
         execute(
-            _transactionId: string,
+            _params: DeleteTransactionServiceParams,
         ): Promise<TransactionRepositoryResponse> {
             return Promise.resolve(deleteTransactionControllerResponse)
         }
@@ -85,8 +89,9 @@ describe('DeleteTransactionController', () => {
                 // arrange
                 const response = await sut.execute({
                     params: {
-                        transactionId: id,
+                        transactionId: id || '',
                     },
+                    headers: { userId: 'user-id' },
                 })
 
                 // assert
@@ -119,9 +124,10 @@ describe('DeleteTransactionController', () => {
             await sut.execute(baseHttpRequest)
 
             // assert
-            expect(executeSpy).toHaveBeenCalledWith(
-                baseHttpRequest.params.transactionId,
-            )
+            expect(executeSpy).toHaveBeenCalledWith({
+                transactionId: baseHttpRequest.params.transactionId,
+                userId: baseHttpRequest.headers.userId,
+            })
             expect(executeSpy).toHaveBeenCalledTimes(1)
         })
     })

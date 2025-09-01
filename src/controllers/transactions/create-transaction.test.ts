@@ -1,11 +1,11 @@
 import { CreateTransactionController } from '@/controllers'
 import {
     CreateTransactionParams,
-    ResponseMessage,
+    ResponseZodMessages,
     TransactionPublicResponse,
 } from '@/shared'
 import {
-    createInvalidIdCases,
+    createInvalidNameCases,
     createTransactionControllerResponse,
     createTransactionHttpRequest as baseHttpRequest,
     createTransactionParams as params,
@@ -61,20 +61,19 @@ describe('CreateTransactionController', () => {
     })
 
     describe('validations', () => {
-        describe('user_id', () => {
-            const invalidIdCases = createInvalidIdCases({
-                missing: ResponseMessage.USER_ID_MISSING,
-                invalid: ResponseMessage.USER_INVALID_ID,
+        describe('name', () => {
+            const invalidNameCases = createInvalidNameCases({
+                required: ResponseZodMessages.name.required,
+                minLength: ResponseZodMessages.name.minLength,
             })
-            it.each(invalidIdCases)(
-                'should return 400 if user_id is $description',
-                async ({ id, expectedMessage }) => {
+            it.each(invalidNameCases)(
+                'should return 400 if name is $description',
+                async ({ name, expectedMessage }) => {
                     // arrange
+
                     const response = await sut.execute({
-                        body: {
-                            ...params,
-                            user_id: id,
-                        },
+                        body: { ...params, name: name as string },
+                        headers: { userId: baseHttpRequest.headers.userId },
                     })
 
                     // assert
@@ -83,150 +82,46 @@ describe('CreateTransactionController', () => {
                 },
             )
         })
-        describe('name', () => {
-            it('should return 400 if name is not provided', async () => {
-                // arrange
-                const response = await sut.execute({
-                    body: {
-                        ...params,
-                        name: undefined,
-                    },
-                })
-
-                // assert
-                expect(response.statusCode).toBe(400)
-            })
-
-            it('should return 400 if name is too short', async () => {
-                // arrange
-                const response = await sut.execute({
-                    body: {
-                        ...params,
-                        name: 'A',
-                    },
-                })
-
-                expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBe(
-                    'Name must be at least 3 characters long',
-                )
-            })
-
-            it('should return 400 if name is too long', async () => {
-                // arrange
-                const response = await sut.execute({
-                    body: {
-                        ...params,
-                        name: 'A'.repeat(101),
-                    },
-                })
-
-                expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBe(
-                    'Name must be at most 100 characters long',
-                )
-            })
-        })
 
         describe('date', () => {
-            it('should return 400 if date is not provided', async () => {
-                // arrange
-                const response = await sut.execute({
-                    body: {
-                        ...params,
-                        date: undefined,
-                    },
-                })
-
-                expect(response.statusCode).toBe(400)
-            })
-
             it.each(invalidDateCases)(
                 'should return 400 if date is $description',
-                async ({ date }) => {
+                async ({ date, expectedMessage }) => {
                     // arrange
                     const response = await sut.execute({
                         body: {
                             ...params,
-                            date: date,
+                            date: date as string,
                         },
+                        headers: { userId: baseHttpRequest.headers.userId },
                     })
 
                     // assert
                     expect(response.statusCode).toBe(400)
-                    expect(response.body?.message).toBe(
-                        'Date must be a valid date',
-                    )
+                    expect(response.body?.message).toBe(expectedMessage)
                 },
             )
         })
         describe('type', () => {
-            it('should return 400 if type is not provided', async () => {
-                // arrange
-                const response = await sut.execute({
-                    body: {
-                        ...params,
-                        type: undefined,
-                    },
-                })
-
-                expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBe(
-                    'Type must be EARNING, EXPENSE or INVESTMENT',
-                )
-            })
-
             it.each(invalidTypeCases)(
                 'should return 400 if type is $description',
-                async ({ type }) => {
+                async ({ type, expectedMessage }) => {
                     // arrange
                     const response = await sut.execute({
                         body: {
                             ...params,
                             type: type,
-                        },
+                        } as CreateTransactionParams,
+                        headers: { userId: baseHttpRequest.headers.userId },
                     })
 
                     // assert
                     expect(response.statusCode).toBe(400)
-                    // expect(response.body?.message).toBe(
-                    //     'Type must be EARNING, EXPENSE or INVESTMENT',
-                    // )
+                    expect(response.body?.message).toBe(expectedMessage)
                 },
             )
         })
         describe('amount', () => {
-            it('should return 400 if amount is not provided', async () => {
-                // arrange
-                const response = await sut.execute({
-                    body: {
-                        ...params,
-                        amount: undefined,
-                    },
-                })
-
-                // assert
-                expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBe('Amount is required')
-            })
-
-            it.each([undefined, null, ''])(
-                'should return 400 if amount is not provided',
-                async (amount: number | undefined | null | string) => {
-                    // arrange
-                    const response = await sut.execute({
-                        body: {
-                            ...params,
-                            amount: amount,
-                        },
-                    })
-
-                    // assert
-                    expect(response.statusCode).toBe(400)
-                    expect(response.body?.message).toBe('Amount is required')
-                },
-            )
-
             it.each(invalidAmountCases)(
                 'should return 400 if amount is $description',
                 async ({ amount, expectedMessage }) => {
@@ -235,7 +130,8 @@ describe('CreateTransactionController', () => {
                         body: {
                             ...params,
                             amount: amount,
-                        },
+                        } as CreateTransactionParams,
+                        headers: { userId: baseHttpRequest.headers.userId },
                     })
 
                     // assert

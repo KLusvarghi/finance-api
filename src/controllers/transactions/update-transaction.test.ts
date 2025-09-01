@@ -74,7 +74,7 @@ describe('UpdateTransactionController', () => {
                 const response = await sut.execute({
                     ...baseHttpRequest,
                     params: {
-                        transactionId: id,
+                        transactionId: id as string,
                     },
                 })
 
@@ -99,7 +99,9 @@ describe('UpdateTransactionController', () => {
                 expect(response.statusCode).toBe(200)
                 expect(executeSpy).toHaveBeenCalledWith(
                     baseHttpRequest.params.transactionId,
-                    {},
+                    {
+                        userId: baseHttpRequest.headers.userId,
+                    },
                 )
             })
 
@@ -136,41 +138,61 @@ describe('UpdateTransactionController', () => {
             })
 
             describe('date', () => {
+                it('should return 200 if date is not provided', async () => {
+                    const response = await sut.execute({
+                        ...baseHttpRequest,
+                        body: {
+                            ...baseHttpRequest.body,
+                            date: undefined,
+                        } as UpdateTransactionParams,
+                        headers: { userId: baseHttpRequest.headers.userId },
+                    })
+                    expect(response.statusCode).toBe(200)
+                })
                 it.each(invalidDateCases)(
                     'should return 400 if date is $description',
-                    async ({ date }) => {
+                    async ({ date, expectedMessage }) => {
                         const response = await sut.execute({
                             ...baseHttpRequest,
                             body: {
                                 ...baseHttpRequest.body,
-                                date,
-                            },
+                                date: date as string,
+                            } as UpdateTransactionParams,
+                            headers: { userId: baseHttpRequest.headers.userId },
                         })
 
                         expect(response.statusCode).toBe(400)
-                        expect(response.body?.message).toBe(
-                            ResponseZodMessages.date.invalid,
-                        )
+                        expect(response.body?.message).toBe(expectedMessage)
                     },
                 )
             })
 
             describe('type', () => {
+                it('should return 200 if type is not provided', async () => {
+                    const response = await sut.execute({
+                        ...baseHttpRequest,
+                        body: {
+                            ...baseHttpRequest.body,
+                            type: undefined,
+                        } as UpdateTransactionParams,
+                        headers: { userId: baseHttpRequest.headers.userId },
+                    })
+                    expect(response.statusCode).toBe(200)
+                })
                 it.each(invalidTypeCases)(
                     'should return 400 if type is $description',
-                    async ({ type }) => {
+                    async ({ type, expectedMessage }) => {
                         const response = await sut.execute({
                             ...baseHttpRequest,
                             body: {
                                 ...baseHttpRequest.body,
-                                type,
-                            },
+                                type: type,
+                            } as UpdateTransactionParams,
+                            headers: { userId: baseHttpRequest.headers.userId },
                         })
 
                         expect(response.statusCode).toBe(400)
-                        expect(response.body?.message).toBe(
-                            ResponseZodMessages.type.invalid,
-                        )
+                        expect(response.body?.message).toBe(expectedMessage)
                     },
                 )
             })
@@ -183,29 +205,15 @@ describe('UpdateTransactionController', () => {
                             ...baseHttpRequest,
                             body: {
                                 ...baseHttpRequest.body,
-                                amount,
+                                amount: amount as number,
                             },
+                            headers: { userId: baseHttpRequest.headers.userId },
                         })
 
                         expect(response.statusCode).toBe(400)
                         expect(response.body?.message).toBe(expectedMessage)
                     },
                 )
-
-                it('should return 400 if amount too small', async () => {
-                    const response = await sut.execute({
-                        ...baseHttpRequest,
-                        body: {
-                            ...baseHttpRequest.body,
-                            amount: 0,
-                        },
-                    })
-
-                    expect(response.statusCode).toBe(400)
-                    expect(response.body?.message).toBe(
-                        ResponseZodMessages.amount.minValue,
-                    )
-                })
             })
 
             it('should return 400 if body has unrecognized keys', async () => {
@@ -213,8 +221,9 @@ describe('UpdateTransactionController', () => {
                     ...baseHttpRequest,
                     body: {
                         ...baseHttpRequest.body,
-                        unexpected: 'value',
-                    },
+                        unexpected: 'value' as string,
+                    } as UpdateTransactionParams,
+                    headers: { userId: baseHttpRequest.headers.userId },
                 })
 
                 expect(response.statusCode).toBe(400)
@@ -247,7 +256,10 @@ describe('UpdateTransactionController', () => {
 
             expect(executeSpy).toHaveBeenCalledWith(
                 baseHttpRequest.params.transactionId,
-                baseHttpRequest.body,
+                {
+                    ...baseHttpRequest.body,
+                    userId: baseHttpRequest.headers.userId,
+                },
             )
             // expect(executeSpy).toHaveBeenCalledTimes(1)
         })
