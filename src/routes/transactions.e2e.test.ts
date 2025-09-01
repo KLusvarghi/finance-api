@@ -6,28 +6,36 @@ import { ResponseMessage } from '@/shared'
 import {
     createTransactionParams,
     createUserParams,
+    transactionId,
     updateTransactionParams,
-    userId,
 } from '@/test'
 import { TransactionType } from '@prisma/client'
 
 describe('Transactions Routes E2E Tests', () => {
-    describe('GET /api/transactions/?userId', () => {
+    describe('GET /api/transactions/me', () => {
         it('should return 200 when transaction is found', async () => {
             const { body: createdUser } = await request(app)
                 .post(`/api/users`)
                 .send(createUserParams)
 
             const { body: createdTransaction } = await request(app)
-                .post('/api/transactions')
+                .post('/api/transactions/me')
+                .set(
+                    'authorization',
+                    `Bearer ${createdUser.data.tokens.accessToken}`,
+                )
                 .send({
                     ...createTransactionParams,
-                    user_id: createdUser.data.id,
+                    userId: createdUser.data.id,
                 })
                 .expect(201)
 
             const { body: responseBody } = await request(app)
-                .get(`/api/transactions/?userId=${createdUser.data.id}`)
+                .get(`/api/transactions/me`)
+                .set(
+                    'authorization',
+                    `Bearer ${createdUser.data.tokens.accessToken}`,
+                )
                 .expect(200)
 
             expect(responseBody.data.length).toBe(1)
@@ -41,7 +49,11 @@ describe('Transactions Routes E2E Tests', () => {
                 .send(createUserParams)
 
             const { body: responseBody } = await request(app)
-                .get(`/api/transactions/?userId=${createdUser.data.id}`)
+                .get(`/api/transactions/me`)
+                .set(
+                    'authorization',
+                    `Bearer ${createdUser.data.tokens.accessToken}`,
+                )
                 .expect(200)
 
             expect(responseBody.data.length).toBe(0)
@@ -56,16 +68,20 @@ describe('Transactions Routes E2E Tests', () => {
                 .send(createUserParams)
 
             const { body: createdTransaction } = await request(app)
-                .post('/api/transactions')
+                .post('/api/transactions/me')
+                .set(
+                    'authorization',
+                    `Bearer ${createdUser.data.tokens.accessToken}`,
+                )
                 .send({
                     ...createTransactionParams,
-                    user_id: createdUser.data.id,
+                    userId: createdUser.data.id,
                     amount: 1000,
                     type: TransactionType.EARNING,
                 })
                 .expect(201)
 
-            expect(createdTransaction.data.user_id).toBe(createdUser.data.id)
+            expect(createdTransaction.data.userId).toBe(createdUser.data.id)
             expect(createdTransaction.data.amount).toBe('1000')
             expect(createdTransaction.data.type).toBe(TransactionType.EARNING)
         })
@@ -78,16 +94,24 @@ describe('Transactions Routes E2E Tests', () => {
                 .send(createUserParams)
 
             const { body: createdTransaction } = await request(app)
-                .post('/api/transactions')
+                .post('/api/transactions/me')
+                .set(
+                    'authorization',
+                    `Bearer ${createdUser.data.tokens.accessToken}`,
+                )
                 .send({
                     ...createTransactionParams,
-                    user_id: createdUser.data.id,
+                    userId: createdUser.data.id,
                     amount: 1000,
                     type: TransactionType.EARNING,
                 })
 
             const { body: responseBody } = await request(app)
                 .patch(`/api/transactions/${createdTransaction.data.id}`)
+                .set(
+                    'authorization',
+                    `Bearer ${createdUser.data.tokens.accessToken}`,
+                )
                 .send(updateTransactionParams)
                 .expect(200)
 
@@ -98,14 +122,22 @@ describe('Transactions Routes E2E Tests', () => {
         })
 
         it('should return 404 when transaction is not found', async () => {
+            const { body: createdUser } = await request(app)
+                .post(`/api/users`)
+                .send(createUserParams)
+
             const { body: responseBody } = await request(app)
-                .patch(`/api/transactions/${userId}`)
+                .patch(`/api/transactions/${transactionId}`)
+                .set(
+                    'authorization',
+                    `Bearer ${createdUser.data.tokens.accessToken}`,
+                )
                 .send(updateTransactionParams)
                 .expect(404)
 
             expect(responseBody.data).toBeNull()
             expect(responseBody.message).toBe(
-                `Transaction with id ${userId} not found`,
+                `Transaction with id ${transactionId} not found`,
             )
         })
     })
@@ -117,14 +149,21 @@ describe('Transactions Routes E2E Tests', () => {
                 .send(createUserParams)
 
             const { body: createdTransaction } = await request(app)
-                .post('/api/transactions')
+                .post('/api/transactions/me')
+                .set(
+                    'authorization',
+                    `Bearer ${createdUser.data.tokens.accessToken}`,
+                )
                 .send({
                     ...createTransactionParams,
-                    user_id: createdUser.data.id,
+                    userId: createdUser.data.id,
                 })
-
             const { body: deletedTransaction } = await request(app)
                 .delete(`/api/transactions/${createdTransaction.data.id}`)
+                .set(
+                    'authorization',
+                    `Bearer ${createdUser.data.tokens.accessToken}`,
+                )
                 .expect(200)
 
             expect(deletedTransaction.data).not.toBeNull()
@@ -134,13 +173,21 @@ describe('Transactions Routes E2E Tests', () => {
         })
 
         it('should return 404 when transaction is not found', async () => {
+            const { body: createdUser } = await request(app)
+                .post(`/api/users`)
+                .send(createUserParams)
+
             const { body: responseBody } = await request(app)
-                .delete(`/api/transactions/${userId}`)
+                .delete(`/api/transactions/${transactionId}`)
+                .set(
+                    'authorization',
+                    `Bearer ${createdUser.data.tokens.accessToken}`,
+                )
                 .expect(404)
 
             expect(responseBody.data).toBeNull()
             expect(responseBody.message).toBe(
-                `Transaction with id ${userId} not found`,
+                `Transaction with id ${transactionId} not found`,
             )
         })
     })

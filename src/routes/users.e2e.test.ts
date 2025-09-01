@@ -37,16 +37,13 @@ describe('User Routes E2E Tests', () => {
                 .send(createUserParams)
                 .expect(201)
 
-            const userData = createdUser.data
-
             await request(app)
-                .post(`/api/transactions`)
+                .post(`/api/transactions/me`)
                 .set(
                     'authorization',
                     `Bearer ${createdUser.data.tokens.accessToken}`,
                 )
                 .send({
-                    user_id: userData.id,
                     name: faker.lorem.words(3),
                     date: faker.date.recent().toISOString(),
                     amount: 10000,
@@ -54,13 +51,12 @@ describe('User Routes E2E Tests', () => {
                 })
 
             await request(app)
-                .post(`/api/transactions`)
+                .post(`/api/transactions/me`)
                 .set(
                     'authorization',
                     `Bearer ${createdUser.data.tokens.accessToken}`,
                 )
                 .send({
-                    user_id: userData.id,
                     name: faker.lorem.words(3),
                     date: faker.date.recent().toISOString(),
                     amount: 2000,
@@ -68,13 +64,12 @@ describe('User Routes E2E Tests', () => {
                 })
 
             await request(app)
-                .post(`/api/transactions`)
+                .post(`/api/transactions/me`)
                 .set(
                     'authorization',
                     `Bearer ${createdUser.data.tokens.accessToken}`,
                 )
                 .send({
-                    user_id: userData.id,
                     name: faker.lorem.words(3),
                     date: faker.date.recent().toISOString(),
                     amount: 2000,
@@ -89,7 +84,7 @@ describe('User Routes E2E Tests', () => {
                 )
                 .expect(200)
 
-            expect(responseBody.data).toEqual({
+            expect(responseBody.data).toStrictEqual({
                 earnings: '10000',
                 expenses: '2000',
                 investments: '2000',
