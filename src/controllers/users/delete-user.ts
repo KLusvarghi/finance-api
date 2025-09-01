@@ -1,44 +1,26 @@
-import {
-    checkIfIdIsValid,
-    invalidIdResponse,
-    notFoundResponse,
-    ok,
-    requiredFieldMissingResponse,
-    serverError,
-} from '../_helpers'
+import { notFoundResponse, ok, serverError } from '../_helpers'
 
 import { UserNotFoundError } from '@/errors'
 import {
-    Controller,
     DeleteUserRequest,
     DeleteUserService,
-    HttpRequest,
+    HeadersController,
     HttpResponse,
     ResponseMessage,
+    UserIdRequestParams,
     UserPublicResponse,
 } from '@/shared'
 
 export class DeleteUserController
-    implements Controller<DeleteUserRequest, UserPublicResponse>
+    implements HeadersController<UserIdRequestParams, UserPublicResponse>
 {
-    private deletedUserService: DeleteUserService
-
-    constructor(deletedUserService: DeleteUserService) {
-        this.deletedUserService = deletedUserService
-    }
+    constructor(private readonly deletedUserService: DeleteUserService) {}
 
     async execute(
-        httpRequest: HttpRequest,
+        httpRequest: DeleteUserRequest,
     ): Promise<HttpResponse<UserPublicResponse>> {
         try {
-            const userId = (httpRequest.params as { userId: string }).userId
-
-            if (!userId) {
-                return requiredFieldMissingResponse('userId')
-            }
-
-            const isIdValid = checkIfIdIsValid(userId)
-            if (!isIdValid) return invalidIdResponse('userId')
+            const { userId } = httpRequest.headers
 
             const deletedUser = await this.deletedUserService.execute(userId)
 

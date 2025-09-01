@@ -14,19 +14,23 @@ import {
     UserNotFoundError,
 } from '@/errors'
 import { loginSchema } from '@/schemas'
-import { HttpRequest, LoginUserService, ResponseMessage } from '@/shared'
+import {
+    Controller,
+    LoginUserRequest,
+    LoginUserRequestParams,
+    LoginUserService,
+    ResponseMessage,
+    UserPublicResponse,
+} from '@/shared'
 
-export class LoginUserController {
-    constructor(private readonly loginUserService: LoginUserService) {
-        this.loginUserService = loginUserService
-    }
+export class LoginUserController
+    implements Controller<LoginUserRequestParams, UserPublicResponse>
+{
+    constructor(private readonly loginUserService: LoginUserService) {}
 
-    async execute(httpRequest: HttpRequest) {
+    async execute(httpRequest: LoginUserRequest) {
         try {
-            const { email, password } = httpRequest.body as {
-                email: string
-                password: string
-            }
+            const { email, password } = httpRequest.body
 
             await loginSchema.parseAsync({ email, password })
 

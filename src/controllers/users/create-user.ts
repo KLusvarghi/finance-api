@@ -10,10 +10,10 @@ import {
 import { EmailAlreadyExistsError } from '@/errors'
 import { createUserSchema } from '@/schemas'
 import {
-    Controller,
+    BodyController,
     CreateUserParams,
+    CreateUserRequest,
     CreateUserService,
-    HttpRequest,
     HttpResponse,
     ResponseMessage,
     TokenGeneratorAdapterResponse,
@@ -22,19 +22,15 @@ import {
 
 export class CreateUserController
     implements
-        Controller<
+        BodyController<
             CreateUserParams,
             UserPublicResponse & { tokens: TokenGeneratorAdapterResponse }
         >
 {
-    private createUserService: CreateUserService
-
-    constructor(createUserService: CreateUserService) {
-        this.createUserService = createUserService
-    }
+    constructor(private readonly createUserService: CreateUserService) {}
 
     async execute(
-        httpRequest: HttpRequest,
+        httpRequest: CreateUserRequest,
     ): Promise<
         HttpResponse<
             UserPublicResponse & { tokens: TokenGeneratorAdapterResponse }

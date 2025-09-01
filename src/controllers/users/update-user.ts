@@ -1,13 +1,10 @@
 import { ZodError } from 'zod'
 
 import {
-    checkIfIdIsValid,
     emailAlreadyExistsResponse,
     handleZodValidationError,
-    invalidIdResponse,
     notFoundResponse,
     ok,
-    requiredFieldMissingResponse,
     serverError,
 } from '../_helpers'
 
@@ -18,35 +15,33 @@ import {
 } from '@/errors'
 import { updateUserSchema } from '@/schemas'
 import {
-    Controller,
-    HttpRequest,
+    BodyHeadersController,
     HttpResponse,
     ResponseMessage,
+    UpdateUserParams,
     UpdateUserRequest,
     UpdateUserService,
+    UserIdRequestParams,
     UserPublicResponse,
 } from '@/shared'
 
 export class UpdateUserController
-    implements Controller<UpdateUserRequest, UserPublicResponse>
+    implements
+        BodyHeadersController<
+            UpdateUserParams,
+            UserIdRequestParams,
+            UserPublicResponse
+        >
 {
-    private updateUserService: UpdateUserService
-
-    constructor(updateUserService: UpdateUserService) {
-        this.updateUserService = updateUserService
-    }
+    constructor(private readonly updateUserService: UpdateUserService) {}
 
     async execute(
-        httpRequest: HttpRequest,
+        httpRequest: UpdateUserRequest,
     ): Promise<HttpResponse<UserPublicResponse>> {
         try {
-            const userId = (httpRequest.params as { userId: string }).userId
-            if (!userId) return requiredFieldMissingResponse('userId')
-
-            const isIdValid = checkIfIdIsValid(userId)
-            if (!isIdValid) return invalidIdResponse('userId')
-
+            const { userId } = httpRequest.headers
             const params = httpRequest.body
+
             const validatedParams = await updateUserSchema.parseAsync(params)
 
             const updatedUser = await this.updateUserService.execute(

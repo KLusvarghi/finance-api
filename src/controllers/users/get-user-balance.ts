@@ -1,43 +1,28 @@
-import {
-    checkIfIdIsValid,
-    invalidIdResponse,
-    notFoundResponse,
-    ok,
-    requiredFieldMissingResponse,
-    serverError,
-} from '../_helpers'
+import { notFoundResponse, ok, serverError } from '../_helpers'
 
 import { UserNotFoundError } from '@/errors'
 import {
-    Controller,
     GetUserBalanceRequest,
     GetUserBalanceService,
-    HttpRequest,
+    HeadersController,
     HttpResponse,
     UserBalanceRepositoryResponse,
+    UserIdRequestParams,
 } from '@/shared'
 
 export class GetUserBalanceController
-    implements Controller<GetUserBalanceRequest, UserBalanceRepositoryResponse>
+    implements
+        HeadersController<UserIdRequestParams, UserBalanceRepositoryResponse>
 {
-    private getUserBalanceService: GetUserBalanceService
-
-    constructor(getUserBalanceService: GetUserBalanceService) {
-        this.getUserBalanceService = getUserBalanceService
-    }
+    constructor(
+        private readonly getUserBalanceService: GetUserBalanceService,
+    ) {}
 
     async execute(
-        httpRequest: HttpRequest,
+        httpRequest: GetUserBalanceRequest,
     ): Promise<HttpResponse<UserBalanceRepositoryResponse>> {
         try {
-            const userId = (httpRequest.params as { userId: string }).userId
-            if (!userId) {
-                return requiredFieldMissingResponse('userId')
-            }
-
-            if (!checkIfIdIsValid(userId)) {
-                return invalidIdResponse('userId')
-            }
+            const { userId } = httpRequest.headers
 
             const userBalance = await this.getUserBalanceService.execute(userId)
 
