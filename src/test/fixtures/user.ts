@@ -121,19 +121,19 @@ export const createUserHttpRequest = {
 }
 
 export const deleteUserHttpRequest = {
-    params: { userId },
+    headers: { userId },
 }
 
 export const getUserBalanceHttpRequest = {
-    params: { userId },
+    headers: { userId },
 }
 
 export const getUserByIdHttpRequest = {
-    params: { userId },
+    headers: { userId },
 }
 
 export const updateUserHttpRequest = {
-    params: { userId },
+    headers: { userId },
     body: updateUserParams,
 }
 
