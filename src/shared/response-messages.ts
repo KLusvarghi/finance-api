@@ -68,6 +68,7 @@ export const ResponseZodMessages = {
         invalid: 'Date must be a valid date',
     },
     type: {
+        required: 'Type is required',
         invalid: 'Type must be EARNING, EXPENSE or INVESTMENT',
     },
     amount: {
