@@ -42,42 +42,42 @@ describe('PostgresGetUserBalanceRepository', () => {
                         amount: 5000,
                         date: new Date(from),
                         type: 'EARNING',
-                        user_id: fakeUser.id,
+                        userId: fakeUser.id,
                     },
                     {
                         name: faker.string.sample(),
                         date: new Date(from),
                         amount: 5000,
                         type: 'EARNING',
-                        user_id: fakeUser.id,
+                        userId: fakeUser.id,
                     },
                     {
                         name: faker.string.sample(),
                         date: new Date(from),
                         amount: 1000,
                         type: 'EXPENSE',
-                        user_id: fakeUser.id,
+                        userId: fakeUser.id,
                     },
                     {
                         name: faker.string.sample(),
                         date: new Date(to),
                         amount: 1000,
                         type: 'EXPENSE',
-                        user_id: fakeUser.id,
+                        userId: fakeUser.id,
                     },
                     {
                         name: faker.string.sample(),
                         date: new Date(to),
                         amount: 3000,
                         type: 'INVESTMENT',
-                        user_id: fakeUser.id,
+                        userId: fakeUser.id,
                     },
                     {
                         name: faker.string.sample(),
                         date: new Date(to),
                         amount: 3000,
                         type: 'INVESTMENT',
-                        user_id: fakeUser.id,
+                        userId: fakeUser.id,
                     },
                 ],
             })
@@ -103,7 +103,7 @@ describe('PostgresGetUserBalanceRepository', () => {
             expect(prismaSpy).toHaveBeenCalledTimes(3)
             expect(prismaSpy).toHaveBeenCalledWith({
                 where: {
-                    user_id: fakeUser.id,
+                    userId: fakeUser.id,
                     type: TransactionType.EXPENSE,
                 },
                 _sum: {
@@ -113,7 +113,7 @@ describe('PostgresGetUserBalanceRepository', () => {
 
             expect(prismaSpy).toHaveBeenCalledWith({
                 where: {
-                    user_id: fakeUser.id,
+                    userId: fakeUser.id,
                     type: TransactionType.EARNING,
                 },
                 _sum: {
@@ -123,7 +123,7 @@ describe('PostgresGetUserBalanceRepository', () => {
 
             expect(prismaSpy).toHaveBeenCalledWith({
                 where: {
-                    user_id: fakeUser.id,
+                    userId: fakeUser.id,
                     type: TransactionType.INVESTMENT,
                 },
                 _sum: {
