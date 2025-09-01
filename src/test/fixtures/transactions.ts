@@ -11,7 +11,7 @@ export const transactionId = faker.string.uuid()
 // ============================================================================
 
 export const createTransactionParams = {
-    userId: faker.string.uuid(),
+    userId: userId,
     name: faker.lorem.words(3),
     amount: faker.number.int({ min: 1, max: 1000 }),
     date: faker.date.recent().toISOString(),
@@ -19,7 +19,6 @@ export const createTransactionParams = {
 }
 
 export const updateTransactionParams = {
-    userId: faker.string.uuid(),
     name: faker.lorem.words(3),
     amount: faker.number.int({ min: 1, max: 1000 }),
     date: faker.date.recent().toISOString(),
@@ -76,7 +75,7 @@ export const getTransactionByUserIdRepositoryResponse = transactionListResponse
 
 export const updateTransactionRepositoryResponse = {
     id: transactionId,
-    userId: faker.string.uuid(),
+    userId: userId,
     name: updateTransactionParams.name || '',
     amount: new Prisma.Decimal(updateTransactionParams.amount || 0),
     date: new Date(updateTransactionParams.date || ''),
@@ -116,6 +115,7 @@ export const updateTransactionControllerResponse = updateTransactionResponse
 
 export const createTransactionHttpRequest = {
     body: createTransactionParams,
+    headers: { userId },
 }
 
 export const deleteTransactionHttpRequest = {
@@ -124,12 +124,12 @@ export const deleteTransactionHttpRequest = {
 }
 
 export const getTransactionsByUserIdHttpRequest = {
-    query: { userId },
+    headers: { userId },
 }
 
 export const updateTransactionHttpRequest = {
-    params: { transactionId },
     body: updateTransactionParams,
+    params: { transactionId },
     headers: { userId },
 }
 
