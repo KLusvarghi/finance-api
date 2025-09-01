@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 import { Prisma } from '@prisma/client'
 
 // ============================================================================
@@ -75,51 +76,61 @@ export interface UpdateUserParams {
     password?: string
 }
 
+export interface UserIdRequestParams {
+    userId: string
+}
+
+export interface TransactionIdRequestParams {
+    transactionId: string
+}
+
+export interface HeadersRequestParams {
+    headers: UserIdRequestParams
+}
+
+export interface LoginUserRequestParams {
+    email: string
+    password: string
+}
+
 // ============================================================================
 // CONTROLLER REQUEST TYPES
 // ============================================================================
 
 // User Controller Request Types
+
 export interface CreateUserRequest {
     body: CreateUserParams
 }
 
-export interface UpdateUserRequest {
+export interface DeleteUserRequest extends HeadersRequestParams {}
+
+export interface GetUserBalanceRequest extends HeadersRequestParams {}
+
+export interface GetUserByIdRequest extends HeadersRequestParams {}
+
+export interface LoginUserRequest {
+    body: LoginUserRequestParams
+}
+
+export interface UpdateUserRequest extends HeadersRequestParams {
     body: UpdateUserParams
-    params: { userId: string }
-}
-
-export interface GetUserByIdRequest {
-    params: { userId: string }
-}
-
-export interface GetUserBalanceRequest {
-    params: { userId: string }
-}
-
-export interface DeleteUserRequest {
-    params: { userId: string }
 }
 
 // Transaction Controller Request Types
-export interface CreateTransactionRequest {
+export interface CreateTransactionRequest extends HeadersRequestParams {
     body: CreateTransactionParams
-    headers: { userId: string }
 }
 
-export interface UpdateTransactionRequest {
-    body: UpdateTransactionParams
-    params: { transactionId: string }
-    headers: { userId: string }
-}
-
-export interface GetTransactionsByUserIdRequest {
-    query: { userId: string }
-}
-
-export interface DeleteTransactionRequest {
+export interface DeleteTransactionRequest extends HeadersRequestParams {
     params: DeleteTransactionParams
-    headers: { userId: string }
+}
+
+export interface GetTransactionsByUserIdRequest extends HeadersRequestParams {}
+
+export interface UpdateTransactionRequest extends HeadersRequestParams {
+    body: UpdateTransactionParams
+    params: TransactionIdRequestParams
 }
 
 // ============================================================================
@@ -370,39 +381,13 @@ export interface HttpRequest {
 }
 
 // ============================================================================
-// GENERIC CONTROLLER TYPES
-// ============================================================================
-
-/**
- * Interface genérica para controllers que unifica a assinatura do método execute
- * @template TRequest - Tipo dos dados de entrada (body, params, query, etc.)
- * @template TResponse - Tipo dos dados de resposta
- */
-export interface Controller<TRequest = unknown, TResponse = unknown> {
-    execute(
-        httpRequest: HttpRequest & { body: TRequest },
-    ): Promise<HttpResponse<TResponse>>
-}
-
-// ============================================================================
 // GENERIC SERVICE TYPES
 // ============================================================================
 
-/**
- * Interface genérica para services que unifica a assinatura do método execute
- * @template TInput - Tipo dos dados de entrada (parâmetros)
- * @template TOutput - Tipo dos dados de saída (resposta)
- */
 export interface Service<TInput = unknown, TOutput = unknown> {
     execute(input: TInput): Promise<TOutput>
 }
 
-/**
- * Interface genérica para services que recebem múltiplos parâmetros
- * @template TInput1 - Primeiro tipo de parâmetro
- * @template TInput2 - Segundo tipo de parâmetro
- * @template TOutput - Tipo dos dados de saída
- */
 export interface ServiceWithMultipleParams<
     TInput1 = unknown,
     TInput2 = unknown,
@@ -411,51 +396,42 @@ export interface ServiceWithMultipleParams<
     execute(input1: TInput1, input2: TInput2): Promise<TOutput>
 }
 
-/**
- * Interface genérica para services que recebem um parâmetro simples (string, number, etc.)
- * @template TInput - Tipo do parâmetro de entrada
- * @template TOutput - Tipo dos dados de saída
- */
 export interface SimpleService<TInput = unknown, TOutput = unknown> {
     execute(input: TInput): Promise<TOutput>
 }
 
-/**
- * Interface genérica para services que não recebem parâmetros
- * @template TOutput - Tipo dos dados de saída
- */
 export interface NoInputService<TOutput = unknown> {
     execute(): Promise<TOutput>
 }
 
-/**
- * Interface genérica para controllers que precisam validar dados de entrada
- * @template TRequest - Tipo dos dados de entrada validados
- * @template TResponse - Tipo dos dados de resposta
- */
-export interface ValidatedController<TRequest = unknown, TResponse = unknown> {
+// ============================================================================
+// GENERIC CONTROLLER TYPES
+// ============================================================================
+
+export interface Controller<TRequest = unknown, TResponse = unknown> {
     execute(
         httpRequest: HttpRequest & { body: TRequest },
     ): Promise<HttpResponse<TResponse>>
 }
 
-/**
- * Interface genérica para controllers que trabalham com parâmetros de URL
- * @template TParams - Tipo dos parâmetros de URL
- * @template TResponse - Tipo dos dados de resposta
- */
+export interface BodyController<TBody = unknown, TResponse = unknown> {
+    execute(
+        httpRequest: HttpRequest & { body: TBody },
+    ): Promise<HttpResponse<TResponse>>
+}
+
 export interface ParamsController<TParams = unknown, TResponse = unknown> {
     execute(
         httpRequest: HttpRequest & { params: TParams },
     ): Promise<HttpResponse<TResponse>>
 }
 
-/**
- * Interface genérica para controllers que trabalham com body e params
- * @template TBody - Tipo dos dados do body
- * @template TParams - Tipo dos parâmetros de URL
- * @template TResponse - Tipo dos dados de resposta
- */
+export interface HeadersController<THeaders = unknown, TResponse = unknown> {
+    execute(
+        httpRequest: HttpRequest & { headers: THeaders },
+    ): Promise<HttpResponse<TResponse>>
+}
+
 export interface BodyParamsController<
     TBody = unknown,
     TParams = unknown,
@@ -463,6 +439,41 @@ export interface BodyParamsController<
 > {
     execute(
         httpRequest: HttpRequest & { body: TBody; params: TParams },
+    ): Promise<HttpResponse<TResponse>>
+}
+
+export interface BodyHeadersController<
+    TBody = unknown,
+    THeaders = unknown,
+    TResponse = unknown,
+> {
+    execute(
+        httpRequest: HttpRequest & { body: TBody; headers: THeaders },
+    ): Promise<HttpResponse<TResponse>>
+}
+
+export interface ParamsHeadersController<
+    TParams = unknown,
+    THeaders = unknown,
+    TResponse = unknown,
+> {
+    execute(
+        httpRequest: HttpRequest & { params: TParams; headers: THeaders },
+    ): Promise<HttpResponse<TResponse>>
+}
+
+export interface BodyParamsHeadersController<
+    TBody = unknown,
+    TParams = unknown,
+    THeaders = unknown,
+    TResponse = unknown,
+> {
+    execute(
+        httpRequest: HttpRequest & {
+            body: TBody
+            params: TParams
+            headers: THeaders
+        },
     ): Promise<HttpResponse<TResponse>>
 }
 
