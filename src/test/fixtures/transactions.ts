@@ -11,7 +11,7 @@ export const transactionId = faker.string.uuid()
 // ============================================================================
 
 export const createTransactionParams = {
-    user_id: faker.string.uuid(),
+    userId: faker.string.uuid(),
     name: faker.lorem.words(3),
     amount: faker.number.int({ min: 1, max: 1000 }),
     date: faker.date.recent().toISOString(),
@@ -19,6 +19,7 @@ export const createTransactionParams = {
 }
 
 export const updateTransactionParams = {
+    userId: faker.string.uuid(),
     name: faker.lorem.words(3),
     amount: faker.number.int({ min: 1, max: 1000 }),
     date: faker.date.recent().toISOString(),
@@ -31,7 +32,7 @@ export const updateTransactionParams = {
 
 export const transactionResponse = {
     id: transactionId,
-    user_id: createTransactionParams.user_id,
+    userId: createTransactionParams.userId,
     name: createTransactionParams.name,
     amount: new Prisma.Decimal(createTransactionParams.amount),
     date: new Date(createTransactionParams.date),
@@ -41,7 +42,7 @@ export const transactionResponse = {
 export const transactionListResponse = [
     {
         id: faker.string.uuid(),
-        user_id: userId,
+        userId: userId,
         name: faker.lorem.words(3),
         amount: new Prisma.Decimal(faker.number.int({ min: 1, max: 1000 })),
         date: faker.date.recent(),
@@ -55,7 +56,7 @@ export const transactionListResponse = [
 
 export const createTransactionRepositoryResponse = {
     id: transactionId,
-    user_id: createTransactionParams.user_id,
+    userId: createTransactionParams.userId,
     name: createTransactionParams.name,
     amount: new Prisma.Decimal(createTransactionParams.amount),
     date: new Date(createTransactionParams.date),
@@ -64,7 +65,7 @@ export const createTransactionRepositoryResponse = {
 
 export const deleteTransactionRepositoryResponse = {
     id: transactionId,
-    user_id: faker.string.uuid(),
+    userId: faker.string.uuid(),
     name: faker.lorem.words(3),
     amount: new Prisma.Decimal(faker.number.int({ min: 1, max: 1000 })),
     date: faker.date.recent(),
@@ -75,11 +76,11 @@ export const getTransactionByUserIdRepositoryResponse = transactionListResponse
 
 export const updateTransactionRepositoryResponse = {
     id: transactionId,
-    user_id: faker.string.uuid(),
+    userId: faker.string.uuid(),
     name: updateTransactionParams.name || '',
     amount: new Prisma.Decimal(updateTransactionParams.amount || 0),
     date: new Date(updateTransactionParams.date || ''),
-    type: updateTransactionParams.type as Prisma.TransactionGetPayload<{}>['type'],
+    type: updateTransactionParams.type as Prisma.TransactionGetPayload<object>['type'],
 }
 
 // ============================================================================
@@ -119,6 +120,7 @@ export const createTransactionHttpRequest = {
 
 export const deleteTransactionHttpRequest = {
     params: { transactionId },
+    headers: { userId },
 }
 
 export const getTransactionsByUserIdHttpRequest = {
@@ -128,6 +130,7 @@ export const getTransactionsByUserIdHttpRequest = {
 export const updateTransactionHttpRequest = {
     params: { transactionId },
     body: updateTransactionParams,
+    headers: { userId },
 }
 
 // ============================================================================
