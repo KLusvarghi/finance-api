@@ -50,7 +50,7 @@ export interface UserPublicResponse {
 
 export interface TransactionPublicResponse {
     id: string
-    user_id: string
+    userId: string
     name: string
     amount: Prisma.Decimal
     date: Date
@@ -104,6 +104,7 @@ export interface DeleteUserRequest {
 // Transaction Controller Request Types
 export interface CreateTransactionRequest {
     body: CreateTransactionParams
+    headers: { userId: string }
 }
 
 export interface UpdateTransactionRequest {
@@ -117,8 +118,8 @@ export interface GetTransactionsByUserIdRequest {
 }
 
 export interface DeleteTransactionRequest {
-    params: { transactionId: string }
-    // headers: { userId: string }
+    params: DeleteTransactionParams
+    headers: { userId: string }
 }
 
 // ============================================================================
@@ -137,11 +138,15 @@ export interface UserHttpRequest {
 // ============================================================================
 
 export interface CreateTransactionParams {
-    user_id: string
     name: string
     amount: number
     date: string
     type: 'EARNING' | 'EXPENSE' | 'INVESTMENT'
+}
+
+export interface CreateTransactionServiceParams
+    extends CreateTransactionParams {
+    userId: string
 }
 
 export interface UpdateTransactionParams {
@@ -149,6 +154,19 @@ export interface UpdateTransactionParams {
     amount?: number
     date?: string
     type?: 'EARNING' | 'EXPENSE' | 'INVESTMENT'
+}
+
+export interface UpdateTransactionServiceParams
+    extends UpdateTransactionParams {
+    userId: string
+}
+
+export interface DeleteTransactionParams {
+    transactionId: string
+}
+export interface DeleteTransactionServiceParams
+    extends DeleteTransactionParams {
+    userId: string
 }
 
 // ============================================================================
@@ -187,7 +205,7 @@ export interface GetUserBalanceRepository {
 // Transaction
 export interface CreateTransactionRepository {
     execute(
-        params: CreateTransactionParams & { id: string },
+        params: CreateTransactionServiceParams & { id: string },
     ): Promise<TransactionRepositoryResponse>
 }
 
@@ -328,7 +346,9 @@ export interface UpdateTransactionService {
 }
 
 export interface DeleteTransactionService {
-    execute(transactionId: string): Promise<TransactionRepositoryResponse>
+    execute(
+        params: DeleteTransactionServiceParams,
+    ): Promise<TransactionRepositoryResponse>
 }
 
 // ============================================================================
@@ -346,6 +366,7 @@ export interface HttpRequest {
     params?: HttpRequestParams
     query?: HttpRequestQuery
     headers?: HttpRequestHeaders
+    userId?: string // userId from JWT token (set by auth middleware)
 }
 
 // ============================================================================
