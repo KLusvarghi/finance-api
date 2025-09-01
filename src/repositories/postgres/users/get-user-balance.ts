@@ -23,7 +23,7 @@ export class PostgresGetUserBalanceRepository
                     // dizemso primeiro onde / o que queremos agragar
 
                     where: {
-                        user_id: userId,
+                        userId: userId,
                         type: TransactionType.EXPENSE,
                     },
                     // o que voltar do where eu irei somar
@@ -35,7 +35,7 @@ export class PostgresGetUserBalanceRepository
                 }),
                 prisma.transaction.aggregate({
                     where: {
-                        user_id: userId,
+                        userId: userId,
                         type: TransactionType.EARNING,
                     },
                     _sum: {
@@ -44,7 +44,7 @@ export class PostgresGetUserBalanceRepository
                 }),
                 prisma.transaction.aggregate({
                     where: {
-                        user_id: userId,
+                        userId: userId,
                         type: TransactionType.INVESTMENT,
                     },
                     _sum: {
