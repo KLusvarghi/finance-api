@@ -24,7 +24,10 @@ describe('DeleteTransactionService', () => {
         async execute(
             _transactionId: string,
         ): Promise<TransactionRepositoryResponse | null> {
-            return Promise.resolve(updateTransactionRepositoryResponse)
+            return Promise.resolve({
+                ...updateTransactionRepositoryResponse,
+                userId: 'user-id', // Usar o mesmo userId dos testes
+            })
         }
     }
 
@@ -69,7 +72,10 @@ describe('DeleteTransactionService', () => {
             ).mockResolvedValueOnce(null)
 
             // act
-            const promise = sut.execute('invalid_transaction_id')
+            const promise = sut.execute({
+                transactionId: 'invalid_transaction_id',
+                userId: 'user-id',
+            })
 
             // assert
             expect(promise).rejects.toThrow(
@@ -86,7 +92,7 @@ describe('DeleteTransactionService', () => {
         ).mockRejectedValueOnce(new Error())
 
         // act
-        const promise = sut.execute(transactionId)
+        const promise = sut.execute({ transactionId, userId: 'user-id' })
 
         // assert
         expect(promise).rejects.toThrow()
@@ -95,7 +101,10 @@ describe('DeleteTransactionService', () => {
     describe('success', () => {
         it('should delete transaction successfully', async () => {
             // act
-            const response = await sut.execute(transactionId)
+            const response = await sut.execute({
+                transactionId,
+                userId: 'user-id',
+            })
 
             // assert
             expect(response).toEqual(deleteTransactionServiceResponse)
@@ -111,7 +120,7 @@ describe('DeleteTransactionService', () => {
             )
 
             // act
-            await sut.execute(transactionId)
+            await sut.execute({ transactionId, userId: 'user-id' })
 
             // assert
             expect(deleteTransactionRepositorySpy).toHaveBeenCalledWith(

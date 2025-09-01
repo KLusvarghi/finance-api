@@ -1,4 +1,4 @@
-import { TransactionNotFoundError } from '@/errors'
+import { ForbiddenError, TransactionNotFoundError } from '@/errors'
 import { UpdateTransactionService } from '@/services'
 import {
     TransactionRepositoryResponse,
@@ -9,11 +9,13 @@ import {
     updateTransactionParams,
     updateTransactionRepositoryResponse,
     updateTransactionServiceResponse,
+    userId,
 } from '@/test'
 
 describe('UpdateTransactionService', () => {
     let sut: UpdateTransactionService
     let updateTransactionRepository: UpdateTransactionRepositoryStub
+    let getTransactionByIdRepository: GetTransactionByIdRepositoryStub
 
     class UpdateTransactionRepositoryStub {
         async execute(
@@ -44,6 +46,7 @@ describe('UpdateTransactionService', () => {
         return {
             sut,
             updateTransactionRepository,
+            getTransactionByIdRepository,
         }
     }
 
@@ -51,10 +54,12 @@ describe('UpdateTransactionService', () => {
         const {
             sut: service,
             updateTransactionRepository: updateTransactionRepositoryStub,
+            getTransactionByIdRepository: getTransactionByIdRepositoryStub,
         } = makeSut()
 
         sut = service
         updateTransactionRepository = updateTransactionRepositoryStub
+        getTransactionByIdRepository = getTransactionByIdRepositoryStub
     })
 
     afterEach(() => {
@@ -64,7 +69,7 @@ describe('UpdateTransactionService', () => {
     })
 
     describe('error handling', () => {
-        it('should throw UserNotFoundError if getUserByIdRepository return null', () => {
+        it('should throw TransactionNotFoundError if getTransactionByIdRepository return null', () => {
             // arrange
             jest.spyOn(
                 updateTransactionRepository,
@@ -74,7 +79,10 @@ describe('UpdateTransactionService', () => {
             )
 
             // act
-            const promise = sut.execute(transactionId, updateTransactionParams)
+            const promise = sut.execute(transactionId, {
+                ...updateTransactionParams,
+                userId,
+            })
 
             // assert
             expect(promise).rejects.toThrow(
@@ -92,22 +100,45 @@ describe('UpdateTransactionService', () => {
             )
 
             // act
-            const promise = sut.execute(transactionId, updateTransactionParams)
+            const promise = sut.execute(transactionId, {
+                ...updateTransactionParams,
+                userId,
+            })
 
             // assert
             expect(promise).rejects.toThrow(
                 new Error('UpdateTransactionRepository error'),
             )
         })
+
+        it('should throw ForbiddenError if user is not the owner of the transaction', () => {
+            // arrange
+            jest.spyOn(
+                getTransactionByIdRepository,
+                'execute',
+            ).mockResolvedValueOnce({
+                ...updateTransactionRepositoryResponse,
+                userId: 'another-user-id',
+            })
+
+            // act
+            const promise = sut.execute(transactionId, {
+                ...updateTransactionParams,
+                userId,
+            })
+
+            // assert
+            expect(promise).rejects.toThrow(new ForbiddenError())
+        })
     })
 
     describe('success', () => {
         it('should update transaction successfully', async () => {
             // act
-            const response = await sut.execute(
-                transactionId,
-                updateTransactionParams,
-            )
+            const response = await sut.execute(transactionId, {
+                ...updateTransactionParams,
+                userId,
+            })
 
             // assert
             expect(response).toBeTruthy()
@@ -116,6 +147,25 @@ describe('UpdateTransactionService', () => {
     })
 
     describe('validations', () => {
+        it('should call GetTransactionByIdRepository with correct params', async () => {
+            // arrange
+            const getTransactionByIdRepositorySpy = jest.spyOn(
+                getTransactionByIdRepository,
+                'execute',
+            )
+
+            // act
+            await sut.execute(transactionId, {
+                ...updateTransactionParams,
+                userId,
+            })
+
+            // assert
+            expect(getTransactionByIdRepositorySpy).toHaveBeenCalledWith(
+                transactionId,
+            )
+            expect(getTransactionByIdRepositorySpy).toHaveBeenCalledTimes(1)
+        })
         it('should call UpdateTransactionRepository with correct params', async () => {
             // arrange
             const updateTransactionRepositorySpy = jest.spyOn(
@@ -124,7 +174,10 @@ describe('UpdateTransactionService', () => {
             )
 
             // act
-            await sut.execute(transactionId, updateTransactionParams)
+            await sut.execute(transactionId, {
+                ...updateTransactionParams,
+                userId,
+            })
 
             // assert
             expect(updateTransactionRepositorySpy).toHaveBeenCalledWith(

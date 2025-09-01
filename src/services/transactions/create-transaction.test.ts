@@ -88,7 +88,7 @@ describe('CreateTransactionService', () => {
 
             // assert
             await expect(promise).rejects.toThrow(
-                new UserNotFoundError(createTransactionParams.user_id),
+                new UserNotFoundError(createTransactionParams.userId),
             )
         })
 
@@ -161,7 +161,7 @@ describe('CreateTransactionService', () => {
             await sut.execute(createTransactionParams)
 
             expect(getUserByIdRepositorySpy).toHaveBeenCalledWith(
-                createTransactionParams.user_id,
+                createTransactionParams.userId,
             )
             expect(getUserByIdRepositorySpy).toHaveBeenCalledTimes(1)
         })
