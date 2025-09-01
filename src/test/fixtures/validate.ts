@@ -4,6 +4,10 @@ type InvalidIdMessages = {
     missing: string
     invalid: string
 }
+type InvalidNameMessages = {
+    required: string
+    minLength: string
+}
 
 export const createInvalidIdCases = (messages: InvalidIdMessages) => [
     {
@@ -44,6 +48,21 @@ export const createInvalidIdCases = (messages: InvalidIdMessages) => [
 ]
 
 export const invalidDateCases = [
+    // {
+    //     description: 'not provided',
+    //     date: undefined,
+    //     expectedMessage: ResponseZodMessages.date.required,
+    // },
+    {
+        description: 'null value',
+        date: null,
+        expectedMessage: ResponseZodMessages.date.required,
+    },
+    {
+        description: 'empty string',
+        date: '',
+        expectedMessage: ResponseZodMessages.date.invalid,
+    },
     {
         description: 'common string format',
         date: '25/08/2024',
@@ -83,11 +102,6 @@ export const invalidDateCases = [
         description: 'incorrect time format',
         date: '2024-08-25 25:61:61',
         expectedMessage: ResponseZodMessages.date.invalid,
-    },
-    {
-        description: 'empty string',
-        date: '',
-        expectedMessage: ResponseZodMessages.date.required,
     },
     {
         description: 'only numbers',
@@ -150,11 +164,11 @@ export const invalidTypeCases = [
 ]
 
 export const invalidAmountCases = [
-    // {
-    //     description: 'zero value',
-    //     amount: 0,
-    //     expectedMessage: ResponseZodMessages.amount.minValue,
-    // },
+    {
+        description: 'zero value',
+        amount: 0,
+        expectedMessage: ResponseZodMessages.amount.minValue,
+    },
     {
         description: 'negative value',
         amount: -10.5,
@@ -287,6 +301,49 @@ export const invalidEmailCases = [
         description: 'object value',
         email: { email: 'user@example.com' },
         expectedMessage: ResponseZodMessages.email.required,
+    },
+]
+
+export const createInvalidNameCases = (messages: InvalidNameMessages) => [
+    {
+        description: 'not provided',
+        name: undefined,
+        expectedMessage: messages.required,
+    },
+    {
+        description: 'empty string',
+        name: '',
+        expectedMessage: messages.minLength,
+    },
+    {
+        description: 'too short',
+        name: 'A',
+        expectedMessage: messages.minLength,
+    },
+    {
+        description: 'null value',
+        name: null,
+        expectedMessage: messages.required,
+    },
+    {
+        description: 'number value',
+        name: 12345,
+        expectedMessage: messages.required,
+    },
+    {
+        description: 'boolean value',
+        name: true,
+        expectedMessage: messages.required,
+    },
+    {
+        description: 'array value',
+        name: ['Doe'],
+        expectedMessage: messages.required,
+    },
+    {
+        description: 'object value',
+        name: { name: 'Doe' },
+        expectedMessage: messages.required,
     },
 ]
 
