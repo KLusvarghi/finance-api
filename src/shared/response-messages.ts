@@ -31,6 +31,7 @@ export const ResponseMessage = {
     BAD_REQUEST: 'Bad request',
     INVALID_ID: 'The provided id is not valid',
     UNAUTHORIZED: 'Unauthorized',
+    FORBIDDEN: 'Forbidden',
     MISSING_FIELD: 'Missing field',
 } as const
 
