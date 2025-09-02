@@ -27,10 +27,7 @@ export const auth = (
         }
 
         // se o token não for válido, ele vai lançar um erro e tratamos no catch
-        jwt.verify(
-            accessToken,
-            process.env.JWT_ACCESS_TOKEN_SECRET_KEY as string,
-        )
+        jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET as string)
 
         // se ele for válido, ele retorna o payload
         const payload = jwt.decode(accessToken) as { userId: string }
