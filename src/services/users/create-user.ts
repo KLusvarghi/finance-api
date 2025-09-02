@@ -1,7 +1,7 @@
 import {
     IdGeneratorAdapter,
     PasswordHasherAdapter,
-    TokenGeneratorAdapter,
+    TokensGeneratorAdapter,
 } from '@/adapters'
 import { EmailAlreadyExistsError } from '@/errors'
 import {
@@ -9,7 +9,7 @@ import {
     CreateUserRepository,
     GetUserByEmailRepository,
     Service,
-    TokenGeneratorAdapterResponse,
+    TokensGeneratorAdapterResponse,
     UserPublicResponse,
 } from '@/shared'
 
@@ -17,7 +17,7 @@ export class CreateUserService
     implements
         Service<
             CreateUserParams,
-            UserPublicResponse & { tokens: TokenGeneratorAdapterResponse }
+            UserPublicResponse & { tokens: TokensGeneratorAdapterResponse }
         >
 {
     constructor(
@@ -25,18 +25,20 @@ export class CreateUserService
         private readonly getUserByEmailRepository: GetUserByEmailRepository,
         private readonly idGenerator: IdGeneratorAdapter,
         private readonly passwordHasher: PasswordHasherAdapter,
-        private readonly tokenGeneratorAdapter: TokenGeneratorAdapter,
+        private readonly TokensGeneratorAdapter: TokensGeneratorAdapter,
     ) {
         this.createUserRepository = createUserRepository
         this.getUserByEmailRepository = getUserByEmailRepository
         this.idGenerator = idGenerator
         this.passwordHasher = passwordHasher
-        this.tokenGeneratorAdapter = tokenGeneratorAdapter
+        this.TokensGeneratorAdapter = TokensGeneratorAdapter
     }
 
     async execute(
         createUserParams: CreateUserParams,
-    ): Promise<UserPublicResponse & { tokens: TokenGeneratorAdapterResponse }> {
+    ): Promise<
+        UserPublicResponse & { tokens: TokensGeneratorAdapterResponse }
+    > {
         const userWithProviderEmail =
             await this.getUserByEmailRepository.execute(createUserParams.email)
 
@@ -63,7 +65,7 @@ export class CreateUserService
         const { password: _password, ...userWithoutPassword } =
             await this.createUserRepository.execute(user)
 
-        const tokens = await this.tokenGeneratorAdapter.execute(user.id)
+        const tokens = await this.TokensGeneratorAdapter.execute(user.id)
 
         return {
             ...userWithoutPassword,
