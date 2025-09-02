@@ -2,8 +2,8 @@ import jwt from 'jsonwebtoken'
 import { ZodError } from 'zod'
 
 import {
+    created,
     handleZodValidationError,
-    ok,
     serverError,
     unauthorized,
 } from '../_helpers'
@@ -35,7 +35,7 @@ export class RefreshTokenController
 
             const tokens = await this.refreshTokenService.execute(refreshToken)
 
-            return ok(tokens, ResponseMessage.TOKEN_REFRESHED)
+            return created(tokens, ResponseMessage.TOKEN_REFRESHED)
         } catch (error) {
             console.error(error)
 
