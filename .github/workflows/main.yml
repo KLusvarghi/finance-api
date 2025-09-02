@@ -33,7 +33,10 @@ jobs:
 
               # Para que conseguimos rodar os tests, quando ele iniciar o docker compose, ele precisa da database url, e assim criamos um arquivo .env.test
             - name: Create .env.test file
-              run: echo "DATABASE_URL=postgresql://root:password@localhost:5433/finance-app-test" >> .env.test
+              run: |
+                  echo "DATABASE_URL=postgresql://root:password@localhost:5433/finance-app-test" >> .env.test
+                  echo "JWT_ACCESS_SECRET=access-secret" >> .env.test
+                  echo "JWT_REFRESH_SECRET=refresh-secret" >> .env.test
 
             # defino o nome da step (install dependencies), e o que ela vai fazer, no caso, instala as dependências do projeto antes de rodar o projeto
             - name: Install dependencies
@@ -78,6 +81,8 @@ jobs:
               uses: SpicyPizza/create-envfile@v2
               with:
                   envkey_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+                  envkey_JWT_ACCESS_SECRET: ${{ secrets.JWT_ACCESS_SECRET }}
+                  envkey_JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
               # por fim rodamos as migration em deploy
             - name: Run migrations
               run: npx prisma migrate deploy
