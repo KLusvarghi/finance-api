@@ -2,14 +2,14 @@ import { EmailAlreadyExistsError } from '@/errors'
 import { CreateUserService } from '@/services'
 import {
     CreateUserParams,
-    TokenGeneratorAdapterResponse,
+    TokensGeneratorAdapterResponse,
     UserRepositoryResponse,
 } from '@/shared'
 import {
     createUserParams,
     createUserRepositoryResponse,
     createUserServiceResponse,
-    tokenGeneratorAdapterResponse,
+    tokensGeneratorAdapterResponse,
 } from '@/test'
 
 describe('CreateUserService', () => {
@@ -18,7 +18,7 @@ describe('CreateUserService', () => {
     let getUserByEmailRepository: GetUserByEmailRepositoryStub
     let passwordHasherAdapter: PasswordHasherAdapterStub
     let idGeneratorAdapter: IdGeneratorAdapterStub
-    let tokenGeneratorAdapter: TokenGeneratorAdapterStub
+    let TokensGeneratorAdapter: TokensGeneratorAdapterStub
     class CreateUserRepositoryStub {
         async execute(
             _params: CreateUserParams,
@@ -42,9 +42,11 @@ describe('CreateUserService', () => {
             return createUserServiceResponse.id
         }
     }
-    class TokenGeneratorAdapterStub {
-        async execute(_userId: string): Promise<TokenGeneratorAdapterResponse> {
-            return Promise.resolve(tokenGeneratorAdapterResponse)
+    class TokensGeneratorAdapterStub {
+        async execute(
+            _userId: string,
+        ): Promise<TokensGeneratorAdapterResponse> {
+            return Promise.resolve(tokensGeneratorAdapterResponse)
         }
     }
 
@@ -53,13 +55,13 @@ describe('CreateUserService', () => {
         const getUserByEmailRepository = new GetUserByEmailRepositoryStub()
         const passwordHasherAdapter = new PasswordHasherAdapterStub()
         const idGeneratorAdapter = new IdGeneratorAdapterStub()
-        const tokenGeneratorAdapter = new TokenGeneratorAdapterStub()
+        const TokensGeneratorAdapter = new TokensGeneratorAdapterStub()
         const sut = new CreateUserService(
             createUserRepository,
             getUserByEmailRepository,
             idGeneratorAdapter,
             passwordHasherAdapter,
-            tokenGeneratorAdapter,
+            TokensGeneratorAdapter,
         )
         return {
             sut,
@@ -67,7 +69,7 @@ describe('CreateUserService', () => {
             getUserByEmailRepository,
             passwordHasherAdapter,
             idGeneratorAdapter,
-            tokenGeneratorAdapter,
+            TokensGeneratorAdapter,
         }
     }
 
@@ -78,14 +80,14 @@ describe('CreateUserService', () => {
             getUserByEmailRepository: getUserByEmailRepositoryStub,
             passwordHasherAdapter: passwordHasherAdapterStub,
             idGeneratorAdapter: idGeneratorAdapterStub,
-            tokenGeneratorAdapter: tokenGeneratorAdapterStub,
+            TokensGeneratorAdapter: TokensGeneratorAdapterStub,
         } = makeSut()
         sut = service
         createUserRepository = createUserRepositoryStub
         getUserByEmailRepository = getUserByEmailRepositoryStub
         passwordHasherAdapter = passwordHasherAdapterStub
         idGeneratorAdapter = idGeneratorAdapterStub
-        tokenGeneratorAdapter = tokenGeneratorAdapterStub
+        TokensGeneratorAdapter = TokensGeneratorAdapterStub
     })
 
     afterEach(() => {
@@ -179,9 +181,9 @@ describe('CreateUserService', () => {
             expect(promise).rejects.toThrow()
         })
 
-        it('should throw if TokenGeneratorAdapter throws', () => {
+        it('should throw if TokensGeneratorAdapter throws', () => {
             // arrange
-            jest.spyOn(tokenGeneratorAdapter, 'execute').mockRejectedValueOnce(
+            jest.spyOn(TokensGeneratorAdapter, 'execute').mockRejectedValueOnce(
                 new Error(),
             )
 
@@ -202,7 +204,7 @@ describe('CreateUserService', () => {
             expect(response).toBeTruthy()
             expect(response).toStrictEqual({
                 ...createUserServiceResponse,
-                tokens: tokenGeneratorAdapterResponse,
+                tokens: tokensGeneratorAdapterResponse,
             })
             expect(response.tokens.accessToken).toBeDefined()
             expect(response.tokens.refreshToken).toBeDefined()
