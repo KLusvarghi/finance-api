@@ -16,7 +16,7 @@ import {
     CreateUserService,
     HttpResponse,
     ResponseMessage,
-    TokenGeneratorAdapterResponse,
+    TokensGeneratorAdapterResponse,
     UserPublicResponse,
 } from '@/shared'
 
@@ -24,7 +24,7 @@ export class CreateUserController
     implements
         BodyController<
             CreateUserParams,
-            UserPublicResponse & { tokens: TokenGeneratorAdapterResponse }
+            UserPublicResponse & { tokens: TokensGeneratorAdapterResponse }
         >
 {
     constructor(private readonly createUserService: CreateUserService) {}
@@ -33,7 +33,7 @@ export class CreateUserController
         httpRequest: CreateUserRequest,
     ): Promise<
         HttpResponse<
-            UserPublicResponse & { tokens: TokenGeneratorAdapterResponse }
+            UserPublicResponse & { tokens: TokensGeneratorAdapterResponse }
         >
     > {
         try {
@@ -53,7 +53,7 @@ export class CreateUserController
                 createdUser,
                 ResponseMessage.USER_CREATED,
             ) as HttpResponse<
-                UserPublicResponse & { tokens: TokenGeneratorAdapterResponse }
+                UserPublicResponse & { tokens: TokensGeneratorAdapterResponse }
             >
         } catch (error) {
             if (error instanceof ZodError) {
