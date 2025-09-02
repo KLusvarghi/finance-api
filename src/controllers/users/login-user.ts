@@ -3,16 +3,11 @@ import { ZodError } from 'zod'
 import {
     badRequest,
     handleZodValidationError,
-    invalidPasswordResponse,
     ok,
     serverError,
 } from '../_helpers'
 
-import {
-    InvalidPasswordError,
-    LoginFailedError,
-    TokenGenerationError,
-} from '@/errors'
+import { LoginFailedError, TokenGenerationError } from '@/errors'
 import { loginSchema } from '@/schemas'
 import {
     Controller,
@@ -44,16 +39,12 @@ export class LoginUserController
                 return handleZodValidationError(error)
             }
 
-            if (error instanceof InvalidPasswordError) {
-                return invalidPasswordResponse()
+            if (error instanceof LoginFailedError) {
+                return badRequest(error.message, error.code)
             }
 
             if (error instanceof TokenGenerationError) {
                 return serverError(error.message, error.code)
-            }
-
-            if (error instanceof LoginFailedError) {
-                return badRequest(error.message, error.code)
             }
 
             return serverError()
