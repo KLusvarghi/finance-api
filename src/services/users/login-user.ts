@@ -1,8 +1,8 @@
-import { PasswordComparatorAdapter, TokenGeneratorAdapter } from '@/adapters'
+import { PasswordComparatorAdapter, TokensGeneratorAdapter } from '@/adapters'
 import { InvalidPasswordError, LoginFailedError } from '@/errors'
 import {
     GetUserByEmailRepository,
-    TokenGeneratorAdapterResponse,
+    TokensGeneratorAdapterResponse,
     UserRepositoryResponse,
 } from '@/shared'
 
@@ -10,17 +10,17 @@ export class LoginUserService {
     constructor(
         private getUserByEmailRepository: GetUserByEmailRepository,
         private passwordComparator: PasswordComparatorAdapter,
-        private tokenGeneratorAdapter: TokenGeneratorAdapter,
+        private TokensGeneratorAdapter: TokensGeneratorAdapter,
     ) {
         this.getUserByEmailRepository = getUserByEmailRepository
         this.passwordComparator = passwordComparator
-        this.tokenGeneratorAdapter = tokenGeneratorAdapter
+        this.TokensGeneratorAdapter = TokensGeneratorAdapter
     }
     async execute(
         email: string,
         password: string,
     ): Promise<
-        UserRepositoryResponse & { tokens: TokenGeneratorAdapterResponse }
+        UserRepositoryResponse & { tokens: TokensGeneratorAdapterResponse }
     > {
         // verificar se o e-mail válido (se não houver usuério com esse e-amil lançamos uma exceção)
         const user = await this.getUserByEmailRepository.execute(email)
@@ -38,7 +38,7 @@ export class LoginUserService {
             throw new InvalidPasswordError()
         }
         // gerar os tokens JWT
-        const tokens = await this.tokenGeneratorAdapter.execute(user.id)
+        const tokens = await this.TokensGeneratorAdapter.execute(user.id)
 
         // TODO: validar se o token é gerado e o adapter não lança erro
 
