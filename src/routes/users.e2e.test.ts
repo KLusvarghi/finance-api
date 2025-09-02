@@ -196,4 +196,23 @@ describe('User Routes E2E Tests', () => {
             expect(responseBody.message).toBe(ResponseMessage.USER_DELETED)
         })
     })
+
+    describe('POST /api/refresh-token', () => {
+        it('should return 200 and new tokens when token is valid', async () => {
+            const { body: createdUser } = await request(app)
+                .post(`/api/users`)
+                .send(createUserParams)
+                .expect(201)
+
+            const { body: responseBody } = await request(app)
+                .post(`/api/users/refresh-token`)
+                .send({
+                    refreshToken: createdUser.data.tokens.refreshToken,
+                })
+                .expect(200)
+            expect(responseBody.message).toBe(ResponseMessage.TOKEN_REFRESHED)
+            expect(responseBody?.data?.accessToken).toBeDefined()
+            expect(responseBody?.data?.refreshToken).toBeDefined()
+        })
+    })
 })
