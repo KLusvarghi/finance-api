@@ -44,3 +44,9 @@ export class UserIdMissingError extends AppError {
         super('User ID is missing', ErrorCode.USER_ID_MISSING)
     }
 }
+
+export class UnauthorizedError extends AppError {
+    constructor() {
+        super('Unauthorized', ErrorCode.UNAUTHORIZED)
+    }
+}
