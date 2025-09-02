@@ -1,5 +1,7 @@
 import { AppError, ErrorCode } from './index'
 
+import { ResponseMessage } from '@/shared'
+
 export class EmailAlreadyExistsError extends AppError {
     constructor(email: string) {
         super(
@@ -11,7 +13,10 @@ export class EmailAlreadyExistsError extends AppError {
 
 export class LoginFailedError extends AppError {
     constructor() {
-        super(`Password or email is incorrect`, ErrorCode.LOGIN_FAILED)
+        super(
+            ResponseMessage.USER_INVALID_PASSWORD_OR_EMAIL,
+            ErrorCode.LOGIN_FAILED,
+        )
     }
 }
 
@@ -29,24 +34,18 @@ export class UpdateUserFailedError extends AppError {
 
 export class ForbiddenError extends AppError {
     constructor() {
-        super('Forbidden', ErrorCode.FORBIDDEN)
-    }
-}
-
-export class InvalidPasswordError extends AppError {
-    constructor() {
-        super('Invalid password', ErrorCode.INVALID_PASSWORD)
+        super(ResponseMessage.FORBIDDEN, ErrorCode.FORBIDDEN)
     }
 }
 
 export class UserIdMissingError extends AppError {
     constructor() {
-        super('User ID is missing', ErrorCode.USER_ID_MISSING)
+        super(ResponseMessage.USER_ID_MISSING, ErrorCode.USER_ID_MISSING)
     }
 }
 
 export class UnauthorizedError extends AppError {
     constructor() {
-        super('Unauthorized', ErrorCode.UNAUTHORIZED)
+        super(ResponseMessage.UNAUTHORIZED, ErrorCode.UNAUTHORIZED)
     }
 }
