@@ -1,14 +1,17 @@
 import { LoginUserService } from './login-user'
 
 import { InvalidPasswordError, UserNotFoundError } from '@/errors'
-import { TokenGeneratorAdapterResponse, UserRepositoryResponse } from '@/shared'
+import {
+    TokensGeneratorAdapterResponse,
+    UserRepositoryResponse,
+} from '@/shared'
 import { createUserRepositoryResponse } from '@/test'
 
 describe('LoginUserService', () => {
     let sut: LoginUserService
     let getUserByEmailRepository: GetUserByEmailRepositoryStub
     let passwordComparator: PasswordComparatorAdapterStub
-    let tokenGeneratorAdapter: TokenGeneratorAdapterStub
+    let TokensGeneratorAdapter: TokensGeneratorAdapterStub
 
     class GetUserByEmailRepositoryStub {
         async execute(_email: string): Promise<UserRepositoryResponse | null> {
@@ -25,8 +28,10 @@ describe('LoginUserService', () => {
         }
     }
 
-    class TokenGeneratorAdapterStub {
-        async execute(_userId: string): Promise<TokenGeneratorAdapterResponse> {
+    class TokensGeneratorAdapterStub {
+        async execute(
+            _userId: string,
+        ): Promise<TokensGeneratorAdapterResponse> {
             return Promise.resolve({
                 accessToken: 'any_access_token',
                 refreshToken: 'any_refresh_token',
@@ -37,18 +42,18 @@ describe('LoginUserService', () => {
     const makeSut = () => {
         const getUserByEmailRepository = new GetUserByEmailRepositoryStub()
         const passwordComparator = new PasswordComparatorAdapterStub()
-        const tokenGeneratorAdapter = new TokenGeneratorAdapterStub()
+        const TokensGeneratorAdapter = new TokensGeneratorAdapterStub()
         const sut = new LoginUserService(
             getUserByEmailRepository,
             passwordComparator,
-            tokenGeneratorAdapter,
+            TokensGeneratorAdapter,
         )
 
         return {
             sut,
             getUserByEmailRepository,
             passwordComparator,
-            tokenGeneratorAdapter,
+            TokensGeneratorAdapter,
         }
     }
 
@@ -57,13 +62,13 @@ describe('LoginUserService', () => {
             sut: service,
             getUserByEmailRepository: getUserByEmailRepositoryStub,
             passwordComparator: passwordComparatorStub,
-            tokenGeneratorAdapter: tokenGeneratorAdapterStub,
+            TokensGeneratorAdapter: TokensGeneratorAdapterStub,
         } = makeSut()
 
         sut = service
         getUserByEmailRepository = getUserByEmailRepositoryStub
         passwordComparator = passwordComparatorStub
-        tokenGeneratorAdapter = tokenGeneratorAdapterStub
+        TokensGeneratorAdapter = TokensGeneratorAdapterStub
     })
 
     afterEach(() => {
@@ -147,9 +152,9 @@ describe('LoginUserService', () => {
             expect(executeSpy).toHaveBeenCalledTimes(1)
         })
 
-        it('should call TokenGeneratorAdapter with correct userId', async () => {
+        it('should call TokensGeneratorAdapter with correct userId', async () => {
             // arrange
-            const executeSpy = jest.spyOn(tokenGeneratorAdapter, 'execute')
+            const executeSpy = jest.spyOn(TokensGeneratorAdapter, 'execute')
 
             // act
             await sut.execute('any_email', 'any_password')
