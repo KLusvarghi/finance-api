@@ -2,7 +2,8 @@ import {
     IdGeneratorAdapter,
     PasswordComparatorAdapter,
     PasswordHasherAdapter,
-    TokenGeneratorAdapter,
+    TokensGeneratorAdapter,
+    TokenVerifierAdapter,
 } from '@/adapters'
 import {
     CreateUserController,
@@ -10,6 +11,7 @@ import {
     GetUserBalanceController,
     GetUserByIdController,
     LoginUserController,
+    RefreshTokenController,
     UpdateUserController,
 } from '@/controllers'
 import {
@@ -26,6 +28,7 @@ import {
     GetUserBalanceService,
     GetUserByIdService,
     LoginUserService,
+    RefreshTokenService,
     UpdateUserService,
 } from '@/services'
 
@@ -42,13 +45,13 @@ export const makeCreateUserController = () => {
     const createUserRepository = new PostgresCreateUserRepository()
     const idGenerator = new IdGeneratorAdapter()
     const passwordHasher = new PasswordHasherAdapter()
-    const tokenGeneratorAdapter = new TokenGeneratorAdapter()
+    const tokensGeneratorAdapter = new TokensGeneratorAdapter()
     const createUserService = new CreateUserService(
         createUserRepository,
         getUserByEmailRepository,
         idGenerator,
         passwordHasher,
-        tokenGeneratorAdapter,
+        tokensGeneratorAdapter,
     )
     const createUserController = new CreateUserController(createUserService)
 
@@ -98,15 +101,29 @@ export const makeGetUserBalanceController = () => {
 export const makeLoginUserController = () => {
     const getUserByEmailRepository = new PostgresGetUserByEmailRepository()
     const passwordComparator = new PasswordComparatorAdapter()
-    const tokenGeneratorAdapter = new TokenGeneratorAdapter()
+    const tokensGeneratorAdapter = new TokensGeneratorAdapter()
 
     const loginUserService = new LoginUserService(
         getUserByEmailRepository,
         passwordComparator,
-        tokenGeneratorAdapter,
+        tokensGeneratorAdapter,
     )
 
     const loginUserController = new LoginUserController(loginUserService)
 
     return loginUserController
+}
+
+export const makeRefreshTokenController = () => {
+    const tokensGeneratorAdapter = new TokensGeneratorAdapter()
+    const tokenVerifierAdapter = new TokenVerifierAdapter()
+    const refreshTokenService = new RefreshTokenService(
+        tokensGeneratorAdapter,
+        tokenVerifierAdapter,
+    )
+    const refreshTokenController = new RefreshTokenController(
+        refreshTokenService,
+    )
+
+    return refreshTokenController
 }
