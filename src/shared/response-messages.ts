@@ -7,6 +7,7 @@ export const ResponseMessage = {
     USER_ID_MISSING: 'User id is required',
     USER_LOGIN_SUCCESS: 'User logged in successfully',
     USER_INVALID_ID: 'User id must be a valid uuid',
+    USER_INVALID_PASSWORD_OR_EMAIL: 'Password or email is incorrect',
 
     // Transações
     TRANSACTION_CREATED: 'Transaction created successfully',
