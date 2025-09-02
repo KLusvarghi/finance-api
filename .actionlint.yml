@@ -1,0 +1,17 @@
+# actionlint configuration
+# https://github.com/rhysd/actionlint/blob/main/docs/config.md
+
+# Disable specific checks
+self-hosted-runner: false
+shellcheck: false
+pyflakes: false
+
+# Allow unknown action inputs for actions that accept dynamic inputs
+# This suppresses "Invalid action input" warnings for actions like SpicyPizza/create-envfile
+# that accept dynamic inputs with specific prefixes
+config-variables: true
+
+# Actions that are known to accept dynamic inputs with prefixes
+# SpicyPizza/create-envfile@v2 accepts any input with 'envkey_' prefix
+ignore:
+    - 'unknown-action-input'
