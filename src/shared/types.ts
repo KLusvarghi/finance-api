@@ -58,6 +58,11 @@ export interface TransactionPublicResponse {
     type: Prisma.TransactionGetPayload<Record<string, never>>['type']
 }
 
+export interface RefreshTokenResponse {
+    accessToken: string
+    refreshToken: string
+}
+
 // ============================================================================
 // USER PARAMETER TYPES
 // ============================================================================
@@ -93,6 +98,10 @@ export interface LoginUserRequestParams {
     password: string
 }
 
+export interface RefreshTokenRequestParams {
+    refreshToken: string
+}
+
 // ============================================================================
 // CONTROLLER REQUEST TYPES
 // ============================================================================
@@ -111,6 +120,10 @@ export interface GetUserByIdRequest extends HeadersRequestParams {}
 
 export interface LoginUserRequest {
     body: LoginUserRequestParams
+}
+
+export interface RefreshTokenRequest {
+    body: RefreshTokenRequestParams
 }
 
 export interface UpdateUserRequest extends HeadersRequestParams {
@@ -336,7 +349,7 @@ export interface LoginUserService {
         email: string,
         password: string,
     ): Promise<
-        UserRepositoryResponse & { tokens: TokenGeneratorAdapterResponse }
+        UserRepositoryResponse & { tokens: TokensGeneratorAdapterResponse }
     >
 }
 
@@ -481,11 +494,11 @@ export interface BodyParamsHeadersController<
 // ADAPTER INTERFACE TYPES
 // ============================================================================
 
-export interface TokenGeneratorAdapter {
-    execute(userId: string): Promise<TokenGeneratorAdapterResponse>
+export interface TokensGeneratorAdapter {
+    execute(userId: string): Promise<TokensGeneratorAdapterResponse>
 }
 
-export interface TokenGeneratorAdapterResponse {
+export interface TokensGeneratorAdapterResponse {
     accessToken: string
     refreshToken: string
 }
