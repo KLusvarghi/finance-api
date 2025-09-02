@@ -3,7 +3,7 @@ import { LoginUserController } from './login-user'
 import { InvalidPasswordError, UserNotFoundError } from '@/errors'
 import {
     ResponseMessage,
-    TokenGeneratorAdapterResponse,
+    TokensGeneratorAdapterResponse,
     UserRepositoryResponse,
 } from '@/shared'
 import {
@@ -12,7 +12,7 @@ import {
     invalidEmailCases,
     invalidPasswordCases,
     loginUserHttpRequest as baseHttpRequest,
-    tokenGeneratorAdapterResponse,
+    tokensGeneratorAdapterResponse,
     userId,
 } from '@/test'
 
@@ -25,12 +25,12 @@ describe('LoginUserController', () => {
             _email: string,
             _password: string,
         ): Promise<
-            UserRepositoryResponse & { tokens: TokenGeneratorAdapterResponse }
+            UserRepositoryResponse & { tokens: TokensGeneratorAdapterResponse }
         > {
             return Promise.resolve({
                 ...createUserServiceResponse,
                 password: createUserRepositoryResponse.password,
-                tokens: tokenGeneratorAdapterResponse,
+                tokens: tokensGeneratorAdapterResponse,
             })
         }
     }
@@ -96,7 +96,7 @@ describe('LoginUserController', () => {
             expect(response.body?.data).toEqual({
                 ...createUserServiceResponse,
                 password: createUserRepositoryResponse.password,
-                tokens: tokenGeneratorAdapterResponse,
+                tokens: tokensGeneratorAdapterResponse,
             })
             expect(response.body?.message).toBe(
                 ResponseMessage.USER_LOGIN_SUCCESS,
