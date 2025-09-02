@@ -1,5 +1,5 @@
 import { PasswordComparatorAdapter, TokensGeneratorAdapter } from '@/adapters'
-import { InvalidPasswordError, LoginFailedError } from '@/errors'
+import { LoginFailedError } from '@/errors'
 import {
     GetUserByEmailRepository,
     TokensGeneratorAdapterResponse,
@@ -35,7 +35,7 @@ export class LoginUserService {
         )
 
         if (!isPasswordValid) {
-            throw new InvalidPasswordError()
+            throw new LoginFailedError()
         }
         // gerar os tokens JWT
         const tokens = await this.TokensGeneratorAdapter.execute(user.id)
