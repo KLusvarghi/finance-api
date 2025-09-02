@@ -171,7 +171,7 @@ const generateMockJWT = (): string => {
     return `${header}.${payload}.${signature}`
 }
 
-export const tokenGeneratorAdapterResponse = {
+export const tokensGeneratorAdapterResponse = {
     accessToken: generateMockJWT(),
     refreshToken: generateMockJWT(),
 }
