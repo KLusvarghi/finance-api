@@ -40,7 +40,7 @@ transactionsRouter.post('/me', auth, async (req: AuthenticatedRequest, res) => {
 
 // Rota para atualizar uma transação
 transactionsRouter.patch(
-    '/:transactionId',
+    '/me/:transactionId',
     auth,
     async (req: AuthenticatedRequest, res) => {
         const updateTransactionsController = makeUpdateTransactionController()
@@ -59,7 +59,7 @@ transactionsRouter.patch(
 
 // Rota para deletar uma transação
 transactionsRouter.delete(
-    '/:transactionId',
+    '/me/:transactionId',
     auth,
     async (req: AuthenticatedRequest, res) => {
         const deleteTransactionsController = makeDeleteTransactionController()
