@@ -22,6 +22,7 @@ export const ResponseMessage = {
     TOKEN_EXPIRED: 'Token has expired',
     TOKEN_NOT_VALID_YET: 'Token not yet valid',
     UNKNOWN_TOKEN_ERROR: 'Failed to generate authentication tokens',
+    TOKEN_REFRESHED: 'Token refreshed successfully',
 
     // Genéricas
     SUCCESS: 'Operation completed successfully',
@@ -75,5 +76,9 @@ export const ResponseZodMessages = {
         required: 'Amount is required',
         minValue: 'Amount must be greater than 0',
         invalidCurrency: 'Amount must be a valid currency (2 decimal places)',
+    },
+    refreshToken: {
+        required: 'Refresh token is required',
+        minLength: 'Refresh token must have at least 1 character',
     },
 }
