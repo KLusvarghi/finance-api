@@ -148,7 +148,7 @@ describe('RefreshTokenController', () => {
         it('should return 200 with new tokens when refresh is successful', async () => {
             const response = await sut.execute(baseHttpRequest)
 
-            expect(response.statusCode).toBe(200)
+            expect(response.statusCode).toBe(201)
             expect(response.body?.data).toEqual(tokensGeneratorAdapterResponse)
             expect(response.body?.data?.accessToken).toBeDefined()
             expect(response.body?.data?.refreshToken).toBeDefined()
