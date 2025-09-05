@@ -18,9 +18,7 @@ export class PostgresCreateTransactionRepository
         return prisma.transaction.create({
             data: {
                 ...transactionData,
-                user: {
-                    connect: { id: userId },
-                },
+                userId: userId,
             },
         })
     }
