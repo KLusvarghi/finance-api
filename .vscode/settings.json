@@ -1,0 +1,15 @@
+{
+  "typescript.preferences.includePackageJsonAutoImports": "auto",
+  "typescript.suggest.autoImports": true,
+  "typescript.suggest.enabled": true,
+  "typescript.validate.enable": true,
+  "typescript.format.enable": true,
+  "editor.quickSuggestions": {
+      "other": true,
+      "comments": false,
+      "strings": true
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.hover.enabled": true,
+  "editor.parameterHints.enabled": true
+}
