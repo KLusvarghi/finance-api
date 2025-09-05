@@ -107,7 +107,7 @@ describe('Transactions Routes E2E Tests', () => {
                 })
 
             const { body: responseBody } = await request(app)
-                .patch(`/api/transactions/${createdTransaction.data.id}`)
+                .patch(`/api/transactions/me/${createdTransaction.data.id}`)
                 .set(
                     'authorization',
                     `Bearer ${createdUser.data.tokens.accessToken}`,
@@ -127,7 +127,7 @@ describe('Transactions Routes E2E Tests', () => {
                 .send(createUserParams)
 
             const { body: responseBody } = await request(app)
-                .patch(`/api/transactions/${transactionId}`)
+                .patch(`/api/transactions/me/${transactionId}`)
                 .set(
                     'authorization',
                     `Bearer ${createdUser.data.tokens.accessToken}`,
@@ -159,7 +159,7 @@ describe('Transactions Routes E2E Tests', () => {
                     userId: createdUser.data.id,
                 })
             const { body: deletedTransaction } = await request(app)
-                .delete(`/api/transactions/${createdTransaction.data.id}`)
+                .delete(`/api/transactions/me/${createdTransaction.data.id}`)
                 .set(
                     'authorization',
                     `Bearer ${createdUser.data.tokens.accessToken}`,
@@ -178,7 +178,7 @@ describe('Transactions Routes E2E Tests', () => {
                 .send(createUserParams)
 
             const { body: responseBody } = await request(app)
-                .delete(`/api/transactions/${transactionId}`)
+                .delete(`/api/transactions/me/${transactionId}`)
                 .set(
                     'authorization',
                     `Bearer ${createdUser.data.tokens.accessToken}`,

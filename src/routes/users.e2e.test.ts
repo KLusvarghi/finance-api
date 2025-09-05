@@ -198,7 +198,7 @@ describe('User Routes E2E Tests', () => {
     })
 
     describe('POST /api/refresh-token', () => {
-        it('should return 200 and new tokens when token is valid', async () => {
+        it('should return 201 and new tokens when token is valid', async () => {
             const { body: createdUser } = await request(app)
                 .post(`/api/users`)
                 .send(createUserParams)
@@ -209,7 +209,7 @@ describe('User Routes E2E Tests', () => {
                 .send({
                     refreshToken: createdUser.data.tokens.refreshToken,
                 })
-                .expect(200)
+                .expect(201)
             expect(responseBody.message).toBe(ResponseMessage.TOKEN_REFRESHED)
             expect(responseBody?.data?.accessToken).toBeDefined()
             expect(responseBody?.data?.refreshToken).toBeDefined()
