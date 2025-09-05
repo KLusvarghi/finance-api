@@ -1,6 +1,6 @@
 import { LoginUserService } from './login-user'
 
-import { InvalidPasswordError, UserNotFoundError } from '@/errors'
+import { LoginFailedError } from '@/errors'
 import {
     TokensGeneratorAdapterResponse,
     UserRepositoryResponse,
@@ -88,12 +88,10 @@ describe('LoginUserService', () => {
             const promise = sut.execute('any_email', 'any_password')
 
             // assert
-            await expect(promise).rejects.toThrow(
-                new UserNotFoundError('any_email'),
-            )
+            await expect(promise).rejects.toThrow(new LoginFailedError())
         })
 
-        it('should throw InvalidPasswordError if password is invalid', async () => {
+        it('should throw LoginFailedError if password is invalid', async () => {
             // arrange
             jest.spyOn(passwordComparator, 'execute').mockResolvedValueOnce(
                 false,
@@ -103,7 +101,7 @@ describe('LoginUserService', () => {
             const promise = sut.execute('any_password', 'any_hashed_password')
 
             // assert
-            await expect(promise).rejects.toThrow(new InvalidPasswordError())
+            await expect(promise).rejects.toThrow(new LoginFailedError())
         })
     })
 
