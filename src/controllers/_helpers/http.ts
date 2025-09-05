@@ -54,6 +54,16 @@ export const unauthorized = <T = any>(
     },
 })
 
+// export const unauthorized = <T = any>(
+//   message?: string,
+// ): HttpResponse<T> => ({
+//   statusCode: 401,
+//   code,
+//   error: "unauthorized"
+//   message: ResponseMessage.UNAUTHORIZED,
+//   ,
+// })
+
 export const forbidden = <T = any>(): HttpResponse<T> => ({
     statusCode: 403,
     body: {
