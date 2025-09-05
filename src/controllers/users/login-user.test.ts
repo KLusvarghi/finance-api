@@ -1,6 +1,6 @@
 import { LoginUserController } from './login-user'
 
-import { InvalidPasswordError, UserNotFoundError } from '@/errors'
+import { LoginFailedError } from '@/errors'
 import {
     ResponseMessage,
     TokensGeneratorAdapterResponse,
@@ -13,7 +13,6 @@ import {
     invalidPasswordCases,
     loginUserHttpRequest as baseHttpRequest,
     tokensGeneratorAdapterResponse,
-    userId,
 } from '@/test'
 
 describe('LoginUserController', () => {
@@ -60,29 +59,31 @@ describe('LoginUserController', () => {
         it('should return 404 if user is not found', async () => {
             jest.spyOn(loginUserService, 'execute').mockImplementationOnce(
                 async () => {
-                    throw new UserNotFoundError(userId)
+                    throw new LoginFailedError()
                 },
             )
 
             const response = await sut.execute(baseHttpRequest)
 
-            expect(response.statusCode).toBe(404)
+            expect(response.statusCode).toBe(400)
             expect(response.body?.message).toBe(
-                `User with id ${userId} not found`,
+                ResponseMessage.USER_INVALID_PASSWORD_OR_EMAIL,
             )
         })
 
-        it('should return 401 and throws InvalidPasswordError if password is invalid', async () => {
+        it('should return 401 and throws LoginFailedError if password is invalid', async () => {
             jest.spyOn(loginUserService, 'execute').mockImplementationOnce(
                 async () => {
-                    throw new InvalidPasswordError()
+                    throw new LoginFailedError()
                 },
             )
 
             const response = await sut.execute(baseHttpRequest)
 
-            expect(response.statusCode).toBe(401)
-            expect(response.body?.message).toBe(ResponseMessage.UNAUTHORIZED)
+            expect(response.statusCode).toBe(400)
+            expect(response.body?.message).toBe(
+                ResponseMessage.USER_INVALID_PASSWORD_OR_EMAIL,
+            )
         })
     })
 
