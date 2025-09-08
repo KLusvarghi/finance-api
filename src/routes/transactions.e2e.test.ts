@@ -30,8 +30,16 @@ describe('Transactions Routes E2E Tests', () => {
                 })
                 .expect(201)
 
+            const from = new Date(createdTransaction.data.date)
+                .toISOString()
+                .split('T')[0]
+            const to = new Date(createdTransaction.data.date)
+                .toISOString()
+                .split('T')[0]
+
             const { body: responseBody } = await request(app)
                 .get(`/api/transactions/me`)
+                .query({ from, to })
                 .set(
                     'authorization',
                     `Bearer ${createdUser.data.tokens.accessToken}`,
@@ -48,8 +56,12 @@ describe('Transactions Routes E2E Tests', () => {
                 .post(`/api/users`)
                 .send(createUserParams)
 
+            const from = '2025-01-01'
+            const to = '2025-01-31'
+
             const { body: responseBody } = await request(app)
                 .get(`/api/transactions/me`)
+                .query({ from, to })
                 .set(
                     'authorization',
                     `Bearer ${createdUser.data.tokens.accessToken}`,
