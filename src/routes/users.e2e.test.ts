@@ -10,6 +10,8 @@ import { TransactionType } from '@prisma/client'
 // Ao invpes de chamar a rota, poderiamos chamar direto o Prisma, mas dessa forma chamando nossas rotas, conseguimos testar o fluxo completo, desde a requisição até a resposta
 
 describe('User Routes E2E Tests', () => {
+    const from = '2025-08-01'
+    const to = '2025-08-08'
     describe('GET /api/users/me', () => {
         it('should return 200 when user is found', async () => {
             const { body: createdUser } = await request(app)
@@ -45,7 +47,7 @@ describe('User Routes E2E Tests', () => {
                 )
                 .send({
                     name: faker.lorem.words(3),
-                    date: faker.date.recent().toISOString(),
+                    date: new Date(from),
                     amount: 10000,
                     type: TransactionType.EARNING,
                 })
@@ -58,7 +60,7 @@ describe('User Routes E2E Tests', () => {
                 )
                 .send({
                     name: faker.lorem.words(3),
-                    date: faker.date.recent().toISOString(),
+                    date: new Date(from),
                     amount: 2000,
                     type: TransactionType.INVESTMENT,
                 })
@@ -71,13 +73,14 @@ describe('User Routes E2E Tests', () => {
                 )
                 .send({
                     name: faker.lorem.words(3),
-                    date: faker.date.recent().toISOString(),
+                    date: new Date(to),
                     amount: 2000,
                     type: TransactionType.EXPENSE,
                 })
 
             const { body: responseBody } = await request(app)
                 .get(`/api/users/me/balance`)
+                .query({ from, to })
                 .set(
                     'authorization',
                     `Bearer ${createdUser.data.tokens.accessToken}`,
