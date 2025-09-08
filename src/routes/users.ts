@@ -37,8 +37,8 @@ usersRouter.get('/me/balance', auth, async (req: AuthenticatedRequest, res) => {
             userId: req.userId as string,
         },
         query: {
-            from: req.query.from,
-            to: req.query.to,
+            from: req.query.from as string,
+            to: req.query.to as string,
         },
     })
 
