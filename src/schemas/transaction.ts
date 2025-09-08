@@ -1,6 +1,8 @@
 import isCurrency from 'validator/lib/isCurrency'
 import z from 'zod'
 
+import { userIdSchema } from './common'
+
 export const createTransactionSchema = z.object({
     // userId: z
     //     .string({
@@ -67,3 +69,33 @@ export const updateTransactionSchema = createTransactionSchema
     // Resultado: { name: string, email: string } | undefined
     .partial() // o "partial" assim a gente atribui o que tem no schema e deixamos ele opcional
     .strict() // "strict" fará com que ele seja estrito, e não deixará passar campos que não existem no schema
+
+export const getTransactionsByUserIdSchema = z.object({
+    userId: userIdSchema,
+    from: z
+        .string({
+            message: 'From is required',
+        })
+        .refine(
+            (dateString) => {
+                const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+                return dateRegex.test(dateString.toString())
+            },
+            {
+                message: 'From must be in YYYY-MM-DD format',
+            },
+        ),
+    to: z
+        .string({
+            message: 'To is required',
+        })
+        .refine(
+            (dateString) => {
+                const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+                return dateRegex.test(dateString.toString())
+            },
+            {
+                message: 'To must be in YYYY-MM-DD format',
+            },
+        ),
+})
