@@ -618,6 +618,30 @@
                 "summary": "Get all transactions by user id",
                 "description": "Get all transactions by user id",
                 "tags": ["Transaction"],
+                "parameters": [
+                    {
+                        "name": "from",
+                        "description": "The start date of the transactions (format: YYYY-MM-DD)",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2025-08-01"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "description": "The end date of the transactions (format: YYYY-MM-DD)",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2025-08-08"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Transactions found",
