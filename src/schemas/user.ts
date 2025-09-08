@@ -1,5 +1,7 @@
 import z from 'zod'
 
+import { userIdSchema } from './common'
+
 export const createUserSchema = z.object({
     first_name: z
         .string({
@@ -69,4 +71,34 @@ export const refreshTokenResponseSchema = z.object({
         .min(1, {
             message: 'Refresh token must have at least 1 character',
         }),
+})
+
+export const getUserBalanceSchema = z.object({
+    userId: userIdSchema,
+    from: z
+        .string({
+            message: 'From is required',
+        })
+        .refine(
+            (dateString) => {
+                const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+                return dateRegex.test(dateString.toString())
+            },
+            {
+                message: 'From must be in YYYY-MM-DD format',
+            },
+        ),
+    to: z
+        .string({
+            message: 'To is required',
+        })
+        .refine(
+            (dateString) => {
+                const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+                return dateRegex.test(dateString.toString())
+            },
+            {
+                message: 'To must be in YYYY-MM-DD format',
+            },
+        ),
 })
