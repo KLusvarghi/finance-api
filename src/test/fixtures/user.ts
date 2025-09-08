@@ -126,6 +126,10 @@ export const deleteUserHttpRequest = {
 
 export const getUserBalanceHttpRequest = {
     headers: { userId },
+    query: {
+        from: '2025-08-01',
+        to: '2025-08-08',
+    },
 }
 
 export const getUserByIdHttpRequest = {
