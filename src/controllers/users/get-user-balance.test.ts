@@ -87,7 +87,11 @@ describe('GetUserBalanceController', () => {
             await sut.execute(baseHttpRequest)
 
             // assert
-            expect(spy).toHaveBeenCalledWith(baseHttpRequest.headers.userId)
+            expect(spy).toHaveBeenCalledWith(
+                baseHttpRequest.headers.userId,
+                baseHttpRequest.query.from,
+                baseHttpRequest.query.to,
+            )
             expect(spy).toHaveBeenCalledTimes(1)
         })
     })
