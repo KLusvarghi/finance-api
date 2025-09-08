@@ -18,6 +18,10 @@ transactionsRouter.get('/me', auth, async (req: AuthenticatedRequest, res) => {
     const { statusCode, body } =
         await getTransactionsByUserIdController.execute({
             ...req,
+            query: {
+                from: req.query.from as string,
+                to: req.query.to as string,
+            },
             headers: {
                 userId: req.userId as string,
             },

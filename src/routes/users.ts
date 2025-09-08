@@ -65,7 +65,7 @@ usersRouter.patch('/me', auth, async (req: AuthenticatedRequest, res) => {
 })
 
 // Rota para deletar um usuário
-usersRouter.delete('/:userId', auth, async (req: AuthenticatedRequest, res) => {
+usersRouter.delete('/me', auth, async (req: AuthenticatedRequest, res) => {
     const deleteUserController = makeDeleteUserController()
 
     const { statusCode, body } = await deleteUserController.execute({
