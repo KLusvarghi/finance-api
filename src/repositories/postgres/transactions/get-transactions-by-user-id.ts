@@ -8,7 +8,20 @@ import {
 export class PostgresGetTransactionsByUserIdRepository
     implements GetTransactionsByUserIdRepository
 {
-    async execute(userId: string): Promise<TransactionRepositoryResponse[]> {
-        return prisma.transaction.findMany({ where: { userId: userId } })
+    // TODO: ver se é mais válido receber um objeto com os valores ou receber separados do jeito que está
+    async execute(
+        userId: string,
+        from: string,
+        to: string,
+    ): Promise<TransactionRepositoryResponse[]> {
+        return prisma.transaction.findMany({
+            where: {
+                userId: userId,
+                date: {
+                    gte: new Date(from),
+                    lte: new Date(to),
+                },
+            },
+        })
     }
 }
