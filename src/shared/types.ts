@@ -114,7 +114,12 @@ export interface CreateUserRequest {
 
 export interface DeleteUserRequest extends HeadersRequestParams {}
 
-export interface GetUserBalanceRequest extends HeadersRequestParams {}
+export interface GetUserBalanceRequest extends HeadersRequestParams {
+    query: {
+        from: string
+        to: string
+    }
+}
 
 export interface GetUserByIdRequest extends HeadersRequestParams {}
 
@@ -140,9 +145,6 @@ export interface DeleteTransactionRequest extends HeadersRequestParams {
 }
 
 export interface GetTransactionsByUserIdRequest extends HeadersRequestParams {
-    headers: {
-        userId: string
-    }
     query: {
         from: string
         to: string
