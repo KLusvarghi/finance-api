@@ -234,7 +234,11 @@ export interface DeleteUserRepository {
 }
 
 export interface GetUserBalanceRepository {
-    execute(userId: string): Promise<UserBalanceRepositoryResponse>
+    execute(
+        userId: string,
+        from: string,
+        to: string,
+    ): Promise<UserBalanceRepositoryResponse>
 }
 // Transaction
 export interface CreateTransactionRepository {
@@ -344,7 +348,11 @@ export interface GetUserByIdService {
 }
 
 export interface GetUserBalanceService {
-    execute(userId: string): Promise<UserBalanceRepositoryResponse>
+    execute(
+        userId: string,
+        from: string,
+        to: string,
+    ): Promise<UserBalanceRepositoryResponse>
 }
 
 export interface UpdateUserService {
