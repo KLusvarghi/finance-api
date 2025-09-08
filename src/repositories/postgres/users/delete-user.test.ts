@@ -51,15 +51,15 @@ describe('PostgresDeleteUserRepository', () => {
     describe('validations', () => {
         it('should call Prisma with correct params', async () => {
             // Criar um usuário antes de testar a validação
-            await createTestUser()
+            const user = await createTestUser()
 
             const prismaSpy = jest.spyOn(prisma.user, 'delete')
 
-            await sut.execute(fakeUser.id)
+            await sut.execute(user.id)
 
             expect(prismaSpy).toHaveBeenCalledWith({
                 where: {
-                    id: fakeUser.id,
+                    id: user.id,
                 },
             })
         })
