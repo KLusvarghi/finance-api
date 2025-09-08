@@ -35,7 +35,11 @@ export class GetUserBalanceController
 
             await getUserBalanceSchema.parseAsync({ userId, from, to })
 
-            const userBalance = await this.getUserBalanceService.execute(userId)
+            const userBalance = await this.getUserBalanceService.execute(
+                userId,
+                from,
+                to,
+            )
 
             return ok(userBalance)
         } catch (error) {
