@@ -33,6 +33,7 @@ export class GetTransactionsByUserIdService
         to: string,
     ): Promise<TransactionPublicResponse[]> {
         const user = await this.getUserByIdRepository.execute(userId)
+
         if (!user) {
             throw new UserNotFoundError(userId)
         }
