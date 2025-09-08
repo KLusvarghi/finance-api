@@ -8,6 +8,9 @@ import { createTestTransaction, createTestUser } from '@/test'
 describe('PostgresGetTransactionsByUserIdRepository', () => {
     const sut = new PostgresGetTransactionsByUserIdRepository()
 
+    const from = '2025-01-01'
+    const to = '2025-01-31'
+
     describe('error handling', () => {
         it('should throw an error if Prisma throws', async () => {
             // arrange
@@ -15,7 +18,7 @@ describe('PostgresGetTransactionsByUserIdRepository', () => {
                 new Error('Prisma error'),
             )
             // act
-            const promise = sut.execute('any_user_id')
+            const promise = sut.execute('any_user_id', from, to)
             expect(promise).rejects.toThrow(new Error('Prisma error'))
         })
     })
@@ -27,7 +30,10 @@ describe('PostgresGetTransactionsByUserIdRepository', () => {
                 userId: user.id,
             })
 
-            const response = await sut.execute(user.id)
+            const from = transaction.date.toISOString().split('T')[0]
+            const to = transaction.date.toISOString().split('T')[0]
+
+            const response = await sut.execute(user.id, from, to)
 
             expect(response?.length).toBe(1)
             expect(response?.[0]).not.toBeNull()
@@ -56,12 +62,16 @@ describe('PostgresGetTransactionsByUserIdRepository', () => {
             const prismaSpy = jest.spyOn(prisma.transaction, 'findMany')
 
             // act
-            await sut.execute(user.id)
+            await sut.execute(user.id, from, to)
 
             // assert
             expect(prismaSpy).toHaveBeenCalledWith({
                 where: {
                     userId: user.id,
+                    date: {
+                        gte: new Date(from),
+                        lte: new Date(to),
+                    },
                 },
             })
         })
@@ -71,7 +81,7 @@ describe('PostgresGetTransactionsByUserIdRepository', () => {
             const user = await createTestUser()
 
             // act
-            const response = await sut.execute(user.id)
+            const response = await sut.execute(user.id, from, to)
 
             // assert
             expect(response).toEqual([])
