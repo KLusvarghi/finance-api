@@ -139,7 +139,15 @@ export interface DeleteTransactionRequest extends HeadersRequestParams {
     params: DeleteTransactionParams
 }
 
-export interface GetTransactionsByUserIdRequest extends HeadersRequestParams {}
+export interface GetTransactionsByUserIdRequest extends HeadersRequestParams {
+    headers: {
+        userId: string
+    }
+    query: {
+        from: string
+        to: string
+    }
+}
 
 export interface UpdateTransactionRequest extends HeadersRequestParams {
     body: UpdateTransactionParams
@@ -234,7 +242,11 @@ export interface CreateTransactionRepository {
 }
 
 export interface GetTransactionsByUserIdRepository {
-    execute(userId: string): Promise<TransactionRepositoryResponse[]>
+    execute(
+        userId: string,
+        from: string,
+        to: string,
+    ): Promise<TransactionRepositoryResponse[]>
 }
 
 export interface GetTransactionByIdRepository {
@@ -359,7 +371,11 @@ export interface CreateTransactionService {
 }
 
 export interface GetTransactionsByUserIdService {
-    execute(userId: string): Promise<TransactionPublicResponse[]>
+    execute(
+        userId: string,
+        from: string,
+        to: string,
+    ): Promise<TransactionPublicResponse[]>
 }
 
 export interface UpdateTransactionService {
@@ -404,9 +420,10 @@ export interface Service<TInput = unknown, TOutput = unknown> {
 export interface ServiceWithMultipleParams<
     TInput1 = unknown,
     TInput2 = unknown,
+    TInput3 = unknown,
     TOutput = unknown,
 > {
-    execute(input1: TInput1, input2: TInput2): Promise<TOutput>
+    execute(input1: TInput1, input2: TInput2, input3: TInput3): Promise<TOutput>
 }
 
 export interface SimpleService<TInput = unknown, TOutput = unknown> {
