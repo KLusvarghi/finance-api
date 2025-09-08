@@ -18,6 +18,9 @@ export class PostgresGetTransactionsByUserIdRepository
             where: {
                 userId: userId,
                 date: {
+                    // gte = greater than or equal to
+                    // lte = less than or equal to
+                    // por serem strings, temos que converter para Date
                     gte: new Date(from),
                     lte: new Date(to),
                 },
