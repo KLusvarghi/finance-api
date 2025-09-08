@@ -2,12 +2,18 @@ import { UserNotFoundError } from '@/errors'
 import {
     GetTransactionsByUserIdRepository,
     GetUserByIdRepository,
-    SimpleService,
+    ServiceWithMultipleParams,
     TransactionPublicResponse,
 } from '@/shared'
 
 export class GetTransactionsByUserIdService
-    implements SimpleService<string, TransactionPublicResponse[]>
+    implements
+        ServiceWithMultipleParams<
+            string,
+            string,
+            string,
+            TransactionPublicResponse[]
+        >
 {
     private getUserByIdRepository: GetUserByIdRepository
     private getTransactionsByUserIdRepository: GetTransactionsByUserIdRepository
@@ -21,15 +27,22 @@ export class GetTransactionsByUserIdService
             getTransactionsByUserIdRepository
     }
 
-    async execute(userId: string): Promise<TransactionPublicResponse[]> {
+    async execute(
+        userId: string,
+        from: string,
+        to: string,
+    ): Promise<TransactionPublicResponse[]> {
         const user = await this.getUserByIdRepository.execute(userId)
         if (!user) {
             throw new UserNotFoundError(userId)
         }
 
         const transactions =
-            await this.getTransactionsByUserIdRepository.execute(userId)
-        console.log('userID', userId)
+            await this.getTransactionsByUserIdRepository.execute(
+                userId,
+                from,
+                to,
+            )
 
         // Garantir que sempre retornamos um array, mesmo se o repository retornar null
         const transactionsArray = transactions ?? []

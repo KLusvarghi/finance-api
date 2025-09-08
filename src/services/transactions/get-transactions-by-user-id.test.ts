@@ -13,6 +13,9 @@ describe('GetTransactionsByUserIdService', () => {
     let getUserByIdRepository: GetUserByIdRepositoryStub
     let getTransactionByUserIdRepository: GetTransactionsByUserIdRepositoryStub
 
+    const from = '2025-01-01'
+    const to = '2025-01-31'
+
     class GetUserByIdRepositoryStub {
         async execute(_userId: string): Promise<UserRepositoryResponse | null> {
             return Promise.resolve(getUserByIdRepositoryResponse)
@@ -22,6 +25,8 @@ describe('GetTransactionsByUserIdService', () => {
     class GetTransactionsByUserIdRepositoryStub {
         async execute(
             _userId: string,
+            _from: string,
+            _to: string,
         ): Promise<TransactionRepositoryResponse[]> {
             return Promise.resolve(getTransactionByUserIdRepositoryResponse)
         }
@@ -69,7 +74,7 @@ describe('GetTransactionsByUserIdService', () => {
                 null,
             )
             // act
-            const promise = sut.execute(userId)
+            const promise = sut.execute(userId, from, to)
 
             // assert
             expect(promise).rejects.toThrow(new UserNotFoundError(userId))
@@ -82,7 +87,7 @@ describe('GetTransactionsByUserIdService', () => {
                 new Error('GetUserByIdRepository error'),
             )
             // act
-            const promise = sut.execute(userId)
+            const promise = sut.execute(userId, from, to)
 
             // assert
             expect(promise).rejects.toThrow(
@@ -99,7 +104,7 @@ describe('GetTransactionsByUserIdService', () => {
                 new Error('GetTransactionsByUserIdRepository error'),
             )
             // act
-            const promise = sut.execute(userId)
+            const promise = sut.execute(userId, from, to)
 
             // assert
             expect(promise).rejects.toThrow(
@@ -111,7 +116,7 @@ describe('GetTransactionsByUserIdService', () => {
     describe('success', () => {
         it('should get transactions by user id successfully', async () => {
             // act
-            const response = await sut.execute(userId)
+            const response = await sut.execute(userId, from, to)
 
             // assert
             expect(response).toEqual(getTransactionByUserIdServiceResponse)
@@ -127,7 +132,7 @@ describe('GetTransactionsByUserIdService', () => {
             )
 
             // act
-            await sut.execute(userId)
+            await sut.execute(userId, from, to)
 
             // assert
             expect(getUserByIdRepositorySpy).toHaveBeenCalledWith(userId)
@@ -142,11 +147,13 @@ describe('GetTransactionsByUserIdService', () => {
             )
 
             // act
-            await sut.execute(userId)
+            await sut.execute(userId, from, to)
 
             // assert
             expect(getTransactionByUserIdRepositorySpy).toHaveBeenCalledWith(
                 userId,
+                from,
+                to,
             )
             expect(getTransactionByUserIdRepositorySpy).toHaveBeenCalledTimes(1)
         })
