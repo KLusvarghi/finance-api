@@ -13,13 +13,17 @@ describe('GetUserBalanceService', () => {
     let getUserBalanceRepository: GetUserBalanceRepositoryStub
 
     class GetUserByIdRepositoryStub {
-        async execute(_id: string): Promise<UserRepositoryResponse | null> {
+        async execute(_userId: string): Promise<UserRepositoryResponse | null> {
             return Promise.resolve(getUserByIdRepositoryResponse)
         }
     }
 
     class GetUserBalanceRepositoryStub {
-        async execute(_id: string): Promise<UserBalanceRepositoryResponse> {
+        async execute(
+            _userId: string,
+            _from: string,
+            _to: string,
+        ): Promise<UserBalanceRepositoryResponse> {
             return Promise.resolve(getUserBalanceServiceResponse)
         }
     }
@@ -57,6 +61,9 @@ describe('GetUserBalanceService', () => {
         jest.resetAllMocks()
     })
 
+    const from = '2025-08-01'
+    const to = '2025-08-08'
+
     describe('error handling', () => {
         it('should return UserNotFoundError if GetUserByIdRepository returns null', async () => {
             // arrange
@@ -65,7 +72,7 @@ describe('GetUserBalanceService', () => {
             )
 
             // act
-            const promise = sut.execute(userId)
+            const promise = sut.execute(userId, from, to)
 
             // assert
             expect(promise).rejects.toThrow(new UserNotFoundError(userId))
@@ -79,7 +86,7 @@ describe('GetUserBalanceService', () => {
             )
 
             // act
-            const promise = sut.execute(userId)
+            const promise = sut.execute(userId, from, to)
 
             // assert
             expect(promise).rejects.toThrow()
@@ -93,7 +100,7 @@ describe('GetUserBalanceService', () => {
             ).mockRejectedValueOnce(new Error())
 
             // act
-            const promise = sut.execute(userId)
+            const promise = sut.execute(userId, from, to)
 
             // assert
             expect(promise).rejects.toThrow()
@@ -103,7 +110,7 @@ describe('GetUserBalanceService', () => {
     describe('success', () => {
         it('should successefully get user balance', async () => {
             // act
-            const response = await sut.execute(userId)
+            const response = await sut.execute(userId, from, to)
 
             // assert
             expect(response).toBeTruthy()
@@ -118,7 +125,7 @@ describe('GetUserBalanceService', () => {
             const executeSpy = jest.spyOn(getUserByIdRepository, 'execute')
 
             // act
-            await sut.execute(userId)
+            await sut.execute(userId, from, to)
 
             // assert
             expect(executeSpy).toHaveBeenCalledWith(userId)
@@ -130,10 +137,10 @@ describe('GetUserBalanceService', () => {
             const executeSpy = jest.spyOn(getUserBalanceRepository, 'execute')
 
             // act
-            await sut.execute(userId)
+            await sut.execute(userId, from, to)
 
             // assert
-            expect(executeSpy).toHaveBeenCalledWith(userId)
+            expect(executeSpy).toHaveBeenCalledWith(userId, from, to)
             expect(executeSpy).toHaveBeenCalledTimes(1)
         })
     })
