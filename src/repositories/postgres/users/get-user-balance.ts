@@ -9,12 +9,23 @@ import { Prisma, TransactionType } from '@prisma/client'
 export class PostgresGetUserBalanceRepository
     implements GetUserBalanceRepository
 {
-    async execute(userId: string): Promise<UserBalanceRepositoryResponse> {
+    async execute(
+        userId: string,
+        from: string,
+        to: string,
+    ): Promise<UserBalanceRepositoryResponse> {
         // para que a gente consiga fazer essa query, ao invés de usar uma function que abstraia a query, vamos usar aggragation: https://www.prisma.io/docs/orm/prisma-client/queries/aggregation-grouping-summarizing
 
         // sem fazer o destructuring
         // const totalExpense = await prisma.transaction.aggregate({
         // fazendo o distructuring para que eu não precise acessar a variavel assim: _sum.amount; e sim:
+
+        const dataFilter = {
+            date: {
+                gte: new Date(from),
+                lte: new Date(to),
+            },
+        }
 
         // Executar todas as agregações em paralelo para melhor performance
         const [expensesResult, earningsResult, investmentsResult] =
@@ -25,6 +36,7 @@ export class PostgresGetUserBalanceRepository
                     where: {
                         userId: userId,
                         type: TransactionType.EXPENSE,
+                        ...dataFilter,
                     },
                     // o que voltar do where eu irei somar
 
@@ -37,6 +49,7 @@ export class PostgresGetUserBalanceRepository
                     where: {
                         userId: userId,
                         type: TransactionType.EARNING,
+                        ...dataFilter,
                     },
                     _sum: {
                         amount: true,
@@ -46,6 +59,7 @@ export class PostgresGetUserBalanceRepository
                     where: {
                         userId: userId,
                         type: TransactionType.INVESTMENT,
+                        ...dataFilter,
                     },
                     _sum: {
                         amount: true,
