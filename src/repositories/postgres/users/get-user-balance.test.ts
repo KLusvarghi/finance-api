@@ -15,6 +15,9 @@ describe('PostgresGetUserBalanceRepository', () => {
         jest.restoreAllMocks()
     })
 
+    const from = '2025-08-01'
+    const to = '2025-08-08'
+
     describe('error handling', () => {
         it('should throw an error if Prisma throws', async () => {
             // arrange
@@ -22,7 +25,7 @@ describe('PostgresGetUserBalanceRepository', () => {
                 new Error('Prisma error'),
             )
             // act
-            const promise = sut.execute(fakeUser.id)
+            const promise = sut.execute(fakeUser.id, from, to)
 
             expect(promise).rejects.toThrow(new Error('Prisma error'))
         })
@@ -30,8 +33,6 @@ describe('PostgresGetUserBalanceRepository', () => {
 
     describe('success', () => {
         it('should get user balance on database successfully', async () => {
-            const from = new Date('2024-01-01')
-            const to = new Date('2024-01-31')
             // precisamos criar um usuário antes de querer deletar
             await createTestUser()
 
@@ -82,7 +83,7 @@ describe('PostgresGetUserBalanceRepository', () => {
                 ],
             })
 
-            const response = await sut.execute(fakeUser.id)
+            const response = await sut.execute(fakeUser.id, from, to)
             expect(response.earnings.toString()).toBe('10000')
             expect(response.expenses.toString()).toBe('2000')
             expect(response.investments.toString()).toBe('6000')
@@ -97,7 +98,7 @@ describe('PostgresGetUserBalanceRepository', () => {
             const prismaSpy = jest.spyOn(prisma.transaction, 'aggregate')
 
             // act
-            await sut.execute(fakeUser.id)
+            await sut.execute(fakeUser.id, from, to)
 
             // assert
             expect(prismaSpy).toHaveBeenCalledTimes(3)
@@ -105,6 +106,10 @@ describe('PostgresGetUserBalanceRepository', () => {
                 where: {
                     userId: fakeUser.id,
                     type: TransactionType.EXPENSE,
+                    date: {
+                        gte: new Date(from),
+                        lte: new Date(to),
+                    },
                 },
                 _sum: {
                     amount: true,
@@ -115,6 +120,10 @@ describe('PostgresGetUserBalanceRepository', () => {
                 where: {
                     userId: fakeUser.id,
                     type: TransactionType.EARNING,
+                    date: {
+                        gte: new Date(from),
+                        lte: new Date(to),
+                    },
                 },
                 _sum: {
                     amount: true,
@@ -125,6 +134,10 @@ describe('PostgresGetUserBalanceRepository', () => {
                 where: {
                     userId: fakeUser.id,
                     type: TransactionType.INVESTMENT,
+                    date: {
+                        gte: new Date(from),
+                        lte: new Date(to),
+                    },
                 },
                 _sum: {
                     amount: true,
