@@ -1,6 +1,14 @@
-import { notFoundResponse, ok, serverError } from '../_helpers'
+import { ZodError } from 'zod'
+
+import {
+    handleZodValidationError,
+    notFoundResponse,
+    ok,
+    serverError,
+} from '../_helpers'
 
 import { UserNotFoundError } from '@/errors'
+import { getUserBalanceSchema } from '@/schemas'
 import {
     GetUserBalanceRequest,
     GetUserBalanceService,
@@ -23,15 +31,22 @@ export class GetUserBalanceController
     ): Promise<HttpResponse<UserBalanceRepositoryResponse>> {
         try {
             const { userId } = httpRequest.headers
+            const { from, to } = httpRequest.query
+
+            await getUserBalanceSchema.parseAsync({ userId, from, to })
 
             const userBalance = await this.getUserBalanceService.execute(userId)
 
             return ok(userBalance)
         } catch (error) {
+            console.error(error)
             if (error instanceof UserNotFoundError) {
                 return notFoundResponse(error)
             }
-            console.error(error)
+
+            if (error instanceof ZodError) {
+                return handleZodValidationError(error)
+            }
             return serverError()
         }
     }
