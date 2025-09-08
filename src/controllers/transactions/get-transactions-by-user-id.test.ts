@@ -12,7 +12,11 @@ describe('GetTransactionsByUserIdController', () => {
     let getTransactionByUserIdService: GetTransactionsByUserIdServiceStub
 
     class GetTransactionsByUserIdServiceStub {
-        execute(_userId: string): Promise<TransactionPublicResponse[]> {
+        execute(
+            _userId: string,
+            _from: string,
+            _to: string,
+        ): Promise<TransactionPublicResponse[]> {
             return Promise.resolve(getTransactionsByUserIdControllerResponse)
         }
     }
@@ -79,7 +83,7 @@ describe('GetTransactionsByUserIdController', () => {
 
             // assert
             expect(response.statusCode).toBe(200)
-            expect(response.body?.data).toEqual(
+            expect(response.body?.data).toStrictEqual(
                 getTransactionsByUserIdControllerResponse,
             )
         })
@@ -97,6 +101,8 @@ describe('GetTransactionsByUserIdController', () => {
             // assert
             expect(executeSpy).toHaveBeenCalledWith(
                 baseHttpRequest.headers.userId,
+                baseHttpRequest.query.from,
+                baseHttpRequest.query.to,
             )
             expect(executeSpy).toHaveBeenCalledTimes(1)
         })
