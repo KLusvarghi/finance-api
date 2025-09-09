@@ -9,15 +9,15 @@ export const userId = faker.string.uuid()
 // ============================================================================
 
 export const createUserParams = {
-    first_name: faker.person.firstName(),
-    last_name: faker.person.lastName(),
+    firstName: faker.person.firstName(),
+    lastName: faker.person.lastName(),
     email: faker.internet.email(),
     password: faker.internet.password({ length: 7 }),
 }
 
 export const updateUserParams = {
-    first_name: faker.person.firstName(),
-    last_name: faker.person.lastName(),
+    firstName: faker.person.firstName(),
+    lastName: faker.person.lastName(),
     email: faker.internet.email(),
     password: faker.internet.password({ length: 7 }),
 }
@@ -28,8 +28,8 @@ export const updateUserParams = {
 
 export const userResponse = {
     id: userId,
-    first_name: createUserParams.first_name,
-    last_name: createUserParams.last_name,
+    firstName: createUserParams.firstName,
+    lastName: createUserParams.lastName,
     email: createUserParams.email,
 }
 
@@ -55,24 +55,24 @@ export const createUserRepositoryResponse = {
 
 export const deleteUserRepositoryResponse = {
     id: userId,
-    first_name: createUserParams.first_name,
-    last_name: createUserParams.last_name,
+    firstName: createUserParams.firstName,
+    lastName: createUserParams.lastName,
     email: createUserParams.email,
     password: 'valid_hash',
 }
 
 export const getUserByIdRepositoryResponse = {
     id: userId,
-    first_name: createUserParams.first_name,
-    last_name: createUserParams.last_name,
+    firstName: createUserParams.firstName,
+    lastName: createUserParams.lastName,
     email: createUserParams.email,
     password: 'valid_hash',
 }
 
 export const updateUserRepositoryResponse = {
     id: userId,
-    first_name: updateUserParams.first_name,
-    last_name: updateUserParams.last_name,
+    firstName: updateUserParams.firstName,
+    lastName: updateUserParams.lastName,
     email: updateUserParams.email,
     password: 'valid_hash',
 }
@@ -83,8 +83,8 @@ export const updateUserRepositoryResponse = {
 
 const createUserResponse = {
     id: createUserRepositoryResponse.id,
-    first_name: createUserRepositoryResponse.first_name,
-    last_name: createUserRepositoryResponse.last_name,
+    firstName: createUserRepositoryResponse.firstName,
+    lastName: createUserRepositoryResponse.lastName,
     email: createUserRepositoryResponse.email,
 }
 
@@ -92,8 +92,8 @@ const deleteUserResponse = userResponse
 const getUserByIdResponse = userResponse
 const updateUserResponse = {
     id: userId,
-    first_name: updateUserParams.first_name,
-    last_name: updateUserParams.last_name,
+    firstName: updateUserParams.firstName,
+    lastName: updateUserParams.lastName,
     email: updateUserParams.email,
 }
 const getUserBalanceResponse = userBalanceResponse
