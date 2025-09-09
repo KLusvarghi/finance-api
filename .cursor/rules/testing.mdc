@@ -63,22 +63,22 @@ Testes de validação de schema repetitivos que podem ser consolidados com `it.e
 ```typescript
 // Extraído de: src/controllers/users/create-user.test.ts
 describe('validations', () => {
-    describe('first_name', () => {
-        it('should return 400 if first_name is not provided', async () => {
+    describe('firstName', () => {
+        it('should return 400 if firstName is not provided', async () => {
             // arrange
             const response = await sut.execute({
-                body: { ...params, first_name: undefined },
+                body: { ...params, firstName: undefined },
             })
             // assert
             expect(response.statusCode).toBe(400)
         })
     })
 
-    describe('last_name', () => {
-        it('should return 400 if last_name is not provided', async () => {
+    describe('lastName', () => {
+        it('should return 400 if lastName is not provided', async () => {
             // arrange
             const response = await sut.execute({
-                body: { ...params, last_name: undefined },
+                body: { ...params, lastName: undefined },
             })
             // assert
             expect(response.statusCode).toBe(400)
