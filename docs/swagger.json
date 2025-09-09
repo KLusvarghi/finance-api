@@ -912,11 +912,11 @@
                         "format": "uuid",
                         "example": "e29ef739-ffae-45a8-a582-fb56f9660a12"
                     },
-                    "first_name": {
+                    "firstName": {
                         "type": "string",
                         "example": "John"
                     },
-                    "last_name": {
+                    "lastName": {
                         "type": "string",
                         "example": "Doe"
                     },
@@ -973,11 +973,11 @@
                         "format": "uuid",
                         "example": "e29ef739-ffae-45a8-a582-fb56f9660a12"
                     },
-                    "first_name": {
+                    "firstName": {
                         "type": "string",
                         "example": "John"
                     },
-                    "last_name": {
+                    "lastName": {
                         "type": "string",
                         "example": "Doe"
                     },
@@ -1030,14 +1030,14 @@
             },
             "CreateUserParams": {
                 "type": "object",
-                "required": ["first_name", "last_name", "email", "password"],
+                "required": ["firstName", "lastName", "email", "password"],
                 "properties": {
-                    "first_name": {
+                    "firstName": {
                         "type": "string",
                         "example": "John",
                         "minLength": 2
                     },
-                    "last_name": {
+                    "lastName": {
                         "type": "string",
                         "example": "Doe",
                         "minLength": 2
@@ -1057,12 +1057,12 @@
             "UpdateUserParams": {
                 "type": "object",
                 "properties": {
-                    "first_name": {
+                    "firstName": {
                         "type": "string",
                         "example": "John",
                         "minLength": 2
                     },
-                    "last_name": {
+                    "lastName": {
                         "type": "string",
                         "example": "Doe",
                         "minLength": 2
