@@ -28,7 +28,12 @@ describe('GetTransactionsByUserIdService', () => {
             _from: string,
             _to: string,
         ): Promise<TransactionRepositoryResponse[]> {
-            return Promise.resolve(getTransactionByUserIdRepositoryResponse)
+            return Promise.resolve([
+                {
+                    ...getTransactionByUserIdRepositoryResponse[0],
+                    deletedAt: null,
+                },
+            ])
         }
     }
 

@@ -142,7 +142,7 @@ describe('UpdateTransactionService', () => {
 
             // assert
             expect(response).toBeTruthy()
-            expect(response).toEqual(updateTransactionServiceResponse)
+            expect(response).toStrictEqual(updateTransactionServiceResponse)
         })
     })
 
