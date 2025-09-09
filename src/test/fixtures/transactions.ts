@@ -60,6 +60,7 @@ export const createTransactionRepositoryResponse = {
     amount: new Prisma.Decimal(createTransactionParams.amount),
     date: new Date(createTransactionParams.date),
     type: createTransactionParams.type as 'EARNING' | 'EXPENSE' | 'INVESTMENT',
+    deletedAt: null,
 }
 
 export const deleteTransactionRepositoryResponse = {
@@ -69,6 +70,7 @@ export const deleteTransactionRepositoryResponse = {
     amount: new Prisma.Decimal(faker.number.int({ min: 1, max: 1000 })),
     date: faker.date.recent(),
     type: faker.helpers.arrayElement(['EARNING', 'EXPENSE', 'INVESTMENT']),
+    deletedAt: null,
 }
 
 export const getTransactionByUserIdRepositoryResponse = transactionListResponse
@@ -80,6 +82,7 @@ export const updateTransactionRepositoryResponse = {
     amount: new Prisma.Decimal(updateTransactionParams.amount || 0),
     date: new Date(updateTransactionParams.date || ''),
     type: updateTransactionParams.type as Prisma.TransactionGetPayload<object>['type'],
+    deletedAt: null,
 }
 
 // ============================================================================
@@ -87,9 +90,23 @@ export const updateTransactionRepositoryResponse = {
 // ============================================================================
 
 const createTransactionResponse = transactionResponse
-const deleteTransactionResponse = deleteTransactionRepositoryResponse
+const deleteTransactionResponse = {
+    id: deleteTransactionRepositoryResponse.id,
+    userId: deleteTransactionRepositoryResponse.userId,
+    name: deleteTransactionRepositoryResponse.name,
+    amount: deleteTransactionRepositoryResponse.amount,
+    date: deleteTransactionRepositoryResponse.date,
+    type: deleteTransactionRepositoryResponse.type,
+}
 const getTransactionsByUserIdResponse = transactionListResponse
-const updateTransactionResponse = updateTransactionRepositoryResponse
+const updateTransactionResponse = {
+    id: updateTransactionRepositoryResponse.id,
+    userId: updateTransactionRepositoryResponse.userId,
+    name: updateTransactionRepositoryResponse.name,
+    amount: updateTransactionRepositoryResponse.amount,
+    date: updateTransactionRepositoryResponse.date,
+    type: updateTransactionRepositoryResponse.type,
+}
 
 // ============================================================================
 // LEGACY EXPORTS (Para manter compatibilidade)
