@@ -3,7 +3,7 @@ import z from 'zod'
 import { userIdSchema } from './common'
 
 export const createUserSchema = z.object({
-    first_name: z
+    firstName: z
         .string({
             message: 'First name is required',
         })
@@ -11,7 +11,7 @@ export const createUserSchema = z.object({
         .min(2, {
             message: 'First name must have at least 2 characters',
         }),
-    last_name: z
+    lastName: z
         .string({
             message: 'Last name is required',
         })
