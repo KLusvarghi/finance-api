@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
 import { Prisma } from '@prisma/client'
-
 // ============================================================================
 // HTTP RESPONSE TYPES
 // ============================================================================
@@ -36,6 +35,9 @@ export interface UserBalanceRepositoryResponse {
     expenses: string
     investments: string
     balance: string
+    earningsPercentage: number
+    expensesPercentage: number
+    investmentsPercentage: number
 }
 
 // ============================================================================
