@@ -47,6 +47,13 @@ export class DeleteTransactionService
         if (!deletedTransaction) {
             throw new TransactionNotFoundError(transactionId)
         }
-        return deletedTransaction
+        return {
+            id: deletedTransaction.id,
+            userId: deletedTransaction.userId,
+            name: deletedTransaction.name,
+            amount: deletedTransaction.amount,
+            date: deletedTransaction.date,
+            type: deletedTransaction.type,
+        }
     }
 }

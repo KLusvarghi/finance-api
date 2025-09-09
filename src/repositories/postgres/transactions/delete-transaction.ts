@@ -17,6 +17,7 @@ export class PostgresDeleteTransactionRepository
             return await prisma.transaction.delete({
                 where: {
                     id: transactionId,
+                    deletedAt: null,
                 },
             })
         } catch (error) {

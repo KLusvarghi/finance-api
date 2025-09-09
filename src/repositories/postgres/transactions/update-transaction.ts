@@ -19,6 +19,7 @@ export class PostgresUpdateTransactionRepository
             return await prisma.transaction.update({
                 where: {
                     id: transactionId,
+                    deletedAt: null,
                 },
                 data: updateParams,
             })

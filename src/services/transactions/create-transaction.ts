@@ -41,6 +41,13 @@ export class CreateTransactionService
             id: transactionId,
         })
 
-        return transaction
+        return {
+            id: transaction.id,
+            userId: transaction.userId,
+            name: transaction.name,
+            amount: transaction.amount,
+            date: transaction.date,
+            type: transaction.type,
+        }
     }
 }
