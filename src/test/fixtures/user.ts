@@ -38,6 +38,9 @@ export const userBalanceResponse = {
     expenses: String(faker.number.float()),
     investments: String(faker.number.float()),
     balance: String(faker.number.float()),
+    earningsPercentage: faker.number.float(),
+    expensesPercentage: faker.number.float(),
+    investmentsPercentage: faker.number.float(),
 }
 
 // ============================================================================
