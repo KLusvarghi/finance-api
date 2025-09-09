@@ -88,6 +88,7 @@ describe('PostgresDeleteTransactionRepository', () => {
             expect(prismaSpy).toHaveBeenCalledWith({
                 where: {
                     id: transaction.id,
+                    deletedAt: null,
                 },
             })
         })
