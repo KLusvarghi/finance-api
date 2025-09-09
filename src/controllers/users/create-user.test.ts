@@ -73,18 +73,18 @@ describe('CreateUserController', () => {
     })
 
     describe('validations', () => {
-        describe('first_name', () => {
+        describe('firstName', () => {
             const invalidNameCases = createInvalidNameCases({
-                required: ResponseZodMessages.first_name.required,
-                minLength: ResponseZodMessages.first_name.minLength,
+                required: ResponseZodMessages.firstName.required,
+                minLength: ResponseZodMessages.firstName.minLength,
             })
             it.each(invalidNameCases)(
-                'should return 400 if first_name is $description',
+                'should return 400 if firstName is $description',
                 async ({ name, expectedMessage }) => {
                     // arrange
 
                     const response = await sut.execute({
-                        body: { ...params, first_name: name as string },
+                        body: { ...params, firstName: name as string },
                     })
 
                     // assert
@@ -94,18 +94,18 @@ describe('CreateUserController', () => {
             )
         })
 
-        describe('last_name', () => {
+        describe('lastName', () => {
             const invalidNameCases = createInvalidNameCases({
-                required: ResponseZodMessages.last_name.required,
-                minLength: ResponseZodMessages.last_name.minLength,
+                required: ResponseZodMessages.lastName.required,
+                minLength: ResponseZodMessages.lastName.minLength,
             })
             it.each(invalidNameCases)(
-                'should return 400 if last_name is $description',
+                'should return 400 if lastName is $description',
                 async ({ name, expectedMessage }) => {
                     // arrange
 
                     const response = await sut.execute({
-                        body: { ...params, last_name: name as string },
+                        body: { ...params, lastName: name as string },
                     })
 
                     // assert

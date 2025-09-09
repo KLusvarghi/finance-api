@@ -3,7 +3,7 @@ import { TransactionNotFoundError } from '@/errors'
 import {
     DeleteTransactionServiceParams,
     ResponseMessage,
-    TransactionRepositoryResponse,
+    TransactionPublicResponse,
 } from '@/shared'
 import {
     createInvalidIdCases,
@@ -19,7 +19,7 @@ describe('DeleteTransactionController', () => {
     class DeleteTransactionServiceStub {
         execute(
             _params: DeleteTransactionServiceParams,
-        ): Promise<TransactionRepositoryResponse> {
+        ): Promise<TransactionPublicResponse> {
             return Promise.resolve(deleteTransactionControllerResponse)
         }
     }

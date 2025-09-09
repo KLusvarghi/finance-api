@@ -2,7 +2,7 @@ import { UpdateTransactionController } from '@/controllers'
 import {
     ResponseMessage,
     ResponseZodMessages,
-    TransactionRepositoryResponse,
+    TransactionPublicResponse,
     UpdateTransactionParams,
 } from '@/shared'
 import {
@@ -22,7 +22,7 @@ describe('UpdateTransactionController', () => {
         execute(
             _transactionId: string,
             _params: UpdateTransactionParams,
-        ): Promise<TransactionRepositoryResponse> {
+        ): Promise<TransactionPublicResponse> {
             return Promise.resolve(updateTransactionControllerResponse)
         }
     }
