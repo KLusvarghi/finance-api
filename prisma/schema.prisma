@@ -23,11 +23,14 @@ model User {
   // o @default irá dizer que o por padrão teremos um uuid caso não seja preenchido
   id         String @id @default(uuid())
   // Se a gente coloca apenas "String" ele por padrão coloca como "text" (que nã otem limite de caracteres)
-  first_name String @db.VarChar(50)
-  last_name  String @db.VarChar(50)
+  firstName String @db.VarChar(50)
+  lastName  String @db.VarChar(50)
   // definimos que ele é unico com @unique
   email      String @unique @db.VarChar(100)
   password   String @db.VarChar(100)
+  // createdAt  DateTime @default(now())
+  // updatedAt  DateTime @updatedAt
+  // deletedAt  DateTime?
 
   // e para que o campo "id" ou qualquer outro consiga ser referenciado em outra tabela, precisamos dizer dizer que "User", pode ter várias transactions:
   // 1:N -> Um usuári pode ter várias transaction
@@ -46,7 +49,9 @@ model Transaction {
   // se deixar apenas "DateTime" ele vai criar uma coluna do tipo timestamp
   // para especificar é só colocar @db.Date
   date    DateTime        @db.Date
+  deletedAt DateTime?    @db.Timestamp
   type    TransactionType
+  updatedAt DateTime @updatedAt
 }
 
 enum TransactionType {
