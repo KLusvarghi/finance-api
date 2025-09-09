@@ -58,6 +58,7 @@ export interface TransactionPublicResponse {
     amount: Prisma.Decimal
     date: Date
     type: Prisma.TransactionGetPayload<Record<string, never>>['type']
+    updatedAt: Date
 }
 
 export interface RefreshTokenResponse {

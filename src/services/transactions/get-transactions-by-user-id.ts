@@ -56,6 +56,7 @@ export class GetTransactionsByUserIdService
             amount: transaction.amount,
             date: transaction.date,
             type: transaction.type,
+            updatedAt: transaction.updatedAt,
         }))
     }
 }

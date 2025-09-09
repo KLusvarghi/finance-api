@@ -54,6 +54,7 @@ export class DeleteTransactionService
             amount: deletedTransaction.amount,
             date: deletedTransaction.date,
             type: deletedTransaction.type,
+            updatedAt: deletedTransaction.updatedAt,
         }
     }
 }

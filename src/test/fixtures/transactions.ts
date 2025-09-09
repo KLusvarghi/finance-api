@@ -36,6 +36,7 @@ export const transactionResponse = {
     amount: new Prisma.Decimal(createTransactionParams.amount),
     date: new Date(createTransactionParams.date),
     type: createTransactionParams.type as 'EARNING' | 'EXPENSE' | 'INVESTMENT',
+    updatedAt: new Date(),
 }
 
 export const transactionListResponse = [
@@ -46,6 +47,7 @@ export const transactionListResponse = [
         amount: new Prisma.Decimal(faker.number.int({ min: 1, max: 1000 })),
         date: faker.date.recent(),
         type: faker.helpers.arrayElement(['EARNING', 'EXPENSE', 'INVESTMENT']),
+        updatedAt: new Date(),
     },
 ]
 
@@ -61,6 +63,7 @@ export const createTransactionRepositoryResponse = {
     date: new Date(createTransactionParams.date),
     type: createTransactionParams.type as 'EARNING' | 'EXPENSE' | 'INVESTMENT',
     deletedAt: null,
+    updatedAt: new Date(),
 }
 
 export const deleteTransactionRepositoryResponse = {
@@ -71,6 +74,7 @@ export const deleteTransactionRepositoryResponse = {
     date: faker.date.recent(),
     type: faker.helpers.arrayElement(['EARNING', 'EXPENSE', 'INVESTMENT']),
     deletedAt: null,
+    updatedAt: new Date(),
 }
 
 export const getTransactionByUserIdRepositoryResponse = transactionListResponse
@@ -83,6 +87,7 @@ export const updateTransactionRepositoryResponse = {
     date: new Date(updateTransactionParams.date || ''),
     type: updateTransactionParams.type as Prisma.TransactionGetPayload<object>['type'],
     deletedAt: null,
+    updatedAt: new Date(),
 }
 
 // ============================================================================
@@ -97,6 +102,7 @@ const deleteTransactionResponse = {
     amount: deleteTransactionRepositoryResponse.amount,
     date: deleteTransactionRepositoryResponse.date,
     type: deleteTransactionRepositoryResponse.type,
+    updatedAt: deleteTransactionRepositoryResponse.updatedAt,
 }
 const getTransactionsByUserIdResponse = transactionListResponse
 const updateTransactionResponse = {
@@ -106,6 +112,7 @@ const updateTransactionResponse = {
     amount: updateTransactionRepositoryResponse.amount,
     date: updateTransactionRepositoryResponse.date,
     type: updateTransactionRepositoryResponse.type,
+    updatedAt: updateTransactionRepositoryResponse.updatedAt,
 }
 
 // ============================================================================

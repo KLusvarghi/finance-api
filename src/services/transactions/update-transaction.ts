@@ -61,6 +61,7 @@ export class UpdateTransactionService
             amount: updatedTransaction.amount,
             date: updatedTransaction.date,
             type: updatedTransaction.type,
+            updatedAt: updatedTransaction.updatedAt,
         }
     }
 }
