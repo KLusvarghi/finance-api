@@ -46,8 +46,8 @@ export interface UserBalanceRepositoryResponse {
 
 export interface UserPublicResponse {
     id: string
-    first_name: string
-    last_name: string
+    firstName: string
+    lastName: string
     email: string
 }
 
@@ -70,15 +70,15 @@ export interface RefreshTokenResponse {
 // ============================================================================
 
 export interface CreateUserParams {
-    first_name: string
-    last_name: string
+    firstName: string
+    lastName: string
     email: string
     password: string
 }
 
 export interface UpdateUserParams {
-    first_name?: string
-    last_name?: string
+    firstName?: string
+    lastName?: string
     email?: string
     password?: string
 }
@@ -163,8 +163,8 @@ export interface UpdateTransactionRequest extends HeadersRequestParams {
 // ============================================================================
 
 export interface UserHttpRequest {
-    first_name: string
-    last_name: string
+    firstName: string
+    lastName: string
     email: string
     password: string
 }
@@ -290,53 +290,6 @@ export interface UpdateUserServiceParams {
 }
 
 // ============================================================================
-// CONTROLLER INTERFACE TYPES
-// ============================================================================
-
-// User Service Interfaces
-// export type CreateUserService = Service<CreateUserParams, UserPublicResponse>
-
-// export type GetUserByIdService = SimpleService<string, UserPublicResponse>
-
-// export type GetUserBalanceService = SimpleService<
-//     string,
-//     UserBalanceRepositoryResponse
-// >
-
-// export type UpdateUserService = ServiceWithMultipleParams<
-//     string,
-//     UpdateUserParams,
-//     unknown,
-//     UserPublicResponse
-// >
-
-// export type DeleteUserService = SimpleService<string, UserPublicResponse>
-
-// // Transaction Service Interfaces
-// export type CreateTransactionService = Service<
-//     CreateTransactionParams,
-//     TransactionPublicResponse
-// >
-
-// export type GetTransactionsByUserIdService = SimpleService<
-//     string,
-//     TransactionPublicResponse[]
-// >
-
-// export type UpdateTransactionService = ServiceWithMultipleParams<
-//     string,
-//     UpdateTransactionParams,
-//     unknown,
-//     TransactionPublicResponse
-// >
-
-// export type DeleteTransactionService = ServiceWithMultipleParams<
-//     string,
-//     unknown,
-//     TransactionPublicResponse
-// >
-
-// ============================================================================
 // SERVICE INTERFACE TYPES
 // ============================================================================
 
@@ -394,13 +347,13 @@ export interface UpdateTransactionService {
     execute(
         transactionId: string,
         params: UpdateTransactionParams,
-    ): Promise<TransactionRepositoryResponse>
+    ): Promise<TransactionPublicResponse>
 }
 
 export interface DeleteTransactionService {
     execute(
         params: DeleteTransactionServiceParams,
-    ): Promise<TransactionRepositoryResponse>
+    ): Promise<TransactionPublicResponse>
 }
 
 // ============================================================================
