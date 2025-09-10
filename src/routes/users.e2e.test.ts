@@ -9,13 +9,16 @@ import {
     makeUserBalance,
     updateUserParams,
 } from '@/test'
+import {
+    createInvalidNameCases,
+    invalidEmailCases,
+    invalidPasswordCases,
+} from '@/test/'
 import { TransactionType } from '@prisma/client'
 
 // Ao invpes de chamar a rota, poderiamos chamar direto o Prisma, mas dessa forma chamando nossas rotas, conseguimos testar o fluxo completo, desde a requisição até a resposta
 
 describe('User Routes E2E Tests', () => {
-    const from = '2025-08-01'
-    const to = '2025-08-08'
     describe('GET /api/users/me', () => {
         it('should return 200 when user is found', async () => {
             const user = await makeUser()
@@ -31,8 +34,63 @@ describe('User Routes E2E Tests', () => {
     })
 
     describe('GET /api/users/me/balance', () => {
+        describe('validation', () => {
+            it.each([
+                [
+                    'from is not provided',
+                    { to: '2025-08-08' },
+                    'From is required',
+                ],
+                [
+                    'from is invalid format',
+                    { from: '2025/08/01', to: '2025-08-08' },
+                    'From must be in YYYY-MM-DD format',
+                ],
+                [
+                    'from is invalid date',
+                    { from: '2025-13-32', to: '2025-08-08' },
+                    'From must be in YYYY-MM-DD format',
+                ],
+                [
+                    'to is not provided',
+                    { from: '2025-08-01' },
+                    'To is required',
+                ],
+                [
+                    'to is invalid format',
+                    { from: '2025-08-01', to: '2025/08/08' },
+                    'To must be in YYYY-MM-DD format',
+                ],
+                [
+                    'to is invalid date',
+                    { from: '2025-08-01', to: '2025-13-32' },
+                    'To must be in YYYY-MM-DD format',
+                ],
+            ])(
+                'should return 400 if %s',
+                async (_description, query, expectedMessage) => {
+                    const user = await makeUser()
+
+                    const { body: responseBody } = await request(app)
+                        .get('/api/users/me/balance')
+                        .query(query)
+                        .set(
+                            'authorization',
+                            `Bearer ${user.tokens.accessToken}`,
+                        )
+                        .expect(400)
+
+                    expect(responseBody.success).toBe(false)
+                    expect(responseBody.message).toBe(expectedMessage)
+                },
+            )
+        })
+
         it('should return 200 when user balance is found', async () => {
             const user = await makeUser()
+            const from = '2025-08-01'
+            const to = '2025-08-08'
+
             await makeUserBalance(
                 user.id,
                 user.tokens.accessToken,
@@ -77,6 +135,96 @@ describe('User Routes E2E Tests', () => {
     })
 
     describe('POST /api/users', () => {
+        describe('validation', () => {
+            const invalidFirstNameCases = createInvalidNameCases({
+                required: ResponseZodMessages.firstName.required,
+                minLength: ResponseZodMessages.firstName.minLength,
+            })
+
+            const invalidLastNameCases = createInvalidNameCases({
+                required: ResponseZodMessages.lastName.required,
+                minLength: ResponseZodMessages.lastName.minLength,
+            })
+
+            it.each(invalidFirstNameCases)(
+                'should return 400 if firstName is $description',
+                async ({ name, expectedMessage }) => {
+                    // arrange
+                    const invalidParams = {
+                        ...createUserParams,
+                        firstName: name,
+                    }
+
+                    // act
+                    const { body: responseBody } = await request(app)
+                        .post('/api/users')
+                        .send(invalidParams)
+                        .expect(400)
+
+                    // assert
+                    expect(responseBody.success).toBe(false)
+                    expect(responseBody.message).toBe(expectedMessage)
+                },
+            )
+
+            it.each(invalidLastNameCases)(
+                'should return 400 if lastName is $description',
+                async ({ name, expectedMessage }) => {
+                    // arrange
+                    const invalidParams = {
+                        ...createUserParams,
+                        lastName: name,
+                    }
+
+                    // act
+                    const { body: responseBody } = await request(app)
+                        .post('/api/users')
+                        .send(invalidParams)
+                        .expect(400)
+
+                    // assert
+                    expect(responseBody.success).toBe(false)
+                    expect(responseBody.message).toBe(expectedMessage)
+                },
+            )
+
+            it.each(invalidEmailCases)(
+                'should return 400 if email is $description',
+                async ({ email, expectedMessage }) => {
+                    // arrange
+                    const invalidParams = { ...createUserParams, email }
+
+                    // act
+                    const { body: responseBody } = await request(app)
+                        .post('/api/users')
+                        .send(invalidParams)
+                        .expect(400)
+
+                    // assert
+                    expect(responseBody.success).toBe(false)
+                    expect(responseBody.message).toBe(expectedMessage)
+                },
+            )
+
+            it.each(invalidPasswordCases)(
+                'should return 400 if password is $description',
+                async ({ password, expectedMessage }) => {
+                    // arrange
+                    const invalidParams = { ...createUserParams, password }
+
+                    // act
+                    const { body: responseBody } = await request(app)
+                        .post('/api/users')
+                        .send(invalidParams)
+                        .expect(400)
+
+                    // assert
+                    expect(responseBody.success).toBe(false)
+                    expect(responseBody.message).toBe(expectedMessage)
+                },
+            )
+        })
+
         it('should return 201 when user is created', async () => {
             const { body: responseBody } = await request(app)
                 .post('/api/users')
@@ -114,6 +262,50 @@ describe('User Routes E2E Tests', () => {
     })
 
     describe('POST /api/users/login', () => {
+        describe('validation', () => {
+            it.each(invalidEmailCases)(
+                'should return 400 if email is $description',
+                async ({ email, expectedMessage }) => {
+                    // arrange
+                    const invalidParams = {
+                        email,
+                        password: 'validPassword123',
+                    }
+
+                    // act
+                    const { body: responseBody } = await request(app)
+                        .post('/api/users/login')
+                        .send(invalidParams)
+                        .expect(400)
+
+                    // assert
+                    expect(responseBody.success).toBe(false)
+                    expect(responseBody.message).toBe(expectedMessage)
+                },
+            )
+
+            it.each(invalidPasswordCases)(
+                'should return 400 if password is $description',
+                async ({ password, expectedMessage }) => {
+                    // arrange
+                    const invalidParams = {
+                        email: 'valid@email.com',
+                        password,
+                    }
+
+                    // act
+                    const { body: responseBody } = await request(app)
+                        .post('/api/users/login')
+                        .send(invalidParams)
+                        .expect(400)
+
+                    // assert
+                    expect(responseBody.success).toBe(false)
+                    expect(responseBody.message).toBe(expectedMessage)
+                },
+            )
+        })
+
         it('should return 200 and tokens when user is logged in', async () => {
             const user = await makeUser('1234562')
 
@@ -134,6 +326,55 @@ describe('User Routes E2E Tests', () => {
     })
 
     describe('PATCH /api/users/me', () => {
+        describe('validation', () => {
+            it('should return 400 if email is invalid', async () => {
+                const user = await makeUser()
+
+                const { body: responseBody } = await request(app)
+                    .patch('/api/users/me')
+                    .set('authorization', `Bearer ${user.tokens.accessToken}`)
+                    .send({ email: 'invalid_email' })
+                    .expect(400)
+
+                expect(responseBody.success).toBe(false)
+                expect(responseBody.message).toBe(
+                    ResponseZodMessages.email.invalid,
+                )
+            })
+
+            it('should return 400 if password is too short', async () => {
+                const user = await makeUser()
+
+                const { body: responseBody } = await request(app)
+                    .patch('/api/users/me')
+                    .set('authorization', `Bearer ${user.tokens.accessToken}`)
+                    .send({ password: '123' })
+                    .expect(400)
+
+                expect(responseBody.success).toBe(false)
+                expect(responseBody.message).toBe(
+                    ResponseZodMessages.password.minLength,
+                )
+            })
+
+            it('should return 400 if disallowed field is provided', async () => {
+                const user = await makeUser()
+
+                const { body: responseBody } = await request(app)
+                    .patch('/api/users/me')
+                    .set('authorization', `Bearer ${user.tokens.accessToken}`)
+                    .send({
+                        firstName: 'Valid Name',
+                        disallowedField: 'not allowed',
+                    })
+                    .expect(400)
+
+                expect(responseBody.success).toBe(false)
+                expect(responseBody.message).toContain('Unrecognized key')
+                expect(responseBody.message).toContain('disallowedField')
+            })
+        })
+
         it('should return 200 when user is updated', async () => {
             const user = await makeUser()
 
@@ -162,7 +403,48 @@ describe('User Routes E2E Tests', () => {
         })
     })
 
-    describe('POST /api/refresh-token', () => {
+    describe('POST /api/users/refresh-token', () => {
+        describe('validation', () => {
+            it.each([
+                [
+                    'is not provided',
+                    {},
+                    ResponseZodMessages.refreshToken.required,
+                ],
+                [
+                    'is null',
+                    { refreshToken: null },
+                    ResponseZodMessages.refreshToken.required,
+                ],
+                [
+                    'is undefined',
+                    { refreshToken: undefined },
+                    ResponseZodMessages.refreshToken.required,
+                ],
+                [
+                    'is empty string',
+                    { refreshToken: '' },
+                    ResponseZodMessages.refreshToken.minLength,
+                ],
+                [
+                    'is only whitespace',
+                    { refreshToken: '   ' },
+                    ResponseZodMessages.refreshToken.minLength,
+                ],
+            ])(
+                'should return 400 if refreshToken %s',
+                async (_description, body, expectedMessage) => {
+                    const { body: responseBody } = await request(app)
+                        .post('/api/users/refresh-token')
+                        .send(body)
+                        .expect(400)
+
+                    expect(responseBody.success).toBe(false)
+                    expect(responseBody.message).toBe(expectedMessage)
+                },
+            )
+        })
+
         it('should return 201 and new tokens when token is valid', async () => {
             const user = await makeUser()
 
