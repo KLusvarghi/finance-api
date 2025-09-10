@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 
+import { userIdSchema } from '@/schemas'
+
 /**
  * Extends Express `Request` to ensure the `authorization` header
  * is recognised by the TypeScript compiler.
@@ -12,7 +14,7 @@ export interface AuthenticatedRequest extends Request {
     userId?: string
 }
 
-export const auth = (
+export const auth = async (
     req: AuthenticatedRequest,
     res: Response,
     next: NextFunction,
@@ -31,6 +33,12 @@ export const auth = (
 
         // se ele for válido, ele retorna o payload
         const payload = jwt.decode(accessToken) as { userId: string }
+
+        const validatedUserId = await userIdSchema.parseAsync(payload?.userId)
+
+        if (!validatedUserId) {
+            return res.status(401).send({ message: 'Unauthorized' })
+        }
 
         req.userId = payload?.userId
 
