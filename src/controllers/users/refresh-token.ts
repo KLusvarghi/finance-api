@@ -1,15 +1,8 @@
 import jwt from 'jsonwebtoken'
-import { ZodError } from 'zod'
 
-import {
-    created,
-    handleZodValidationError,
-    serverError,
-    unauthorized,
-} from '../_helpers'
+import { created, serverError, unauthorized } from '../_helpers'
 
-import { AppError } from '@/errors'
-import { refreshTokenResponseSchema } from '@/schemas'
+import { AppError, ErrorCode } from '@/errors'
 import { RefreshTokenService } from '@/services'
 import {
     Controller,
@@ -29,9 +22,8 @@ export class RefreshTokenController
         httpRequest: RefreshTokenRequest,
     ): Promise<HttpResponse<RefreshTokenResponse>> {
         try {
+            // Validation is now handled by middleware
             const { refreshToken } = httpRequest.body
-
-            await refreshTokenResponseSchema.parseAsync({ refreshToken })
 
             const tokens = await this.refreshTokenService.execute(refreshToken)
 
@@ -39,26 +31,31 @@ export class RefreshTokenController
         } catch (error) {
             console.error(error)
 
-            if (error instanceof ZodError) {
-                return handleZodValidationError(error)
-            }
-
             // Handle JWT-specific errors first
             if (error instanceof jwt.TokenExpiredError) {
-                return unauthorized('TOKEN_EXPIRED')
+                return unauthorized(
+                    ResponseMessage.UNAUTHORIZED,
+                    ErrorCode.TOKEN_EXPIRED,
+                )
             }
 
             if (error instanceof jwt.JsonWebTokenError) {
-                return unauthorized('INVALID_TOKEN')
+                return unauthorized(
+                    ResponseMessage.UNAUTHORIZED,
+                    ErrorCode.TOKEN_INVALID,
+                )
             }
 
             if (error instanceof jwt.NotBeforeError) {
-                return unauthorized('TOKEN_NOT_ACTIVE')
+                return unauthorized(
+                    ResponseMessage.UNAUTHORIZED,
+                    ErrorCode.TOKEN_NOT_ACTIVE,
+                )
             }
 
             // Handle application-specific errors
             if (error instanceof AppError) {
-                return unauthorized(error.code)
+                return unauthorized(ResponseMessage.UNAUTHORIZED, error.code)
             }
 
             return serverError()

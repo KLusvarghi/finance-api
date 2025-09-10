@@ -1,14 +1,6 @@
-import { ZodError } from 'zod'
-
-import {
-    handleZodValidationError,
-    notFoundResponse,
-    ok,
-    serverError,
-} from '../_helpers'
+import { notFoundResponse, ok, serverError } from '../_helpers'
 
 import { UserNotFoundError } from '@/errors'
-import { getUserBalanceSchema } from '@/schemas'
 import {
     GetUserBalanceRequest,
     GetUserBalanceService,
@@ -30,10 +22,9 @@ export class GetUserBalanceController
         httpRequest: GetUserBalanceRequest,
     ): Promise<HttpResponse<UserBalanceRepositoryResponse>> {
         try {
+            // Validation is now handled by middleware
             const { userId } = httpRequest.headers
             const { from, to } = httpRequest.query
-
-            await getUserBalanceSchema.parseAsync({ userId, from, to })
 
             const userBalance = await this.getUserBalanceService.execute(
                 userId,
@@ -48,9 +39,6 @@ export class GetUserBalanceController
                 return notFoundResponse(error)
             }
 
-            if (error instanceof ZodError) {
-                return handleZodValidationError(error)
-            }
             return serverError()
         }
     }

@@ -1,14 +1,6 @@
-import { ZodError } from 'zod'
-
-import {
-    created,
-    emailAlreadyExistsResponse,
-    handleZodValidationError,
-    serverError,
-} from '../_helpers'
+import { created, emailAlreadyExistsResponse, serverError } from '../_helpers'
 
 import { EmailAlreadyExistsError } from '@/errors'
-import { createUserSchema } from '@/schemas'
 import {
     BodyController,
     CreateUserParams,
@@ -37,18 +29,13 @@ export class CreateUserController
         >
     > {
         try {
-            // validar a requisição (campos obrigatório, email e tamenho de senha)
-            const params = httpRequest.body
+            // Validation is now handled by middleware
+            const params = httpRequest.body as CreateUserParams
 
-            // validando o schema de forma asyncrona
-            await createUserSchema.parseAsync(params as CreateUserParams)
+            // Execute business logic
+            const createdUser = await this.createUserService.execute(params)
 
-            // rxecutamos nossa regra de negocio
-            const createdUser = await this.createUserService.execute(
-                params as CreateUserParams,
-            )
-
-            // retornar a resposta para o user (status code)
+            // Return response to user
             return created(
                 createdUser,
                 ResponseMessage.USER_CREATED,
@@ -56,10 +43,6 @@ export class CreateUserController
                 UserPublicResponse & { tokens: TokensGeneratorAdapterResponse }
             >
         } catch (error) {
-            if (error instanceof ZodError) {
-                return handleZodValidationError(error)
-            }
-
             if (error instanceof EmailAlreadyExistsError) {
                 return emailAlreadyExistsResponse(error.message)
             }

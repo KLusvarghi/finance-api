@@ -1,14 +1,6 @@
-import { ZodError } from 'zod'
-
-import {
-    badRequest,
-    handleZodValidationError,
-    ok,
-    serverError,
-} from '../_helpers'
+import { badRequest, ok, serverError } from '../_helpers'
 
 import { LoginFailedError, TokenGenerationError } from '@/errors'
-import { loginSchema } from '@/schemas'
 import {
     Controller,
     LoginUserRequest,
@@ -25,19 +17,14 @@ export class LoginUserController
 
     async execute(httpRequest: LoginUserRequest) {
         try {
+            // Validation is now handled by middleware
             const { email, password } = httpRequest.body
-
-            await loginSchema.parseAsync({ email, password })
 
             const user = await this.loginUserService.execute(email, password)
 
             return ok(user, ResponseMessage.USER_LOGIN_SUCCESS)
         } catch (error) {
             console.error(error)
-
-            if (error instanceof ZodError) {
-                return handleZodValidationError(error)
-            }
 
             if (error instanceof LoginFailedError) {
                 return badRequest(error.message, error.code)
