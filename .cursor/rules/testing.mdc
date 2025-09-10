@@ -89,6 +89,51 @@ describe('validations', () => {
 })
 ```
 
+### Testes E2E: Factories para Setup
+
+#### ✅ Correto
+
+Usar uma factory para criar dados pré-requisito (ex: criar um usuário para poder testar a rota de deleção). Isso isola o teste à funcionalidade que está sendo validada.
+
+```typescript
+// Extraído de: src/routes/users.e2e.test.ts
+describe('DELETE /api/users/me', () => {
+    it('should return 200 when user is deleted', async () => {
+        // arrange: setup com factory
+        const user = await makeUser()
+
+        // act: testa a rota de deleção
+        const { body: responseBody } = await request(app)
+            .delete(`/api/users/me`)
+            .set('authorization', `Bearer ${user.tokens.accessToken}`)
+            .expect(200)
+
+        // assert
+        expect(responseBody.message).toBe(ResponseMessage.USER_DELETED)
+    })
+})
+```
+
+#### ❌ Evitar
+
+Não usar uma factory para testar a própria funcionalidade de criação. A rota de criação deve ser testada diretamente para validar todo o fluxo (controller, serviço, etc.).
+
+```typescript
+// Extraído de: src/routes/users.e2e.test.ts
+describe('POST /api/users', () => {
+    it('should return 201 when user is created', async () => {
+        // act & assert: testa a rota de criação diretamente
+        const { body: responseBody } = await request(app)
+            .post('/api/users')
+            .send(createUserParams)
+            .expect(201)
+
+        expect(responseBody.data.tokens.accessToken).toBeDefined()
+        expect(responseBody.message).toBe(ResponseMessage.USER_CREATED)
+    })
+})
+```
+
 ## Escopo & Particularidades
 
 - **Aplica-se a**: Todos os arquivos de teste (`.test.ts`, `.e2e.test.ts`).
@@ -97,6 +142,8 @@ describe('validations', () => {
     - **Testes Unitários (Serviços, Adapters)**: Foco em isolamento total com mocks/stubs.
     - **Testes de Integração (Controllers, Repositories)**: Interação com stubs de serviços e/ou banco de dados de teste.
     - **Testes E2E (Routes)**: Simulam requisições HTTP reais e verificam a resposta de ponta a ponta.
+        - **PREFER** usar _factories_ (localizadas em `src/test/factories/`) para criar o estado necessário para um teste (ex: criar um usuário antes de testar a rota de deleção). Isso evita chamadas de API desnecessárias e torna os testes mais rápidos e focados.
+        - **NEVER** use _factories_ para testar a própria lógica de criação. O SUT (System Under Test) deve ser exercitado através da requisição HTTP (`supertest`). Se uma _factory_ necessária não existir, ela deve ser criada.
 
 ## Referências
 
