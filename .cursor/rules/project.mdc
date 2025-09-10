@@ -63,26 +63,105 @@ alwaysApply: true
 
 ## Padrões de Projeto
 
-### Respostas HTTP
+### Padrões de Resposta (HTTP)
 
-- **ALWAYS** usar helpers (`ok`, `created`, `badRequest`, `serverError`).
-- **Shape padrão de sucesso**:
-    ```json
-    {
-        "success": true,
-        "message": "Operação bem-sucedida",
-        "data": {}
+- **ALWAYS** use os helpers (`ok`, `created`, etc.) para garantir um envelope de resposta padronizado.
+- **ALWAYS** estruture todas as respostas com um envelope JSON consistente para previsibilidade no front-end.
+
+#### ✅ Estrutura de Sucesso (Status `2xx`)
+
+- **ALWAYS** inclua `success: true` e uma `message` descritiva.
+- **PREFER** omitir a chave `data` se não houver conteúdo a ser retornado (ex: em operações de `DELETE`).
+
+**Exemplo: Sucesso com dados (e.g., `POST /users`)**
+
+```json
+// Status: 201 Created
+{
+    "success": true,
+    "message": "User created successfully.",
+    "data": {
+        "id": "user-123",
+        "firstName": "John",
+        "email": "john.doe@email.com"
     }
-    ```
+}
+```
 
-### Tratamento de Erros
+**Exemplo: Sucesso sem dados (e.g., `DELETE /transactions/tx-456`)**
 
-- **ALWAYS** lançar erros customizados (`AppError`).
-- **NEVER** expor stack trace para o cliente.
-- Exemplo:
-    ```ts
-    throw new AppError('USER_NOT_FOUND', 404)
-    ```
+```json
+// Status: 200 OK
+{
+    "success": true,
+    "message": "Transaction deleted successfully."
+}
+```
+
+---
+
+### Tratamento de Erros e Estrutura de Resposta
+
+- **ALWAYS** lance erros customizados que estendem a classe `Error` a partir dos `Services` (ex: `EmailAlreadyExistsError`).
+- **ALWAYS** capture os erros nos `Controllers` e use os helpers HTTP (ex: `badRequest`, `notFound`) para formatar a resposta de erro padronizada.
+- **NEVER** exponha stack traces ou mensagens de erro internas na resposta da API. Logue-os internamente.
+
+#### ✅ Estrutura de Erro (Status `4xx`, `5xx`)
+
+- **ALWAYS** inclua `success: false`, uma `message` clara para o usuário e um `code` para consumo da lógica do client.
+- **PREFER** usar a chave `details` para enviar contexto adicional de debugging (ex: ID da entidade, erros de validação por campo). O conteúdo de `details` **NÃO** deve ser usado para lógica no front-end.
+- **PREFER** omitir a chave `details` se não houver contexto adicional.
+
+**Exemplo: Erro de Validação (e.g., `POST /users` com email inválido)**
+
+```json
+// Status: 400 Bad Request
+{
+    "success": false,
+    "message": "Invalid input provided.",
+    "code": "VALIDATION_ERROR",
+    "details": {
+        "email": "Must be a valid email address."
+    }
+}
+```
+
+**Exemplo: Recurso não encontrado (e.g., `GET /transactions/tx-inexistente`)**
+
+```json
+// Status: 404 Not Found
+{
+    "success": false,
+    "message": "Transaction not found.",
+    "code": "TRANSACTION_NOT_FOUND",
+    "details": {
+        "transactionId": "tx-inexistente"
+    }
+}
+```
+
+**Exemplo de fluxo (Service -> Controller):**
+
+```ts
+// Em um Service:
+if (userExists) {
+    throw new EmailAlreadyExistsError(email);
+}
+
+// Em um Controller:
+// ...
+} catch (error) {
+    if (error instanceof EmailAlreadyExistsError) {
+        return badRequest(
+            error.message,
+            'EMAIL_ALREADY_EXISTS', // code
+            { email: error.email }  // details
+        );
+    }
+    // ...
+    return serverError();
+}
+```
 
 ### Paginação & Ordenação
 
