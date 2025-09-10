@@ -4,9 +4,9 @@ export const ResponseMessage = {
     USER_UPDATED: 'User updated successfully',
     USER_DELETED: 'User deleted successfully',
     USER_NOT_FOUND: 'User not found',
-    USER_ID_MISSING: 'User id is required',
+    USER_ID_MISSING: 'User ID is required',
+    USER_INVALID_ID: 'User ID is not valid',
     USER_LOGIN_SUCCESS: 'User logged in successfully',
-    USER_INVALID_ID: 'User id must be a valid uuid',
     USER_INVALID_PASSWORD_OR_EMAIL: 'Password or email is incorrect',
 
     // Transações
@@ -14,8 +14,8 @@ export const ResponseMessage = {
     TRANSACTION_UPDATED: 'Transaction updated successfully',
     TRANSACTION_DELETED: 'Transaction deleted successfully',
     TRANSACTION_NOT_FOUND: 'Transaction not found',
-    TRANSACTION_ID_MISSING: 'Transaction id is required',
-    TRANSACTION_INVALID_ID: 'Transaction id is not valid',
+    TRANSACTION_ID_MISSING: 'Transaction ID is required',
+    TRANSACTION_INVALID_ID: 'Transaction ID is not valid',
 
     // Token
     TOKEN_GENERATION_FAILED: 'Failed to generate authentication tokens',
@@ -62,7 +62,7 @@ export const ResponseZodMessages = {
         minLength: 'Password must have at least 6 characters',
     },
     email: {
-        required: 'Email is required',
+        required: 'Please provide a valid email',
         invalid: 'Please provide a valid email',
     },
     date: {
