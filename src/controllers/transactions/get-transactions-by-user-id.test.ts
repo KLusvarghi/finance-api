@@ -1,6 +1,10 @@
 import { GetTransactionsByUserIdController } from '@/controllers'
 import { UserNotFoundError } from '@/errors'
-import { ResponseMessage, TransactionPublicResponse } from '@/shared'
+import {
+    HttpResponseSuccessBody,
+    ResponseMessage,
+    TransactionPublicResponse,
+} from '@/shared'
 import {
     getTransactionsByUserIdControllerResponse,
     getTransactionsByUserIdHttpRequest as baseHttpRequest,
@@ -83,9 +87,10 @@ describe('GetTransactionsByUserIdController', () => {
 
             // assert
             expect(response.statusCode).toBe(200)
-            expect(response.body?.data).toStrictEqual(
-                getTransactionsByUserIdControllerResponse,
-            )
+            expect(response.body?.success).toBe(true)
+            expect(
+                (response.body as HttpResponseSuccessBody)?.data,
+            ).toStrictEqual(getTransactionsByUserIdControllerResponse)
         })
 
         it('should call GetTransactionsByUserIdService with correct parameters', async () => {

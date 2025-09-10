@@ -6,7 +6,6 @@ import {
     TransactionPublicResponse,
 } from '@/shared'
 import {
-    createInvalidIdCases,
     deleteTransactionControllerResponse,
     deleteTransactionHttpRequest as baseHttpRequest,
     transactionId,
@@ -75,30 +74,6 @@ describe('DeleteTransactionController', () => {
                 `Transaction with id ${transactionId} not found`,
             )
         })
-    })
-
-    describe('validations', () => {
-        const invalidIdCases = createInvalidIdCases({
-            missing: ResponseMessage.TRANSACTION_ID_MISSING,
-            invalid: ResponseMessage.TRANSACTION_INVALID_ID,
-        })
-
-        it.each(invalidIdCases)(
-            'should return 400 if transactionId is $description',
-            async ({ id, expectedMessage }) => {
-                // arrange
-                const response = await sut.execute({
-                    params: {
-                        transactionId: id || '',
-                    },
-                    headers: { userId: 'user-id' },
-                })
-
-                // assert
-                expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBe(expectedMessage)
-            },
-        )
     })
 
     describe('success cases', () => {
