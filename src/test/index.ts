@@ -1,3 +1,4 @@
+export * from './factories/make-transaction'
 export * from './factories/make-user'
 export * from './factories/make-user-balance'
 export * from './fixtures/transactions'
