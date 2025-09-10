@@ -1,18 +1,6 @@
-import { ZodError } from 'zod'
-
-import {
-    checkIfIdIsValid,
-    forbidden,
-    handleZodValidationError,
-    invalidIdResponse,
-    notFoundResponse,
-    ok,
-    requiredFieldMissingResponse,
-    serverError,
-} from '../_helpers'
+import { forbidden, notFoundResponse, ok, serverError } from '../_helpers'
 
 import { ForbiddenError, TransactionNotFoundError } from '@/errors'
-import { updateTransactionSchema } from '@/schemas'
 import {
     BodyParamsHeadersController,
     HttpResponse,
@@ -43,27 +31,13 @@ export class UpdateTransactionController
         httpRequest: UpdateTransactionRequest,
     ): Promise<HttpResponse<TransactionPublicResponse>> {
         try {
+            // Validation is now handled by middleware
             const { transactionId } = httpRequest.params
             const { userId } = httpRequest.headers
-
-            if (!transactionId) {
-                return requiredFieldMissingResponse('transactionId')
-            }
-
-            if (!checkIfIdIsValid(transactionId)) {
-                return invalidIdResponse('transactionId')
-            }
-
-            if (!userId) {
-                return requiredFieldMissingResponse('userId')
-            }
-
-            const validatedParams = await updateTransactionSchema.parseAsync(
-                httpRequest.body,
-            )
+            const updateParams = httpRequest.body
 
             const serviceParams: UpdateTransactionServiceParams = {
-                ...validatedParams,
+                ...updateParams,
                 userId,
             }
 
@@ -78,14 +52,6 @@ export class UpdateTransactionController
             console.error(error)
             if (error instanceof TransactionNotFoundError) {
                 return notFoundResponse(error)
-            }
-            // if (error instanceof ForbiddenError) {
-            //     return unauthorized(
-            //         'You do not have permission to update this transaction',
-            //     )
-            // }
-            if (error instanceof ZodError) {
-                return handleZodValidationError(error)
             }
 
             if (error instanceof ForbiddenError) {

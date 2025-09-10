@@ -1,12 +1,4 @@
-import {
-    checkIfIdIsValid,
-    forbidden,
-    invalidIdResponse,
-    notFoundResponse,
-    ok,
-    requiredFieldMissingResponse,
-    serverError,
-} from '../_helpers'
+import { forbidden, notFoundResponse, ok, serverError } from '../_helpers'
 
 import { ForbiddenError, TransactionNotFoundError } from '@/errors'
 import {
@@ -40,13 +32,13 @@ export class DeleteTransactionController
             const { transactionId } = httpRequest.params
             const { userId } = httpRequest.headers
 
-            if (!transactionId) {
-                return requiredFieldMissingResponse('transactionId')
-            }
+            // if (!transactionId) {
+            //     return requiredFieldMissingResponse('transactionId')
+            // }
 
-            if (!checkIfIdIsValid(transactionId)) {
-                return invalidIdResponse('transactionId')
-            }
+            // if (!checkIfIdIsValid(transactionId)) {
+            //     return invalidIdResponse('transactionId')
+            // }checkIfIdIsValid
 
             const serviceParams: DeleteTransactionServiceParams = {
                 transactionId,

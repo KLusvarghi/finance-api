@@ -1,8 +1,5 @@
-import { ZodError } from 'zod'
+import { created, serverError } from '../_helpers'
 
-import { created, handleZodValidationError, serverError } from '../_helpers'
-
-import { createTransactionSchema } from '@/schemas'
 import {
     BodyHeadersController,
     CreateTransactionParams,
@@ -31,17 +28,12 @@ export class CreateTransactionController
         httpRequest: CreateTransactionRequest,
     ): Promise<HttpResponse<TransactionPublicResponse>> {
         try {
+            // Validation is now handled by middleware
             const createTransactionParams = httpRequest.body
             const { userId } = httpRequest.headers
 
-            // usando o "safeParseAsync" é uma forma de tratar os erros de forma mais segura e eveitar que de um throw e caia no catch e consigamos tratar o erro aqui ainda
-            // await createTransactionSchema.safeParseAsync(params)
-            const validatedParams = await createTransactionSchema.parseAsync(
-                createTransactionParams,
-            )
-
             const serviceParams: CreateTransactionServiceParams = {
-                ...validatedParams,
+                ...createTransactionParams,
                 userId,
             }
 
@@ -53,9 +45,6 @@ export class CreateTransactionController
                 ResponseMessage.TRANSACTION_CREATED,
             )
         } catch (error) {
-            if (error instanceof ZodError) {
-                return handleZodValidationError(error)
-            }
             console.error(error)
             return serverError()
         }
