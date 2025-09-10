@@ -3,8 +3,12 @@ import request from 'supertest'
 import { app } from '../app'
 import { ResponseMessage, ResponseZodMessages } from '../shared'
 
-import { createUserParams, updateUserParams } from '@/test'
-import { faker } from '@faker-js/faker'
+import {
+    createUserParams,
+    makeUser,
+    makeUserBalance,
+    updateUserParams,
+} from '@/test'
 import { TransactionType } from '@prisma/client'
 
 // Ao invpes de chamar a rota, poderiamos chamar direto o Prisma, mas dessa forma chamando nossas rotas, conseguimos testar o fluxo completo, desde a requisição até a resposta
@@ -14,77 +18,49 @@ describe('User Routes E2E Tests', () => {
     const to = '2025-08-08'
     describe('GET /api/users/me', () => {
         it('should return 200 when user is found', async () => {
-            const { body: createdUser } = await request(app)
-                .post(`/api/users`)
-                .send(createUserParams)
-                .expect(201)
+            const user = await makeUser()
 
             const { body: responseBody } = await request(app)
                 .get(`/api/users/me`)
-                .set(
-                    'authorization',
-                    `Bearer ${createdUser.data.tokens.accessToken}`,
-                )
+                .set('authorization', `Bearer ${user.tokens.accessToken}`)
                 .expect(200)
 
-            expect(responseBody.data.id).toEqual(createdUser.data.id)
+            expect(responseBody.data.id).toEqual(user.id)
             expect(responseBody.message).toBe(ResponseMessage.SUCCESS)
         })
     })
 
     describe('GET /api/users/me/balance', () => {
         it('should return 200 when user balance is found', async () => {
-            const { body: createdUser } = await request(app)
-                .post(`/api/users`)
-                .send(createUserParams)
-                .expect(201)
+            const user = await makeUser()
+            await makeUserBalance(
+                user.id,
+                user.tokens.accessToken,
+                from,
+                10000,
+                TransactionType.EARNING,
+            )
 
-            await request(app)
-                .post(`/api/transactions/me`)
-                .set(
-                    'authorization',
-                    `Bearer ${createdUser.data.tokens.accessToken}`,
-                )
-                .send({
-                    name: faker.lorem.words(3),
-                    date: new Date(from),
-                    amount: 10000,
-                    type: TransactionType.EARNING,
-                })
+            await makeUserBalance(
+                user.id,
+                user.tokens.accessToken,
+                from,
+                2000,
+                TransactionType.INVESTMENT,
+            )
 
-            await request(app)
-                .post(`/api/transactions/me`)
-                .set(
-                    'authorization',
-                    `Bearer ${createdUser.data.tokens.accessToken}`,
-                )
-                .send({
-                    name: faker.lorem.words(3),
-                    date: new Date(from),
-                    amount: 2000,
-                    type: TransactionType.INVESTMENT,
-                })
-
-            await request(app)
-                .post(`/api/transactions/me`)
-                .set(
-                    'authorization',
-                    `Bearer ${createdUser.data.tokens.accessToken}`,
-                )
-                .send({
-                    name: faker.lorem.words(3),
-                    date: new Date(to),
-                    amount: 2000,
-                    type: TransactionType.EXPENSE,
-                })
+            await makeUserBalance(
+                user.id,
+                user.tokens.accessToken,
+                from,
+                2000,
+                TransactionType.EXPENSE,
+            )
 
             const { body: responseBody } = await request(app)
                 .get(`/api/users/me/balance`)
                 .query({ from, to })
-                .set(
-                    'authorization',
-                    `Bearer ${createdUser.data.tokens.accessToken}`,
-                )
+                .set('authorization', `Bearer ${user.tokens.accessToken}`)
                 .expect(200)
 
             expect(responseBody.data).toStrictEqual({
