@@ -1,8 +1,7 @@
 import z from 'zod'
 
-import { userIdSchema } from './common'
-
-export const createUserSchema = z.object({
+// Body schemas (for request body validation)
+export const createUserBodySchema = z.object({
     firstName: z
         .string({
             message: 'First name is required',
@@ -20,9 +19,6 @@ export const createUserSchema = z.object({
             message: 'Last name must have at least 2 characters',
         }),
     email: z
-        .string({
-            message: 'Email is required',
-        })
         .email({
             message: 'Please provide a valid email',
         })
@@ -40,13 +36,20 @@ export const createUserSchema = z.object({
 
 // o partial assim a gente atribui o que tem no schema e deixamos ele opcional
 // e o metodo "strict" fará com que ele seja estrito, e não deixará passar campos que não existem no schema
-export const updateUserSchema = createUserSchema.partial().strict()
 
-export const loginSchema = z.object({
+// Route schemas (for middleware validation)
+export const createUserSchema = z.object({
+    body: createUserBodySchema,
+})
+
+export const updateUserBodySchema = createUserBodySchema.partial().strict()
+
+export const updateUserSchema = z.object({
+    body: updateUserBodySchema,
+})
+
+export const loginBodySchema = z.object({
     email: z
-        .string({
-            message: 'Email is required',
-        })
         .email({
             message: 'Please provide a valid email',
         })
@@ -62,7 +65,11 @@ export const loginSchema = z.object({
         }),
 })
 
-export const refreshTokenResponseSchema = z.object({
+export const loginSchema = z.object({
+    body: loginBodySchema,
+})
+
+export const refreshTokenBodySchema = z.object({
     refreshToken: z
         .string({
             message: 'Refresh token is required',
@@ -73,16 +80,28 @@ export const refreshTokenResponseSchema = z.object({
         }),
 })
 
-export const getUserBalanceSchema = z.object({
-    userId: userIdSchema,
+export const refreshTokenSchema = z.object({
+    body: refreshTokenBodySchema,
+})
+
+export const getUserBalanceQuerySchema = z.object({
     from: z
         .string({
             message: 'From is required',
         })
         .refine(
             (dateString) => {
-                const dateRegex = /^\d{4}-\d{2}-\d{2}$/
-                return dateRegex.test(dateString.toString())
+                try {
+                    const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+                    if (!dateRegex.test(dateString.toString())) {
+                        return false
+                    }
+                    // Additional validation: check if the date is actually valid
+                    const date = new Date(dateString + 'T00:00:00.000Z')
+                    return date.toISOString().startsWith(dateString)
+                } catch {
+                    return false
+                }
             },
             {
                 message: 'From must be in YYYY-MM-DD format',
@@ -94,11 +113,29 @@ export const getUserBalanceSchema = z.object({
         })
         .refine(
             (dateString) => {
-                const dateRegex = /^\d{4}-\d{2}-\d{2}$/
-                return dateRegex.test(dateString.toString())
+                try {
+                    const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+                    if (!dateRegex.test(dateString.toString())) {
+                        return false
+                    }
+                    // Additional validation: check if the date is actually valid
+                    const date = new Date(dateString + 'T00:00:00.000Z')
+                    return date.toISOString().startsWith(dateString)
+                } catch {
+                    return false
+                }
             },
             {
                 message: 'To must be in YYYY-MM-DD format',
             },
         ),
 })
+
+export const getUserBalanceSchema = z.object({
+    query: getUserBalanceQuerySchema,
+})
+
+// Schema for routes that only need user ID from auth middleware (no validation needed)
+export const getUserByIdSchema = z.object({})
+
+export const deleteUserSchema = z.object({})

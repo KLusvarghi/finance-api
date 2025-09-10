@@ -1,17 +1,10 @@
 import isCurrency from 'validator/lib/isCurrency'
 import z from 'zod'
 
-import { userIdSchema } from './common'
+import { transactionIdSchema } from './common'
 
-export const createTransactionSchema = z.object({
-    // userId: z
-    //     .string({
-    //         message: 'User id is required',
-    //     })
-    //     .min(1, { message: 'User id is required' }) // o min é para validar se o campo é obrigatório
-    //     .uuid({
-    //         message: 'User id must be a valid uuid',
-    //     }),
+// Body schemas (for request body validation)
+export const createTransactionBodySchema = z.object({
     name: z
         .string({
             message: 'Name is required',
@@ -60,26 +53,49 @@ export const createTransactionSchema = z.object({
         ),
 })
 
-export const updateTransactionSchema = createTransactionSchema
-    // o omit ele exclui o campo "userId" do schema, entõa ele não aceira esse campo na hora de valdiar
-    // .omit({
-    //     userId: true,
-    // })
-    // .optional() // o "optional" assim a gente atribui o que tem no schema e deixamos ele opcional
-    // Resultado: { name: string, email: string } | undefined
+// Route schemas (for middleware validation)
+export const createTransactionSchema = z.object({
+    body: createTransactionBodySchema,
+})
+
+// o omit ele exclui o campo "userId" do schema, entõa ele não aceira esse campo na hora de valdiar
+// .omit({
+//     userId: true,
+// })
+// .optional() // o "optional" assim a gente atribui o que tem no schema e deixamos ele opcional
+// Resultado: { name: string, email: string } | undefined
+
+export const updateTransactionBodySchema = createTransactionBodySchema
     .partial() // o "partial" assim a gente atribui o que tem no schema e deixamos ele opcional
     .strict() // "strict" fará com que ele seja estrito, e não deixará passar campos que não existem no schema
 
-export const getTransactionsByUserIdSchema = z.object({
-    userId: userIdSchema,
+export const updateTransactionParamsSchema = z.object({
+    transactionId: transactionIdSchema,
+})
+
+export const updateTransactionSchema = z.object({
+    params: updateTransactionParamsSchema,
+    body: updateTransactionBodySchema,
+})
+
+export const getTransactionsByUserIdQuerySchema = z.object({
     from: z
         .string({
             message: 'From is required',
         })
         .refine(
             (dateString) => {
-                const dateRegex = /^\d{4}-\d{2}-\d{2}$/
-                return dateRegex.test(dateString.toString())
+                try {
+                    const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+                    if (!dateRegex.test(dateString.toString())) {
+                        return false
+                    }
+                    // Additional validation: check if the date is actually valid
+                    const date = new Date(dateString + 'T00:00:00.000Z')
+                    return date.toISOString().startsWith(dateString)
+                } catch {
+                    return false
+                }
             },
             {
                 message: 'From must be in YYYY-MM-DD format',
@@ -91,11 +107,32 @@ export const getTransactionsByUserIdSchema = z.object({
         })
         .refine(
             (dateString) => {
-                const dateRegex = /^\d{4}-\d{2}-\d{2}$/
-                return dateRegex.test(dateString.toString())
+                try {
+                    const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+                    if (!dateRegex.test(dateString.toString())) {
+                        return false
+                    }
+                    // Additional validation: check if the date is actually valid
+                    const date = new Date(dateString + 'T00:00:00.000Z')
+                    return date.toISOString().startsWith(dateString)
+                } catch {
+                    return false
+                }
             },
             {
                 message: 'To must be in YYYY-MM-DD format',
             },
         ),
+})
+
+export const getTransactionsByUserIdSchema = z.object({
+    query: getTransactionsByUserIdQuerySchema,
+})
+
+export const deleteTransactionParamsSchema = z.object({
+    transactionId: transactionIdSchema,
+})
+
+export const deleteTransactionSchema = z.object({
+    params: deleteTransactionParamsSchema,
 })

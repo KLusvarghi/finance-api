@@ -22,6 +22,9 @@ export const userIdSchema = z
     .string({
         message: 'User ID is required',
     })
+    .min(1, {
+        message: 'User ID is required',
+    })
     .refine(validateUUID, {
         message: 'User ID must be a valid UUID',
     })
@@ -31,8 +34,11 @@ export const transactionIdSchema = z
     .string({
         message: 'Transaction ID is required',
     })
+    .min(1, {
+        message: 'Transaction ID is required',
+    })
     .refine(validateUUID, {
-        message: 'Transaction ID must be a valid UUID v4',
+        message: 'Transaction ID is not valid',
     })
 
 // // Função helper para criar schemas de ID customizados
