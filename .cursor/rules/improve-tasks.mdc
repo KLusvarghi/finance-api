@@ -1,5 +1,4 @@
 ---
-globs: ['tasks/**/*.md']
 alwaysApply: false
 ---
 
@@ -13,6 +12,7 @@ alwaysApply: false
 - **ALWAYS** forneça um **plano passo a passo** com ações específicas.
 - **ALWAYS** liste os **arquivos-alvo** que serão modificados.
 - **ALWAYS** defina **critérios de aceite** testáveis para validar a conclusão.
+- **ALWAYS** inclua a execução dos scripts de lint e prettier como parte dos critérios de aceite.
 - **ALWAYS** realize uma análise prévia do código com `grep` e `codebase_search` para embasar o plano.
 - **PREFER** citar exemplos de código existentes no repositório como referência.
 - **AVOID** tasks vagas ou genéricas. Seja explícito sobre o que precisa ser feito.
@@ -54,6 +54,8 @@ tipo: feat|fix|refactor|chore
 
 - [ ] O endpoint `GET /users` agora retorna o novo campo `Z`.
 - [ ] Todos os testes (`pnpm test`) passam.
+- [ ] O código passa no linter (`pnpm eslint:check`).
+- [ ] O código está formatado corretamente (`pnpm prettier:check`).
 
 ### 5. Riscos & Plano de Rollback (Opcional)
 
@@ -93,6 +95,8 @@ O campo `data` em respostas de erro (`4xx`, `5xx`) é sempre `null`, tornando a 
 - [ ] Uma requisição que resulta em erro 400 ou 500 retorna um JSON sem o campo `data`.
 - [ ] Os tipos TypeScript relacionados a `HttpResponse` estão consistentes.
 - [ ] A suíte de testes completa passa com sucesso (`pnpm test`).
+- [ ] O código passa no linter (`pnpm eslint:check`).
+- [ ] O código está formatado corretamente (`pnpm prettier:check`).
 ```
 
 ## Escopo & Particularidades
