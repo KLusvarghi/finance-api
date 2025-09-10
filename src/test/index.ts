@@ -1,3 +1,5 @@
+export * from './factories/make-user'
+export * from './factories/make-user-balance'
 export * from './fixtures/transactions'
 export * from './fixtures/user'
 export * from './fixtures/validate'
