@@ -1,0 +1,111 @@
+---
+alwaysApply: false
+---
+
+**ESTRUTURE** tasks técnicas em Markdown para a IA, detalhando contexto, um plano de execução passo a passo e critérios de aceite claros.
+
+## Princípios (Core)
+
+- **ALWAYS** crie tasks em arquivos Markdown seguindo o modelo definido.
+- **ALWAYS** detalhe o **contexto** e a **motivação** da mudança.
+- **ALWAYS** defina um **objetivo** claro e mensurável (outcome).
+- **ALWAYS** forneça um **plano passo a passo** com ações específicas.
+- **ALWAYS** liste os **arquivos-alvo** que serão modificados.
+- **ALWAYS** defina **critérios de aceite** testáveis para validar a conclusão.
+- **ALWAYS** inclua a execução dos scripts de lint e prettier como parte dos critérios de aceite.
+- **ALWAYS** realize uma análise prévia do código com `grep` e `codebase_search` para embasar o plano.
+- **PREFER** citar exemplos de código existentes no repositório como referência.
+- **AVOID** tasks vagas ou genéricas. Seja explícito sobre o que precisa ser feito.
+- **NEVER** inclua `diffs` de código no markdown; descreva a mudança que deve ser feita.
+- **NEVER** solicite alterações destrutivas (ex: `drop table`) sem uma seção de **Riscos & Rollback**.
+- **SEMPRE** deixe explícito na task que é **PROIBIDO** introduzir ou manter o tipo `any` no código — o ESLint configurado no projeto falhará se esse tipo aparecer.
+
+## Padrão de Task (Modelo Sugerido)
+
+> Use esta estrutura como base. Seções podem ser adicionadas ou removidas conforme a complexidade.
+
+```md
+---
+id: YYYY-MM-DD-<slug>
+titulo: <título conciso>
+tipo: feat|fix|refactor|chore
+---
+
+### 1. Contexto e Objetivo
+
+<!-- O que precisa ser feito e por quê? Qual o resultado esperado? -->
+
+### 2. Plano de Execução
+
+<!-- Lista de passos detalhados e sequenciais -->
+
+- [ ] Passo 1: Modificar o arquivo `X`.
+- [ ] Passo 2: Atualizar o teste `Y`.
+
+### 3. Arquivos-Alvo
+
+<!-- Lista de arquivos a serem modificados -->
+
+- `src/services/service-a.ts`
+- `src/controllers/controller-b.ts`
+
+### 4. Critérios de Aceite
+
+<!-- Como saber que a task foi concluída com sucesso? -->
+
+- [ ] O endpoint `GET /users` agora retorna o novo campo `Z`.
+- [ ] Todos os testes (`pnpm test`) passam.
+- [ ] O código passa no linter (`pnpm eslint:check`).
+- [ ] O código está formatado corretamente (`pnpm prettier:check`).
+
+### 5. Riscos & Plano de Rollback (Opcional)
+
+<!-- Apenas para mudanças complexas ou arriscadas -->
+
+- **Risco**: A mudança pode impactar o cliente X.
+- **Rollback**: Reverter o commit e reiniciar o serviço.
+```
+
+## Exemplo de Task
+
+```md
+---
+id: 2025-08-21-remover-data-erros-http
+titulo: Remover `data` das respostas HTTP de erro
+tipo: refactor
+---
+
+### 1. Contexto e Objetivo
+
+O campo `data` em respostas de erro (`4xx`, `5xx`) é sempre `null`, tornando a resposta verbosa. O objetivo é remover este campo, simplificando o contrato da API para `{ success, message, errors }`.
+
+### 2. Plano de Execução
+
+- [ ] Modificar os helpers de resposta de erro em `src/controllers/_helpers/http.ts` para omitir o campo `data`.
+- [ ] Atualizar a interface `HttpResponse` em `src/shared/types.ts` para refletir que `data` é opcional.
+- [ ] Revisar os testes de integração em `src/routes/` para ajustar as asserções que esperam o campo `data`.
+
+### 3. Arquivos-Alvo
+
+- `src/controllers/_helpers/http.ts`
+- `src/shared/types.ts`
+- `src/routes/*.e2e.test.ts`
+
+### 4. Critérios de Aceite
+
+- [ ] Uma requisição que resulta em erro 400 ou 500 retorna um JSON sem o campo `data`.
+- [ ] Os tipos TypeScript relacionados a `HttpResponse` estão consistentes.
+- [ ] A suíte de testes completa passa com sucesso (`pnpm test`).
+- [ ] O código passa no linter (`pnpm eslint:check`).
+- [ ] O código está formatado corretamente (`pnpm prettier:check`).
+```
+
+## Escopo & Particularidades
+
+- **Aplica-se a**: Todos os arquivos de tasks em `tasks/**/*.md`.
+- **Particularidades**: Esta regra orienta a _criação do plano de trabalho_, que precede a execução e a codificação pela IA. A qualidade da task gerada impacta diretamente a qualidade da implementação.
+
+## Referências
+
+- `build-improve-rules.mdc`
+- `project.mdc`
