@@ -1,11 +1,11 @@
 import {
     checkIfIdIsValid,
+    forbidden,
     invalidIdResponse,
     notFoundResponse,
     ok,
     requiredFieldMissingResponse,
     serverError,
-    unauthorized,
 } from '../_helpers'
 
 import { ForbiddenError, TransactionNotFoundError } from '@/errors'
@@ -65,7 +65,7 @@ export class DeleteTransactionController
             }
 
             if (error instanceof ForbiddenError) {
-                return unauthorized(
+                return forbidden(
                     'You do not have permission to delete this transaction',
                 )
             }
