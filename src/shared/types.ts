@@ -5,14 +5,30 @@ import { Prisma } from '@prisma/client'
 // ============================================================================
 
 export interface HttpResponseBody<T = unknown> {
+    success: boolean
     message: string
     code?: string
-    data?: T | null
+    data?: T
+    details?: T
+}
+
+// More specific types for success and error responses
+export interface HttpResponseSuccessBody<T = unknown> {
+    success: true
+    message: string
+    data?: T
+}
+
+export interface HttpResponseErrorBody<T = unknown> {
+    success: false
+    message: string
+    code: string
+    details?: T
 }
 
 export type HttpResponse<T = unknown> = {
     statusCode: number
-    body: HttpResponseBody<T> | null
+    body: HttpResponseSuccessBody<T> | HttpResponseErrorBody<T> | null
 }
 
 // ============================================================================
@@ -490,4 +506,13 @@ export interface TokensGeneratorAdapterResponse {
 
 export interface PasswordComparatorAdapter {
     execute(password: string, hashedPassword: string): Promise<boolean>
+}
+
+export type InvalidIdMessages = {
+    missing: string
+    invalid: string
+}
+export type InvalidNameMessages = {
+    required: string
+    minLength: string
 }
