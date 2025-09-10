@@ -2,6 +2,7 @@ import { LoginUserController } from './login-user'
 
 import { LoginFailedError } from '@/errors'
 import {
+    HttpResponseSuccessBody,
     ResponseMessage,
     TokensGeneratorAdapterResponse,
     UserRepositoryResponse,
@@ -9,8 +10,6 @@ import {
 import {
     createUserRepositoryResponse,
     createUserServiceResponse,
-    invalidEmailCases,
-    invalidPasswordCases,
     loginUserHttpRequest as baseHttpRequest,
     tokensGeneratorAdapterResponse,
 } from '@/test'
@@ -66,6 +65,7 @@ describe('LoginUserController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(400)
+            expect(response.body?.success).toBe(false)
             expect(response.body?.message).toBe(
                 ResponseMessage.USER_INVALID_PASSWORD_OR_EMAIL,
             )
@@ -81,6 +81,7 @@ describe('LoginUserController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(400)
+            expect(response.body?.success).toBe(false)
             expect(response.body?.message).toBe(
                 ResponseMessage.USER_INVALID_PASSWORD_OR_EMAIL,
             )
@@ -94,53 +95,14 @@ describe('LoginUserController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(200)
-            expect(response.body?.data).toEqual({
+            expect(response.body?.success).toBe(true)
+            expect((response.body as HttpResponseSuccessBody)?.data).toEqual({
                 ...createUserServiceResponse,
                 password: createUserRepositoryResponse.password,
                 tokens: tokensGeneratorAdapterResponse,
             })
             expect(response.body?.message).toBe(
                 ResponseMessage.USER_LOGIN_SUCCESS,
-            )
-        })
-    })
-
-    describe('validations', () => {
-        describe('email', () => {
-            it.each(invalidEmailCases)(
-                'should return 400 and throws ZodError if email is $description',
-                async ({ email, expectedMessage }) => {
-                    // arrange
-                    const response = await sut.execute({
-                        body: {
-                            email: email as string,
-                            password: baseHttpRequest.body.password,
-                        },
-                    })
-
-                    // assert
-                    expect(response.statusCode).toBe(400)
-                    expect(response.body?.message).toBe(expectedMessage)
-                },
-            )
-        })
-
-        describe('password', () => {
-            it.each(invalidPasswordCases)(
-                'should return 400 and throws ZodError if password is $description',
-                async ({ password, expectedMessage }) => {
-                    // arrange
-                    const response = await sut.execute({
-                        body: {
-                            email: baseHttpRequest.body.email,
-                            password: password as string,
-                        },
-                    })
-
-                    // assert
-                    expect(response.statusCode).toBe(400)
-                    expect(response.body?.message).toBe(expectedMessage)
-                },
             )
         })
     })

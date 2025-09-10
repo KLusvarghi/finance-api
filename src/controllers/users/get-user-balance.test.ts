@@ -1,6 +1,9 @@
 import { GetUserBalanceController } from '@/controllers'
 import { UserNotFoundError } from '@/errors'
-import { UserBalanceRepositoryResponse } from '@/shared'
+import {
+    HttpResponseSuccessBody,
+    UserBalanceRepositoryResponse,
+} from '@/shared'
 import {
     getUserBalanceHttpRequest as baseHttpRequest,
     userBalanceResponse,
@@ -46,6 +49,7 @@ describe('GetUserBalanceController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(500)
+            expect(response.body?.success).toBe(false)
             expect(response.body?.message).toBeTruthy()
         })
 
@@ -57,6 +61,7 @@ describe('GetUserBalanceController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(404)
+            expect(response.body?.success).toBe(false)
             expect(response.body?.message).toBeTruthy()
             expect(response.body?.message).toContain(userId)
         })
@@ -67,16 +72,51 @@ describe('GetUserBalanceController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(200)
+            expect(response.body?.success).toBe(true)
             expect(response.body?.message).toBeTruthy()
-            expect(response.body?.data).toEqual(userBalanceResponse)
-            expect(response.body?.data?.earnings).toBeDefined()
-            expect(response.body?.data?.expenses).toBeDefined()
-            expect(response.body?.data?.investments).toBeDefined()
-            expect(response.body?.data?.balance).toBeDefined()
-            expect(typeof response.body?.data?.earnings).toBe('string')
-            expect(typeof response.body?.data?.expenses).toBe('string')
-            expect(typeof response.body?.data?.investments).toBe('string')
-            expect(typeof response.body?.data?.balance).toBe('string')
+            expect((response.body as HttpResponseSuccessBody)?.data).toEqual(
+                userBalanceResponse,
+            )
+            expect(
+                (
+                    response.body as HttpResponseSuccessBody<UserBalanceRepositoryResponse>
+                )?.data?.earnings,
+            ).toBeDefined()
+            expect(
+                (
+                    response.body as HttpResponseSuccessBody<UserBalanceRepositoryResponse>
+                )?.data?.expenses,
+            ).toBeDefined()
+            expect(
+                (
+                    response.body as HttpResponseSuccessBody<UserBalanceRepositoryResponse>
+                )?.data?.investments,
+            ).toBeDefined()
+            expect(
+                (
+                    response.body as HttpResponseSuccessBody<UserBalanceRepositoryResponse>
+                )?.data?.balance,
+            ).toBeDefined()
+            expect(
+                typeof (
+                    response.body as HttpResponseSuccessBody<UserBalanceRepositoryResponse>
+                )?.data?.earnings,
+            ).toBe('string')
+            expect(
+                typeof (
+                    response.body as HttpResponseSuccessBody<UserBalanceRepositoryResponse>
+                )?.data?.expenses,
+            ).toBe('string')
+            expect(
+                typeof (
+                    response.body as HttpResponseSuccessBody<UserBalanceRepositoryResponse>
+                )?.data?.investments,
+            ).toBe('string')
+            expect(
+                typeof (
+                    response.body as HttpResponseSuccessBody<UserBalanceRepositoryResponse>
+                )?.data?.balance,
+            ).toBe('string')
         })
 
         it('should call GetUserBalanceService with correct parameters', async () => {

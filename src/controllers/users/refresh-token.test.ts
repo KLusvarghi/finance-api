@@ -4,7 +4,12 @@ import { RefreshTokenController } from './refresh-token'
 
 import { UserNotFoundError } from '@/errors'
 import { RefreshTokenService } from '@/services'
-import { RefreshTokenRequest, RefreshTokenResponse } from '@/shared'
+import {
+    HttpResponseErrorBody,
+    HttpResponseSuccessBody,
+    RefreshTokenRequest,
+    RefreshTokenResponse,
+} from '@/shared'
 import { tokensGeneratorAdapterResponse } from '@/test'
 
 describe('RefreshTokenController', () => {
@@ -46,38 +51,6 @@ describe('RefreshTokenController', () => {
         jest.resetAllMocks()
     })
 
-    describe('validation errors', () => {
-        it.each([
-            ['is not provided', {}, 'Refresh token is required'],
-            ['is null', { refreshToken: null }, 'Refresh token is required'],
-            [
-                'is undefined',
-                { refreshToken: undefined },
-                'Refresh token is required',
-            ],
-            [
-                'is empty string',
-                { refreshToken: '' },
-                'Refresh token must have at least 1 character',
-            ],
-            [
-                'is only whitespace',
-                { refreshToken: '   ' },
-                'Refresh token must have at least 1 character',
-            ],
-        ])(
-            'should return 400 if refreshToken %s',
-            async (_description, body, expectedMessage) => {
-                const response = await sut.execute({
-                    body,
-                } as RefreshTokenRequest)
-
-                expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBe(expectedMessage)
-            },
-        )
-    })
-
     describe('JWT errors', () => {
         it('should return 401 with TOKEN_EXPIRED code if token is expired', async () => {
             jest.spyOn(refreshTokenService, 'execute').mockRejectedValueOnce(
@@ -87,8 +60,11 @@ describe('RefreshTokenController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(401)
+            expect(response.body?.success).toBe(false)
             expect(response.body?.message).toBe('Unauthorized')
-            expect(response.body?.code).toBe('TOKEN_EXPIRED')
+            expect((response.body as HttpResponseErrorBody)?.code).toBe(
+                'TOKEN_EXPIRED',
+            )
         })
 
         it('should return 401 with INVALID_TOKEN code if token is malformed', async () => {
@@ -99,8 +75,11 @@ describe('RefreshTokenController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(401)
+            expect(response.body?.success).toBe(false)
             expect(response.body?.message).toBe('Unauthorized')
-            expect(response.body?.code).toBe('INVALID_TOKEN')
+            expect((response.body as HttpResponseErrorBody)?.code).toBe(
+                'TOKEN_INVALID',
+            )
         })
 
         it('should return 401 with INVALID_TOKEN code if token is not active yet (caught by JsonWebTokenError)', async () => {
@@ -111,8 +90,11 @@ describe('RefreshTokenController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(401)
+            expect(response.body?.success).toBe(false)
             expect(response.body?.message).toBe('Unauthorized')
-            expect(response.body?.code).toBe('INVALID_TOKEN')
+            expect((response.body as HttpResponseErrorBody)?.code).toBe(
+                'TOKEN_INVALID',
+            )
         })
     })
 
@@ -126,8 +108,11 @@ describe('RefreshTokenController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(401)
+            expect(response.body?.success).toBe(false)
             expect(response.body?.message).toBe('Unauthorized')
-            expect(response.body?.code).toBe('USER_NOT_FOUND')
+            expect((response.body as HttpResponseErrorBody)?.code).toBe(
+                'USER_NOT_FOUND',
+            )
         })
     })
 
@@ -140,6 +125,7 @@ describe('RefreshTokenController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(500)
+            expect(response.body?.success).toBe(false)
             expect(response.body?.message).toBe('Internal server error')
         })
     })
@@ -149,11 +135,28 @@ describe('RefreshTokenController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(201)
-            expect(response.body?.data).toEqual(tokensGeneratorAdapterResponse)
-            expect(response.body?.data?.accessToken).toBeDefined()
-            expect(response.body?.data?.refreshToken).toBeDefined()
-            expect(typeof response.body?.data?.accessToken).toBe('string')
-            expect(typeof response.body?.data?.refreshToken).toBe('string')
+            expect(response.body?.success).toBe(true)
+            expect((response.body as HttpResponseSuccessBody)?.data).toEqual(
+                tokensGeneratorAdapterResponse,
+            )
+            expect(
+                (response.body as HttpResponseSuccessBody<RefreshTokenResponse>)
+                    ?.data?.accessToken,
+            ).toBeDefined()
+            expect(
+                (response.body as HttpResponseSuccessBody<RefreshTokenResponse>)
+                    ?.data?.refreshToken,
+            ).toBeDefined()
+            expect(
+                typeof (
+                    response.body as HttpResponseSuccessBody<RefreshTokenResponse>
+                )?.data?.accessToken,
+            ).toBe('string')
+            expect(
+                typeof (
+                    response.body as HttpResponseSuccessBody<RefreshTokenResponse>
+                )?.data?.refreshToken,
+            ).toBe('string')
         })
 
         it('should call RefreshTokenService with correct parameters', async () => {

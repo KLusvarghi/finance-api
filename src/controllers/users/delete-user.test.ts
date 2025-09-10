@@ -1,6 +1,10 @@
 import { DeleteUserController } from '@/controllers'
 import { UserNotFoundError } from '@/errors'
-import { ResponseMessage, UserRepositoryResponse } from '@/shared'
+import {
+    HttpResponseSuccessBody,
+    ResponseMessage,
+    UserRepositoryResponse,
+} from '@/shared'
 import {
     deleteUserHttpRequest as baseHttpRequest,
     deleteUserRepositoryResponse,
@@ -48,6 +52,7 @@ describe('DeleteUserController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(404)
+            expect(response.body?.success).toBe(false)
             expect(response.body?.message).toBe(
                 `User with id ${userId} not found`,
             )
@@ -63,6 +68,7 @@ describe('DeleteUserController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(500)
+            expect(response.body?.success).toBe(false)
             expect(response.body?.message).toBe(ResponseMessage.SERVER_ERROR)
         })
     })
@@ -72,8 +78,11 @@ describe('DeleteUserController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(200)
+            expect(response.body?.success).toBe(true)
             expect(response.body?.message).toBe(ResponseMessage.USER_DELETED)
-            expect(response.body?.data).toEqual(deleteUserRepositoryResponse)
+            expect((response.body as HttpResponseSuccessBody)?.data).toEqual(
+                deleteUserRepositoryResponse,
+            )
         })
 
         it('should call DeleteUserService with correct parameters', async () => {

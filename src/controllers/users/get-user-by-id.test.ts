@@ -1,6 +1,6 @@
 import { GetUserByIdController } from '@/controllers'
 import { UserNotFoundError } from '@/errors'
-import { UserPublicResponse } from '@/shared'
+import { HttpResponseSuccessBody, UserPublicResponse } from '@/shared'
 import {
     getUserByIdHttpRequest as baseHttpRequest,
     getUserByIdServiceResponse,
@@ -49,6 +49,7 @@ describe('GetUserByIdController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(404)
+            expect(response.body?.success).toBe(false)
             expect(response.body?.message).toBeTruthy()
             expect(response.body?.message).toContain(userId)
             expect(response.body?.message).toBe(
@@ -63,6 +64,7 @@ describe('GetUserByIdController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(500)
+            expect(response.body?.success).toBe(false)
             expect(response.body?.message).toBeTruthy()
         })
     })
@@ -74,13 +76,30 @@ describe('GetUserByIdController', () => {
             })
 
             expect(response.statusCode).toBe(200)
+            expect(response.body?.success).toBe(true)
             expect(response.body?.message).toBeTruthy()
-            expect(response.body?.data).toBeTruthy()
-            expect(response.body?.data?.id).toBeTruthy()
-            expect(response.body?.data?.firstName).toBeTruthy()
-            expect(response.body?.data?.lastName).toBeTruthy()
-            expect(response.body?.data?.email).toBeTruthy()
-            expect(response.body?.data).not.toHaveProperty('password')
+            expect(
+                (response.body as HttpResponseSuccessBody)?.data,
+            ).toBeTruthy()
+            expect(
+                (response.body as HttpResponseSuccessBody<UserPublicResponse>)
+                    ?.data?.id,
+            ).toBeTruthy()
+            expect(
+                (response.body as HttpResponseSuccessBody<UserPublicResponse>)
+                    ?.data?.firstName,
+            ).toBeTruthy()
+            expect(
+                (response.body as HttpResponseSuccessBody<UserPublicResponse>)
+                    ?.data?.lastName,
+            ).toBeTruthy()
+            expect(
+                (response.body as HttpResponseSuccessBody<UserPublicResponse>)
+                    ?.data?.email,
+            ).toBeTruthy()
+            expect(
+                (response.body as HttpResponseSuccessBody)?.data,
+            ).not.toHaveProperty('password')
         })
 
         it('should call GetUserByIdService with correct parameters', async () => {

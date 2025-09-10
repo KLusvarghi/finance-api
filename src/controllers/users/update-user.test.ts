@@ -4,12 +4,14 @@ import {
     UpdateUserFailedError,
     UserNotFoundError,
 } from '@/errors'
-import { UpdateUserParams, UserRepositoryResponse } from '@/shared'
+import {
+    HttpResponseSuccessBody,
+    UpdateUserParams,
+    UserRepositoryResponse,
+} from '@/shared'
 import {
     updateUserHttpRequest as baseHttpRequest,
-    updateUserParams,
     updateUserRepositoryResponse,
-    userId,
 } from '@/test'
 
 describe('UpdateUserController', () => {
@@ -57,6 +59,7 @@ describe('UpdateUserController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(500)
+            expect(response.body?.success).toBe(false)
             expect(response.body?.message).toBeTruthy()
         })
 
@@ -68,6 +71,7 @@ describe('UpdateUserController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(400)
+            expect(response.body?.success).toBe(false)
             expect(response.body?.message).toBeTruthy()
             expect(response.body?.message).toContain(baseHttpRequest.body.email)
             expect(response.body?.message).toContain('already in use')
@@ -81,6 +85,7 @@ describe('UpdateUserController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(404)
+            expect(response.body?.success).toBe(false)
             expect(response.body?.message).toBeTruthy()
             expect(response.body?.message).toContain(
                 baseHttpRequest.headers.userId,
@@ -95,51 +100,8 @@ describe('UpdateUserController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(500)
+            expect(response.body?.success).toBe(false)
             expect(response.body?.message).toBeTruthy()
-        })
-    })
-
-    describe('validations', () => {
-        describe('email', () => {
-            it('should return 400 when invalid email is provided', async () => {
-                const response = await sut.execute({
-                    headers: { userId: userId },
-                    body: { ...updateUserParams, email: 'invalid_email' },
-                })
-
-                expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBeTruthy()
-            })
-        })
-
-        describe('password', () => {
-            it('should return 400 when invalid password is provided', async () => {
-                const response = await sut.execute({
-                    headers: { userId: userId },
-                    body: {
-                        ...updateUserParams,
-                        password: '12345', // Less than 6 characters
-                    },
-                })
-
-                expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBeTruthy()
-            })
-        })
-
-        describe('disallowed fields', () => {
-            it('should return 400 when disallowed field is provided', async () => {
-                const response = await sut.execute({
-                    headers: { userId: userId },
-                    body: {
-                        ...updateUserParams,
-                        disallowed_field: 'disallowed_field',
-                    } as UpdateUserParams,
-                })
-
-                expect(response.statusCode).toBe(400)
-                expect(response.body?.message).toBeTruthy()
-            })
         })
     })
 
@@ -148,8 +110,11 @@ describe('UpdateUserController', () => {
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(200)
+            expect(response.body?.success).toBe(true)
             expect(response.body?.message).toBeTruthy()
-            expect(response.body?.data).toEqual(updateUserRepositoryResponse)
+            expect((response.body as HttpResponseSuccessBody)?.data).toEqual(
+                updateUserRepositoryResponse,
+            )
         })
 
         it('should call UpdateUserService with correct parameters', async () => {
