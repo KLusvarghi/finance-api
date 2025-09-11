@@ -189,8 +189,8 @@ Diagrama ER (simplificado):
 erDiagram
     USER {
         STRING id PK
-        STRING first_name
-        STRING last_name
+        STRING firstName
+        STRING lastName
         STRING email "unique"
         STRING password
     }
