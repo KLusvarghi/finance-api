@@ -1,10 +1,12 @@
+// auth
+export * from './auth/authenticate-user'
+export * from './auth/refresh-token'
+
 // users
 export * from './users/create-user'
 export * from './users/delete-user'
 export * from './users/get-user-balance'
 export * from './users/get-user-by-id'
-export * from './users/login-user'
-export * from './users/refresh-token'
 export * from './users/update-user'
 
 // transaction
