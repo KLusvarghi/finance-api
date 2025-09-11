@@ -1,17 +1,13 @@
 import {
     IdGeneratorAdapter,
-    PasswordComparatorAdapter,
     PasswordHasherAdapter,
     TokensGeneratorAdapter,
-    TokenVerifierAdapter,
 } from '@/adapters'
 import {
     CreateUserController,
     DeleteUserController,
     GetUserBalanceController,
     GetUserByIdController,
-    LoginUserController,
-    RefreshTokenController,
     UpdateUserController,
 } from '@/controllers'
 import {
@@ -27,8 +23,6 @@ import {
     DeleteUserService,
     GetUserBalanceService,
     GetUserByIdService,
-    LoginUserService,
-    RefreshTokenService,
     UpdateUserService,
 } from '@/services'
 
@@ -96,34 +90,4 @@ export const makeGetUserBalanceController = () => {
     )
 
     return getUserBalanceController
-}
-
-export const makeLoginUserController = () => {
-    const getUserByEmailRepository = new PostgresGetUserByEmailRepository()
-    const passwordComparator = new PasswordComparatorAdapter()
-    const tokensGeneratorAdapter = new TokensGeneratorAdapter()
-
-    const loginUserService = new LoginUserService(
-        getUserByEmailRepository,
-        passwordComparator,
-        tokensGeneratorAdapter,
-    )
-
-    const loginUserController = new LoginUserController(loginUserService)
-
-    return loginUserController
-}
-
-export const makeRefreshTokenController = () => {
-    const tokensGeneratorAdapter = new TokensGeneratorAdapter()
-    const tokenVerifierAdapter = new TokenVerifierAdapter()
-    const refreshTokenService = new RefreshTokenService(
-        tokensGeneratorAdapter,
-        tokenVerifierAdapter,
-    )
-    const refreshTokenController = new RefreshTokenController(
-        refreshTokenService,
-    )
-
-    return refreshTokenController
 }
