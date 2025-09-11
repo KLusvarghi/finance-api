@@ -1,5 +1,7 @@
 import { Router } from 'express'
 
+import { adaptRoute } from './adapters/express-route-adapter'
+
 import {
     makeCreateUserController,
     makeDeleteUserController,
@@ -7,7 +9,7 @@ import {
     makeGetUserByIdController,
     makeUpdateUserController,
 } from '@/factories/controllers/'
-import { auth, AuthenticatedRequest } from '@/middlewares/auth'
+import { auth } from '@/middlewares/auth'
 import { validate } from '@/middlewares/validate'
 import {
     createUserSchema,
@@ -24,18 +26,7 @@ usersRouter.get(
     '/me',
     auth,
     validate(getUserByIdSchema),
-    async (req: AuthenticatedRequest, res) => {
-        const getUserByIdController = makeGetUserByIdController()
-
-        const { statusCode, body } = await getUserByIdController.execute({
-            ...req,
-            headers: {
-                userId: req.userId as string,
-            },
-        })
-
-        res.status(statusCode).send(body)
-    },
+    adaptRoute(makeGetUserByIdController()),
 )
 
 // Rota para buscar o saldo do usuário logado
@@ -43,35 +34,14 @@ usersRouter.get(
     '/me/balance',
     auth,
     validate(getUserBalanceSchema),
-    async (req: AuthenticatedRequest, res) => {
-        const getUserBalanceController = makeGetUserBalanceController()
-
-        const { statusCode, body } = await getUserBalanceController.execute({
-            ...req,
-            headers: {
-                userId: req.userId as string,
-            },
-            query: {
-                from: req.query.from as string,
-                to: req.query.to as string,
-            },
-        })
-
-        res.status(statusCode).send(body)
-    },
+    adaptRoute(makeGetUserBalanceController()),
 )
 
 // Rota para criar um novo usuário
 usersRouter.post(
     '/',
     validate(createUserSchema),
-    async (req: AuthenticatedRequest, res) => {
-        const createUserController = makeCreateUserController()
-
-        const { statusCode, body } = await createUserController.execute(req)
-
-        res.status(statusCode).send(body)
-    },
+    adaptRoute(makeCreateUserController()),
 )
 
 // Rota para atualizar um usuário
@@ -79,18 +49,7 @@ usersRouter.patch(
     '/me',
     auth,
     validate(updateUserSchema),
-    async (req: AuthenticatedRequest, res) => {
-        const updateUserController = makeUpdateUserController()
-
-        const { statusCode, body } = await updateUserController.execute({
-            ...req,
-            headers: {
-                userId: req.userId as string,
-            },
-        })
-
-        res.status(statusCode).send(body)
-    },
+    adaptRoute(makeUpdateUserController()),
 )
 
 // Rota para deletar um usuário
@@ -98,16 +57,5 @@ usersRouter.delete(
     '/me',
     auth,
     validate(deleteUserSchema),
-    async (req: AuthenticatedRequest, res) => {
-        const deleteUserController = makeDeleteUserController()
-
-        const { statusCode, body } = await deleteUserController.execute({
-            ...req,
-            headers: {
-                userId: req.userId as string,
-            },
-        })
-
-        res.status(statusCode).send(body)
-    },
+    adaptRoute(makeDeleteUserController()),
 )
