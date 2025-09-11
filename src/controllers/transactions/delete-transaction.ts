@@ -1,6 +1,5 @@
-import { forbidden, notFoundResponse, ok, serverError } from '../_helpers'
+import { ok } from '../_helpers'
 
-import { ForbiddenError, TransactionNotFoundError } from '@/errors'
 import {
     DeleteTransactionParams,
     DeleteTransactionRequest,
@@ -28,33 +27,18 @@ export class DeleteTransactionController
     async execute(
         httpRequest: DeleteTransactionRequest,
     ): Promise<HttpResponse<TransactionPublicResponse>> {
-        try {
-            const { transactionId } = httpRequest.params
-            const { userId } = httpRequest.headers
+        const { transactionId } = httpRequest.params
+        const { userId } = httpRequest.headers
 
-            const serviceParams: DeleteTransactionServiceParams = {
-                transactionId,
-                userId,
-            }
-
-            const deletedTransaction: TransactionPublicResponse =
-                await this.deleteTransactionService.execute(serviceParams)
-
-            return ok(deletedTransaction, ResponseMessage.TRANSACTION_DELETED)
-        } catch (error) {
-            console.error(error)
-
-            if (error instanceof TransactionNotFoundError) {
-                return notFoundResponse(error)
-            }
-
-            if (error instanceof ForbiddenError) {
-                return forbidden(
-                    'You do not have permission to delete this transaction',
-                )
-            }
-
-            return serverError()
+        const serviceParams: DeleteTransactionServiceParams = {
+            transactionId,
+            userId,
         }
+
+        // Execute business logic - errors will be caught by error middleware
+        const deletedTransaction: TransactionPublicResponse =
+            await this.deleteTransactionService.execute(serviceParams)
+
+        return ok(deletedTransaction, ResponseMessage.TRANSACTION_DELETED)
     }
 }

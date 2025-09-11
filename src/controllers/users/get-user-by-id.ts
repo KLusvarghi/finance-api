@@ -1,6 +1,5 @@
-import { notFoundResponse, ok, serverError } from '../_helpers'
+import { ok } from '../_helpers'
 
-import { UserNotFoundError } from '@/errors'
 import {
     GetUserByIdRequest,
     GetUserByIdService,
@@ -18,20 +17,11 @@ export class GetUserByIdController
     async execute(
         httpRequest: GetUserByIdRequest,
     ): Promise<HttpResponse<UserPublicResponse>> {
-        try {
-            const { userId } = httpRequest.headers
+        const { userId } = httpRequest.headers
 
-            const user = await this.getUserByIdService.execute(userId)
+        // Execute business logic - errors will be caught by error middleware
+        const user = await this.getUserByIdService.execute(userId)
 
-            return ok(user)
-        } catch (error) {
-            console.error(error)
-
-            if (error instanceof UserNotFoundError) {
-                return notFoundResponse(error)
-            }
-
-            return serverError()
-        }
+        return ok(user)
     }
 }

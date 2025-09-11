@@ -41,33 +41,33 @@ describe('CreateUserController', () => {
     })
 
     describe('error handling', () => {
-        it('should return 500 if CreateUserService throws generic error', async () => {
+        it('should throw generic error when CreateUserService throws generic error', async () => {
             // arrange
+            const genericError = new Error('Generic service error')
             jest.spyOn(createUserService, 'execute').mockRejectedValueOnce(
-                new Error(),
+                genericError,
             )
 
-            // act
-            const response = await sut.execute(baseHttpRequest)
-
-            // assert
-            expect(response.statusCode).toBe(500)
-            expect(response.body?.success).toBe(false)
+            // act & assert
+            await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
+                genericError,
+            )
         })
 
-        it('should return 400 if CreateUserService throws EmailAlreadyExistsError', async () => {
+        it('should throw EmailAlreadyExistsError when CreateUserService throws EmailAlreadyExistsError', async () => {
             // arrange
+            const emailError = new EmailAlreadyExistsError(params.email)
             jest.spyOn(createUserService, 'execute').mockRejectedValueOnce(
-                new EmailAlreadyExistsError(params.email),
+                emailError,
             )
 
-            // act
-            const response = await sut.execute(baseHttpRequest)
-
-            // assert
-            expect(response.statusCode).toBe(400)
-            expect(response.body?.success).toBe(false)
-            expect(response.body?.message).toContain(params.email)
+            // act & assert
+            await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
+                EmailAlreadyExistsError,
+            )
+            await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
+                `The e-mail ${params.email} is already in use`,
+            )
         })
     })
 

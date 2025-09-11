@@ -1,6 +1,5 @@
-import { notFoundResponse, ok, serverError } from '../_helpers'
+import { ok } from '../_helpers'
 
-import { UserNotFoundError } from '@/errors'
 import {
     DeleteUserRequest,
     DeleteUserService,
@@ -19,20 +18,11 @@ export class DeleteUserController
     async execute(
         httpRequest: DeleteUserRequest,
     ): Promise<HttpResponse<UserPublicResponse>> {
-        try {
-            const { userId } = httpRequest.headers
+        const { userId } = httpRequest.headers
 
-            const deletedUser = await this.deletedUserService.execute(userId)
+        // Execute business logic - errors will be caught by error middleware
+        const deletedUser = await this.deletedUserService.execute(userId)
 
-            return ok(deletedUser, ResponseMessage.USER_DELETED)
-        } catch (error) {
-            console.error(error)
-
-            if (error instanceof UserNotFoundError) {
-                return notFoundResponse(error)
-            }
-
-            return serverError()
-        }
+        return ok(deletedUser, ResponseMessage.USER_DELETED)
     }
 }

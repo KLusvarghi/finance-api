@@ -21,6 +21,25 @@ import { TransactionType } from '@prisma/client'
 
 describe('Transactions Routes E2E Tests', () => {
     describe('GET /api/transactions/me', () => {
+        it('should return 401 if authorization header is missing', async () => {
+            const { body: responseBody } = await request(app)
+                .get('/api/transactions/me')
+                .query({ from: '2025-08-01', to: '2025-08-08' })
+                .expect(401)
+
+            expect(responseBody.message).toBe('Unauthorized')
+        })
+
+        it('should return 401 if token is invalid', async () => {
+            const { body: responseBody } = await request(app)
+                .get('/api/transactions/me')
+                .query({ from: '2025-08-01', to: '2025-08-08' })
+                .set('authorization', 'Bearer invalid-token')
+                .expect(401)
+
+            expect(responseBody.message).toBe('Unauthorized')
+        })
+
         it('should return 200 when transaction is found', async () => {
             const { user, transaction } = await makeTransaction()
 
@@ -59,6 +78,25 @@ describe('Transactions Routes E2E Tests', () => {
     })
 
     describe('POST /api/transactions/me', () => {
+        it('should return 401 if authorization header is missing', async () => {
+            const { body: responseBody } = await request(app)
+                .post('/api/transactions/me')
+                .send(createTransactionParams)
+                .expect(401)
+
+            expect(responseBody.message).toBe('Unauthorized')
+        })
+
+        it('should return 401 if token is invalid', async () => {
+            const { body: responseBody } = await request(app)
+                .post('/api/transactions/me')
+                .set('authorization', 'Bearer invalid-token')
+                .send(createTransactionParams)
+                .expect(401)
+
+            expect(responseBody.message).toBe('Unauthorized')
+        })
+
         describe('validation', () => {
             const invalidNameCases = createInvalidNameCases({
                 required: ResponseZodMessages.name.required,
@@ -164,6 +202,25 @@ describe('Transactions Routes E2E Tests', () => {
     })
 
     describe('PATCH /api/transactions/me/:transactionId', () => {
+        it('should return 401 if authorization header is missing', async () => {
+            const { body: responseBody } = await request(app)
+                .patch('/api/transactions/me/some-transaction-id')
+                .send(updateTransactionParams)
+                .expect(401)
+
+            expect(responseBody.message).toBe('Unauthorized')
+        })
+
+        it('should return 401 if token is invalid', async () => {
+            const { body: responseBody } = await request(app)
+                .patch('/api/transactions/me/some-transaction-id')
+                .set('authorization', 'Bearer invalid-token')
+                .send(updateTransactionParams)
+                .expect(401)
+
+            expect(responseBody.message).toBe('Unauthorized')
+        })
+
         describe('validation', () => {
             const invalidIdCases = createInvalidIdCases({
                 missing: ResponseMessage.TRANSACTION_ID_MISSING,
@@ -330,6 +387,23 @@ describe('Transactions Routes E2E Tests', () => {
     })
 
     describe('DELETE /api/transactions/me/:transactionId', () => {
+        it('should return 401 if authorization header is missing', async () => {
+            const { body: responseBody } = await request(app)
+                .delete('/api/transactions/me/some-transaction-id')
+                .expect(401)
+
+            expect(responseBody.message).toBe('Unauthorized')
+        })
+
+        it('should return 401 if token is invalid', async () => {
+            const { body: responseBody } = await request(app)
+                .delete('/api/transactions/me/some-transaction-id')
+                .set('authorization', 'Bearer invalid-token')
+                .expect(401)
+
+            expect(responseBody.message).toBe('Unauthorized')
+        })
+
         describe('validation', () => {
             const invalidIdCases = createInvalidIdCases({
                 missing: ResponseMessage.TRANSACTION_ID_MISSING,

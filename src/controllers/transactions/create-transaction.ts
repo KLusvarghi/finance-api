@@ -1,4 +1,4 @@
-import { created, serverError } from '../_helpers'
+import { created } from '../_helpers'
 
 import {
     BodyHeadersController,
@@ -27,26 +27,19 @@ export class CreateTransactionController
     async execute(
         httpRequest: CreateTransactionRequest,
     ): Promise<HttpResponse<TransactionPublicResponse>> {
-        try {
-            // Validation is now handled by middleware
-            const createTransactionParams = httpRequest.body
-            const { userId } = httpRequest.headers
+        // Validation is now handled by middleware
+        const createTransactionParams = httpRequest.body
+        const { userId } = httpRequest.headers
 
-            const serviceParams: CreateTransactionServiceParams = {
-                ...createTransactionParams,
-                userId,
-            }
-
-            const createdTransaction =
-                await this.createTransactionService.execute(serviceParams)
-
-            return created(
-                createdTransaction,
-                ResponseMessage.TRANSACTION_CREATED,
-            )
-        } catch (error) {
-            console.error(error)
-            return serverError()
+        const serviceParams: CreateTransactionServiceParams = {
+            ...createTransactionParams,
+            userId,
         }
+
+        // Execute business logic - errors will be caught by error middleware
+        const createdTransaction =
+            await this.createTransactionService.execute(serviceParams)
+
+        return created(createdTransaction, ResponseMessage.TRANSACTION_CREATED)
     }
 }

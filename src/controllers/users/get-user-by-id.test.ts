@@ -41,31 +41,29 @@ describe('GetUserByIdController', () => {
     })
 
     describe('error handling', () => {
-        it('should return 404 if user is not found', async () => {
+        it('should throw UserNotFoundError when user is not found', async () => {
+            const userNotFoundError = new UserNotFoundError(userId)
             jest.spyOn(getUserByIdService, 'execute').mockRejectedValue(
-                new UserNotFoundError(userId),
+                userNotFoundError,
             )
 
-            const response = await sut.execute(baseHttpRequest)
-
-            expect(response.statusCode).toBe(404)
-            expect(response.body?.success).toBe(false)
-            expect(response.body?.message).toBeTruthy()
-            expect(response.body?.message).toContain(userId)
-            expect(response.body?.message).toBe(
+            await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
+                UserNotFoundError,
+            )
+            await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
                 `User with id ${userId} not found`,
             )
         })
-        it('should return 500 if GetUserByIdService throws an error', async () => {
+
+        it('should throw generic error when GetUserByIdService throws an error', async () => {
+            const genericError = new Error('Service error')
             jest.spyOn(getUserByIdService, 'execute').mockRejectedValue(
-                new Error(),
+                genericError,
             )
 
-            const response = await sut.execute(baseHttpRequest)
-
-            expect(response.statusCode).toBe(500)
-            expect(response.body?.success).toBe(false)
-            expect(response.body?.message).toBeTruthy()
+            await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
+                genericError,
+            )
         })
     })
 

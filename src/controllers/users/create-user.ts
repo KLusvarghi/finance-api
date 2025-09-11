@@ -1,6 +1,5 @@
-import { created, emailAlreadyExistsResponse, serverError } from '../_helpers'
+import { created } from '../_helpers'
 
-import { EmailAlreadyExistsError } from '@/errors'
 import {
     BodyController,
     CreateUserParams,
@@ -28,26 +27,18 @@ export class CreateUserController
             UserPublicResponse & { tokens: TokensGeneratorAdapterResponse }
         >
     > {
-        try {
-            // Validation is now handled by middleware
-            const params = httpRequest.body as CreateUserParams
+        // Validation is now handled by middleware
+        const params = httpRequest.body as CreateUserParams
 
-            // Execute business logic
-            const createdUser = await this.createUserService.execute(params)
+        // Execute business logic - errors will be caught by error middleware
+        const createdUser = await this.createUserService.execute(params)
 
-            // Return response to user
-            return created(
-                createdUser,
-                ResponseMessage.USER_CREATED,
-            ) as HttpResponse<
-                UserPublicResponse & { tokens: TokensGeneratorAdapterResponse }
-            >
-        } catch (error) {
-            if (error instanceof EmailAlreadyExistsError) {
-                return emailAlreadyExistsResponse(error.message)
-            }
-            console.error(error)
-            return serverError()
-        }
+        // Return success response
+        return created(
+            createdUser,
+            ResponseMessage.USER_CREATED,
+        ) as HttpResponse<
+            UserPublicResponse & { tokens: TokensGeneratorAdapterResponse }
+        >
     }
 }

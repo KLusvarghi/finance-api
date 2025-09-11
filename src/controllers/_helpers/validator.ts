@@ -51,6 +51,19 @@ export const notFoundResponse = (error: AppError) =>
     notFound(error.message, error.code)
 
 export const handleZodValidationError = (error: ZodError) => {
-    const message = error.issues?.[0]?.message ?? ResponseMessage.BAD_REQUEST
+    let message = error.issues?.[0]?.message ?? ResponseMessage.BAD_REQUEST
+
+    if (error.issues?.[0]?.message) {
+        message = error.issues?.[0]?.message
+
+        // Check if it's an "Unrecognized key" error and extract the field name
+        const unrecognizedKeyRegex = /Unrecognized key: "([^"]+)"/
+        const match = message.match(unrecognizedKeyRegex)
+
+        if (match) {
+            const unrecognizedField = match[1]
+            message = `Field "${unrecognizedField}" is not allowed in this request`
+        }
+    }
     return badRequest(message, ErrorCode.BAD_REQUEST)
 }

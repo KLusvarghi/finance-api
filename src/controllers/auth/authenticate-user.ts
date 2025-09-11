@@ -1,6 +1,5 @@
-import { badRequest, ok, serverError } from '../_helpers'
+import { ok } from '../_helpers'
 
-import { LoginFailedError, TokenGenerationError } from '@/errors'
 import {
     AuthenticateUserRequest,
     AuthenticateUserRequestParams,
@@ -18,28 +17,12 @@ export class AuthenticateUserController
     ) {}
 
     async execute(httpRequest: AuthenticateUserRequest) {
-        try {
-            // Validation is now handled by middleware
-            const { email, password } = httpRequest.body
+        // Validation is now handled by middleware
+        const { email, password } = httpRequest.body
 
-            const user = await this.authenticateUserService.execute(
-                email,
-                password,
-            )
+        // Execute business logic - errors will be caught by error middleware
+        const user = await this.authenticateUserService.execute(email, password)
 
-            return ok(user, ResponseMessage.USER_LOGIN_SUCCESS)
-        } catch (error) {
-            console.error(error)
-
-            if (error instanceof LoginFailedError) {
-                return badRequest(error.message, error.code)
-            }
-
-            if (error instanceof TokenGenerationError) {
-                return serverError(error.message, error.code)
-            }
-
-            return serverError()
-        }
+        return ok(user, ResponseMessage.USER_LOGIN_SUCCESS)
     }
 }

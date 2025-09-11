@@ -1,6 +1,5 @@
-import { notFoundResponse, ok, serverError } from '../_helpers'
+import { ok } from '../_helpers'
 
-import { UserNotFoundError } from '@/errors'
 import {
     GetUserBalanceRequest,
     GetUserBalanceService,
@@ -21,25 +20,17 @@ export class GetUserBalanceController
     async execute(
         httpRequest: GetUserBalanceRequest,
     ): Promise<HttpResponse<UserBalanceRepositoryResponse>> {
-        try {
-            // Validation is now handled by middleware
-            const { userId } = httpRequest.headers
-            const { from, to } = httpRequest.query
+        // Validation is now handled by middleware
+        const { userId } = httpRequest.headers
+        const { from, to } = httpRequest.query
 
-            const userBalance = await this.getUserBalanceService.execute(
-                userId,
-                from,
-                to,
-            )
+        // Execute business logic - errors will be caught by error middleware
+        const userBalance = await this.getUserBalanceService.execute(
+            userId,
+            from,
+            to,
+        )
 
-            return ok(userBalance)
-        } catch (error) {
-            console.error(error)
-            if (error instanceof UserNotFoundError) {
-                return notFoundResponse(error)
-            }
-
-            return serverError()
-        }
+        return ok(userBalance)
     }
 }

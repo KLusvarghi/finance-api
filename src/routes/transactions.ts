@@ -1,4 +1,6 @@
-import { Router } from 'express'
+import { Response, Router } from 'express'
+
+import { adaptRoute } from './adapters/express-route-adapter'
 
 import {
     makeCreateTransactionController,
@@ -6,7 +8,7 @@ import {
     makeGetTransactionsByUserIdController,
     makeUpdateTransactionController,
 } from '@/factories/controllers'
-import { auth, AuthenticatedRequest } from '@/middlewares/auth'
+import { auth } from '@/middlewares/auth'
 import { validate } from '@/middlewares/validate'
 import {
     createTransactionSchema,
@@ -23,24 +25,7 @@ transactionsRouter.get(
     '/me',
     auth,
     validate(getTransactionsByUserIdSchema),
-    async (req: AuthenticatedRequest, res) => {
-        const getTransactionsByUserIdController =
-            makeGetTransactionsByUserIdController()
-
-        const { statusCode, body } =
-            await getTransactionsByUserIdController.execute({
-                ...req,
-                query: {
-                    from: req.query.from as string,
-                    to: req.query.to as string,
-                },
-                headers: {
-                    userId: req.userId as string,
-                },
-            })
-
-        res.status(statusCode).send(body)
-    },
+    adaptRoute(makeGetTransactionsByUserIdController()),
 )
 
 // Rota para criar uma nova transação
@@ -48,20 +33,12 @@ transactionsRouter.post(
     '/me',
     auth,
     validate(createTransactionSchema),
-    async (req: AuthenticatedRequest, res) => {
-        const createTransactionController = makeCreateTransactionController()
-
-        const { statusCode, body } = await createTransactionController.execute({
-            ...req,
-            headers: { userId: req.userId as string },
-        })
-
-        res.status(statusCode).send(body)
-    },
+    adaptRoute(makeCreateTransactionController()),
 )
 
+// TODO: ver se é necessário
 // Rota para lidar com transactionId ausente - deve vir ANTES da rota com parâmetro
-transactionsRouter.patch('/me/', auth, (req: AuthenticatedRequest, res) => {
+transactionsRouter.patch('/me/', auth, (res: Response) => {
     res.status(400).json({
         success: false,
         message: ResponseMessage.TRANSACTION_ID_MISSING,
@@ -74,23 +51,12 @@ transactionsRouter.patch(
     '/me/:transactionId',
     auth,
     validate(updateTransactionSchema),
-    async (req: AuthenticatedRequest, res) => {
-        const updateTransactionsController = makeUpdateTransactionController()
-
-        const { statusCode, body } = await updateTransactionsController.execute(
-            {
-                body: req.body,
-                params: { transactionId: req.params.transactionId as string },
-                headers: { userId: req.userId as string },
-            },
-        )
-
-        res.status(statusCode).send(body)
-    },
+    adaptRoute(makeUpdateTransactionController()),
 )
 
+// TODO: ver se é necessário
 // Rota para lidar com transactionId ausente no DELETE - deve vir ANTES da rota com parâmetro
-transactionsRouter.delete('/me/', auth, (req: AuthenticatedRequest, res) => {
+transactionsRouter.delete('/me/', auth, (res: Response) => {
     res.status(400).json({
         success: false,
         message: ResponseMessage.TRANSACTION_ID_MISSING,
@@ -103,18 +69,5 @@ transactionsRouter.delete(
     '/me/:transactionId',
     auth,
     validate(deleteTransactionSchema),
-    async (req: AuthenticatedRequest, res) => {
-        const deleteTransactionsController = makeDeleteTransactionController()
-
-        const { statusCode, body } = await deleteTransactionsController.execute(
-            {
-                params: {
-                    transactionId: req.params.transactionId,
-                },
-                headers: { userId: req.userId as string },
-            },
-        )
-
-        res.status(statusCode).send(body)
-    },
+    adaptRoute(makeDeleteTransactionController()),
 )

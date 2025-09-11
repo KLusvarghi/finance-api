@@ -55,34 +55,34 @@ describe('AuthenticateUserController', () => {
     })
 
     describe('error handling', () => {
-        it('should return 404 if user is not found', async () => {
+        it('should throw LoginFailedError when user is not found', async () => {
+            const loginFailedError = new LoginFailedError()
             jest.spyOn(loginUserService, 'execute').mockImplementationOnce(
                 async () => {
-                    throw new LoginFailedError()
+                    throw loginFailedError
                 },
             )
 
-            const response = await sut.execute(baseHttpRequest)
-
-            expect(response.statusCode).toBe(400)
-            expect(response.body?.success).toBe(false)
-            expect(response.body?.message).toBe(
+            await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
+                LoginFailedError,
+            )
+            await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
                 ResponseMessage.USER_INVALID_PASSWORD_OR_EMAIL,
             )
         })
 
-        it('should return 401 and throws LoginFailedError if password is invalid', async () => {
+        it('should throw LoginFailedError when password is invalid', async () => {
+            const loginFailedError = new LoginFailedError()
             jest.spyOn(loginUserService, 'execute').mockImplementationOnce(
                 async () => {
-                    throw new LoginFailedError()
+                    throw loginFailedError
                 },
             )
 
-            const response = await sut.execute(baseHttpRequest)
-
-            expect(response.statusCode).toBe(400)
-            expect(response.body?.success).toBe(false)
-            expect(response.body?.message).toBe(
+            await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
+                LoginFailedError,
+            )
+            await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
                 ResponseMessage.USER_INVALID_PASSWORD_OR_EMAIL,
             )
         })

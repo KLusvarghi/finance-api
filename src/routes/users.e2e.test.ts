@@ -31,9 +31,45 @@ describe('User Routes E2E Tests', () => {
             expect(responseBody.data.id).toEqual(user.id)
             expect(responseBody.message).toBe(ResponseMessage.SUCCESS)
         })
+
+        it('should return 401 if authorization header is missing', async () => {
+            const { body: responseBody } = await request(app)
+                .get('/api/users/me')
+                .expect(401)
+
+            expect(responseBody.message).toBe('Unauthorized')
+        })
+
+        it('should return 401 if token is invalid', async () => {
+            const { body: responseBody } = await request(app)
+                .get('/api/users/me')
+                .set('authorization', 'Bearer invalid-token')
+                .expect(401)
+
+            expect(responseBody.message).toBe('Unauthorized')
+        })
     })
 
     describe('GET /api/users/me/balance', () => {
+        it('should return 401 if authorization header is missing', async () => {
+            const { body: responseBody } = await request(app)
+                .get('/api/users/me/balance')
+                .query({ from: '2025-08-01', to: '2025-08-08' })
+                .expect(401)
+
+            expect(responseBody.message).toBe('Unauthorized')
+        })
+
+        it('should return 401 if token is invalid', async () => {
+            const { body: responseBody } = await request(app)
+                .get('/api/users/me/balance')
+                .query({ from: '2025-08-01', to: '2025-08-08' })
+                .set('authorization', 'Bearer invalid-token')
+                .expect(401)
+
+            expect(responseBody.message).toBe('Unauthorized')
+        })
+
         describe('validation', () => {
             it.each([
                 [
@@ -236,13 +272,13 @@ describe('User Routes E2E Tests', () => {
             expect(responseBody.message).toBe(ResponseMessage.USER_CREATED)
         })
 
-        it('should return 400 when Email already exists', async () => {
+        it('should return 409 when Email already exists', async () => {
             const user = await makeUser()
 
             const { body: responseBody } = await request(app)
                 .post(`/api/users`)
                 .send({ ...createUserParams, email: user.email })
-                .expect(400)
+                .expect(409)
 
             expect(responseBody.message).toBe(
                 `The e-mail ${user.email} is already in use`,
@@ -262,6 +298,25 @@ describe('User Routes E2E Tests', () => {
     })
 
     describe('PATCH /api/users/me', () => {
+        it('should return 401 if authorization header is missing', async () => {
+            const { body: responseBody } = await request(app)
+                .patch('/api/users/me')
+                .send({ firstName: 'New Name' })
+                .expect(401)
+
+            expect(responseBody.message).toBe('Unauthorized')
+        })
+
+        it('should return 401 if token is invalid', async () => {
+            const { body: responseBody } = await request(app)
+                .patch('/api/users/me')
+                .set('authorization', 'Bearer invalid-token')
+                .send({ firstName: 'New Name' })
+                .expect(401)
+
+            expect(responseBody.message).toBe('Unauthorized')
+        })
+
         describe('validation', () => {
             it('should return 400 if email is invalid', async () => {
                 const user = await makeUser()
@@ -327,6 +382,23 @@ describe('User Routes E2E Tests', () => {
     })
 
     describe('DELETE /api/users/me', () => {
+        it('should return 401 if authorization header is missing', async () => {
+            const { body: responseBody } = await request(app)
+                .delete('/api/users/me')
+                .expect(401)
+
+            expect(responseBody.message).toBe('Unauthorized')
+        })
+
+        it('should return 401 if token is invalid', async () => {
+            const { body: responseBody } = await request(app)
+                .delete('/api/users/me')
+                .set('authorization', 'Bearer invalid-token')
+                .expect(401)
+
+            expect(responseBody.message).toBe('Unauthorized')
+        })
+
         it('should return 200 when user is deleted', async () => {
             const user = await makeUser()
 
