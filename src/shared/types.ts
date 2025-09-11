@@ -112,7 +112,7 @@ export interface HeadersRequestParams {
     headers: UserIdRequestParams
 }
 
-export interface LoginUserRequestParams {
+export interface AuthenticateUserRequestParams {
     email: string
     password: string
 }
@@ -142,8 +142,8 @@ export interface GetUserBalanceRequest extends HeadersRequestParams {
 
 export interface GetUserByIdRequest extends HeadersRequestParams {}
 
-export interface LoginUserRequest {
-    body: LoginUserRequestParams
+export interface AuthenticateUserRequest {
+    body: AuthenticateUserRequestParams
 }
 
 export interface RefreshTokenRequest {
@@ -338,7 +338,7 @@ export interface DeleteUserService {
     execute(userId: string): Promise<UserPublicResponse>
 }
 
-export interface LoginUserService {
+export interface AuthenticateUserService {
     execute(
         email: string,
         password: string,
