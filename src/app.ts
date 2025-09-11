@@ -3,6 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import swaggerUi from 'swagger-ui-express'
 
+import { errorHandler } from './middlewares/error-handler'
 import { authRouter, transactionsRouter, usersRouter } from './routes'
 
 // no teste e2e, acontece que se a gente deixa a instancia do app junto com a instancia do server,
@@ -27,3 +28,6 @@ const swaggerDocument = JSON.parse(
 )
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+
+// Error handling middleware must be registered LAST
+app.use(errorHandler)
