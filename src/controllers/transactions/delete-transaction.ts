@@ -32,14 +32,6 @@ export class DeleteTransactionController
             const { transactionId } = httpRequest.params
             const { userId } = httpRequest.headers
 
-            // if (!transactionId) {
-            //     return requiredFieldMissingResponse('transactionId')
-            // }
-
-            // if (!checkIfIdIsValid(transactionId)) {
-            //     return invalidIdResponse('transactionId')
-            // }checkIfIdIsValid
-
             const serviceParams: DeleteTransactionServiceParams = {
                 transactionId,
                 userId,
