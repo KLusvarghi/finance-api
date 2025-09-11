@@ -5,9 +5,9 @@ POST http://localhost:3001/api/users
 Content-Type: application/json
 
 {
-  "first_name": "aaaa",
-  "last_name": "aaaaa", 
-  "email": "kaue@gmail.com",
+  "firstName": "aaaa",
+  "lastName": "aaaaa", 
+  "email": "iaq@gmail.com",
   "password": "password123"
 }
 
@@ -15,11 +15,11 @@ Content-Type: application/json
 
 
 # Login User
-POST http://localhost:3001/api/users/login
+POST http://localhost:3001/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "kaue@gmail.com",
+  "email": "iaq@gmail.com",
   "password": "password123"
 }
 
@@ -27,7 +27,7 @@ Content-Type: application/json
 
 # Get User By Id
 GET http://localhost:3001/api/users/me
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlMDE5YTVkNC1jNTc0LTQyMzYtODBjYS0wYWEzNTQwYzYwMWYiLCJpYXQiOjE3NTY3MzUzNTgsImV4cCI6MTc1NjczNjI1OH0.tdVwPpEcPcUintdvmmB_S_IUr9-Nx1e-gLHzJkIZIpA
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjYjQ4ODI2Yi05ZDcxLTRiMTgtOGUxNi03YzZiN2NhZDQzNjIiLCJpYXQiOjE3NTc2Mjg5NzIsImV4cCI6MTc1NzYyOTg3Mn0.Oar79tOs1wnmkbfX0ml0KUJgRsFXJyI5JeH3iAg4V1k
 
 ###
 
@@ -43,8 +43,8 @@ Content-Type: application/json
 authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlMDE5YTVkNC1jNTc0LTQyMzYtODBjYS0wYWEzNTQwYzYwMWYiLCJpYXQiOjE3NTY3MzUzNTgsImV4cCI6MTc1NjczNjI1OH0.tdVwPpEcPcUintdvmmB_S_IUr9-Nx1e-gLHzJkIZIpA
 
 {
-  "first_name": "piton",
-  "last_name": "delas",
+  "firstName": "piton",
+  "lastName": "delas",
   "email": "kaua@gmail.com",
   "password": "newpassword456"
 }
@@ -58,44 +58,46 @@ authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiOTk5M
 ###
 
 # Refresh Token
-POST http://localhost:3001/api/users/refresh-token
+POST http://localhost:3001/api/auth/refresh-token
 Content-Type: application/json
 
 {
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1MDljYWE1Yi0wY2RmLTQ0NTktOGQ4MS1lYmFhNjI5M2QyYWMiLCJpYXQiOjE3NTY4MTg3NDQsImV4cCI6MTc1NzQyMzU0NH0.2lP9Y-NpA5CqxI0R8Ov14b2-C20KTomOu1AFPx1c3zg"
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjYjQ4ODI2Yi05ZDcxLTRiMTgtOGUxNi03YzZiN2NhZDQzNjIiLCJpYXQiOjE3NTc1NTIxODMsImV4cCI6MTc1ODE1Njk4M30.QNQBLoqZ_aEon5rQn9sPNrMhtwApAVne4rvRblCbYzo"
 }
 
 ###
 
----
+
+
+
 
 ### TRANSACTIONS
 
 # Create Transaction
 POST http://localhost:3001/api/transactions/me
 Content-Type: application/json
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1MDljYWE1Yi0wY2RmLTQ0NTktOGQ4MS1lYmFhNjI5M2QyYWMiLCJpYXQiOjE3NTY3NjQ3ODUsImV4cCI6MTc1Njc2NTY4NX0.GDIByKCCm3DcIvO08l4YB6mh6B9TrYdSE_kvcOVr5Dk
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjYjQ4ODI2Yi05ZDcxLTRiMTgtOGUxNi03YzZiN2NhZDQzNjIiLCJpYXQiOjE3NTc2MzAxNTUsImV4cCI6MTc1NzYzMTA1NX0._cRkIRUFoeJKB42wm2sUraTazDTKR_gYIxxF1IyDzxI
 
 {
   "name": "pizza",
   "amount": 5000,
-  "date": "2024-06-01T00:00:00.000Z",
+  "date": "2025-08-08T00:00:00.000Z",
   "type": "EARNING"
 }
 
 ###
 
 # Get Transactions By User Id
-GET http://localhost:3001/api/transactions/me
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1MDljYWE1Yi0wY2RmLTQ0NTktOGQ4MS1lYmFhNjI5M2QyYWMiLCJpYXQiOjE3NTY3NjQ3ODUsImV4cCI6MTc1Njc2NTY4NX0.GDIByKCCm3DcIvO08l4YB6mh6B9TrYdSE_kvcOVr5Dk
+GET http://localhost:3001/api/transactions/me?from=2025-08-01&to=2025-08-08
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjYjQ4ODI2Yi05ZDcxLTRiMTgtOGUxNi03YzZiN2NhZDQzNjIiLCJpYXQiOjE3NTc2Mjg5NzIsImV4cCI6MTc1NzYyOTg3Mn0.Oar79tOs1wnmkbfX0ml0KUJgRsFXJyI5JeH3iAg4V1k
 
 
 ###
 
 # Update Transaction
-PATCH http://localhost:3001/api/transactions/8dcc9a8b-b4cc-4d6b-80fc-d2fbd1a4dd3b
+PATCH http://localhost:3001/api/transactions/me/213c5188-3067-4974-af6b-7c62bed0a8fc
 Content-Type: application/json
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1MDljYWE1Yi0wY2RmLTQ0NTktOGQ4MS1lYmFhNjI5M2QyYWMiLCJpYXQiOjE3NTY3NjQ3ODUsImV4cCI6MTc1Njc2NTY4NX0.GDIByKCCm3DcIvO08l4YB6mh6B9TrYdSE_kvcOVr5Dk
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjYjQ4ODI2Yi05ZDcxLTRiMTgtOGUxNi03YzZiN2NhZDQzNjIiLCJpYXQiOjE3NTc2Mjg5NzIsImV4cCI6MTc1NzYyOTg3Mn0.Oar79tOs1wnmkbfX0ml0KUJgRsFXJyI5JeH3iAg4a1k
 
 {
   "amount": 126000,
@@ -106,5 +108,5 @@ authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1MDljY
 ###
 
 # Delete Transaction
-DELETE http://localhost:3001/api/transactions/8dcc9a8b-b4cc-4d6b-80fc-d2fbd1a4dd3b
-authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1MDljYWE1Yi0wY2RmLTQ0NTktOGQ4MS1lYmFhNjI5M2QyYWMiLCJpYXQiOjE3NTY3NjQ3ODUsImV4cCI6MTc1Njc2NTY4NX0.GDIByKCCm3DcIvO08l4YB6mh6B9TrYdSE_kvcOVr5Dk
+DELETE http://localhost:3001/api/transactions/me/213c5188-3067-4974-af6b-7c62bed0a8fc
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjYjQ4ODI2Yi05ZDcxLTRiMTgtOGUxNi03YzZiN2NhZDQzNjIiLCJpYXQiOjE3NTc2Mjg5NzIsImV4cCI6MTc1NzYyOTg3Mn0.Oar79tOs1wnmkbfX0ml0KUJgRsFXJyI5JeH3iAg4V1k

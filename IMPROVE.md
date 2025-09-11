@@ -1,20 +1,5 @@
-[x] Ver melhor maneira de como melhorar os validators que está em test/fixtures/
-[x] implementar as mesmas melhorias nos testes de User
-[x] Implementar adapters no nosso service
-[x] add soft delete nas tabelas
 
 [] padronizar as variáveis dos tests no repository
-[] a validação do deleteUserRepostory tem que ser refeita, não só os testes, temos que alterar ele para não retornar null e sim um throw usernotfonunerror, e temos que tratar no teste caso a função user.delete retorne um erro e a caso o repository de um throw
-
-Bom, será que nesse caso eu não consigo reutilizar a criação do usuário? Porque em todos os meus repositores, que estão em user, eu tenho a necessidade de criar um usuário. E provavelmente eu vou ter que replicar a mesma coisa para o transactions. Mas focando só no users, acaba que eu tenho que, para testar um certo comportamento, eu preciso mocar a criação de um usuário. Então eu tenho que criar um usuário, aí depois deletar ou algo do tipo. Será que eu não poderia, por exemplo, no meu fixtures, eu acabar criando uma função, que dentro dessa função a gente cria o usuário e retorna ele. Então ela recebe os parâmetros e retorna o usuário. Será que é válido? Porque eu penso muito na questão de uma chamada no banco, por mais que seja o banco de teste, mas uma chamada no banco, ele acaba sendo feita fora do meu repositor. Então eu fico pensando se é uma boa prática ou não.
-
----
-
-[x] Arrumar os testes de deleteRepository
-[x] criar tesste para getTransactionRepository
-[x] Arrumar todos os controllers com a nova ordem de mensagem de erro
-[x] ver o que é mais válido, verificar o result da query dentro d orepository afim de não retoranr null e não precisar tratar no service, ou tratar em ambos, ou tratar só no service?
-[x] ver de implemntar o "implemnts"
 
 [] ver com AI tipos de erros genericos que podemos criar e quais outros custom erros para podermos criar
 [] ver com a ai como eu posso verificar no getuserbaçance como eu faço para saber se o user tem alguma transaction, eu faço no service ou no repository?
@@ -32,19 +17,8 @@ Bom, será que nesse caso eu não consigo reutilizar a criação do usuário? Po
 
 ---
 
-# melhorias da ai
-
 [] melhorar a tipagem dos meus: httpRequest: HttpRequest, poruqem dessa maneira eu não tenho o auto complite se é body, params ou querys que eu tenho
-[] Extrair repetição de lógica de validação de ID + existência para decorators/middlewares caso evoluam para framework HTTP real (p. ex. Fastify routes).
 [] Trocar console.error por logger; incluir requestId/userId no log.
-[X] Usar ESLint rule para proibir imports fora do barrel (@/shared/types, etc.).
-[x] Automatizar ordenação de imports.
-[x] Considerar criar um tipo genérico Controller<TRequest, TResponse> para unificar assinatura e evitar repetição de execute(HttpRequest): Promise<HttpResponse<…>>.
-[x] Considerar criar tipos genéricos para Services (Service<TInput, TOutput>, SimpleService<TInput, TOutput>, etc.) para unificar assinaturas e melhorar type safety.
-
-# Roadmap de Melhorias Sugerido
-
-Aqui está um roadmap sugerido para estruturar as melhorias para a API. Ele está dividido em fases, começando com mudanças fundamentais e avançando para refatorações mais complexas e novas funcionalidades.
 
 ---
 
@@ -52,51 +26,22 @@ Aqui está um roadmap sugerido para estruturar as melhorias para a API. Ele est�
 
 O foco desta fase é padronizar o código, melhorar a consistência da API e corrigir pequenos problemas que têm um grande impacto na qualidade e na experiência do desenvolvedor.
 
+<!-- TODO: -->
 1.  **[ ] Padronizar Variáveis de Testes nos Repositórios**
     - **Tarefa Original**: `padronizar as variáveis dos tests no repository`.
     - **Justificativa**: Manter um padrão de nomenclatura e estrutura nas variáveis de teste (e.g., `sut`, `mockedUser`) torna os testes mais fáceis de ler e manter.
 
+<!-- TODO: -->
 2.  **[ ] Melhorar Mensagens de Erro para Entidades Não Encontradas**
     - **Tarefa Original**: `ver com a ai se é válido retornar "Transaction with id {id} not found"`.
     - **Resposta e Justificativa**: Sim, é uma excelente prática. Incluir o ID na mensagem de erro `"{Entidade} with id {id} not found"` ajuda muito na depuração (debugging) do frontend e na análise de logs, pois você sabe exatamente qual registro estava sendo procurado. Recomendo aplicar este padrão para todas as mensagens de "não encontrado".
 
-3.  **[ ] Refatorar o Tipo de Retorno da API em `http.ts`**
-    - **Tarefa Original**: `no arquivo http.ts, retirar a propriedade "data" das respostas que provavelmente nunca terão o "data"`.
-    - **Justificativa**: Isso torna a API mais limpa e previsível. Respostas de sucesso sem corpo (como um `204 No Content` para deleção) não devem ter uma chave `data`. Você pode criar tipos diferentes para `HttpResponseWithData<T>` e `HttpResponseWithoutData`.
-
-4.  **[ ] Mudar o Tipo do `userBalance` para String na Resposta da API**
-    - **Tarefa Original**: `mudar o tipo de valor que o userBalance recebe de number para string`.
-    - **Justificativa**: Embora internamente você use `Decimal` (o que é ótimo), retornar valores monetários como `string` no JSON é a melhor prática para evitar problemas de precisão com ponto flutuante em JavaScript no lado do cliente. O repositório já parece fazer isso, então é só garantir que isso seja mantido em toda a API.
-
 ---
 
-## Fase 2: Tratamento de Erros e Validações de Segurança
-
-Esta fase foca em tornar a API mais robusta e segura, melhorando o fluxo de validação e o tratamento de erros.
-
-1.  **[ ] Refatorar `deleteUserRepository` para Lançar Erros**
-    - **Tarefa Original**: `a validação do deleteUserRepostory tem que ser refeita... alterar ele para não retornar null e sim um throw UserNotFoundError`.
-    - **Justificativa**: Repositórios não devem retornar `null` quando uma entidade não é encontrada se isso for um estado excepcional. Lançar um erro (e.g., `UserNotFoundError`) torna o fluxo de controle mais explícito e força o `Service` a tratar essa exceção, evitando bugs silenciosos.
-
-2.  **[ ] Adicionar Validação de `userId` em `delete-transaction`**
-    - **Tarefa Original**: `no meu delete-transaction eu não valido se o id do user passado pode ser um user id inexistente`.
-    - **Justificativa**: Esta é uma validação de segurança crucial. Antes de deletar uma transação, você deve sempre verificar se o `userId` fornecido na requisição é válido e existe no banco de dados.
-
-3.  **[ ] Validar `userId` ao Atualizar uma Transação**
-    - **Tarefa Original**: `ver com a ai, se é valido ao atualizar uma transação, a gente receber o userId afim de validar`.
-    - **Resposta e Justificativa**: Sim, é absolutamente essencial. Ao atualizar uma transação, a rota deve ser algo como `PATCH /transactions/{transactionId}`. No backend, você deve obter o `userId` do usuário autenticado (geralmente de um token JWT, que é um passo futuro) e verificar se a transação com `transactionId` pertence a ele. Isso impede que um usuário modifique as transações de outro.
-
+<!-- TODO: -->
 4.  **[ ] Implementar Middleware de Tratamento de Erros Centralizado**
     - **Tarefa Original**: `implementar midwarre ... que centraliza o tratamento dos erros`.
     - **Justificativa**: Esta é uma das melhorias mais importantes. Um middleware de erro centralizado (Error Handling Middleware) remove a lógica de `try/catch` dos controllers, limpa o código e garante que todos os erros sejam tratados de forma consistente, retornando respostas HTTP padronizadas.
-
-5.  **[ ] Implementar Middleware para Validação de Requisições**
-    - **Tarefa Original**: `implementar midwarre para validações de request`.
-    - **Justificativa**: Após o middleware de erro, um middleware de validação (usando uma biblioteca como `zod` ou `joi`) para validar `body`, `params` e `query` antes que cheguem aos controllers é a melhor abordagem. Isso limpa os controllers da lógica de validação e retorna erros `400 Bad Request` claros para o cliente.
-
-6.  **[ ] Expandir e Padronizar Erros Customizados**
-    - **Tarefa Original**: `ver com AI tipos de erros genericos que podemos criar`.
-    - **Justificativa**: Com um middleware de erro, você pode criar uma hierarquia de erros customizados (e.g., `NotFoundError`, `ValidationError`, `UnauthorizedError`) que seu middleware pode capturar e traduzir para os códigos de status HTTP corretos.
 
 ---
 
@@ -174,3 +119,56 @@ Melhorias focadas na lógica de negócio específica da aplicação.
 1.  **[ ] Clarificar Lógica de Negócio para `getUserBalance` com Zero Transações**
     - **Tarefa Original**: `ver com a ai como eu posso verificar no getuserbalance como eu faço para saber se o user tem alguma transaction`.
     - **Análise e Sugestão**: Seu repositório já calcula o balanço a partir das transações. Se não há transações, o balanço será zero, o que é o comportamento correto e esperado. A responsabilidade de exibir uma mensagem como "Você ainda não tem transações" é do frontend. O ideal é manter a responsabilidade do repositório de apenas buscar os dados.
+
+---
+
+- 
+
+- [ ] COMO EU POSSO MELHORAR A TIPAGEM DO MEU SERVICE?
+
+Ver se a maioria das minhas interface eu coloco elas uso elas em mais de dois arquivos, se for 1 ou dois apenas, eu mudo a interface para dentro do arquivo original (evitar o overengineer)
+
+- [ ] ver se é válido passar os fixtures em um arquivo separado (que tem o propósito de centralizar a criação deles), ou é mia sválido deixar eles dentro do próprio arquivo
+
+
+
+
+
+7.  
+
+---
+
+# Ordem do que estou fazendo no momento:
+
+[x] implementar o middlware de error handling
+
+[x] testes no middleware de auth
+
+[] melhorar a tipagem dos meus: httpRequest: HttpRequest, poruqem dessa maneira eu não tenho o auto complite se é body, params ou querys que eu tenho
+
+[] ver com a AI como eu farei com a distribuição das interfaces, quais eu coloco prŕoprio arquivo e quais eu deixo no arquivo de types
+
+[] mudar o arquivo de types para "@types" igual o projeto da rocketseat: https://github.com/rocketseat-education/ignite-nodejs-03-api-solid-nodejs/tree/main/src/%40types
+
+[]  Dentro da rota de login user, preciso validar se os adapter não lançam erros (ver se é valido, é uma task antiga que não sei se faz sentido ainda)
+
+[]  Posso melhorar todos os meu outros adapters afim de tratarem o erro da melhor forma independente de quem chama eles (ver com a AI se é válido, isso gera complexidade e temos que ter em mente de não cair no over engineer)
+
+[] implementar paginação no get transactions (talvez o scroll infinito seja melhor nesse caso para exibir as transações)
+  [] fiquei com duvida de como eu faço e utilizo filtros utilizando paginação (entra naquele problema que o gabriel tinha na mamba, a diferença é que a minha paginação talvez seja de cursor (scroll infinito))
+
+[] implementar cache na rota de get transaction (fica a duvida de como fazer isso usando com a rota que tem paginação)
+
+[] ver possibildiade de implementar middleware de rate limiting, ou se faço isso com alguma lib ou metodos nativos do node. Acredito que a algumas rotas apenas possam ter essa necessidade (ver quais com a AI)
+  Bom, o que eu achei interessante foram alguns middles como, por exemplo, o de segurança e headers HTTP, pra gente lidar com o hate limiting. Eu acho muito legal a gente utilizar isso porque, por exemplo, alguém que esteja tentando ter uma conta, mas tentar quebrar o nosso servidor, o nosso banco de dados enchendo de requisições, com injeção de Javascript, por exemplo, a gente pode limitar isso. Se diz que dá pra gente fazer com, geralmente, esse tipo de coisa de hate limit, a gente faz com o middler mesmo, no Express, porque eu sei que, por exemplo, quando a gente utiliza algumas ferramentas e etc, a gente consegue, as ferramentas mesmas tem esses benefícios, mas no middler, no Express, a gente lidaria dessa forma, então?
+
+
+[] Ver de implementar observabilidade com algum software ou como a AI sugeriu com middleware, porem, com middleware pode ser mais complexo snedo que tem softwares que podem facilitar isso (talvez não tenha necssidade de usar mcp de algum software de observailidade porque no final não terá um impacto, sendo que é um projeto para de estudos)
+  Bom, você também mencionou de login e requisições, que é para a gente conseguir monitorar de onde veio o método, a URL, status da resposta, tempo de execução, API do cliente e afins. A gente fazendo isso, não seria a mesma coisa que a gente adicionar observabilidade no nosso projeto? Porque isso me gera uma dúvida, porque é uma coisa que eu vou fazer posteriormente e eu não quero ter retrabalho. Se eu adicionando observabilidade, eu já vou ter acesso a todos esses recursos? Então não faz sentido para mim adicionar um meter, entendeu?
+
+
+[] Melhorar a composição e organização dos meus testes, acredito que estou fazendo over engineer, aplicando várias coisas em todos os testes, sendo que talvez eles não precisem
+  [] 1. nos tests, o quye é convencional, crir um stub mais realista, que recebe os params mesmo que não iremos utilizar, ou fazemos do modo mais simples e necessário?
+
+  [] 2. EU sinto que nos meus tests nem sempre é necessário eu ter a estrutura que eu tenho em todos os tasts, tenho que ver melhor o que é necessaŕio, e como usar o beforeEach, beforeEachAll, afterEach, afterEachAll da melhor forma
+    [] Será que aplicando direito esses métodos, eu consigo melhorar a questão que quando a gente roda os testes, a gente tem algumas opções. Uma, por exemplo, rodar com o teste container, que é uma biblioteca que a gente consegue a cada teste subir um container, então subir um banco de dados, fazer o teste, matar esse banco de dados e ir para o próximo, de forma que todos os testes podem rodar de forma assíncrona, então ao mesmo tempo, mas com banco de dados diferentes. Ou a gente continua executando da mesma forma que a gente faz, que cada teste ele é executado sequencialmente, então eles não são executados de forma aleatória e ao mesmo tempo, porque a gente faz com que a cada teste ele limpe o banco de dados. Então o teste vai rodar e para o próximo ele tem que esperar o anterior acabar, limpar o banco de dados para ele prosseguir. Mas será que se a gente usar melhor o before all ou after it, ou qualquer que seja, a gente não consiga superar essa necessidade de juntar esses dois mundos, de conseguir rodar tudo ao mesmo tempo, da melhor forma, e a gente tem que ter o banco mais limpo possível. Eu não sei exatamente porque você existe o teste container para superar essa necessidade, é porque deve ter algum empecilho nesse meio do caminho, de não conseguir fazer isso, mas é válido a gente tentar fazer e ver da melhor forma que pode funcionar.
