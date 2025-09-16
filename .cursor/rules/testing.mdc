@@ -1,5 +1,7 @@
 ---
-globs: ['*.test.ts', '*.spec.ts', '*.e2e.test.ts']
+globs:
+    - '**/*.test.ts'
+    - '**/*.e2e.test.ts'
 alwaysApply: true
 ---
 
@@ -10,82 +12,71 @@ alwaysApply: true
 - **ALWAYS** nomeie testes com a estrutura `should <comportamento esperado> if/when <condição>`.
     - Ex: `it('should return 400 if e-mail is already in use')`.
 - **ALWAYS** organize testes em blocos `describe` aninhados para agrupar cenários relacionados (ex: `describe('error handling', ...)`).
-- **ALWAYS** isole o "System Under Test" (SUT) usando mocks ou stubs para suas dependências em testes unitários.
+- **ALWAYS** isole o "System Under Test" (SUT) usando mocks com `jest-mock-extended` para dependências injetadas.
 - **NEVER** teste múltiplas responsabilidades em um único `it`. Cada teste deve ter um foco e uma asserção principal.
 - **PREFER** asserções explícitas (`expect(result).toBe(...)`) a snapshots (`.toMatchSnapshot()`) para garantir clareza e evitar regressões acidentais.
 - **PREFER** `it.each` para testar a mesma lógica com diferentes entradas (ex: validação de schema), evitando repetição de código.
+
+## Estratégia de Mocking: A Regra de Ouro
+
+- **Para Injeção de Dependência (DI): ALWAYS use `jest-mock-extended`**.
+    - **O quê**: Services, Repositories, Adapters — qualquer classe injetada via construtor.
+    - **Por quê**: Garante segurança de tipos máxima. Se a assinatura de um método na classe original mudar, o TypeScript quebrará o teste, prevenindo falsos positivos. É a abordagem mais robusta e de fácil manutenção.
+    - **Como**: `const serviceMock = mock<MyService>()`.
+
+- **Para Módulos Estáticos/Importados: PREFER `jest.mock`**.
+    - **O quê**: Bibliotecas como `uuid`, `bcrypt`, SDKs externos ou helpers que são importados e usados diretamente, sem DI.
+    - **Por quê**: É a ferramenta correta para substituir um módulo inteiro no escopo do teste.
+    - **Como**: `jest.mock('uuid')`.
+
+- **Manuais Stubs: AVOID**.
+    - **Por quê**: São frágeis, verbosos e quebram facilmente com refatorações, como visto no caso do `DeleteUserController`. A abordagem com `jest-mock-extended` é superior em todos os aspectos para DI.
 
 ## Exemplos (do repositório)
 
 ### ✅ Correto
 
-Um teste de serviço bem estruturado, com nomes descritivos e mocks claros para isolar a unidade.
+Um teste de controlador usando `jest-mock-extended` para injetar uma dependência de serviço mockada, garantindo segurança de tipos e isolamento.
 
 ```typescript
-// Extraído de: src/services/users/create-user.test.ts
-describe('CreateUserService', () => {
-    // ... setup com stubs para repositórios e adapters ...
+// Extraído de: src/controllers/users/delete-user.test.ts
+import { mock, MockProxy } from 'jest-mock-extended'
+
+describe('DeleteUserController', () => {
+    let sut: DeleteUserController
+    let deleteUserService: MockProxy<DeleteUserService> // Tipo seguro!
+
+    beforeEach(() => {
+        // Mock criado com segurança de tipos, sem stubs manuais.
+        deleteUserService = mock<DeleteUserService>()
+        sut = new DeleteUserController(deleteUserService)
+    })
 
     describe('error handling', () => {
-        it('should throw an EmailAlreadyExistsError if getUserByEmailRepository returns a user', () => {
+        it('should throw UserNotFoundError when service throws it', async () => {
             // arrange
-            jest.spyOn(
-                getUserByEmailRepository,
-                'execute',
-            ).mockResolvedValueOnce(createUserRepositoryResponse)
+            const error = new UserNotFoundError(userId)
+            // O método 'execute' é tipado. Se a assinatura mudar, isto quebrará.
+            deleteUserService.execute.mockRejectedValue(error)
 
-            // act
-            const promise = sut.execute(createUserParams)
-
-            // assert
-            expect(promise).rejects.toThrow(
-                new EmailAlreadyExistsError(createUserParams.email),
-            )
+            // act & assert
+            await expect(sut.execute(baseHttpRequest)).rejects.toThrow(error)
         })
     })
 
     describe('success', () => {
-        it('should create a user successfully', async () => {
+        it('should return 200 if user is deleted successfully', async () => {
+            // arrange
+            deleteUserService.execute.mockResolvedValueOnce(
+                deleteUserRepositoryResponse,
+            )
             // act
-            const response = await sut.execute(createUserParams)
+            const response = await sut.execute(baseHttpRequest)
 
             // assert
-            expect(response).toEqual(createUserServiceResponse)
+            expect(response.statusCode).toBe(200)
         })
     })
-})
-```
-
-### ❌ Evitar
-
-Testes de validação de schema repetitivos que podem ser consolidados com `it.each`.
-
-```typescript
-// Extraído de: src/controllers/users/create-user.test.ts
-describe('validations', () => {
-    describe('firstName', () => {
-        it('should return 400 if firstName is not provided', async () => {
-            // arrange
-            const response = await sut.execute({
-                body: { ...params, firstName: undefined },
-            })
-            // assert
-            expect(response.statusCode).toBe(400)
-        })
-    })
-
-    describe('lastName', () => {
-        it('should return 400 if lastName is not provided', async () => {
-            // arrange
-            const response = await sut.execute({
-                body: { ...params, lastName: undefined },
-            })
-            // assert
-            expect(response.statusCode).toBe(400)
-        })
-    })
-
-    // ... mais testes repetitivos para email e password ...
 })
 ```
 
@@ -114,37 +105,13 @@ describe('DELETE /api/users/me', () => {
 })
 ```
 
-#### ❌ Evitar
-
-Não usar uma factory para testar a própria funcionalidade de criação. A rota de criação deve ser testada diretamente para validar todo o fluxo (controller, serviço, etc.).
-
-```typescript
-// Extraído de: src/routes/users.e2e.test.ts
-describe('POST /api/users', () => {
-    it('should return 201 when user is created', async () => {
-        // act & assert: testa a rota de criação diretamente
-        const { body: responseBody } = await request(app)
-            .post('/api/users')
-            .send(createUserParams)
-            .expect(201)
-
-        expect(responseBody.data.tokens.accessToken).toBeDefined()
-        expect(responseBody.message).toBe(ResponseMessage.USER_CREATED)
-    })
-})
-```
-
 ## Escopo & Particularidades
 
 - **Aplica-se a**: Todos os arquivos de teste (`.test.ts`, `.e2e.test.ts`).
 - **Não se aplica a**: Lógica de setup de testes (ex: `jest.global-setup.ts`).
 - **Particularidades**:
-    - **Testes Unitários (Serviços, Adapters)**: Foco em isolamento total com mocks/stubs.
-    - **Testes de Integração (Controllers, Repositories)**: Interação com stubs de serviços e/ou banco de dados de teste.
-    - **Testes E2E (Routes)**: Simulam requisições HTTP reais e verificam a resposta de ponta a ponta.
-        - **PREFER** usar _factories_ (localizadas em `src/test/factories/`) para criar o estado necessário para um teste (ex: criar um usuário antes de testar a rota de deleção). Isso evita chamadas de API desnecessárias e torna os testes mais rápidos e focados.
-        - **NEVER** use _factories_ para testar a própria lógica de criação. O SUT (System Under Test) deve ser exercitado através da requisição HTTP (`supertest`). Se uma _factory_ necessária não existir, ela deve ser criada.
-
-## Referências
-
-- `build-improve-rules.mdc`
+    - **Testes Unitários (Controllers, Services, Adapters)**: Foco em isolamento total com mocks (`jest-mock-extended` ou `jest.mock`).
+    - **Testes de Integração (Repositories)**: Interação com o banco de dados de teste, sem mocks para o Prisma Client.
+    - **Testes E2E (Routes)**: Simulam requisições HTTP reais.
+        - **PREFER** usar _factories_ (`src/test/factories/`) para criar o estado necessário para um teste.
+        - **NEVER** use _factories_ para testar a própria lógica de criação (ex: a rota `POST /users`).
