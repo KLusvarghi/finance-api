@@ -1,10 +1,9 @@
+import { mock, MockProxy } from 'jest-mock-extended'
+
 import { DeleteUserController } from '@/controllers'
 import { UserNotFoundError } from '@/errors'
-import {
-    HttpResponseSuccessBody,
-    ResponseMessage,
-    UserRepositoryResponse,
-} from '@/shared'
+import { DeleteUserService } from '@/services'
+import { HttpResponseSuccessBody, ResponseMessage } from '@/shared'
 import {
     deleteUserHttpRequest as baseHttpRequest,
     deleteUserRepositoryResponse,
@@ -13,26 +12,12 @@ import {
 
 describe('DeleteUserController', () => {
     let sut: DeleteUserController
-    let deleteUserService: DeleteUserServiceStub
-
-    class DeleteUserServiceStub {
-        execute(_userId: string): Promise<UserRepositoryResponse> {
-            return Promise.resolve(deleteUserRepositoryResponse)
-        }
-    }
-
-    const makeSut = () => {
-        const deleteUserService = new DeleteUserServiceStub()
-        const sut = new DeleteUserController(deleteUserService)
-
-        return { deleteUserService, sut }
-    }
+    let deleteUserService: MockProxy<DeleteUserService>
 
     beforeEach(() => {
         // Setup executado antes de cada teste
-        const { sut: controller, deleteUserService: service } = makeSut()
-        sut = controller
-        deleteUserService = service
+        deleteUserService = mock<DeleteUserService>()
+        sut = new DeleteUserController(deleteUserService)
     })
 
     afterEach(() => {
@@ -42,39 +27,38 @@ describe('DeleteUserController', () => {
     })
 
     describe('error handling', () => {
-        it('should return 404 if user is not found', async () => {
-            jest.spyOn(deleteUserService, 'execute').mockImplementationOnce(
-                async () => {
-                    throw new UserNotFoundError(userId)
-                },
+        it('should throw UserNotFoundError when DeleteUserService throws UserNotFoundError', async () => {
+            // arrange
+            const userNotFoundError = new UserNotFoundError(userId)
+            deleteUserService.execute.mockRejectedValue(userNotFoundError)
+
+            // act & assert
+            await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
+                UserNotFoundError,
             )
-
-            const response = await sut.execute(baseHttpRequest)
-
-            expect(response.statusCode).toBe(404)
-            expect(response.body?.success).toBe(false)
-            expect(response.body?.message).toBe(
+            await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
                 `User with id ${userId} not found`,
             )
         })
 
-        it('should return 500 if DeleteUserService throws', async () => {
-            jest.spyOn(deleteUserService, 'execute').mockRejectedValueOnce(
-                () => {
-                    new Error()
-                },
+        it('should throw generic error when DeleteUserService throws generic error', async () => {
+            // arrange
+            const genericError = new Error('Generic service error')
+            deleteUserService.execute.mockRejectedValue(genericError)
+
+            // act & assert
+            await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
+                genericError,
             )
-
-            const response = await sut.execute(baseHttpRequest)
-
-            expect(response.statusCode).toBe(500)
-            expect(response.body?.success).toBe(false)
-            expect(response.body?.message).toBe(ResponseMessage.SERVER_ERROR)
         })
     })
 
     describe('success cases', () => {
         it('should return 200 if user is deleted successfully', async () => {
+            deleteUserService.execute.mockResolvedValueOnce(
+                deleteUserRepositoryResponse,
+            )
+
             const response = await sut.execute(baseHttpRequest)
 
             expect(response.statusCode).toBe(200)
@@ -87,14 +71,14 @@ describe('DeleteUserController', () => {
 
         it('should call DeleteUserService with correct parameters', async () => {
             // arrange
-            const spy = jest.spyOn(deleteUserService, 'execute')
-
             // act
             await sut.execute(baseHttpRequest)
 
             // assert
-            expect(spy).toHaveBeenCalledWith(baseHttpRequest.headers.userId)
-            expect(spy).toHaveBeenCalledTimes(1)
+            expect(deleteUserService.execute).toHaveBeenCalledWith(
+                baseHttpRequest.headers.userId,
+            )
+            expect(deleteUserService.execute).toHaveBeenCalledTimes(1)
         })
     })
 })
