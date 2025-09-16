@@ -1,7 +1,15 @@
+import { ResponseZodMessages } from '@/shared'
+
 export const invalidTokenCases = [
     {
-        description: 'token is missing',
+        description: 'token is undefined',
         token: undefined,
+        message: ResponseZodMessages.refreshToken.required,
+    },
+    {
+        description: 'token is null',
+        token: null,
+        message: ResponseZodMessages.refreshToken.required,
     },
     {
         description: 'authorization header is empty',
@@ -32,5 +40,15 @@ export const invalidTokenCases = [
         description: 'token is expired',
         // This will be handled by jwt.verify throwing an error
         token: 'Bearer expired-token',
+    },
+    {
+        description: 'is only whitespace',
+        token: '   ',
+        message: ResponseZodMessages.refreshToken.minLength,
+    },
+    {
+        description: 'is empty string',
+        token: '',
+        message: ResponseZodMessages.refreshToken.minLength,
     },
 ]
