@@ -48,24 +48,4 @@ describe('TokensGeneratorAdapter', () => {
             expect(response.accessToken).not.toBe(response.refreshToken)
         })
     })
-
-    // describe('validations', () => {
-    //     it('should throw UserIdMissingError when userId is empty', async () => {
-    //         const promise = sut.execute('')
-
-    //         await expect(promise).rejects.toThrow(UserIdMissingError)
-    //     })
-
-    //     it('should throw UserIdMissingError when userId is null', async () => {
-    //         const promise = sut.execute(null as unknown as string)
-
-    //         await expect(promise).rejects.toThrow(UserIdMissingError)
-    //     })
-
-    //     it('should throw UserIdMissingError when userId is undefined', async () => {
-    //         const promise = sut.execute(undefined as unknown as string)
-
-    //         await expect(promise).rejects.toThrow(UserIdMissingError)
-    //     })
-    // })
 })
