@@ -34,3 +34,6 @@ export class PostgresUpdateTransactionRepository
         }
     }
 }
+
+// Alias para manter compatibilidade com as importações
+export { PostgresUpdateTransactionRepository as UpdateTransactionRepository }

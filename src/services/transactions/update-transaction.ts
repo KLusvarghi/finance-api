@@ -1,9 +1,11 @@
 import { ForbiddenError, TransactionNotFoundError } from '@/errors'
 import {
     GetTransactionByIdRepository,
+    UpdateTransactionRepository,
+} from '@/repositories/postgres'
+import {
     ServiceWithMultipleParams,
     TransactionPublicResponse,
-    UpdateTransactionRepository,
     UpdateTransactionServiceParams,
 } from '@/shared'
 
@@ -15,16 +17,10 @@ export class UpdateTransactionService
             TransactionPublicResponse
         >
 {
-    private updateTransactionRepository: UpdateTransactionRepository
-    private getTransactionByIdRepository: GetTransactionByIdRepository
-
     constructor(
-        updateTransactionRepository: UpdateTransactionRepository,
-        getTransactionByIdRepository: GetTransactionByIdRepository,
-    ) {
-        this.updateTransactionRepository = updateTransactionRepository
-        this.getTransactionByIdRepository = getTransactionByIdRepository
-    }
+        private readonly updateTransactionRepository: UpdateTransactionRepository,
+        private readonly getTransactionByIdRepository: GetTransactionByIdRepository,
+    ) {}
 
     async execute(
         transactionId: string,
@@ -53,15 +49,11 @@ export class UpdateTransactionService
             throw new TransactionNotFoundError(transactionId)
         }
 
-        // Convert to public response
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { deletedAt, ...updatedTransactionWithoutDeletedAt } =
+            updatedTransaction
         return {
-            id: updatedTransaction.id,
-            userId: updatedTransaction.userId,
-            name: updatedTransaction.name,
-            amount: updatedTransaction.amount,
-            date: updatedTransaction.date,
-            type: updatedTransaction.type,
-            updatedAt: updatedTransaction.updatedAt,
+            ...updatedTransactionWithoutDeletedAt,
         }
     }
 }

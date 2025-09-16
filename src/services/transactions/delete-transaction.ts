@@ -1,8 +1,10 @@
 import { ForbiddenError, TransactionNotFoundError } from '@/errors'
 import {
     DeleteTransactionRepository,
+    GetTransactionByIdRepository,
+} from '@/repositories/postgres'
+import {
     DeleteTransactionServiceParams,
-    GetTransactionByUserIdRepository,
     ServiceWithMultipleParams,
     TransactionPublicResponse,
 } from '@/shared'
@@ -15,16 +17,10 @@ export class DeleteTransactionService
             TransactionPublicResponse
         >
 {
-    private deleteTransactionRepository: DeleteTransactionRepository
-    private getTransactionByIdRepository: GetTransactionByUserIdRepository
-
     constructor(
-        deleteTransactionRepository: DeleteTransactionRepository,
-        getTransactionByIdRepository: GetTransactionByUserIdRepository,
-    ) {
-        this.deleteTransactionRepository = deleteTransactionRepository
-        this.getTransactionByIdRepository = getTransactionByIdRepository
-    }
+        private readonly deleteTransactionRepository: DeleteTransactionRepository,
+        private readonly getTransactionByIdRepository: GetTransactionByIdRepository,
+    ) {}
 
     async execute({
         transactionId,
@@ -47,14 +43,12 @@ export class DeleteTransactionService
         if (!deletedTransaction) {
             throw new TransactionNotFoundError(transactionId)
         }
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { deletedAt, ...deletedTransactionWithoutDeletedAt } =
+            deletedTransaction
         return {
-            id: deletedTransaction.id,
-            userId: deletedTransaction.userId,
-            name: deletedTransaction.name,
-            amount: deletedTransaction.amount,
-            date: deletedTransaction.date,
-            type: deletedTransaction.type,
-            updatedAt: deletedTransaction.updatedAt,
+            ...deletedTransactionWithoutDeletedAt,
         }
     }
 }

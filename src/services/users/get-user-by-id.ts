@@ -1,18 +1,13 @@
 import { UserNotFoundError } from '@/errors'
-import {
-    GetUserByIdRepository,
-    SimpleService,
-    UserPublicResponse,
-} from '@/shared'
+import { GetUserByIdRepository } from '@/repositories/postgres'
+import { SimpleService, UserPublicResponse } from '@/shared'
 
 export class GetUserByIdService
     implements SimpleService<string, UserPublicResponse>
 {
-    private getUserByIdRepository: GetUserByIdRepository
-
-    constructor(getUserByIdRepository: GetUserByIdRepository) {
-        this.getUserByIdRepository = getUserByIdRepository
-    }
+    constructor(
+        private readonly getUserByIdRepository: GetUserByIdRepository,
+    ) {}
 
     async execute(userId: string): Promise<UserPublicResponse> {
         const user = await this.getUserByIdRepository.execute(userId)
@@ -20,8 +15,8 @@ export class GetUserByIdService
         if (!user) {
             throw new UserNotFoundError(userId)
         }
-        // eslint-disable-next-line
-        const { password: _password, ...userWithoutPassword } = user
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { password, ...userWithoutPassword } = user
         return userWithoutPassword
     }
 }

@@ -7,3 +7,6 @@ export class PostgresGetUserByIdRepository implements GetUserByIdRepository {
         return prisma.user.findUnique({ where: { id: userId } })
     }
 }
+
+// Alias para manter compatibilidade com as importações
+export { PostgresGetUserByIdRepository as GetUserByIdRepository }

@@ -2,6 +2,8 @@ import { UserNotFoundError } from '@/errors'
 import {
     GetUserBalanceRepository,
     GetUserByIdRepository,
+} from '@/repositories/postgres'
+import {
     ServiceWithMultipleParams,
     UserBalanceRepositoryResponse,
 } from '@/shared'
@@ -15,16 +17,10 @@ export class GetUserBalanceService
             UserBalanceRepositoryResponse
         >
 {
-    private getUserByIdRepository: GetUserByIdRepository
-    private getUserBalanceRepository: GetUserBalanceRepository
-
     constructor(
-        getUserByIdRepository: GetUserByIdRepository,
-        getUserBalanceRepository: GetUserBalanceRepository,
-    ) {
-        this.getUserByIdRepository = getUserByIdRepository
-        this.getUserBalanceRepository = getUserBalanceRepository
-    }
+        private readonly getUserByIdRepository: GetUserByIdRepository,
+        private readonly getUserBalanceRepository: GetUserBalanceRepository,
+    ) {}
 
     async execute(
         userId: string,

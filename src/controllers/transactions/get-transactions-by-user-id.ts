@@ -1,13 +1,22 @@
 import { ok } from '../_helpers'
 
+import { GetTransactionsByUserIdService } from '@/services'
 import {
-    GetTransactionsByUserIdRequest,
-    GetTransactionsByUserIdService,
     HeadersController,
+    HttpRequest,
     HttpResponse,
     TransactionPublicResponse,
     UserIdRequestParams,
 } from '@/shared'
+
+// Local interfaces - used only by this controller
+interface GetTransactionsByUserIdRequest extends HttpRequest {
+    headers: UserIdRequestParams
+    query: {
+        from: string
+        to: string
+    }
+}
 
 export class GetTransactionsByUserIdController
     implements

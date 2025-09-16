@@ -2,9 +2,8 @@ import { UserNotFoundError } from '@/errors'
 import {
     GetTransactionsByUserIdRepository,
     GetUserByIdRepository,
-    ServiceWithMultipleParams,
-    TransactionPublicResponse,
-} from '@/shared'
+} from '@/repositories/postgres'
+import { ServiceWithMultipleParams, TransactionPublicResponse } from '@/shared'
 
 export class GetTransactionsByUserIdService
     implements
@@ -15,17 +14,10 @@ export class GetTransactionsByUserIdService
             TransactionPublicResponse[]
         >
 {
-    private getUserByIdRepository: GetUserByIdRepository
-    private getTransactionsByUserIdRepository: GetTransactionsByUserIdRepository
-
     constructor(
-        getUserByIdRepository: GetUserByIdRepository,
-        getTransactionsByUserIdRepository: GetTransactionsByUserIdRepository,
-    ) {
-        this.getUserByIdRepository = getUserByIdRepository
-        this.getTransactionsByUserIdRepository =
-            getTransactionsByUserIdRepository
-    }
+        private readonly getUserByIdRepository: GetUserByIdRepository,
+        private readonly getTransactionsByUserIdRepository: GetTransactionsByUserIdRepository,
+    ) {}
 
     async execute(
         userId: string,
@@ -49,14 +41,10 @@ export class GetTransactionsByUserIdService
         const transactionsArray = transactions ?? []
 
         // Converter TransactionRepositoryResponse[] para TransactionPublicResponse[]
-        return transactionsArray.map((transaction) => ({
-            id: transaction.id,
-            userId: transaction.userId,
-            name: transaction.name,
-            amount: transaction.amount,
-            date: transaction.date,
-            type: transaction.type,
-            updatedAt: transaction.updatedAt,
-        }))
+        return transactionsArray.map(
+            ({ deletedAt, ...transactionWithoutDeletedAt }) => ({
+                ...transactionWithoutDeletedAt,
+            }),
+        )
     }
 }

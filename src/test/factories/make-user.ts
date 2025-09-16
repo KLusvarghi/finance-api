@@ -1,12 +1,12 @@
 import { prisma } from '../../../prisma/prisma'
 
 import { PasswordHasherAdapter, TokensGeneratorAdapter } from '@/adapters'
-import { TokensGeneratorAdapterResponse, UserPublicResponse } from '@/shared'
+import { UserWithTokensResponse } from '@/shared'
 import { fakerPT_BR as faker } from '@faker-js/faker'
 
 export const makeUser = async (
     password?: string,
-): Promise<UserPublicResponse & { tokens: TokensGeneratorAdapterResponse }> => {
+): Promise<UserWithTokensResponse> => {
     const hashPassword = await new PasswordHasherAdapter().execute(
         password || faker.internet.password(),
     )

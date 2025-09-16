@@ -1,15 +1,27 @@
 import { ok } from '../_helpers'
 
+import { UpdateUserService } from '@/services'
 import {
     BodyHeadersController,
+    HttpRequest,
     HttpResponse,
-    ResponseMessage,
-    UpdateUserParams,
-    UpdateUserRequest,
-    UpdateUserService,
     UserIdRequestParams,
     UserPublicResponse,
 } from '@/shared'
+import { ResponseMessage } from '@/shared'
+
+// Local interfaces - used only by this controller
+interface UpdateUserParams {
+    firstName?: string
+    lastName?: string
+    email?: string
+    password?: string
+}
+
+interface UpdateUserRequest extends HttpRequest {
+    body: UpdateUserParams
+    headers: UserIdRequestParams
+}
 
 export class UpdateUserController
     implements

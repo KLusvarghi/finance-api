@@ -13,3 +13,6 @@ export class PostgresGetUserByEmailRepository
         })
     }
 }
+
+// Alias para manter compatibilidade com as importações
+export { PostgresGetUserByEmailRepository as GetUserByEmailRepository }

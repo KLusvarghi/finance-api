@@ -1,16 +1,25 @@
 import { ok } from '../_helpers'
 
+import { DeleteTransactionService } from '@/services'
 import {
-    DeleteTransactionParams,
-    DeleteTransactionRequest,
-    DeleteTransactionService,
     DeleteTransactionServiceParams,
+    HttpRequest,
     HttpResponse,
     ParamsHeadersController,
-    ResponseMessage,
     TransactionPublicResponse,
     UserIdRequestParams,
 } from '@/shared'
+import { ResponseMessage } from '@/shared'
+
+// Local interfaces - used only by this controller
+interface DeleteTransactionParams {
+    transactionId: string
+}
+
+interface DeleteTransactionRequest extends HttpRequest {
+    params: DeleteTransactionParams
+    headers: UserIdRequestParams
+}
 
 export class DeleteTransactionController
     implements

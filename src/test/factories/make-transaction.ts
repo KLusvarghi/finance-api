@@ -1,12 +1,12 @@
 import { prisma } from '../../../prisma/prisma'
 import { makeUser } from './make-user'
 
-import { TokensGeneratorAdapterResponse, UserPublicResponse } from '@/shared'
+import { UserWithTokensResponse } from '@/shared'
 import { fakerPT_BR as faker } from '@faker-js/faker'
 import { Transaction, TransactionType } from '@prisma/client'
 
 interface MakeTransactionResponse {
-    user: UserPublicResponse & { tokens: TokensGeneratorAdapterResponse }
+    user: UserWithTokensResponse
     transaction: Transaction
 }
 

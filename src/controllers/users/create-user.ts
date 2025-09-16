@@ -1,32 +1,34 @@
 import { created } from '../_helpers'
 
+import { CreateUserService } from '@/services'
 import {
     BodyController,
-    CreateUserParams,
-    CreateUserRequest,
-    CreateUserService,
+    HttpRequest,
     HttpResponse,
-    ResponseMessage,
-    TokensGeneratorAdapterResponse,
-    UserPublicResponse,
+    UserWithTokensResponse,
 } from '@/shared'
+import { ResponseMessage } from '@/shared'
+
+// Local interfaces - used only by this controller
+interface CreateUserParams {
+    firstName: string
+    lastName: string
+    email: string
+    password: string
+}
+
+interface CreateUserRequest extends HttpRequest {
+    body: CreateUserParams
+}
 
 export class CreateUserController
-    implements
-        BodyController<
-            CreateUserParams,
-            UserPublicResponse & { tokens: TokensGeneratorAdapterResponse }
-        >
+    implements BodyController<CreateUserParams, UserWithTokensResponse>
 {
     constructor(private readonly createUserService: CreateUserService) {}
 
     async execute(
         httpRequest: CreateUserRequest,
-    ): Promise<
-        HttpResponse<
-            UserPublicResponse & { tokens: TokensGeneratorAdapterResponse }
-        >
-    > {
+    ): Promise<HttpResponse<UserWithTokensResponse>> {
         // Validation is now handled by middleware
         const params = httpRequest.body as CreateUserParams
 
@@ -37,8 +39,6 @@ export class CreateUserController
         return created(
             createdUser,
             ResponseMessage.USER_CREATED,
-        ) as HttpResponse<
-            UserPublicResponse & { tokens: TokensGeneratorAdapterResponse }
-        >
+        ) as HttpResponse<UserWithTokensResponse>
     }
 }

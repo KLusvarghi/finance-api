@@ -14,3 +14,6 @@ export class PostgresGetTransactionByIdRepository
         return prisma.transaction.findUnique({ where: { id: transactionId } })
     }
 }
+
+// Alias para manter compatibilidade com as importações
+export { PostgresGetTransactionByIdRepository as GetTransactionByIdRepository }

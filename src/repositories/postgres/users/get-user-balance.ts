@@ -119,3 +119,6 @@ export class PostgresGetUserBalanceRepository
         }
     }
 }
+
+// Alias para manter compatibilidade com as importações
+export { PostgresGetUserBalanceRepository as GetUserBalanceRepository }

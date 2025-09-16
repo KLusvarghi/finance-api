@@ -5,20 +5,13 @@ import {
 } from '@/adapters'
 import { EmailAlreadyExistsError } from '@/errors'
 import {
-    CreateUserParams,
     CreateUserRepository,
     GetUserByEmailRepository,
-    Service,
-    TokensGeneratorAdapterResponse,
-    UserPublicResponse,
-} from '@/shared'
+} from '@/repositories/postgres'
+import { CreateUserParams, Service, UserWithTokensResponse } from '@/shared'
 
 export class CreateUserService
-    implements
-        Service<
-            CreateUserParams,
-            UserPublicResponse & { tokens: TokensGeneratorAdapterResponse }
-        >
+    implements Service<CreateUserParams, UserWithTokensResponse>
 {
     constructor(
         private readonly createUserRepository: CreateUserRepository,
@@ -26,19 +19,11 @@ export class CreateUserService
         private readonly idGenerator: IdGeneratorAdapter,
         private readonly passwordHasher: PasswordHasherAdapter,
         private readonly TokensGeneratorAdapter: TokensGeneratorAdapter,
-    ) {
-        this.createUserRepository = createUserRepository
-        this.getUserByEmailRepository = getUserByEmailRepository
-        this.idGenerator = idGenerator
-        this.passwordHasher = passwordHasher
-        this.TokensGeneratorAdapter = TokensGeneratorAdapter
-    }
+    ) {}
 
     async execute(
         createUserParams: CreateUserParams,
-    ): Promise<
-        UserPublicResponse & { tokens: TokensGeneratorAdapterResponse }
-    > {
+    ): Promise<UserWithTokensResponse> {
         const userWithProviderEmail =
             await this.getUserByEmailRepository.execute(createUserParams.email)
 
@@ -61,8 +46,8 @@ export class CreateUserService
             // e colocando o password no final para ele sobrescrever o que está sendo desestruturado acima
             password: hashPassword,
         }
-        // eslint-disable-next-line
-        const { password: _password, ...userWithoutPassword } =
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { password, ...userWithoutPassword } =
             await this.createUserRepository.execute(user)
 
         const tokens = await this.TokensGeneratorAdapter.execute(user.id)

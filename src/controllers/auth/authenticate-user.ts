@@ -1,13 +1,18 @@
 import { ok } from '../_helpers'
 
-import {
-    AuthenticateUserRequest,
-    AuthenticateUserRequestParams,
-    AuthenticateUserService,
-    Controller,
-    ResponseMessage,
-    UserPublicResponse,
-} from '@/shared'
+import { AuthenticateUserService } from '@/services'
+import { Controller, HttpRequest, UserPublicResponse } from '@/shared'
+import { ResponseMessage } from '@/shared'
+
+// Local interfaces - used only by this controller
+interface AuthenticateUserRequestParams {
+    email: string
+    password: string
+}
+
+interface AuthenticateUserRequest extends HttpRequest {
+    body: AuthenticateUserRequestParams
+}
 
 export class AuthenticateUserController
     implements Controller<AuthenticateUserRequestParams, UserPublicResponse>

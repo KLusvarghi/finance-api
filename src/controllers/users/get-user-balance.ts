@@ -1,13 +1,22 @@
 import { ok } from '../_helpers'
 
+import { GetUserBalanceService } from '@/services'
 import {
-    GetUserBalanceRequest,
-    GetUserBalanceService,
     HeadersController,
+    HttpRequest,
     HttpResponse,
     UserBalanceRepositoryResponse,
     UserIdRequestParams,
 } from '@/shared'
+
+// Local interfaces - used only by this controller
+interface GetUserBalanceRequest extends HttpRequest {
+    headers: UserIdRequestParams
+    query: {
+        from: string
+        to: string
+    }
+}
 
 export class GetUserBalanceController
     implements

@@ -1,16 +1,28 @@
 import { created } from '../_helpers'
 
+import { CreateTransactionService } from '@/services'
 import {
     BodyHeadersController,
-    CreateTransactionParams,
-    CreateTransactionRequest,
-    CreateTransactionService,
     CreateTransactionServiceParams,
+    HttpRequest,
     HttpResponse,
-    ResponseMessage,
     TransactionPublicResponse,
     UserIdRequestParams,
 } from '@/shared'
+import { ResponseMessage } from '@/shared'
+
+// Local interfaces - used only by this controller
+interface CreateTransactionParams {
+    name: string
+    amount: number
+    date: string
+    type: 'EARNING' | 'EXPENSE' | 'INVESTMENT'
+}
+
+interface CreateTransactionRequest extends HttpRequest {
+    body: CreateTransactionParams
+    headers: UserIdRequestParams
+}
 
 export class CreateTransactionController
     implements

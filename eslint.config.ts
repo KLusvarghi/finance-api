@@ -41,9 +41,9 @@ export default defineConfig([
                 {
                     // Não sinalizar argumentos de funções/métodos
                     args: 'none',
-                    // OU ignore argumentos/variáveis que comecem com _
-                    // argsIgnorePattern: '^_',
-                    // varsIgnorePattern: '^_',
+                    // Ignore argumentos/variáveis que comecem com _
+                    argsIgnorePattern: '^_',
+                    varsIgnorePattern: '^_',
                 },
             ],
             // Desabilitar a regra de variáveis não utilizadas do TypeScript
@@ -68,6 +68,8 @@ export default defineConfig([
                 },
             ],
             'simple-import-sort/exports': 'error',
+            // Permitir variáveis com underscore no início (ex: _password, _userId)
+            'no-underscore-dangle': 'off',
             // Proíbe imports diretos de subdiretórios específicos, forçando uso do barrel
             'no-restricted-imports': [
                 'error',

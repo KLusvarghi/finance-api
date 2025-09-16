@@ -1,14 +1,19 @@
 import { ok } from '../_helpers'
 
+import { DeleteUserService } from '@/services'
 import {
-    DeleteUserRequest,
-    DeleteUserService,
     HeadersController,
+    HttpRequest,
     HttpResponse,
-    ResponseMessage,
     UserIdRequestParams,
     UserPublicResponse,
 } from '@/shared'
+import { ResponseMessage } from '@/shared'
+
+// Local interfaces - used only by this controller
+interface DeleteUserRequest extends HttpRequest {
+    headers: UserIdRequestParams
+}
 
 export class DeleteUserController
     implements HeadersController<UserIdRequestParams, UserPublicResponse>

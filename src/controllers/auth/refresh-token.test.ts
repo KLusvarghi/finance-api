@@ -1,15 +1,15 @@
 import jwt from 'jsonwebtoken'
 
-import { RefreshTokenController } from './refresh-token'
+import { RefreshTokenController, RefreshTokenRequest } from './refresh-token'
 
 import { UserNotFoundError } from '@/errors'
 import { RefreshTokenService } from '@/services'
 import {
     HttpResponseErrorBody,
     HttpResponseSuccessBody,
-    RefreshTokenRequest,
     RefreshTokenResponse,
 } from '@/shared'
+// Import the interface from the controller instead of duplicating it
 import { tokensGeneratorAdapterResponse } from '@/test'
 
 describe('RefreshTokenController', () => {

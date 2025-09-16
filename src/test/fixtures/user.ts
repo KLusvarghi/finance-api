@@ -78,6 +78,22 @@ export const updateUserRepositoryResponse = {
 }
 
 // ============================================================================
+// TOKENS ADAPTER RESPONSE
+// ============================================================================
+
+const generateMockJWT = (): string => {
+    const header = faker.string.alphanumeric(36)
+    const payload = faker.string.alphanumeric(128)
+    const signature = faker.string.alphanumeric(43)
+    return `${header}.${payload}.${signature}`
+}
+
+export const tokensGeneratorAdapterResponse = {
+    accessToken: generateMockJWT(),
+    refreshToken: generateMockJWT(),
+}
+
+// ============================================================================
 // UNIFIED RESPONSES (Service + Controller)
 // ============================================================================
 
@@ -86,6 +102,7 @@ const createUserResponse = {
     firstName: createUserRepositoryResponse.firstName,
     lastName: createUserRepositoryResponse.lastName,
     email: createUserRepositoryResponse.email,
+    tokens: tokensGeneratorAdapterResponse,
 }
 
 const deleteUserResponse = userResponse
@@ -169,16 +186,4 @@ export const createTestUser = async (
             ...customData,
         },
     })
-}
-
-const generateMockJWT = (): string => {
-    const header = faker.string.alphanumeric(36)
-    const payload = faker.string.alphanumeric(128)
-    const signature = faker.string.alphanumeric(43)
-    return `${header}.${payload}.${signature}`
-}
-
-export const tokensGeneratorAdapterResponse = {
-    accessToken: generateMockJWT(),
-    refreshToken: generateMockJWT(),
 }

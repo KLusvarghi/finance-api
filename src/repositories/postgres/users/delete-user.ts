@@ -19,3 +19,6 @@ export class PostgresDeleteUserRepository implements DeleteUserRepository {
         }
     }
 }
+
+// Alias para manter compatibilidade com as importações
+export { PostgresDeleteUserRepository as DeleteUserRepository }

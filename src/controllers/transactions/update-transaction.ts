@@ -1,17 +1,33 @@
 import { ok } from '../_helpers'
 
+import { UpdateTransactionService } from '@/services'
 import {
     BodyParamsHeadersController,
+    HttpRequest,
     HttpResponse,
-    ResponseMessage,
-    TransactionIdRequestParams,
     TransactionPublicResponse,
-    UpdateTransactionParams,
-    UpdateTransactionRequest,
-    UpdateTransactionService,
     UpdateTransactionServiceParams,
     UserIdRequestParams,
 } from '@/shared'
+import { ResponseMessage } from '@/shared'
+
+// Local interfaces - used only by this controller
+interface TransactionIdRequestParams {
+    transactionId: string
+}
+
+interface UpdateTransactionParams {
+    name?: string
+    amount?: number
+    date?: string
+    type?: 'EARNING' | 'EXPENSE' | 'INVESTMENT'
+}
+
+interface UpdateTransactionRequest extends HttpRequest {
+    body: UpdateTransactionParams
+    params: TransactionIdRequestParams
+    headers: UserIdRequestParams
+}
 
 export class UpdateTransactionController
     implements

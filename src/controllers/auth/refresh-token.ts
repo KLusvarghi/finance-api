@@ -3,12 +3,20 @@ import { created } from '../_helpers'
 import { RefreshTokenService } from '@/services'
 import {
     Controller,
+    HttpRequest,
     HttpResponse,
-    RefreshTokenRequest,
-    RefreshTokenRequestParams,
     RefreshTokenResponse,
-    ResponseMessage,
 } from '@/shared'
+import { ResponseMessage } from '@/shared'
+
+// Local interfaces - used only by this controller
+interface RefreshTokenRequestParams {
+    refreshToken: string
+}
+
+export interface RefreshTokenRequest extends HttpRequest {
+    body: RefreshTokenRequestParams
+}
 
 export class RefreshTokenController
     implements Controller<RefreshTokenRequestParams, RefreshTokenResponse>

@@ -28,3 +28,6 @@ export class PostgresGetTransactionsByUserIdRepository
         })
     }
 }
+
+// Alias para manter compatibilidade com as importações
+export { PostgresGetTransactionsByUserIdRepository as GetTransactionsByUserIdRepository }

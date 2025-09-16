@@ -3,7 +3,7 @@ import { EmailAlreadyExistsError } from '@/errors'
 import {
     CreateUserParams,
     HttpResponseSuccessBody,
-    UserPublicResponse,
+    UserWithTokensResponse,
 } from '@/shared'
 import {
     createUserControllerResponse,
@@ -16,7 +16,9 @@ describe('CreateUserController', () => {
     let createUserService: CreateUserServiceStub
 
     class CreateUserServiceStub {
-        async execute(_params: CreateUserParams): Promise<UserPublicResponse> {
+        async execute(
+            _params: CreateUserParams,
+        ): Promise<UserWithTokensResponse> {
             return Promise.resolve(createUserControllerResponse)
         }
     }

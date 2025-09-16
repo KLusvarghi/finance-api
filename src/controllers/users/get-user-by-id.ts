@@ -1,13 +1,18 @@
 import { ok } from '../_helpers'
 
+import { GetUserByIdService } from '@/services'
 import {
-    GetUserByIdRequest,
-    GetUserByIdService,
     HeadersController,
+    HttpRequest,
     HttpResponse,
     UserIdRequestParams,
     UserPublicResponse,
 } from '@/shared'
+
+// Local interfaces - used only by this controller
+interface GetUserByIdRequest extends HttpRequest {
+    headers: UserIdRequestParams
+}
 
 export class GetUserByIdController
     implements HeadersController<UserIdRequestParams, UserPublicResponse>

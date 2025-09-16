@@ -31,3 +31,6 @@ export class PostgresDeleteTransactionRepository
         }
     }
 }
+
+// Alias para manter compatibilidade com as importações
+export { PostgresDeleteTransactionRepository as DeleteTransactionRepository }

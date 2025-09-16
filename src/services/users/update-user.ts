@@ -7,9 +7,11 @@ import {
 import {
     GetUserByEmailRepository,
     GetUserByIdRepository,
+    UpdateUserRepository,
+} from '@/repositories/postgres'
+import {
     ServiceWithMultipleParams,
     UpdateUserParams,
-    UpdateUserRepository,
     UserPublicResponse,
 } from '@/shared'
 
@@ -17,22 +19,12 @@ export class UpdateUserService
     implements
         ServiceWithMultipleParams<string, UpdateUserParams, UserPublicResponse>
 {
-    private getUserByEmailRepository: GetUserByEmailRepository
-    private updateUserRepository: UpdateUserRepository
-    private passwordHasher: PasswordHasherAdapter
-    private getUserByIdRepository: GetUserByIdRepository
-
     constructor(
-        getUserByEmailRepository: GetUserByEmailRepository,
-        updateUserRepository: UpdateUserRepository,
-        passwordHasher: PasswordHasherAdapter,
-        getUserByIdRepository: GetUserByIdRepository,
-    ) {
-        this.getUserByEmailRepository = getUserByEmailRepository
-        this.updateUserRepository = updateUserRepository
-        this.passwordHasher = passwordHasher
-        this.getUserByIdRepository = getUserByIdRepository
-    }
+        private readonly getUserByEmailRepository: GetUserByEmailRepository,
+        private readonly updateUserRepository: UpdateUserRepository,
+        private readonly passwordHasher: PasswordHasherAdapter,
+        private readonly getUserByIdRepository: GetUserByIdRepository,
+    ) {}
 
     async execute(
         userId: string,
@@ -76,8 +68,8 @@ export class UpdateUserService
         if (!updatedUser) {
             throw new UpdateUserFailedError()
         }
-        // eslint-disable-next-line
-        const { password: _password, ...userWithoutPassword } = updatedUser
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { password, ...userWithoutPassword } = updatedUser
         return userWithoutPassword
     }
 }

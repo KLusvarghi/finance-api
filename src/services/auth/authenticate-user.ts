@@ -1,27 +1,18 @@
 import { PasswordComparatorAdapter, TokensGeneratorAdapter } from '@/adapters'
 import { LoginFailedError } from '@/errors'
-import {
-    GetUserByEmailRepository,
-    TokensGeneratorAdapterResponse,
-    UserRepositoryResponse,
-} from '@/shared'
+import { GetUserByEmailRepository } from '@/repositories/postgres'
+import { AuthenticatedUserResponse } from '@/shared'
 
 export class AuthenticateUserService {
     constructor(
-        private getUserByEmailRepository: GetUserByEmailRepository,
-        private passwordComparator: PasswordComparatorAdapter,
-        private TokensGeneratorAdapter: TokensGeneratorAdapter,
-    ) {
-        this.getUserByEmailRepository = getUserByEmailRepository
-        this.passwordComparator = passwordComparator
-        this.TokensGeneratorAdapter = TokensGeneratorAdapter
-    }
+        private readonly getUserByEmailRepository: GetUserByEmailRepository,
+        private readonly passwordComparator: PasswordComparatorAdapter,
+        private readonly TokensGeneratorAdapter: TokensGeneratorAdapter,
+    ) {}
     async execute(
         email: string,
         password: string,
-    ): Promise<
-        UserRepositoryResponse & { tokens: TokensGeneratorAdapterResponse }
-    > {
+    ): Promise<AuthenticatedUserResponse> {
         // verificar se o e-mail válido (se não houver usuério com esse e-amil lançamos uma exceção)
         const user = await this.getUserByEmailRepository.execute(email)
         if (!user) {
