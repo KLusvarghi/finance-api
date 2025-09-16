@@ -1,5 +1,6 @@
 import { defineConfig } from 'eslint/config'
 import simpleImportSort from 'eslint-plugin-simple-import-sort'
+import unusedImports from 'eslint-plugin-unused-imports'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
@@ -26,6 +27,7 @@ export default defineConfig([
         files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
         plugins: {
             'simple-import-sort': simpleImportSort,
+            'unused-imports': unusedImports,
         },
         languageOptions: {
             ecmaVersion: 2022,
@@ -34,21 +36,37 @@ export default defineConfig([
         },
         rules: {
             'no-unused-vars': 'off',
+            '@typescript-eslint/no-unused-vars': 'off',
 
-            /* 2.  ATIVAR a regra @typescript-eslint */
-            '@typescript-eslint/no-unused-vars': [
-                'error',
-                {
-                    // Não sinalizar argumentos de funções/métodos
-                    args: 'none',
-                    // Ignore argumentos/variáveis que comecem com _
-                    argsIgnorePattern: '^_',
-                    varsIgnorePattern: '^_',
-                },
-            ],
+            // '@typescript-eslint/no-unused-vars': [
+            //     'error',
+            //     {
+            //         // Não sinalizar argumentos de funções/métodos
+            //         args: 'none',
+            //         // Ignore argumentos/variáveis que comecem com _
+            //         argsIgnorePattern: '^_',
+            //         varsIgnorePattern: '^_',
+            //         // Adicionar esta opção para permitir fix automático
+            //         ignoreRestSiblings: true,
+            //         // Adicionar esta opção para detectar imports de tipos não utilizados
+            //     },
+            // ],
             // Desabilitar a regra de variáveis não utilizadas do TypeScript
             // '@typescript-eslint/no-unused-vars': 'off',
             // '@typescript-eslint/no-explicit-any': 'off',
+
+            // Usar o plugin unused-imports para detectar e remover imports não utilizados
+            'unused-imports/no-unused-imports': 'error',
+            'unused-imports/no-unused-vars': [
+                'warn',
+                {
+                    vars: 'all',
+                    varsIgnorePattern: '^_',
+                    args: 'after-used',
+                    argsIgnorePattern: '^_',
+                },
+            ],
+
             // Configuração completa do simple-import-sort
             'simple-import-sort/imports': [
                 'error',
