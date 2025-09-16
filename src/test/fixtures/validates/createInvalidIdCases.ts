@@ -4,7 +4,7 @@ export const createInvalidIdCases = (messages: InvalidIdMessages) => [
     {
         description: 'not provided',
         id: undefined,
-        expectedMessage: messages.missing,
+        expectedMessage: messages.invalid,
     },
     {
         description: 'too long',
