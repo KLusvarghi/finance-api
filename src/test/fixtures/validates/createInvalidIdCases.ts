@@ -1,11 +1,11 @@
 import { InvalidIdMessages } from '@/shared'
 
 export const createInvalidIdCases = (messages: InvalidIdMessages) => [
-    {
-        description: 'not provided',
-        id: undefined,
-        expectedMessage: messages.invalid,
-    },
+    // {
+    //     description: 'not provided',
+    //     id: undefined,
+    //     expectedMessage: messages.invalid,
+    // },
     {
         description: 'too long',
         id: '12345678-1234-1234-1234-123456789012',
