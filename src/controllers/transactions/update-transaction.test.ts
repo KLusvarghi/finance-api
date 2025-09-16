@@ -1,9 +1,8 @@
+import { mock, MockProxy } from 'jest-mock-extended'
+
 import { UpdateTransactionController } from '@/controllers'
-import {
-    HttpResponseSuccessBody,
-    TransactionPublicResponse,
-    UpdateTransactionParams,
-} from '@/shared'
+import { UpdateTransactionService } from '@/services'
+import { HttpResponseSuccessBody } from '@/shared'
 import {
     updateTransactionControllerResponse,
     updateTransactionHttpRequest as baseHttpRequest,
@@ -11,29 +10,12 @@ import {
 
 describe('UpdateTransactionController', () => {
     let sut: UpdateTransactionController
-    let updateTransactionService: UpdateTransactionServiceStub
-
-    class UpdateTransactionServiceStub {
-        execute(
-            _transactionId: string,
-            _params: UpdateTransactionParams,
-        ): Promise<TransactionPublicResponse> {
-            return Promise.resolve(updateTransactionControllerResponse)
-        }
-    }
-
-    const makeSut = () => {
-        const updateTransactionService = new UpdateTransactionServiceStub()
-        const sut = new UpdateTransactionController(updateTransactionService)
-
-        return { sut, updateTransactionService }
-    }
+    let updateTransactionService: MockProxy<UpdateTransactionService>
 
     beforeEach(() => {
-        const { sut: controller, updateTransactionService: service } = makeSut()
-
-        sut = controller
-        updateTransactionService = service
+        // Setup executado antes de cada teste
+        updateTransactionService = mock<UpdateTransactionService>()
+        sut = new UpdateTransactionController(updateTransactionService)
     })
 
     afterEach(() => {
@@ -42,46 +24,54 @@ describe('UpdateTransactionController', () => {
     })
 
     describe('error handling', () => {
-        it('should return 500 if UpdateTransactionService throws generic error', async () => {
-            jest.spyOn(
-                updateTransactionService,
-                'execute',
-            ).mockRejectedValueOnce(new Error())
+        it('should throw generic error when UpdateTransactionService throws generic error', async () => {
+            // arrange
+            const genericError = new Error('Database connection failed')
+            updateTransactionService.execute.mockRejectedValue(genericError)
 
-            const response = await sut.execute({
-                ...baseHttpRequest,
-            })
-
-            expect(response.statusCode).toBe(500)
+            // act & assert
+            await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
+                genericError,
+            )
         })
     })
 
     describe('success cases', () => {
         it('should return 200 when updating transaction successfully', async () => {
+            // arrange
+            updateTransactionService.execute.mockResolvedValueOnce(
+                updateTransactionControllerResponse,
+            )
+
             // act
             const response = await sut.execute(baseHttpRequest)
-
-            const data = (response.body as HttpResponseSuccessBody)?.data
 
             // assert
             expect(response.statusCode).toBe(200)
             expect(response.body?.success).toBe(true)
-            expect(data).toMatchObject(updateTransactionControllerResponse)
+            expect(
+                (response.body as HttpResponseSuccessBody)?.data,
+            ).toMatchObject(updateTransactionControllerResponse)
         })
 
         it('should call UpdateTransactionService with correct params', async () => {
-            const executeSpy = jest.spyOn(updateTransactionService, 'execute')
+            // arrange
+            updateTransactionService.execute.mockResolvedValueOnce(
+                updateTransactionControllerResponse,
+            )
 
+            // act
             await sut.execute(baseHttpRequest)
 
-            expect(executeSpy).toHaveBeenCalledWith(
+            // assert
+            expect(updateTransactionService.execute).toHaveBeenCalledWith(
                 baseHttpRequest.params.transactionId,
                 {
                     ...baseHttpRequest.body,
                     userId: baseHttpRequest.headers.userId,
                 },
             )
-            // expect(executeSpy).toHaveBeenCalledTimes(1)
+            expect(updateTransactionService.execute).toHaveBeenCalledTimes(1)
         })
     })
 })

@@ -1,5 +1,8 @@
+import { mock, MockProxy } from 'jest-mock-extended'
+
 import { GetUserByIdController } from '@/controllers'
 import { UserNotFoundError } from '@/errors'
+import { GetUserByIdService } from '@/services'
 import { HttpResponseSuccessBody, UserPublicResponse } from '@/shared'
 import {
     getUserByIdHttpRequest as baseHttpRequest,
@@ -9,29 +12,12 @@ import {
 
 describe('GetUserByIdController', () => {
     let sut: GetUserByIdController
-    let getUserByIdService: GetUserByIdServiceStub
-
-    class GetUserByIdServiceStub {
-        async execute(_userId: string): Promise<UserPublicResponse> {
-            return Promise.resolve(getUserByIdServiceResponse)
-        }
-    }
-
-    const makeSut = () => {
-        const getUserByIdService = new GetUserByIdServiceStub()
-        const sut = new GetUserByIdController(getUserByIdService)
-
-        return {
-            getUserByIdService,
-            sut,
-        }
-    }
+    let getUserByIdService: MockProxy<GetUserByIdService>
 
     beforeEach(() => {
         // Setup executado antes de cada teste
-        const { sut: controller, getUserByIdService: service } = makeSut()
-        sut = controller
-        getUserByIdService = service
+        getUserByIdService = mock<GetUserByIdService>()
+        sut = new GetUserByIdController(getUserByIdService)
     })
 
     afterEach(() => {
@@ -42,11 +28,11 @@ describe('GetUserByIdController', () => {
 
     describe('error handling', () => {
         it('should throw UserNotFoundError when user is not found', async () => {
+            // arrange
             const userNotFoundError = new UserNotFoundError(userId)
-            jest.spyOn(getUserByIdService, 'execute').mockRejectedValue(
-                userNotFoundError,
-            )
+            getUserByIdService.execute.mockRejectedValue(userNotFoundError)
 
+            // act & assert
             await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
                 UserNotFoundError,
             )
@@ -56,11 +42,11 @@ describe('GetUserByIdController', () => {
         })
 
         it('should throw generic error when GetUserByIdService throws an error', async () => {
+            // arrange
             const genericError = new Error('Service error')
-            jest.spyOn(getUserByIdService, 'execute').mockRejectedValue(
-                genericError,
-            )
+            getUserByIdService.execute.mockRejectedValue(genericError)
 
+            // act & assert
             await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
                 genericError,
             )
@@ -69,10 +55,17 @@ describe('GetUserByIdController', () => {
 
     describe('success cases', () => {
         it('should return 200 if user is found successfully', async () => {
+            // arrange
+            getUserByIdService.execute.mockResolvedValueOnce(
+                getUserByIdServiceResponse,
+            )
+
+            // act
             const response = await sut.execute({
                 headers: { userId },
             })
 
+            // assert
             expect(response.statusCode).toBe(200)
             expect(response.body?.success).toBe(true)
             expect(response.body?.message).toBeTruthy()
@@ -102,14 +95,18 @@ describe('GetUserByIdController', () => {
 
         it('should call GetUserByIdService with correct parameters', async () => {
             // arrange
-            const spy = jest.spyOn(getUserByIdService, 'execute')
+            getUserByIdService.execute.mockResolvedValueOnce(
+                getUserByIdServiceResponse,
+            )
 
             // act
             await sut.execute(baseHttpRequest)
 
             // assert
-            expect(spy).toHaveBeenCalledWith(baseHttpRequest.headers.userId)
-            expect(spy).toHaveBeenCalledTimes(1)
+            expect(getUserByIdService.execute).toHaveBeenCalledWith(
+                baseHttpRequest.headers.userId,
+            )
+            expect(getUserByIdService.execute).toHaveBeenCalledTimes(1)
         })
     })
 })

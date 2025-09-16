@@ -1,10 +1,9 @@
+import { mock, MockProxy } from 'jest-mock-extended'
+
 import { GetTransactionsByUserIdController } from '@/controllers'
 import { UserNotFoundError } from '@/errors'
-import {
-    HttpResponseSuccessBody,
-    ResponseMessage,
-    TransactionPublicResponse,
-} from '@/shared'
+import { GetTransactionsByUserIdService } from '@/services'
+import { HttpResponseSuccessBody } from '@/shared'
 import {
     getTransactionsByUserIdControllerResponse,
     getTransactionsByUserIdHttpRequest as baseHttpRequest,
@@ -13,34 +12,14 @@ import {
 
 describe('GetTransactionsByUserIdController', () => {
     let sut: GetTransactionsByUserIdController
-    let getTransactionByUserIdService: GetTransactionsByUserIdServiceStub
-
-    class GetTransactionsByUserIdServiceStub {
-        execute(
-            _userId: string,
-            _from: string,
-            _to: string,
-        ): Promise<TransactionPublicResponse[]> {
-            return Promise.resolve(getTransactionsByUserIdControllerResponse)
-        }
-    }
-
-    const makeSut = () => {
-        const getTransactionByUserIdService =
-            new GetTransactionsByUserIdServiceStub()
-        const sut = new GetTransactionsByUserIdController(
-            getTransactionByUserIdService,
-        )
-
-        return { sut, getTransactionByUserIdService }
-    }
+    let getTransactionsByUserIdService: MockProxy<GetTransactionsByUserIdService>
 
     beforeEach(() => {
-        const { sut: controller, getTransactionByUserIdService: service } =
-            makeSut()
-
-        sut = controller
-        getTransactionByUserIdService = service
+        // Setup executado antes de cada teste
+        getTransactionsByUserIdService = mock<GetTransactionsByUserIdService>()
+        sut = new GetTransactionsByUserIdController(
+            getTransactionsByUserIdService,
+        )
     })
 
     afterEach(() => {
@@ -49,32 +28,31 @@ describe('GetTransactionsByUserIdController', () => {
     })
 
     describe('error handling', () => {
-        it('should return 500 if GetTransactionsByUserIdService throws generic error', async () => {
+        it('should throw generic error when GetTransactionsByUserIdService throws generic error', async () => {
             // arrange
-            jest.spyOn(
-                getTransactionByUserIdService,
-                'execute',
-            ).mockRejectedValueOnce(new Error())
-            // act
-            const response = await sut.execute(baseHttpRequest)
+            const genericError = new Error('Database connection failed')
+            getTransactionsByUserIdService.execute.mockRejectedValue(
+                genericError,
+            )
 
-            // assert
-            expect(response.statusCode).toBe(500)
-            expect(response.body?.message).toBe(ResponseMessage.SERVER_ERROR)
+            // act & assert
+            await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
+                genericError,
+            )
         })
 
-        it('should return 404 if GetTransactionsByUserIdService throws UserNotFoundError', async () => {
+        it('should throw UserNotFoundError when GetTransactionsByUserIdService throws it', async () => {
             // arrange
-            jest.spyOn(
-                getTransactionByUserIdService,
-                'execute',
-            ).mockRejectedValueOnce(new UserNotFoundError(userId))
-            // act
-            const response = await sut.execute(baseHttpRequest)
+            const userNotFoundError = new UserNotFoundError(userId)
+            getTransactionsByUserIdService.execute.mockRejectedValue(
+                userNotFoundError,
+            )
 
-            // assert
-            expect(response.statusCode).toBe(404)
-            expect(response.body?.message).toBe(
+            // act & assert
+            await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
+                UserNotFoundError,
+            )
+            await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
                 `User with id ${userId} not found`,
             )
         })
@@ -82,6 +60,11 @@ describe('GetTransactionsByUserIdController', () => {
 
     describe('success cases', () => {
         it('should return 200 when finding transactions by user id', async () => {
+            // arrange
+            getTransactionsByUserIdService.execute.mockResolvedValueOnce(
+                getTransactionsByUserIdControllerResponse,
+            )
+
             // act
             const response = await sut.execute(baseHttpRequest)
 
@@ -95,21 +78,22 @@ describe('GetTransactionsByUserIdController', () => {
 
         it('should call GetTransactionsByUserIdService with correct parameters', async () => {
             // arrange
-            const executeSpy = jest.spyOn(
-                getTransactionByUserIdService,
-                'execute',
+            getTransactionsByUserIdService.execute.mockResolvedValueOnce(
+                getTransactionsByUserIdControllerResponse,
             )
 
             // act
             await sut.execute(baseHttpRequest)
 
             // assert
-            expect(executeSpy).toHaveBeenCalledWith(
+            expect(getTransactionsByUserIdService.execute).toHaveBeenCalledWith(
                 baseHttpRequest.headers.userId,
                 baseHttpRequest.query.from,
                 baseHttpRequest.query.to,
             )
-            expect(executeSpy).toHaveBeenCalledTimes(1)
+            expect(
+                getTransactionsByUserIdService.execute,
+            ).toHaveBeenCalledTimes(1)
         })
     })
 })

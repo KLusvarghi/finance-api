@@ -1,12 +1,10 @@
+import { mock, MockProxy } from 'jest-mock-extended'
+
 import { AuthenticateUserController } from './authenticate-user'
 
 import { LoginFailedError } from '@/errors'
-import {
-    HttpResponseSuccessBody,
-    ResponseMessage,
-    TokensGeneratorAdapterResponse,
-    UserRepositoryResponse,
-} from '@/shared'
+import { AuthenticateUserService } from '@/services'
+import { HttpResponseSuccessBody, ResponseMessage } from '@/shared'
 import {
     createUserRepositoryResponse,
     createUserServiceResponse,
@@ -16,37 +14,12 @@ import {
 
 describe('AuthenticateUserController', () => {
     let sut: AuthenticateUserController
-    let loginUserService: LoginUserServiceStub
-
-    class LoginUserServiceStub {
-        async execute(
-            _email: string,
-            _password: string,
-        ): Promise<
-            UserRepositoryResponse & { tokens: TokensGeneratorAdapterResponse }
-        > {
-            return Promise.resolve({
-                ...createUserServiceResponse,
-                password: createUserRepositoryResponse.password,
-                tokens: tokensGeneratorAdapterResponse,
-            })
-        }
-    }
-
-    const makeSut = () => {
-        const loginUserService = new LoginUserServiceStub()
-        const sut = new AuthenticateUserController(loginUserService)
-
-        return {
-            loginUserService,
-            sut,
-        }
-    }
+    let authenticateUserService: MockProxy<AuthenticateUserService>
 
     beforeEach(() => {
-        const { sut: controller, loginUserService: service } = makeSut()
-        sut = controller
-        loginUserService = service
+        // Setup executado antes de cada teste
+        authenticateUserService = mock<AuthenticateUserService>()
+        sut = new AuthenticateUserController(authenticateUserService)
     })
 
     afterEach(() => {
@@ -56,13 +29,11 @@ describe('AuthenticateUserController', () => {
 
     describe('error handling', () => {
         it('should throw LoginFailedError when user is not found', async () => {
+            // arrange
             const loginFailedError = new LoginFailedError()
-            jest.spyOn(loginUserService, 'execute').mockImplementationOnce(
-                async () => {
-                    throw loginFailedError
-                },
-            )
+            authenticateUserService.execute.mockRejectedValue(loginFailedError)
 
+            // act & assert
             await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
                 LoginFailedError,
             )
@@ -72,13 +43,11 @@ describe('AuthenticateUserController', () => {
         })
 
         it('should throw LoginFailedError when password is invalid', async () => {
+            // arrange
             const loginFailedError = new LoginFailedError()
-            jest.spyOn(loginUserService, 'execute').mockImplementationOnce(
-                async () => {
-                    throw loginFailedError
-                },
-            )
+            authenticateUserService.execute.mockRejectedValue(loginFailedError)
 
+            // act & assert
             await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
                 LoginFailedError,
             )
@@ -88,22 +57,52 @@ describe('AuthenticateUserController', () => {
         })
     })
 
-    describe('success', () => {
+    describe('success cases', () => {
         it('should return 200 and the user when login is successful', async () => {
-            const { sut } = makeSut()
-
-            const response = await sut.execute(baseHttpRequest)
-
-            expect(response.statusCode).toBe(200)
-            expect(response.body?.success).toBe(true)
-            expect((response.body as HttpResponseSuccessBody)?.data).toEqual({
+            // arrange
+            const expectedUserData = {
                 ...createUserServiceResponse,
                 password: createUserRepositoryResponse.password,
                 tokens: tokensGeneratorAdapterResponse,
-            })
+            }
+            authenticateUserService.execute.mockResolvedValueOnce(
+                expectedUserData,
+            )
+
+            // act
+            const response = await sut.execute(baseHttpRequest)
+
+            // assert
+            expect(response.statusCode).toBe(200)
+            expect(response.body?.success).toBe(true)
+            expect((response.body as HttpResponseSuccessBody)?.data).toEqual(
+                expectedUserData,
+            )
             expect(response.body?.message).toBe(
                 ResponseMessage.USER_LOGIN_SUCCESS,
             )
+        })
+
+        it('should call AuthenticateUserService with correct parameters', async () => {
+            // arrange
+            const expectedUserData = {
+                ...createUserServiceResponse,
+                password: createUserRepositoryResponse.password,
+                tokens: tokensGeneratorAdapterResponse,
+            }
+            authenticateUserService.execute.mockResolvedValueOnce(
+                expectedUserData,
+            )
+
+            // act
+            await sut.execute(baseHttpRequest)
+
+            // assert
+            expect(authenticateUserService.execute).toHaveBeenCalledWith(
+                baseHttpRequest.body.email,
+                baseHttpRequest.body.password,
+            )
+            expect(authenticateUserService.execute).toHaveBeenCalledTimes(1)
         })
     })
 })

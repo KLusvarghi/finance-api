@@ -1,10 +1,9 @@
+import { mock, MockProxy } from 'jest-mock-extended'
+
 import { DeleteTransactionController } from '@/controllers'
 import { TransactionNotFoundError } from '@/errors'
-import {
-    DeleteTransactionServiceParams,
-    ResponseMessage,
-    TransactionPublicResponse,
-} from '@/shared'
+import { DeleteTransactionService } from '@/services'
+import { HttpResponseSuccessBody, ResponseMessage } from '@/shared'
 import {
     deleteTransactionControllerResponse,
     deleteTransactionHttpRequest as baseHttpRequest,
@@ -13,28 +12,12 @@ import {
 
 describe('DeleteTransactionController', () => {
     let sut: DeleteTransactionController
-    let deleteTransactionService: DeleteTransactionServiceStub
-
-    class DeleteTransactionServiceStub {
-        execute(
-            _params: DeleteTransactionServiceParams,
-        ): Promise<TransactionPublicResponse> {
-            return Promise.resolve(deleteTransactionControllerResponse)
-        }
-    }
-
-    const makeSut = () => {
-        const deleteTransactionService = new DeleteTransactionServiceStub()
-        const sut = new DeleteTransactionController(deleteTransactionService)
-
-        return { deleteTransactionService, sut }
-    }
+    let deleteTransactionService: MockProxy<DeleteTransactionService>
 
     beforeEach(() => {
-        const { sut: controller, deleteTransactionService: service } = makeSut()
-
-        sut = controller
-        deleteTransactionService = service
+        // Setup executado antes de cada teste
+        deleteTransactionService = mock<DeleteTransactionService>()
+        sut = new DeleteTransactionController(deleteTransactionService)
     })
 
     afterEach(() => {
@@ -43,34 +26,31 @@ describe('DeleteTransactionController', () => {
     })
 
     describe('error handling', () => {
-        it('should return 500 if DeleteTransactionService throws an error', async () => {
+        it('should throw generic error when DeleteTransactionService throws generic error', async () => {
             // arrange
-            jest.spyOn(
-                deleteTransactionService,
-                'execute',
-            ).mockRejectedValueOnce(new Error())
+            const genericError = new Error('Database connection failed')
+            deleteTransactionService.execute.mockRejectedValue(genericError)
 
-            // act
-            const response = await sut.execute(baseHttpRequest)
-
-            // assert
-            expect(response.statusCode).toBe(500)
+            // act & assert
+            await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
+                genericError,
+            )
         })
 
-        it('should return 404 if DeleteTransactionService throws TransactionNotFoundError', async () => {
+        it('should throw TransactionNotFoundError when DeleteTransactionService throws it', async () => {
             // arrange
-            // sempre usamos o "mockRejectedValueOnce" quando queremos testar um erro específico, porque ele irá dar um throw
-            jest.spyOn(
-                deleteTransactionService,
-                'execute',
-            ).mockRejectedValueOnce(new TransactionNotFoundError(transactionId))
+            const transactionNotFoundError = new TransactionNotFoundError(
+                transactionId,
+            )
+            deleteTransactionService.execute.mockRejectedValue(
+                transactionNotFoundError,
+            )
 
-            // act
-            const response = await sut.execute(baseHttpRequest)
-
-            // assert
-            expect(response.statusCode).toBe(404)
-            expect(response.body?.message).toBe(
+            // act & assert
+            await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
+                TransactionNotFoundError,
+            )
+            await expect(sut.execute(baseHttpRequest)).rejects.toThrow(
                 `Transaction with id ${transactionId} not found`,
             )
         })
@@ -78,32 +58,40 @@ describe('DeleteTransactionController', () => {
 
     describe('success cases', () => {
         it('should return 200 when deleting transaction successfully', async () => {
+            // arrange
+            deleteTransactionService.execute.mockResolvedValueOnce(
+                deleteTransactionControllerResponse,
+            )
+
             // act
             const response = await sut.execute(baseHttpRequest)
 
             // assert
             expect(response.statusCode).toBe(200)
+            expect(response.body?.success).toBe(true)
             expect(response.body?.message).toBe(
                 ResponseMessage.TRANSACTION_DELETED,
             )
-            // expect(response.body?.data).toEqual(
-            //     deleteTransactionControllerResponse,
-            // )
+            expect((response.body as HttpResponseSuccessBody)?.data).toEqual(
+                deleteTransactionControllerResponse,
+            )
         })
 
         it('should call DeleteTransactionService with correct parameters', async () => {
             // arrange
-            const executeSpy = jest.spyOn(deleteTransactionService, 'execute')
+            deleteTransactionService.execute.mockResolvedValueOnce(
+                deleteTransactionControllerResponse,
+            )
 
             // act
             await sut.execute(baseHttpRequest)
 
             // assert
-            expect(executeSpy).toHaveBeenCalledWith({
+            expect(deleteTransactionService.execute).toHaveBeenCalledWith({
                 transactionId: baseHttpRequest.params.transactionId,
                 userId: baseHttpRequest.headers.userId,
             })
-            expect(executeSpy).toHaveBeenCalledTimes(1)
+            expect(deleteTransactionService.execute).toHaveBeenCalledTimes(1)
         })
     })
 })
