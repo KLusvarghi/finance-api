@@ -4,6 +4,7 @@ import path from 'path'
 import swaggerUi from 'swagger-ui-express'
 
 import { errorHandler } from './middlewares/error-handler'
+import { routeNotFound } from './middlewares/route-not-found'
 import { authRouter, transactionsRouter, usersRouter } from './routes'
 
 // no teste e2e, acontece que se a gente deixa a instancia do app junto com a instancia do server,
@@ -28,6 +29,8 @@ const swaggerDocument = JSON.parse(
 )
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+
+app.use(routeNotFound)
 
 // Error handling middleware must be registered LAST
 app.use(errorHandler)
