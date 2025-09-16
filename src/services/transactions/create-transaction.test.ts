@@ -5,8 +5,8 @@ import { UserNotFoundError } from '@/errors'
 import { CreateTransactionService } from '@/services'
 import { CreateTransactionRepository, GetUserByIdRepository } from '@/shared'
 import {
-    createTransactionParams,
     createTransactionRepositoryResponse,
+    createTransactionServiceParams,
     createTransactionServiceResponse,
     getUserByIdRepositoryResponse,
 } from '@/test'
@@ -41,11 +41,11 @@ describe('CreateTransactionService', () => {
             getUserByIdRepository.execute.mockResolvedValue(null)
 
             // act
-            const promise = sut.execute(createTransactionParams)
+            const promise = sut.execute(createTransactionServiceParams)
 
             // assert
             await expect(promise).rejects.toThrow(
-                new UserNotFoundError(createTransactionParams.userId),
+                new UserNotFoundError(createTransactionServiceParams.userId),
             )
         })
 
@@ -54,7 +54,7 @@ describe('CreateTransactionService', () => {
             getUserByIdRepository.execute.mockRejectedValue(new Error())
 
             // act
-            const promise = sut.execute(createTransactionParams)
+            const promise = sut.execute(createTransactionServiceParams)
 
             // assert
             await expect(promise).rejects.toThrow()
@@ -70,7 +70,7 @@ describe('CreateTransactionService', () => {
             })
 
             // act
-            const promise = sut.execute(createTransactionParams)
+            const promise = sut.execute(createTransactionServiceParams)
 
             // assert
             await expect(promise).rejects.toThrow(
@@ -91,7 +91,7 @@ describe('CreateTransactionService', () => {
             )
 
             // act
-            const promise = sut.execute(createTransactionParams)
+            const promise = sut.execute(createTransactionServiceParams)
 
             // assert
             await expect(promise).rejects.toThrow(
@@ -114,7 +114,7 @@ describe('CreateTransactionService', () => {
             )
 
             // act
-            const response = await sut.execute(createTransactionParams)
+            const response = await sut.execute(createTransactionServiceParams)
 
             // assert
             expect(response).toBeTruthy()
@@ -146,11 +146,11 @@ describe('CreateTransactionService', () => {
             )
 
             // act
-            await sut.execute(createTransactionParams)
+            await sut.execute(createTransactionServiceParams)
 
             // assert
             expect(getUserByIdRepository.execute).toHaveBeenCalledWith(
-                createTransactionParams.userId,
+                createTransactionServiceParams.userId,
             )
             expect(getUserByIdRepository.execute).toHaveBeenCalledTimes(1)
         })
@@ -168,7 +168,7 @@ describe('CreateTransactionService', () => {
             )
 
             // act
-            await sut.execute(createTransactionParams)
+            await sut.execute(createTransactionServiceParams)
 
             // assert
             expect(idGenerator.execute).toHaveBeenCalled()
@@ -191,11 +191,11 @@ describe('CreateTransactionService', () => {
             )
 
             // act
-            const response = await sut.execute(createTransactionParams)
+            const response = await sut.execute(createTransactionServiceParams)
 
             // assert
             expect(createTransactionRepository.execute).toHaveBeenCalledWith({
-                ...createTransactionParams,
+                ...createTransactionServiceParams,
                 id: createTransactionServiceResponse.id,
             })
             expect(createTransactionRepository.execute).toHaveBeenCalledTimes(1)
