@@ -188,7 +188,6 @@ describe('Transactions Routes E2E Tests', () => {
                 .set('authorization', `Bearer ${user.tokens.accessToken}`)
                 .send({
                     ...createTransactionParams,
-                    userId: user.id,
                     amount: 1000,
                     type: TransactionType.EARNING,
                 })
@@ -233,7 +232,7 @@ describe('Transactions Routes E2E Tests', () => {
                     const user = await makeUser()
 
                     const { body: responseBody } = await request(app)
-                        .patch(`/api/transactions/me/${id || ''}`)
+                        .patch(`/api/transactions/me/${id}`)
                         .set(
                             'authorization',
                             `Bearer ${user.tokens.accessToken}`,
@@ -346,7 +345,9 @@ describe('Transactions Routes E2E Tests', () => {
                     .expect(400)
 
                 expect(responseBody.success).toBe(false)
-                expect(responseBody.message).toContain('Unrecognized key')
+                expect(responseBody.message).toContain(
+                    'Field \"unexpected\" is not allowed in this request',
+                )
                 expect(responseBody.message).toContain('unexpected')
             })
         })
