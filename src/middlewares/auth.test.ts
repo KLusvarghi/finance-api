@@ -97,7 +97,7 @@ describe('Auth Middleware', () => {
             'should return 401 if $description',
             async ({ token }) => {
                 // arrange
-                if (token === undefined) {
+                if (token === undefined || token === null) {
                     mockRequest.headers = {}
                 } else {
                     mockRequest.headers = {
