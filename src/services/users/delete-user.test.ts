@@ -1,6 +1,8 @@
+import { mock, MockProxy } from 'jest-mock-extended'
+
 import { UserNotFoundError } from '@/errors'
+import { PostgresDeleteUserRepository } from '@/repositories/postgres'
 import { DeleteUserService } from '@/services'
-import { UserRepositoryResponse } from '@/shared'
 import {
     deleteUserRepositoryResponse,
     deleteUserServiceResponse,
@@ -9,30 +11,11 @@ import {
 
 describe('DeleteUserService', () => {
     let sut: DeleteUserService
-    let deleteUserRepository: DeleteUserRepositoryStub
-
-    class DeleteUserRepositoryStub {
-        async execute(_id: string): Promise<UserRepositoryResponse | null> {
-            return Promise.resolve(deleteUserRepositoryResponse)
-        }
-    }
-
-    const makeSut = () => {
-        const deleteUserRepository = new DeleteUserRepositoryStub()
-        const sut = new DeleteUserService(deleteUserRepository)
-
-        return {
-            sut,
-            deleteUserRepository,
-        }
-    }
+    let deleteUserRepository: MockProxy<PostgresDeleteUserRepository>
 
     beforeEach(() => {
-        const { sut: service, deleteUserRepository: deleteUserRepositoryStub } =
-            makeSut()
-
-        sut = service
-        deleteUserRepository = deleteUserRepositoryStub
+        deleteUserRepository = mock<PostgresDeleteUserRepository>()
+        sut = new DeleteUserService(deleteUserRepository)
     })
 
     afterEach(() => {
@@ -42,38 +25,40 @@ describe('DeleteUserService', () => {
     })
 
     describe('error handling', () => {
-        it('should return UserNotFoundError if DeleteUserRepository returns null', async () => {
+        it('should throw UserNotFoundError if DeleteUserRepository throws it', async () => {
             // arrange
-            jest.spyOn(deleteUserRepository, 'execute').mockResolvedValueOnce(
-                null,
+            deleteUserRepository.execute.mockRejectedValueOnce(
+                new UserNotFoundError(userId),
             )
 
             // act
             const promise = sut.execute(userId)
 
             // assert
-            expect(promise).rejects.toThrow(new UserNotFoundError(userId))
+            await expect(promise).rejects.toThrow(new UserNotFoundError(userId))
         })
 
-        // esse tipo de teste é importnate para garantir que o nosso service não está tratando a excessão do nosso repository e passando para cima para o nosso controller
-        it('should throw if DeleteUserRepository throws', async () => {
+        it('should throw if DeleteUserRepository throws other errors', async () => {
             // arrange
-            jest.spyOn(deleteUserRepository, 'execute').mockRejectedValueOnce(
-                new UserNotFoundError('invalid_user_id'),
+            deleteUserRepository.execute.mockRejectedValueOnce(
+                new Error('Database error'),
             )
 
             // act
-            const promise = sut.execute('invalid_user_id')
+            const promise = sut.execute(userId)
 
             // assert
-            expect(promise).rejects.toThrow(
-                new UserNotFoundError('invalid_user_id'),
-            )
+            await expect(promise).rejects.toThrow('Database error')
         })
     })
 
     describe('success', () => {
         it('should successefully delete an user', async () => {
+            // arrange
+            deleteUserRepository.execute.mockResolvedValue(
+                deleteUserRepositoryResponse,
+            )
+
             // act
             const response = await sut.execute(userId)
 
@@ -84,17 +69,18 @@ describe('DeleteUserService', () => {
     })
 
     describe('validations', () => {
-        //  validando se o deleteUserRepository foi chamado com o id correto
         it('should call deleteUserRepository with correct params', async () => {
             // arrange
-            const executeSpy = jest.spyOn(deleteUserRepository, 'execute')
+            deleteUserRepository.execute.mockResolvedValue(
+                deleteUserRepositoryResponse,
+            )
 
             // act
             await sut.execute(userId)
 
             // assert
-            expect(executeSpy).toHaveBeenCalledWith(userId)
-            expect(executeSpy).toHaveBeenCalledTimes(1)
+            expect(deleteUserRepository.execute).toHaveBeenCalledWith(userId)
+            expect(deleteUserRepository.execute).toHaveBeenCalledTimes(1)
         })
     })
 })

@@ -361,7 +361,9 @@ describe('User Routes E2E Tests', () => {
                     .expect(400)
 
                 expect(responseBody.success).toBe(false)
-                expect(responseBody.message).toContain('Unrecognized key')
+                expect(responseBody.message).toContain(
+                    'Field \"disallowedField\" is not allowed in this request',
+                )
                 expect(responseBody.message).toContain('disallowedField')
             })
         })

@@ -1,6 +1,11 @@
+import { mock, MockProxy } from 'jest-mock-extended'
+
 import { TransactionNotFoundError } from '@/errors'
+import {
+    PostgresDeleteTransactionRepository,
+    PostgresGetTransactionByIdRepository,
+} from '@/repositories/postgres'
 import { DeleteTransactionService } from '@/services'
-import { TransactionRepositoryResponse } from '@/shared'
 import {
     deleteTransactionRepositoryResponse,
     deleteTransactionServiceResponse,
@@ -10,51 +15,19 @@ import {
 
 describe('DeleteTransactionService', () => {
     let sut: DeleteTransactionService
-    let deleteTransactionRepository: DeleteTransactionRepositoryStub
+    let deleteTransactionRepository: MockProxy<PostgresDeleteTransactionRepository>
+    let getTransactionByIdRepository: MockProxy<PostgresGetTransactionByIdRepository>
 
-    class DeleteTransactionRepositoryStub {
-        async execute(
-            _id: string,
-        ): Promise<TransactionRepositoryResponse | null> {
-            return Promise.resolve(deleteTransactionRepositoryResponse)
-        }
-    }
+    beforeEach(() => {
+        deleteTransactionRepository =
+            mock<PostgresDeleteTransactionRepository>()
+        getTransactionByIdRepository =
+            mock<PostgresGetTransactionByIdRepository>()
 
-    class GetTransactionByIdRepositoryStub {
-        async execute(
-            _transactionId: string,
-        ): Promise<TransactionRepositoryResponse | null> {
-            return Promise.resolve({
-                ...updateTransactionRepositoryResponse,
-                userId: 'user-id', // Usar o mesmo userId dos testes
-            })
-        }
-    }
-
-    const makeSut = () => {
-        const deleteTransactionRepository =
-            new DeleteTransactionRepositoryStub()
-        const getTransactionByIdRepository =
-            new GetTransactionByIdRepositoryStub()
-        const sut = new DeleteTransactionService(
+        sut = new DeleteTransactionService(
             deleteTransactionRepository,
             getTransactionByIdRepository,
         )
-
-        return {
-            sut,
-            deleteTransactionRepository,
-        }
-    }
-
-    beforeEach(() => {
-        const {
-            sut: service,
-            deleteTransactionRepository: deleteTransactionRepositoryStub,
-        } = makeSut()
-
-        sut = service
-        deleteTransactionRepository = deleteTransactionRepositoryStub
     })
 
     afterEach(() => {
@@ -64,12 +37,9 @@ describe('DeleteTransactionService', () => {
     })
 
     describe('error handling', () => {
-        it('should throw TransactionNotFoundError if DeleteTransactionRepository returns null', async () => {
+        it('should throw TransactionNotFoundError if getTransactionByIdRepository returns null', async () => {
             // arrange
-            jest.spyOn(
-                deleteTransactionRepository,
-                'execute',
-            ).mockResolvedValueOnce(null)
+            getTransactionByIdRepository.execute.mockResolvedValueOnce(null)
 
             // act
             const promise = sut.execute({
@@ -78,28 +48,39 @@ describe('DeleteTransactionService', () => {
             })
 
             // assert
-            expect(promise).rejects.toThrow(
+            await expect(promise).rejects.toThrow(
                 new TransactionNotFoundError('invalid_transaction_id'),
             )
         })
-    })
 
-    it('should throw if DeleteTransactionRepository throws', async () => {
-        // arrange
-        jest.spyOn(
-            deleteTransactionRepository,
-            'execute',
-        ).mockRejectedValueOnce(new Error())
+        it('should throw if DeleteTransactionRepository throws', async () => {
+            // arrange
+            getTransactionByIdRepository.execute.mockResolvedValue(
+                updateTransactionRepositoryResponse,
+            )
+            deleteTransactionRepository.execute.mockRejectedValueOnce(
+                new Error(),
+            )
 
-        // act
-        const promise = sut.execute({ transactionId, userId: 'user-id' })
+            // act
+            const promise = sut.execute({ transactionId, userId: 'user-id' })
 
-        // assert
-        expect(promise).rejects.toThrow()
+            // assert
+            await expect(promise).rejects.toThrow()
+        })
     })
 
     describe('success', () => {
         it('should delete transaction successfully', async () => {
+            // arrange
+            getTransactionByIdRepository.execute.mockResolvedValue({
+                ...updateTransactionRepositoryResponse,
+                userId: 'user-id',
+            })
+            deleteTransactionRepository.execute.mockResolvedValue(
+                deleteTransactionRepositoryResponse,
+            )
+
             // act
             const response = await sut.execute({
                 transactionId,
@@ -114,19 +95,22 @@ describe('DeleteTransactionService', () => {
     describe('validation', () => {
         it('should call DeleteTransactionRepository with correct params', async () => {
             // arrange
-            const deleteTransactionRepositorySpy = jest.spyOn(
-                deleteTransactionRepository,
-                'execute',
+            getTransactionByIdRepository.execute.mockResolvedValue({
+                ...updateTransactionRepositoryResponse,
+                userId: 'user-id',
+            })
+            deleteTransactionRepository.execute.mockResolvedValue(
+                deleteTransactionRepositoryResponse,
             )
 
             // act
             await sut.execute({ transactionId, userId: 'user-id' })
 
             // assert
-            expect(deleteTransactionRepositorySpy).toHaveBeenCalledWith(
+            expect(deleteTransactionRepository.execute).toHaveBeenCalledWith(
                 transactionId,
             )
-            expect(deleteTransactionRepositorySpy).toHaveBeenCalledTimes(1)
+            expect(deleteTransactionRepository.execute).toHaveBeenCalledTimes(1)
         })
     })
 })

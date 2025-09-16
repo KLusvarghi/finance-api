@@ -1,9 +1,11 @@
+import { mock, MockProxy } from 'jest-mock-extended'
+
 import { ForbiddenError, TransactionNotFoundError } from '@/errors'
-import { UpdateTransactionService } from '@/services'
 import {
-    TransactionRepositoryResponse,
-    UpdateTransactionParams,
-} from '@/shared'
+    PostgresGetTransactionByIdRepository,
+    PostgresUpdateTransactionRepository,
+} from '@/repositories/postgres'
+import { UpdateTransactionService } from '@/services'
 import {
     transactionId,
     updateTransactionParams,
@@ -14,52 +16,19 @@ import {
 
 describe('UpdateTransactionService', () => {
     let sut: UpdateTransactionService
-    let updateTransactionRepository: UpdateTransactionRepositoryStub
-    let getTransactionByIdRepository: GetTransactionByIdRepositoryStub
+    let updateTransactionRepository: MockProxy<PostgresUpdateTransactionRepository>
+    let getTransactionByIdRepository: MockProxy<PostgresGetTransactionByIdRepository>
 
-    class UpdateTransactionRepositoryStub {
-        async execute(
-            _transactionId: string,
-            _params: UpdateTransactionParams,
-        ): Promise<TransactionRepositoryResponse> {
-            return Promise.resolve(updateTransactionRepositoryResponse)
-        }
-    }
-    class GetTransactionByIdRepositoryStub {
-        async execute(
-            _transactionId: string,
-        ): Promise<TransactionRepositoryResponse | null> {
-            return Promise.resolve(updateTransactionRepositoryResponse)
-        }
-    }
+    beforeEach(() => {
+        updateTransactionRepository =
+            mock<PostgresUpdateTransactionRepository>()
+        getTransactionByIdRepository =
+            mock<PostgresGetTransactionByIdRepository>()
 
-    const makeSut = () => {
-        const updateTransactionRepository =
-            new UpdateTransactionRepositoryStub()
-        const getTransactionByIdRepository =
-            new GetTransactionByIdRepositoryStub()
-        const sut = new UpdateTransactionService(
+        sut = new UpdateTransactionService(
             updateTransactionRepository,
             getTransactionByIdRepository,
         )
-
-        return {
-            sut,
-            updateTransactionRepository,
-            getTransactionByIdRepository,
-        }
-    }
-
-    beforeEach(() => {
-        const {
-            sut: service,
-            updateTransactionRepository: updateTransactionRepositoryStub,
-            getTransactionByIdRepository: getTransactionByIdRepositoryStub,
-        } = makeSut()
-
-        sut = service
-        updateTransactionRepository = updateTransactionRepositoryStub
-        getTransactionByIdRepository = getTransactionByIdRepositoryStub
     })
 
     afterEach(() => {
@@ -69,14 +38,9 @@ describe('UpdateTransactionService', () => {
     })
 
     describe('error handling', () => {
-        it('should throw TransactionNotFoundError if getTransactionByIdRepository return null', () => {
+        it('should throw TransactionNotFoundError if getTransactionByIdRepository returns null', async () => {
             // arrange
-            jest.spyOn(
-                updateTransactionRepository,
-                'execute',
-            ).mockResolvedValueOnce(
-                null as unknown as TransactionRepositoryResponse,
-            )
+            getTransactionByIdRepository.execute.mockResolvedValueOnce(null)
 
             // act
             const promise = sut.execute(transactionId, {
@@ -85,17 +49,17 @@ describe('UpdateTransactionService', () => {
             })
 
             // assert
-            expect(promise).rejects.toThrow(
+            await expect(promise).rejects.toThrow(
                 new TransactionNotFoundError(transactionId),
             )
         })
 
-        it('should throw if UpdateTransactionRepository throws', () => {
+        it('should throw if UpdateTransactionRepository throws', async () => {
             // arrange
-            jest.spyOn(
-                updateTransactionRepository,
-                'execute',
-            ).mockRejectedValueOnce(
+            getTransactionByIdRepository.execute.mockResolvedValue(
+                updateTransactionRepositoryResponse,
+            )
+            updateTransactionRepository.execute.mockRejectedValueOnce(
                 new Error('UpdateTransactionRepository error'),
             )
 
@@ -106,17 +70,14 @@ describe('UpdateTransactionService', () => {
             })
 
             // assert
-            expect(promise).rejects.toThrow(
+            await expect(promise).rejects.toThrow(
                 new Error('UpdateTransactionRepository error'),
             )
         })
 
-        it('should throw ForbiddenError if user is not the owner of the transaction', () => {
+        it('should throw ForbiddenError if user is not the owner of the transaction', async () => {
             // arrange
-            jest.spyOn(
-                getTransactionByIdRepository,
-                'execute',
-            ).mockResolvedValueOnce({
+            getTransactionByIdRepository.execute.mockResolvedValueOnce({
                 ...updateTransactionRepositoryResponse,
                 userId: 'another-user-id',
             })
@@ -128,12 +89,20 @@ describe('UpdateTransactionService', () => {
             })
 
             // assert
-            expect(promise).rejects.toThrow(new ForbiddenError())
+            await expect(promise).rejects.toThrow(new ForbiddenError())
         })
     })
 
     describe('success', () => {
         it('should update transaction successfully', async () => {
+            // arrange
+            getTransactionByIdRepository.execute.mockResolvedValue(
+                updateTransactionRepositoryResponse,
+            )
+            updateTransactionRepository.execute.mockResolvedValue(
+                updateTransactionRepositoryResponse,
+            )
+
             // act
             const response = await sut.execute(transactionId, {
                 ...updateTransactionParams,
@@ -149,9 +118,11 @@ describe('UpdateTransactionService', () => {
     describe('validations', () => {
         it('should call GetTransactionByIdRepository with correct params', async () => {
             // arrange
-            const getTransactionByIdRepositorySpy = jest.spyOn(
-                getTransactionByIdRepository,
-                'execute',
+            getTransactionByIdRepository.execute.mockResolvedValue(
+                updateTransactionRepositoryResponse,
+            )
+            updateTransactionRepository.execute.mockResolvedValue(
+                updateTransactionRepositoryResponse,
             )
 
             // act
@@ -161,16 +132,21 @@ describe('UpdateTransactionService', () => {
             })
 
             // assert
-            expect(getTransactionByIdRepositorySpy).toHaveBeenCalledWith(
+            expect(getTransactionByIdRepository.execute).toHaveBeenCalledWith(
                 transactionId,
             )
-            expect(getTransactionByIdRepositorySpy).toHaveBeenCalledTimes(1)
+            expect(getTransactionByIdRepository.execute).toHaveBeenCalledTimes(
+                1,
+            )
         })
+
         it('should call UpdateTransactionRepository with correct params', async () => {
             // arrange
-            const updateTransactionRepositorySpy = jest.spyOn(
-                updateTransactionRepository,
-                'execute',
+            getTransactionByIdRepository.execute.mockResolvedValue(
+                updateTransactionRepositoryResponse,
+            )
+            updateTransactionRepository.execute.mockResolvedValue(
+                updateTransactionRepositoryResponse,
             )
 
             // act
@@ -180,11 +156,11 @@ describe('UpdateTransactionService', () => {
             })
 
             // assert
-            expect(updateTransactionRepositorySpy).toHaveBeenCalledWith(
+            expect(updateTransactionRepository.execute).toHaveBeenCalledWith(
                 transactionId,
                 updateTransactionParams,
             )
-            expect(updateTransactionRepositorySpy).toHaveBeenCalledTimes(1)
+            expect(updateTransactionRepository.execute).toHaveBeenCalledTimes(1)
         })
     })
 })

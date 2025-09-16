@@ -1,62 +1,24 @@
-import jwt from 'jsonwebtoken'
+import { mock, MockProxy } from 'jest-mock-extended'
 
 import { RefreshTokenService } from './refresh-token'
 
+import { TokensGeneratorAdapter, TokenVerifierAdapter } from '@/adapters'
 import { UnauthorizedError } from '@/errors'
-import { TokensGeneratorAdapterResponse } from '@/shared'
 import { tokensGeneratorAdapterResponse } from '@/test'
 
 describe('RefreshTokenService', () => {
     let sut: RefreshTokenService
-    let tokenVerifierAdapter: TokenVerifierAdapterStub
-    // let TokensGeneratorAdapter: TokensGeneratorAdapterStub
-
-    // class RefreshTokenServiceStub {
-    //     async execute(
-    //         _refreshToken: string,
-    //     ): Promise<TokensGeneratorAdapterResponse> {
-    //         return Promise.resolve(tokensGeneratorAdapterResponse)
-    //     }
-    // }
-
-    class TokenVerifierAdapterStub {
-        async execute(_refreshToken: string): Promise<string | jwt.JwtPayload> {
-            return Promise.resolve(jwt.decode)
-        }
-    }
-
-    class TokensGeneratorAdapterStub {
-        async execute(
-            _userId: string,
-        ): Promise<TokensGeneratorAdapterResponse> {
-            return Promise.resolve(tokensGeneratorAdapterResponse)
-        }
-    }
-
-    const makeSut = () => {
-        const tokenVerifierAdapter = new TokenVerifierAdapterStub()
-        const TokensGeneratorAdapter = new TokensGeneratorAdapterStub()
-        const sut = new RefreshTokenService(
-            TokensGeneratorAdapter,
-            tokenVerifierAdapter,
-        )
-
-        return {
-            sut,
-            tokenVerifierAdapter,
-            TokensGeneratorAdapter,
-        }
-    }
+    let tokenVerifierAdapter: MockProxy<TokenVerifierAdapter>
+    let tokensGeneratorAdapter: MockProxy<TokensGeneratorAdapter>
 
     beforeEach(() => {
-        const {
-            sut: service,
-            tokenVerifierAdapter: tokenVerifierAdapterStub,
-            // TokensGeneratorAdapter: TokensGeneratorAdapterStub,
-        } = makeSut()
-        sut = service
-        tokenVerifierAdapter = tokenVerifierAdapterStub
-        // TokensGeneratorAdapter = TokensGeneratorAdapterStub
+        tokenVerifierAdapter = mock<TokenVerifierAdapter>()
+        tokensGeneratorAdapter = mock<TokensGeneratorAdapter>()
+
+        sut = new RefreshTokenService(
+            tokensGeneratorAdapter,
+            tokenVerifierAdapter,
+        )
     })
 
     afterEach(() => {
@@ -68,7 +30,7 @@ describe('RefreshTokenService', () => {
     describe('error handling', () => {
         it('should throw UnauthorizedError if tokenVerifierAdapter returns string', async () => {
             // arrange
-            jest.spyOn(tokenVerifierAdapter, 'execute').mockResolvedValueOnce(
+            tokenVerifierAdapter.execute.mockResolvedValueOnce(
                 'invalid_refresh_token',
             )
 
@@ -76,24 +38,27 @@ describe('RefreshTokenService', () => {
             const promise = sut.execute('invalid_refresh_token')
 
             // assert
-            expect(promise).rejects.toThrow(new UnauthorizedError())
+            await expect(promise).rejects.toThrow(new UnauthorizedError())
         })
     })
 
     describe('success', () => {
         it('should return tokensGeneratorAdapterResponse if tokenVerifierAdapter returns object', async () => {
             // arrange
-            jest.spyOn(tokenVerifierAdapter, 'execute').mockResolvedValueOnce(
+            const decodedToken = { userId: 'valid_user_id' }
+            tokenVerifierAdapter.execute.mockResolvedValueOnce(decodedToken)
+            tokensGeneratorAdapter.execute.mockResolvedValueOnce(
                 tokensGeneratorAdapterResponse,
             )
 
             // act
-            const promise = await sut.execute(
-                tokensGeneratorAdapterResponse.refreshToken,
-            )
+            const result = await sut.execute('valid_refresh_token')
 
             // assert
-            expect(promise).toEqual(tokensGeneratorAdapterResponse)
+            expect(result).toEqual(tokensGeneratorAdapterResponse)
+            expect(tokensGeneratorAdapter.execute).toHaveBeenCalledWith(
+                'valid_user_id',
+            )
         })
     })
 })

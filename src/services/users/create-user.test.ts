@@ -1,10 +1,13 @@
+import { mock, MockProxy } from 'jest-mock-extended'
+
+import {
+    IdGeneratorAdapter,
+    PasswordHasherAdapter,
+    TokensGeneratorAdapter,
+} from '@/adapters'
 import { EmailAlreadyExistsError } from '@/errors'
 import { CreateUserService } from '@/services'
-import {
-    CreateUserParams,
-    TokensGeneratorAdapterResponse,
-    UserRepositoryResponse,
-} from '@/shared'
+import { CreateUserRepository, GetUserByEmailRepository } from '@/shared'
 import {
     createUserParams,
     createUserRepositoryResponse,
@@ -14,80 +17,25 @@ import {
 
 describe('CreateUserService', () => {
     let sut: CreateUserService
-    let createUserRepository: CreateUserRepositoryStub
-    let getUserByEmailRepository: GetUserByEmailRepositoryStub
-    let passwordHasherAdapter: PasswordHasherAdapterStub
-    let idGeneratorAdapter: IdGeneratorAdapterStub
-    let TokensGeneratorAdapter: TokensGeneratorAdapterStub
-    class CreateUserRepositoryStub {
-        async execute(
-            _params: CreateUserParams,
-        ): Promise<UserRepositoryResponse> {
-            return Promise.resolve(createUserRepositoryResponse)
-        }
-    }
-
-    class GetUserByEmailRepositoryStub {
-        async execute(_email: string): Promise<UserRepositoryResponse | null> {
-            return Promise.resolve(null)
-        }
-    }
-    class PasswordHasherAdapterStub {
-        async execute(_password: string): Promise<string> {
-            return Promise.resolve(createUserRepositoryResponse.password)
-        }
-    }
-    class IdGeneratorAdapterStub {
-        execute(): string {
-            return createUserServiceResponse.id
-        }
-    }
-    class TokensGeneratorAdapterStub {
-        async execute(
-            _userId: string,
-        ): Promise<TokensGeneratorAdapterResponse> {
-            return Promise.resolve(tokensGeneratorAdapterResponse)
-        }
-    }
-
-    const makeSut = () => {
-        const createUserRepository = new CreateUserRepositoryStub()
-        const getUserByEmailRepository = new GetUserByEmailRepositoryStub()
-        const passwordHasherAdapter = new PasswordHasherAdapterStub()
-        const idGeneratorAdapter = new IdGeneratorAdapterStub()
-        const TokensGeneratorAdapter = new TokensGeneratorAdapterStub()
-        const sut = new CreateUserService(
-            createUserRepository,
-            getUserByEmailRepository,
-            idGeneratorAdapter,
-            passwordHasherAdapter,
-            TokensGeneratorAdapter,
-        )
-        return {
-            sut,
-            createUserRepository,
-            getUserByEmailRepository,
-            passwordHasherAdapter,
-            idGeneratorAdapter,
-            TokensGeneratorAdapter,
-        }
-    }
-
+    let createUserRepository: MockProxy<CreateUserRepository>
+    let getUserByEmailRepository: MockProxy<GetUserByEmailRepository>
+    let passwordHasherAdapter: MockProxy<PasswordHasherAdapter>
+    let idGeneratorAdapter: MockProxy<IdGeneratorAdapter>
+    let tokensGeneratorAdapter: MockProxy<TokensGeneratorAdapter>
     beforeEach(() => {
-        const {
-            sut: service,
-            createUserRepository: createUserRepositoryStub,
-            getUserByEmailRepository: getUserByEmailRepositoryStub,
-            passwordHasherAdapter: passwordHasherAdapterStub,
-            idGeneratorAdapter: idGeneratorAdapterStub,
-            TokensGeneratorAdapter: TokensGeneratorAdapterStub,
-        } = makeSut()
-        sut = service
-        createUserRepository = createUserRepositoryStub
-        getUserByEmailRepository = getUserByEmailRepositoryStub
-        passwordHasherAdapter = passwordHasherAdapterStub
-        idGeneratorAdapter = idGeneratorAdapterStub
-        TokensGeneratorAdapter = TokensGeneratorAdapterStub
+        createUserRepository = mock<CreateUserRepository>()
+        getUserByEmailRepository = mock<GetUserByEmailRepository>()
+        passwordHasherAdapter = mock<PasswordHasherAdapter>()
+        idGeneratorAdapter = mock<IdGeneratorAdapter>()
+        tokensGeneratorAdapter = mock<TokensGeneratorAdapter>()
+
+        sut = new CreateUserService(
+            createUserRepository,
+            getUserByEmailRepository,
+            idGeneratorAdapter,
+            passwordHasherAdapter,
+            tokensGeneratorAdapter,
+        )
     })
 
     afterEach(() => {
@@ -97,106 +45,118 @@ describe('CreateUserService', () => {
     })
 
     describe('error handling', () => {
-        it('should throw an EmailAlreadyExistsError if getUserByEmailRepository returns a user', () => {
+        it('should throw an EmailAlreadyExistsError if getUserByEmailRepository returns a user', async () => {
             // arrange
-            // mockando o retorno do getUserByEmailRepository, mas dessa vez, retornando um usuário válido
-            jest.spyOn(
-                getUserByEmailRepository,
-                'execute',
-            ).mockResolvedValueOnce(createUserRepositoryResponse)
+            getUserByEmailRepository.execute.mockResolvedValueOnce(
+                createUserRepositoryResponse,
+            )
 
             // act
-            // nestes casos, o teste deve falhar, pois o usuário já existe
-            // então, não queremos que nossa promise seja resolvida
-            // então, não vamos usar o await (assim a promisse não é resolvida)
-
             const promise = sut.execute(createUserParams)
 
             // assert
-            // e aqui, esperamos que nossa promisse seja rejeitada, lançando o erro "EmailAlreadyExistsError" para cima (para o nosso controller)
-            expect(promise).rejects.toThrow(
+            await expect(promise).rejects.toThrow(
                 new EmailAlreadyExistsError(createUserParams.email),
             )
         })
 
-        // se houver uma excessão de qualquer tipo, eu não quero que ela seja tratada dentro do meu service, mas sim, lançada para cima (para o nosso controller)
-        it('should throw if GetUserByEmailRepository throws', () => {
+        it('should throw if GetUserByEmailRepository throws', async () => {
             // arrange
-            jest.spyOn(
-                getUserByEmailRepository,
-                'execute',
-            ).mockRejectedValueOnce(new Error())
+            getUserByEmailRepository.execute.mockRejectedValueOnce(new Error())
 
             // act
-            // não vamos usar o await, pois queremos que a promisse seja rejeitada
             const promise = sut.execute(createUserParams)
 
             // assert
-            // e aqui, esperamos que nossa promisse seja rejeitada, lançando o erro "Error" para cima (para o nosso controller)
-            expect(promise).rejects.toThrow()
+            await expect(promise).rejects.toThrow()
         })
 
-        // fazendo o mesmo para idGeneratorAdapter
-        it('should throw if IdGeneratorAdapter throws', () => {
+        it('should throw if IdGeneratorAdapter throws', async () => {
             // arrange
-            // como o "execute" do idGeneratorAdapter é não é uma promisse e sim uma função normal, não podemos usar o "mockRejectedValueOnce"
-            // então, vamos usar o "mockImplementationOnce"
-            jest.spyOn(idGeneratorAdapter, 'execute').mockImplementationOnce(
-                () => {
-                    throw new Error()
-                },
-            )
+            getUserByEmailRepository.execute.mockResolvedValue(null)
+            idGeneratorAdapter.execute.mockImplementationOnce(() => {
+                throw new Error()
+            })
 
             // act
             const promise = sut.execute(createUserParams)
 
             // assert
-            expect(promise).rejects.toThrow()
+            await expect(promise).rejects.toThrow()
         })
 
-        it('should throw if PasswordHasherAdapter throws', () => {
+        it('should throw if PasswordHasherAdapter throws', async () => {
             // arrange
-            jest.spyOn(passwordHasherAdapter, 'execute').mockRejectedValueOnce(
-                new Error(),
+            getUserByEmailRepository.execute.mockResolvedValue(null)
+            idGeneratorAdapter.execute.mockReturnValue(
+                createUserServiceResponse.id,
             )
+            passwordHasherAdapter.execute.mockRejectedValueOnce(new Error())
 
             // act
             const promise = sut.execute(createUserParams)
 
             // assert
-            expect(promise).rejects.toThrow()
+            await expect(promise).rejects.toThrow()
         })
 
-        // se meu repository lançar uma excessão, eu não quero que ela seja tratada dentro do meu service, mas sim, lançada para cima (para o nosso controller)
-        it('should throw if CreateUserRepository throws', () => {
+        it('should throw if CreateUserRepository throws', async () => {
             // arrange
-            jest.spyOn(createUserRepository, 'execute').mockRejectedValueOnce(
-                new Error(),
+            getUserByEmailRepository.execute.mockResolvedValue(null)
+            idGeneratorAdapter.execute.mockReturnValue(
+                createUserServiceResponse.id,
             )
+            passwordHasherAdapter.execute.mockResolvedValue(
+                createUserRepositoryResponse.password,
+            )
+            createUserRepository.execute.mockRejectedValueOnce(new Error())
 
             // act
             const promise = sut.execute(createUserParams)
 
             // assert
-            expect(promise).rejects.toThrow()
+            await expect(promise).rejects.toThrow()
         })
 
-        it('should throw if TokensGeneratorAdapter throws', () => {
+        it('should throw if TokensGeneratorAdapter throws', async () => {
             // arrange
-            jest.spyOn(TokensGeneratorAdapter, 'execute').mockRejectedValueOnce(
-                new Error(),
+            getUserByEmailRepository.execute.mockResolvedValue(null)
+            idGeneratorAdapter.execute.mockReturnValue(
+                createUserServiceResponse.id,
             )
+            passwordHasherAdapter.execute.mockResolvedValue(
+                createUserRepositoryResponse.password,
+            )
+            createUserRepository.execute.mockResolvedValue(
+                createUserRepositoryResponse,
+            )
+            tokensGeneratorAdapter.execute.mockRejectedValueOnce(new Error())
 
             // act
             const promise = sut.execute(createUserParams)
 
             // assert
-            expect(promise).rejects.toThrow()
+            await expect(promise).rejects.toThrow()
         })
     })
 
     describe('success', () => {
         it('should create a user successfully', async () => {
+            // arrange
+            getUserByEmailRepository.execute.mockResolvedValue(null)
+            idGeneratorAdapter.execute.mockReturnValue(
+                createUserServiceResponse.id,
+            )
+            passwordHasherAdapter.execute.mockResolvedValue(
+                createUserRepositoryResponse.password,
+            )
+            createUserRepository.execute.mockResolvedValue(
+                createUserRepositoryResponse,
+            )
+            tokensGeneratorAdapter.execute.mockResolvedValue(
+                tokensGeneratorAdapterResponse,
+            )
+
             // act
             const response = await sut.execute(createUserParams)
 
@@ -214,76 +174,92 @@ describe('CreateUserService', () => {
     describe('validations', () => {
         it('should call CreateUserRepository with correct params', async () => {
             // arrange
-            const executeSpy = jest.spyOn(createUserRepository, 'execute')
+            getUserByEmailRepository.execute.mockResolvedValue(null)
+            idGeneratorAdapter.execute.mockReturnValue(
+                createUserServiceResponse.id,
+            )
+            passwordHasherAdapter.execute.mockResolvedValue(
+                createUserRepositoryResponse.password,
+            )
+            createUserRepository.execute.mockResolvedValue(
+                createUserRepositoryResponse,
+            )
+            tokensGeneratorAdapter.execute.mockResolvedValue(
+                tokensGeneratorAdapterResponse,
+            )
 
             // act
             await sut.execute(createUserParams)
 
             // assert
-            expect(executeSpy).toHaveBeenCalledWith(
-                createUserRepositoryResponse,
-            )
-            expect(executeSpy).toHaveBeenCalledTimes(1)
+            expect(createUserRepository.execute).toHaveBeenCalledWith({
+                ...createUserParams,
+                id: createUserServiceResponse.id,
+                password: createUserRepositoryResponse.password,
+            })
+            expect(createUserRepository.execute).toHaveBeenCalledTimes(1)
         })
 
         it('should call idGeneratorAdapter to generate a random uuid', async () => {
             // arrange
-            // neste caso, não precisamos mocar nada, apenas falar para ele espiar o idGeneratorAdapter
-            const idGeneratorAdapterSpy = jest.spyOn(
-                idGeneratorAdapter,
-                'execute',
+            getUserByEmailRepository.execute.mockResolvedValue(null)
+            idGeneratorAdapter.execute.mockReturnValue(
+                createUserServiceResponse.id,
             )
-
-            // para que a gente verifique se esse "id" foi retornado passado para o repository, temos que espiar a classe "CreateUserRepository"
-            const createUserRepositorySpy = jest.spyOn(
-                createUserRepository,
-                'execute',
+            passwordHasherAdapter.execute.mockResolvedValue(
+                createUserRepositoryResponse.password,
+            )
+            createUserRepository.execute.mockResolvedValue(
+                createUserRepositoryResponse,
+            )
+            tokensGeneratorAdapter.execute.mockResolvedValue(
+                tokensGeneratorAdapterResponse,
             )
 
             // act
             await sut.execute(createUserParams)
 
             // assert
-            // validando se o idGeneratorAdapter foi chamado
-            expect(idGeneratorAdapterSpy).toHaveBeenCalled()
-            expect(idGeneratorAdapterSpy).toHaveBeenCalledTimes(1)
-
-            // validando se o createUserRepository foi chamado contendo o Id gerado pelo idGeneratorAdapter
-            expect(createUserRepositorySpy).toHaveBeenCalledWith({
+            expect(idGeneratorAdapter.execute).toHaveBeenCalled()
+            expect(idGeneratorAdapter.execute).toHaveBeenCalledTimes(1)
+            expect(createUserRepository.execute).toHaveBeenCalledWith({
                 ...createUserParams,
                 id: createUserServiceResponse.id,
                 password: createUserRepositoryResponse.password,
             })
-            expect(createUserRepositorySpy).toHaveBeenCalledTimes(1)
+            expect(createUserRepository.execute).toHaveBeenCalledTimes(1)
         })
 
         it('should call passwordHasherAdapter to hash the password', async () => {
             // arrange
-            const passwordHasherAdapterSpy = jest.spyOn(
-                passwordHasherAdapter,
-                'execute',
+            getUserByEmailRepository.execute.mockResolvedValue(null)
+            idGeneratorAdapter.execute.mockReturnValue(
+                createUserServiceResponse.id,
             )
-
-            const createUserRepositorySpy = jest.spyOn(
-                createUserRepository,
-                'execute',
+            passwordHasherAdapter.execute.mockResolvedValue(
+                createUserRepositoryResponse.password,
+            )
+            createUserRepository.execute.mockResolvedValue(
+                createUserRepositoryResponse,
+            )
+            tokensGeneratorAdapter.execute.mockResolvedValue(
+                tokensGeneratorAdapterResponse,
             )
 
             // act
             await sut.execute(createUserParams)
 
             // assert
-            // validando se o passwordHasherAdapter foi chamado
-            expect(passwordHasherAdapterSpy).toHaveBeenCalled()
-            expect(passwordHasherAdapterSpy).toHaveBeenCalledTimes(1)
-
-            // validando se o createUserRepository foi chamado contendo o Id gerado pelo passwordHasherAdapter
-            expect(createUserRepositorySpy).toHaveBeenCalledWith({
+            expect(passwordHasherAdapter.execute).toHaveBeenCalledWith(
+                createUserParams.password,
+            )
+            expect(passwordHasherAdapter.execute).toHaveBeenCalledTimes(1)
+            expect(createUserRepository.execute).toHaveBeenCalledWith({
                 ...createUserParams,
                 id: createUserServiceResponse.id,
                 password: createUserRepositoryResponse.password,
             })
-            expect(createUserRepositorySpy).toHaveBeenCalledTimes(1)
+            expect(createUserRepository.execute).toHaveBeenCalledTimes(1)
         })
     })
 })

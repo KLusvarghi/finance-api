@@ -1,10 +1,9 @@
+import { mock, MockProxy } from 'jest-mock-extended'
+
+import { IdGeneratorAdapter } from '@/adapters'
 import { UserNotFoundError } from '@/errors'
 import { CreateTransactionService } from '@/services'
-import {
-    CreateTransactionParams,
-    TransactionRepositoryResponse,
-    UserRepositoryResponse,
-} from '@/shared'
+import { CreateTransactionRepository, GetUserByIdRepository } from '@/shared'
 import {
     createTransactionParams,
     createTransactionRepositoryResponse,
@@ -14,60 +13,20 @@ import {
 
 describe('CreateTransactionService', () => {
     let sut: CreateTransactionService
-    let createTransactionRepository: CreateTransactionRepositoryStub
-    let getUserByIdRepository: GetUserByIdRepositoryStub
-    let idGenerator: IdGeneratorAdapterStub
+    let createTransactionRepository: MockProxy<CreateTransactionRepository>
+    let getUserByIdRepository: MockProxy<GetUserByIdRepository>
+    let idGenerator: MockProxy<IdGeneratorAdapter>
 
-    class CreateTransactionRepositoryStub {
-        async execute(
-            _params: CreateTransactionParams,
-        ): Promise<TransactionRepositoryResponse> {
-            return Promise.resolve(createTransactionRepositoryResponse)
-        }
-    }
+    beforeEach(() => {
+        createTransactionRepository = mock<CreateTransactionRepository>()
+        getUserByIdRepository = mock<GetUserByIdRepository>()
+        idGenerator = mock<IdGeneratorAdapter>()
 
-    class GetUserByIdRepositoryStub {
-        async execute(_userId: string): Promise<UserRepositoryResponse | null> {
-            return Promise.resolve(getUserByIdRepositoryResponse)
-        }
-    }
-
-    class IdGeneratorAdapterStub {
-        execute(): string {
-            return createTransactionServiceResponse.id
-        }
-    }
-
-    const makeSut = () => {
-        const createTransactionRepository =
-            new CreateTransactionRepositoryStub()
-        const getUserByIdRepository = new GetUserByIdRepositoryStub()
-        const idGenerator = new IdGeneratorAdapterStub()
-        const sut = new CreateTransactionService(
+        sut = new CreateTransactionService(
             createTransactionRepository,
             getUserByIdRepository,
             idGenerator,
         )
-        return {
-            sut,
-            createTransactionRepository,
-            getUserByIdRepository,
-            idGenerator,
-        }
-    }
-
-    beforeEach(() => {
-        const {
-            sut: service,
-            createTransactionRepository: createTransactionRepositoryStub,
-            getUserByIdRepository: getUserByIdRepositoryStub,
-            idGenerator: idGeneratorAdapterStub,
-        } = makeSut()
-
-        sut = service
-        createTransactionRepository = createTransactionRepositoryStub
-        getUserByIdRepository = getUserByIdRepositoryStub
-        idGenerator = idGeneratorAdapterStub
     })
 
     afterEach(() => {
@@ -79,11 +38,9 @@ describe('CreateTransactionService', () => {
     describe('error handling', () => {
         it('should throw UserNotFoundError if user is not found', async () => {
             // arrange
-            jest.spyOn(getUserByIdRepository, 'execute').mockResolvedValue(null)
+            getUserByIdRepository.execute.mockResolvedValue(null)
 
             // act
-            // lembrando que não passamos o await para que a promise não seja resolvida
-            // e sim rejeitada
             const promise = sut.execute(createTransactionParams)
 
             // assert
@@ -92,12 +49,9 @@ describe('CreateTransactionService', () => {
             )
         })
 
-        // garantindo que o erro seja lançado para cima
         it('should throw if GetUserByIdRepository throws', async () => {
             // arrange
-            jest.spyOn(getUserByIdRepository, 'execute').mockRejectedValue(
-                new Error(),
-            )
+            getUserByIdRepository.execute.mockRejectedValue(new Error())
 
             // act
             const promise = sut.execute(createTransactionParams)
@@ -106,10 +60,12 @@ describe('CreateTransactionService', () => {
             await expect(promise).rejects.toThrow()
         })
 
-        // garantindo que o erro seja lançado para cima
         it('should throw if IdGeneratorAdapter throws', async () => {
             // arrange
-            jest.spyOn(idGenerator, 'execute').mockImplementationOnce(() => {
+            getUserByIdRepository.execute.mockResolvedValue(
+                getUserByIdRepositoryResponse,
+            )
+            idGenerator.execute.mockImplementationOnce(() => {
                 throw new Error('idGenerator error')
             })
 
@@ -122,13 +78,17 @@ describe('CreateTransactionService', () => {
             )
         })
 
-        // garantindo que o erro seja lançado para cima
         it('should throw if CreateTransactionRepository throws', async () => {
             // arrange
-            jest.spyOn(
-                createTransactionRepository,
-                'execute',
-            ).mockRejectedValue(new Error('createTransactionRepository error'))
+            getUserByIdRepository.execute.mockResolvedValue(
+                getUserByIdRepositoryResponse,
+            )
+            idGenerator.execute.mockReturnValue(
+                createTransactionServiceResponse.id,
+            )
+            createTransactionRepository.execute.mockRejectedValue(
+                new Error('createTransactionRepository error'),
+            )
 
             // act
             const promise = sut.execute(createTransactionParams)
@@ -142,56 +102,113 @@ describe('CreateTransactionService', () => {
 
     describe('success', () => {
         it('should create transaction successfully', async () => {
+            // arrange
+            getUserByIdRepository.execute.mockResolvedValue(
+                getUserByIdRepositoryResponse,
+            )
+            idGenerator.execute.mockReturnValue(
+                createTransactionServiceResponse.id,
+            )
+            createTransactionRepository.execute.mockResolvedValue(
+                createTransactionRepositoryResponse,
+            )
+
             // act
             const response = await sut.execute(createTransactionParams)
 
             // assert
             expect(response).toBeTruthy()
-            expect(response).toEqual(createTransactionServiceResponse)
+            expect(response).toEqual(
+                expect.objectContaining({
+                    id: createTransactionServiceResponse.id,
+                    name: createTransactionServiceResponse.name,
+                    amount: createTransactionServiceResponse.amount,
+                    type: createTransactionServiceResponse.type,
+                    userId: createTransactionServiceResponse.userId,
+                    date: createTransactionServiceResponse.date,
+                }),
+            )
+            expect(response.updatedAt).toBeInstanceOf(Date)
         })
     })
 
     describe('validations', () => {
         it('should call GetUserByIdRepository with correct params', async () => {
-            const getUserByIdRepositorySpy = jest.spyOn(
-                getUserByIdRepository,
-                'execute',
+            // arrange
+            getUserByIdRepository.execute.mockResolvedValue(
+                getUserByIdRepositoryResponse,
+            )
+            idGenerator.execute.mockReturnValue(
+                createTransactionServiceResponse.id,
+            )
+            createTransactionRepository.execute.mockResolvedValue(
+                createTransactionRepositoryResponse,
             )
 
+            // act
             await sut.execute(createTransactionParams)
 
-            expect(getUserByIdRepositorySpy).toHaveBeenCalledWith(
+            // assert
+            expect(getUserByIdRepository.execute).toHaveBeenCalledWith(
                 createTransactionParams.userId,
             )
-            expect(getUserByIdRepositorySpy).toHaveBeenCalledTimes(1)
+            expect(getUserByIdRepository.execute).toHaveBeenCalledTimes(1)
         })
 
         it('should call IdGeneratorAdapter to generate a random uuid', async () => {
-            const idGeneratorAdapterSpy = jest.spyOn(idGenerator, 'execute')
+            // arrange
+            getUserByIdRepository.execute.mockResolvedValue(
+                getUserByIdRepositoryResponse,
+            )
+            idGenerator.execute.mockReturnValue(
+                createTransactionServiceResponse.id,
+            )
+            createTransactionRepository.execute.mockResolvedValue(
+                createTransactionRepositoryResponse,
+            )
 
+            // act
             await sut.execute(createTransactionParams)
 
-            expect(idGeneratorAdapterSpy).toHaveBeenCalled()
-            expect(idGeneratorAdapterSpy).toHaveBeenCalledTimes(1)
-            expect(idGeneratorAdapterSpy).toHaveReturnedWith(
+            // assert
+            expect(idGenerator.execute).toHaveBeenCalled()
+            expect(idGenerator.execute).toHaveBeenCalledTimes(1)
+            expect(idGenerator.execute).toHaveReturnedWith(
                 createTransactionServiceResponse.id,
             )
         })
 
         it('should call CreateTransactionRepository with correct params', async () => {
-            const createTransactionRepositorySpy = jest.spyOn(
-                createTransactionRepository,
-                'execute',
+            // arrange
+            getUserByIdRepository.execute.mockResolvedValue(
+                getUserByIdRepositoryResponse,
+            )
+            idGenerator.execute.mockReturnValue(
+                createTransactionServiceResponse.id,
+            )
+            createTransactionRepository.execute.mockResolvedValue(
+                createTransactionRepositoryResponse,
             )
 
+            // act
             const response = await sut.execute(createTransactionParams)
 
-            expect(createTransactionRepositorySpy).toHaveBeenCalledWith({
+            // assert
+            expect(createTransactionRepository.execute).toHaveBeenCalledWith({
                 ...createTransactionParams,
                 id: createTransactionServiceResponse.id,
             })
-            expect(createTransactionRepositorySpy).toHaveBeenCalledTimes(1)
-            expect(response).toEqual(createTransactionServiceResponse)
+            expect(createTransactionRepository.execute).toHaveBeenCalledTimes(1)
+            expect(response).toEqual(
+                expect.objectContaining({
+                    id: createTransactionServiceResponse.id,
+                    name: createTransactionServiceResponse.name,
+                    amount: createTransactionServiceResponse.amount,
+                    type: createTransactionServiceResponse.type,
+                    userId: createTransactionServiceResponse.userId,
+                    date: createTransactionServiceResponse.date,
+                }),
+            )
         })
     })
 })

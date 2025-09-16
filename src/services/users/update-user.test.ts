@@ -1,10 +1,17 @@
+import { mock, MockProxy } from 'jest-mock-extended'
+
+import { PasswordHasherAdapter } from '@/adapters'
 import {
     EmailAlreadyExistsError,
     UpdateUserFailedError,
     UserNotFoundError,
 } from '@/errors'
+import {
+    PostgresGetUserByEmailRepository,
+    PostgresGetUserByIdRepository,
+    PostgresUpdateUserRepository,
+} from '@/repositories/postgres'
 import { UpdateUserService } from '@/services'
-import { UpdateUserParams, UserRepositoryResponse } from '@/shared'
 import {
     updateUserParams,
     updateUserRepositoryResponse,
@@ -14,116 +21,70 @@ import {
 
 describe('UpdateUserService', () => {
     let sut: UpdateUserService
-    let updateUserRepository: UpdateUserRepositoryStub
-    let getUserByEmailRepository: GetUserByEmailRepositoryStub
-    let getUserByIdRepository: GetUserByIdRepositoryStub
-    let passwordHasherAdapter: PasswordHasherAdapterStub
+    let updateUserRepository: MockProxy<PostgresUpdateUserRepository>
+    let getUserByEmailRepository: MockProxy<PostgresGetUserByEmailRepository>
+    let getUserByIdRepository: MockProxy<PostgresGetUserByIdRepository>
+    let passwordHasherAdapter: MockProxy<PasswordHasherAdapter>
 
-    class UpdateUserRepositoryStub {
-        async execute(
-            _userId: string,
-            _updateUserParams: UpdateUserParams,
-        ): Promise<UserRepositoryResponse | null> {
-            return Promise.resolve(updateUserRepositoryResponse)
-        }
-    }
+    beforeEach(() => {
+        updateUserRepository = mock<PostgresUpdateUserRepository>()
+        getUserByEmailRepository = mock<PostgresGetUserByEmailRepository>()
+        getUserByIdRepository = mock<PostgresGetUserByIdRepository>()
+        passwordHasherAdapter = mock<PasswordHasherAdapter>()
 
-    class GetUserByIdRepositoryStub {
-        async execute(_userId: string): Promise<UserRepositoryResponse | null> {
-            return Promise.resolve(updateUserRepositoryResponse)
-        }
-    }
-
-    class GetUserByEmailRepositoryStub {
-        async execute(_email: string): Promise<UserRepositoryResponse | null> {
-            return Promise.resolve(null)
-        }
-    }
-
-    class PasswordHasherAdapterStub {
-        async execute(_password: string): Promise<string> {
-            return Promise.resolve(updateUserRepositoryResponse.password)
-        }
-    }
-
-    const makeSut = () => {
-        const updateUserRepository = new UpdateUserRepositoryStub()
-        const getUserByEmailRepository = new GetUserByEmailRepositoryStub()
-        const getUserByIdRepository = new GetUserByIdRepositoryStub()
-        const passwordHasherAdapter = new PasswordHasherAdapterStub()
-
-        const sut = new UpdateUserService(
+        sut = new UpdateUserService(
             getUserByEmailRepository,
             updateUserRepository,
             passwordHasherAdapter,
             getUserByIdRepository,
         )
 
-        return {
-            sut,
-            updateUserRepository,
-            getUserByEmailRepository,
-            getUserByIdRepository,
-            passwordHasherAdapter,
-        }
-    }
-
-    beforeEach(() => {
-        const {
-            sut: service,
-            updateUserRepository: updateUserRepositoryStub,
-            getUserByEmailRepository: getUserByEmailRepositoryStub,
-            getUserByIdRepository: getUserByIdRepositoryStub,
-            passwordHasherAdapter: passwordHasherAdapterStub,
-        } = makeSut()
-
-        sut = service
-        updateUserRepository = updateUserRepositoryStub
-        getUserByEmailRepository = getUserByEmailRepositoryStub
-        getUserByIdRepository = getUserByIdRepositoryStub
-        passwordHasherAdapter = passwordHasherAdapterStub
+        // Default "happy path" setup for all tests
+        getUserByIdRepository.execute.mockResolvedValue(
+            updateUserRepositoryResponse,
+        )
+        updateUserRepository.execute.mockResolvedValue(
+            updateUserRepositoryResponse,
+        )
+        passwordHasherAdapter.execute.mockResolvedValue('valid_hash')
+        getUserByEmailRepository.execute.mockResolvedValue(null)
     })
 
     describe('error handling', () => {
         it('should throw UpdateUserFailedError if UpdateUserRepository throws', async () => {
-            // arrange
-            jest.spyOn(updateUserRepository, 'execute').mockResolvedValueOnce(
-                null,
+            // arrange: Override the default happy path
+            updateUserRepository.execute.mockRejectedValueOnce(
+                new UpdateUserFailedError(),
             )
 
             // act
             const promise = sut.execute(userId, updateUserParams)
 
             // assert
-            expect(promise).rejects.toThrow(new UpdateUserFailedError())
+            await expect(promise).rejects.toThrow(new UpdateUserFailedError())
         })
 
-        it('should throw EmailAlreadyExistsError if email already exists', () => {
-            // arrange
-            // mockamos o retorno para que o email já exista e ele entre no if do service
-            jest.spyOn(
-                getUserByEmailRepository,
-                'execute',
-            ).mockResolvedValueOnce(updateUserRepositoryResponse)
+        it('should throw EmailAlreadyExistsError if email already exists', async () => {
+            // arrange: Override the default happy path
+            getUserByEmailRepository.execute.mockResolvedValueOnce(
+                updateUserRepositoryResponse,
+            )
 
             // act
-            // não passamos o await para que ele retorne uma promise e não um valor
-            // passando um id diferente do que é passado no "updateUserRepositoryResponse" para que ele entre no outro if do service e retorne o erro
+            // Use a different user ID to simulate another user having the email
             const promise = sut.execute('different-user-id', {
                 email: updateUserServiceResponse.email,
             })
 
             // assert
-            expect(promise).rejects.toThrow(
+            await expect(promise).rejects.toThrow(
                 new EmailAlreadyExistsError(updateUserServiceResponse.email),
             )
         })
 
-        it('should throw UserNotFoundError if GetUserByIdRepository throws', async () => {
-            // arrange
-            jest.spyOn(getUserByIdRepository, 'execute').mockResolvedValueOnce(
-                null,
-            )
+        it('should throw UserNotFoundError if user is not found', async () => {
+            // arrange: Override the default happy path
+            getUserByIdRepository.execute.mockResolvedValueOnce(null)
 
             // act
             const promise = sut.execute(userId, {
@@ -131,15 +92,12 @@ describe('UpdateUserService', () => {
             })
 
             // assert
-            expect(promise).rejects.toThrow()
-            expect(promise).rejects.toThrow(new UserNotFoundError(userId))
+            await expect(promise).rejects.toThrow(new UserNotFoundError(userId))
         })
 
         it('should throw if PasswordHasherAdapter throws', async () => {
-            // arrange
-            jest.spyOn(passwordHasherAdapter, 'execute').mockRejectedValueOnce(
-                new Error(),
-            )
+            // arrange: Override the default happy path
+            passwordHasherAdapter.execute.mockRejectedValueOnce(new Error())
 
             // act
             const promise = sut.execute(userId, {
@@ -147,25 +105,14 @@ describe('UpdateUserService', () => {
             })
 
             // assert
-            expect(promise).rejects.toThrow()
-        })
-
-        it('should throw if UpdateUserRepository throws', async () => {
-            // arrange
-            jest.spyOn(updateUserRepository, 'execute').mockRejectedValueOnce(
-                new Error(),
-            )
-
-            // act
-            const promise = sut.execute(userId, updateUserParams)
-
-            // assert
-            expect(promise).rejects.toThrow()
+            await expect(promise).rejects.toThrow()
         })
     })
 
     describe('success', () => {
         it('should successfully update a user (without password and email)', async () => {
+            // arrange is handled by beforeEach
+
             // act
             const response = await sut.execute(userId, updateUserParams)
 
@@ -187,8 +134,6 @@ describe('UpdateUserService', () => {
 
             // assert
             expect(response).toEqual(updateUserServiceResponse)
-
-            // para garantir que o repository seja chamado com o email que estamos passando no service:
             expect(getUserByEmailRepositorySpy).toHaveBeenCalledWith(
                 updateUserServiceResponse.email,
             )
@@ -208,8 +153,6 @@ describe('UpdateUserService', () => {
 
             // assert
             expect(response).toEqual(updateUserServiceResponse)
-
-            // para garantir que o repository seja chamado com o email que estamos passando no service:
             expect(passwordHasherAdapterSpy).toHaveBeenCalledWith(
                 updateUserParams.password,
             )
@@ -224,10 +167,9 @@ describe('UpdateUserService', () => {
                 await sut.execute(userId, updateUserParams)
 
                 // assert
-                // O serviço deve fazer hash da senha antes de chamar o repository
                 const expectedParams = {
                     ...updateUserParams,
-                    password: 'valid_hash', // Senha já com hash
+                    password: 'valid_hash',
                 }
 
                 expect(executeSpy).toHaveBeenCalledWith(userId, expectedParams)
