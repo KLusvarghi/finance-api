@@ -11,11 +11,15 @@ export const transactionId = faker.string.uuid()
 // ============================================================================
 
 export const createTransactionParams = {
-    userId: userId,
     name: faker.lorem.words(3),
     amount: faker.number.int({ min: 1, max: 1000 }),
     date: faker.date.recent().toISOString(),
     type: faker.helpers.arrayElement(['EARNING', 'EXPENSE', 'INVESTMENT']),
+}
+
+export const createTransactionServiceParams = {
+    ...createTransactionParams,
+    userId: userId,
 }
 
 export const updateTransactionParams = {
@@ -31,11 +35,14 @@ export const updateTransactionParams = {
 
 export const transactionResponse = {
     id: transactionId,
-    userId: createTransactionParams.userId,
-    name: createTransactionParams.name,
-    amount: new Prisma.Decimal(createTransactionParams.amount),
-    date: new Date(createTransactionParams.date),
-    type: createTransactionParams.type as 'EARNING' | 'EXPENSE' | 'INVESTMENT',
+    userId: createTransactionServiceParams.userId,
+    name: createTransactionServiceParams.name,
+    amount: new Prisma.Decimal(createTransactionServiceParams.amount),
+    date: new Date(createTransactionServiceParams.date),
+    type: createTransactionServiceParams.type as
+        | 'EARNING'
+        | 'EXPENSE'
+        | 'INVESTMENT',
     updatedAt: new Date(),
 }
 
@@ -57,11 +64,14 @@ export const transactionListResponse = [
 
 export const createTransactionRepositoryResponse = {
     id: transactionId,
-    userId: createTransactionParams.userId,
-    name: createTransactionParams.name,
-    amount: new Prisma.Decimal(createTransactionParams.amount),
-    date: new Date(createTransactionParams.date),
-    type: createTransactionParams.type as 'EARNING' | 'EXPENSE' | 'INVESTMENT',
+    userId: createTransactionServiceParams.userId,
+    name: createTransactionServiceParams.name,
+    amount: new Prisma.Decimal(createTransactionServiceParams.amount),
+    date: new Date(createTransactionServiceParams.date),
+    type: createTransactionServiceParams.type as
+        | 'EARNING'
+        | 'EXPENSE'
+        | 'INVESTMENT',
     deletedAt: null,
     updatedAt: new Date(),
 }
