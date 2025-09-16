@@ -13,6 +13,7 @@ alwaysApply: true
     - Ex: `it('should return 400 if e-mail is already in use')`.
 - **ALWAYS** organize testes em blocos `describe` aninhados para agrupar cenários relacionados (ex: `describe('error handling', ...)`).
 - **ALWAYS** isole o "System Under Test" (SUT) usando mocks com `jest-mock-extended` para dependências injetadas.
+- **ALWAYS** utilize `beforeEach` para configurar um cenário de sucesso padrão ("happy path"). Isso centraliza o `arrange` comum, mantém os testes DRY e permite que cada `it` se concentre em sobrescrever apenas os mocks necessários para seu caso específico.
 - **NEVER** teste múltiplas responsabilidades em um único `it`. Cada teste deve ter um foco e uma asserção principal.
 - **PREFER** asserções explícitas (`expect(result).toBe(...)`) a snapshots (`.toMatchSnapshot()`) para garantir clareza e evitar regressões acidentais.
 - **PREFER** `it.each` para testar a mesma lógica com diferentes entradas (ex: validação de schema), evitando repetição de código.
@@ -34,7 +35,7 @@ alwaysApply: true
 
 ## Exemplos (do repositório)
 
-### ✅ Correto
+### ✅ Correto (Isolamento Básico)
 
 Um teste de controlador usando `jest-mock-extended` para injetar uma dependência de serviço mockada, garantindo segurança de tipos e isolamento.
 
@@ -75,6 +76,70 @@ describe('DeleteUserController', () => {
 
             // assert
             expect(response.statusCode).toBe(200)
+        })
+    })
+})
+```
+
+### ✅ Correto (com `beforeEach` para DRY)
+
+Use `beforeEach` para definir o estado padrão dos mocks (geralmente o "caminho feliz"). Testes individuais devem então sobrescrever apenas o necessário para testar seus cenários específicos, tornando o código mais limpo e focado.
+
+```typescript
+// Baseado em: src/services/users/update-user.test.ts
+describe('UpdateUserService', () => {
+    let sut: UpdateUserService
+    let getUserByIdRepository: MockProxy<PostgresGetUserByIdRepository>
+    let getUserByEmailRepository: MockProxy<PostgresGetUserByEmailRepository>
+    // ... outros mocks
+
+    beforeEach(() => {
+        // Inicialização de todos os mocks
+        getUserByIdRepository = mock<PostgresGetUserByIdRepository>()
+        getUserByEmailRepository = mock<PostgresGetUserByEmailRepository>()
+        // ...
+
+        sut = new UpdateUserService(...)
+
+        // SETUP PADRÃO (HAPPY PATH)
+        // Por padrão, todo teste assume que o usuário existe, o email não está em uso, etc.
+        getUserByIdRepository.execute.mockResolvedValue(updateUserRepositoryResponse)
+        getUserByEmailRepository.execute.mockResolvedValue(null) // Email não está em uso
+        updateUserRepository.execute.mockResolvedValue(updateUserRepositoryResponse)
+        passwordHasherAdapter.execute.mockResolvedValue('valid_hash')
+    })
+
+    describe('success', () => {
+        it('should update a user successfully', async () => {
+            // arrange: Já foi feito no beforeEach!
+
+            // act
+            const response = await sut.execute(userId, updateUserParams)
+
+            // assert
+            expect(response).toEqual(updateUserServiceResponse)
+        })
+    })
+
+    describe('error handling', () => {
+        it('should throw UserNotFoundError if user is not found', async () => {
+            // arrange: Sobrescreve apenas o mock necessário para este cenário
+            getUserByIdRepository.execute.mockResolvedValue(null)
+
+            // act & assert
+            await expect(sut.execute(userId, updateUserParams)).rejects.toThrow(
+                UserNotFoundError,
+            )
+        })
+
+        it('should throw EmailAlreadyExistsError if email is already in use', async () => {
+            // arrange: Sobrescreve apenas o mock necessário para este cenário
+            getUserByEmailRepository.execute.mockResolvedValue(updateUserRepositoryResponse)
+
+            // act & assert
+            await expect(sut.execute('different-user-id', { email: 'test@test.com' })).rejects.toThrow(
+                EmailAlreadyExistsError,
+            )
         })
     })
 })
