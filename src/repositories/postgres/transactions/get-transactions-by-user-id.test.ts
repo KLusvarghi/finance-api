@@ -35,21 +35,22 @@ describe('PostgresGetTransactionsByUserIdRepository', () => {
 
             const response = await sut.execute(user.id, from, to)
 
-            expect(response?.length).toBe(1)
-            expect(response?.[0]).not.toBeNull()
-            expect(response?.[0].name).toBe(transaction.name)
-            expect(response?.[0].type).toBe(transaction.type)
-            expect(response?.[0].userId).toBe(user.id)
-            expect(String(response?.[0].amount)).toBe(
+            expect(response.transactions.length).toBe(1)
+            expect(response.nextCursor).toBeNull()
+            expect(response.transactions[0]).not.toBeNull()
+            expect(response.transactions[0].name).toBe(transaction.name)
+            expect(response.transactions[0].type).toBe(transaction.type)
+            expect(response.transactions[0].userId).toBe(user.id)
+            expect(String(response.transactions[0].amount)).toBe(
                 String(transaction.amount),
             )
-            expect(dayjs(response?.[0].date).daysInMonth()).toBe(
+            expect(dayjs(response.transactions[0].date).daysInMonth()).toBe(
                 dayjs(transaction.date).daysInMonth(),
             )
-            expect(dayjs(response?.[0].date).month()).toBe(
+            expect(dayjs(response.transactions[0].date).month()).toBe(
                 dayjs(transaction.date).month(),
             )
-            expect(dayjs(response?.[0].date).year()).toBe(
+            expect(dayjs(response.transactions[0].date).year()).toBe(
                 dayjs(transaction.date).year(),
             )
         })
@@ -73,10 +74,12 @@ describe('PostgresGetTransactionsByUserIdRepository', () => {
                         lte: new Date(to),
                     },
                 },
+                take: 21,
+                orderBy: [{ date: 'desc' }, { id: 'asc' }],
             })
         })
 
-        it('should return an empty array if user has no transactions', async () => {
+        it('should return empty paginated response if user has no transactions', async () => {
             // arrange
             const user = await createTestUser()
 
@@ -84,7 +87,10 @@ describe('PostgresGetTransactionsByUserIdRepository', () => {
             const response = await sut.execute(user.id, from, to)
 
             // assert
-            expect(response).toEqual([])
+            expect(response).toEqual({
+                transactions: [],
+                nextCursor: null,
+            })
         })
     })
 })

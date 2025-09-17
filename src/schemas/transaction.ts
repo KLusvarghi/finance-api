@@ -83,50 +83,15 @@ export const updateTransactionSchema = z.object({
 })
 
 export const getTransactionsByUserIdQuerySchema = z.object({
-    from: z
-        .string({
-            message: 'From is required',
-        })
-        .refine(
-            (dateString) => {
-                try {
-                    const dateRegex = /^\d{4}-\d{2}-\d{2}$/
-                    if (!dateRegex.test(dateString.toString())) {
-                        return false
-                    }
-                    // Additional validation: check if the date is actually valid
-                    const date = new Date(dateString + 'T00:00:00.000Z')
-                    return date.toISOString().startsWith(dateString)
-                } catch {
-                    return false
-                }
-            },
-            {
-                message: 'From must be in YYYY-MM-DD format',
-            },
-        ),
-    to: z
-        .string({
-            message: 'To is required',
-        })
-        .refine(
-            (dateString) => {
-                try {
-                    const dateRegex = /^\d{4}-\d{2}-\d{2}$/
-                    if (!dateRegex.test(dateString.toString())) {
-                        return false
-                    }
-                    // Additional validation: check if the date is actually valid
-                    const date = new Date(dateString + 'T00:00:00.000Z')
-                    return date.toISOString().startsWith(dateString)
-                } catch {
-                    return false
-                }
-            },
-            {
-                message: 'To must be in YYYY-MM-DD format',
-            },
-        ),
+    // Filters
+    title: z.string().optional(),
+    type: z.enum(['EARNING', 'EXPENSE', 'INVESTMENT']).optional(),
+    startDate: z.coerce.date().optional(),
+    endDate: z.coerce.date().optional(),
+
+    // Pagination
+    limit: z.coerce.number().int().positive().max(100).optional().default(20),
+    cursor: z.string().optional(),
 })
 
 export const getTransactionsByUserIdSchema = z.object({

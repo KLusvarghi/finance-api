@@ -5,41 +5,37 @@ import {
     HeadersController,
     HttpRequest,
     HttpResponse,
-    TransactionPublicResponse,
+    PaginatedTransactionsResponse,
     UserIdRequestParams,
 } from '@/shared'
 
-// Local interfaces - used only by this controller
-interface GetTransactionsByUserIdRequest extends HttpRequest {
-    headers: UserIdRequestParams
-    query: {
-        from: string
-        to: string
-    }
-}
-
 export class GetTransactionsByUserIdController
     implements
-        HeadersController<UserIdRequestParams, TransactionPublicResponse[]>
+        HeadersController<UserIdRequestParams, PaginatedTransactionsResponse>
 {
     constructor(
         private readonly getTransactionByUserIdService: GetTransactionsByUserIdService,
     ) {}
 
     async execute(
-        httpRequest: GetTransactionsByUserIdRequest,
-    ): Promise<HttpResponse<TransactionPublicResponse[]>> {
-        // Validation is now handled by middleware
+        httpRequest: HttpRequest,
+    ): Promise<HttpResponse<PaginatedTransactionsResponse>> {
+        // Validation and type coercion are handled by Zod middleware
         const { userId } = httpRequest.headers
-        const { from, to } = httpRequest.query
+        const { title, type, startDate, endDate, limit, cursor } =
+            httpRequest.query
 
         // Execute business logic - errors will be caught by error middleware
-        const transactions = await this.getTransactionByUserIdService.execute(
+        const result = await this.getTransactionByUserIdService.execute({
             userId,
-            from,
-            to,
-        )
+            title,
+            type,
+            startDate,
+            endDate,
+            limit,
+            cursor,
+        })
 
-        return ok(transactions)
+        return ok(result)
     }
 }

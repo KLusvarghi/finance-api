@@ -1,18 +1,14 @@
 import { UserNotFoundError } from '@/errors'
+import { GetUserByIdRepository } from '@/repositories/postgres'
 import {
+    GetTransactionsByUserIdParams,
     GetTransactionsByUserIdRepository,
-    GetUserByIdRepository,
-} from '@/repositories/postgres'
-import { ServiceWithMultipleParams, TransactionPublicResponse } from '@/shared'
+    GetTransactionsByUserIdService as GetTransactionsByUserIdServiceInterface,
+    PaginatedTransactionsResponse,
+} from '@/shared'
 
 export class GetTransactionsByUserIdService
-    implements
-        ServiceWithMultipleParams<
-            string,
-            string,
-            string,
-            TransactionPublicResponse[]
-        >
+    implements GetTransactionsByUserIdServiceInterface
 {
     constructor(
         private readonly getUserByIdRepository: GetUserByIdRepository,
@@ -20,31 +16,27 @@ export class GetTransactionsByUserIdService
     ) {}
 
     async execute(
-        userId: string,
-        from: string,
-        to: string,
-    ): Promise<TransactionPublicResponse[]> {
-        const user = await this.getUserByIdRepository.execute(userId)
+        params: GetTransactionsByUserIdParams,
+    ): Promise<PaginatedTransactionsResponse> {
+        const user = await this.getUserByIdRepository.execute(params.userId)
 
         if (!user) {
-            throw new UserNotFoundError(userId)
+            throw new UserNotFoundError(params.userId)
         }
 
-        const transactions =
-            await this.getTransactionsByUserIdRepository.execute(
-                userId,
-                from,
-                to,
-            )
+        const result =
+            await this.getTransactionsByUserIdRepository.execute(params)
 
-        // Garantir que sempre retornamos um array, mesmo se o repository retornar null
-        const transactionsArray = transactions ?? []
-
-        // Converter TransactionRepositoryResponse[] para TransactionPublicResponse[]
-        return transactionsArray.map(
-            ({ deletedAt, ...transactionWithoutDeletedAt }) => ({
+        // Convert TransactionRepositoryResponse[] to TransactionPublicResponse[]
+        const transactions = result.transactions.map(
+            ({ deletedAt: _deletedAt, ...transactionWithoutDeletedAt }) => ({
                 ...transactionWithoutDeletedAt,
             }),
         )
+
+        return {
+            transactions,
+            nextCursor: result.nextCursor,
+        }
     }
 }

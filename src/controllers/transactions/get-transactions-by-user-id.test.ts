@@ -5,8 +5,8 @@ import { UserNotFoundError } from '@/errors'
 import { GetTransactionsByUserIdService } from '@/services'
 import { HttpResponseSuccessBody } from '@/shared'
 import {
-    getTransactionsByUserIdControllerResponse,
     getTransactionsByUserIdHttpRequest as baseHttpRequest,
+    paginatedTransactionsServiceResponse,
     userId,
 } from '@/test'
 
@@ -19,6 +19,11 @@ describe('GetTransactionsByUserIdController', () => {
         getTransactionsByUserIdService = mock<GetTransactionsByUserIdService>()
         sut = new GetTransactionsByUserIdController(
             getTransactionsByUserIdService,
+        )
+
+        // Setup default happy path
+        getTransactionsByUserIdService.execute.mockResolvedValue(
+            paginatedTransactionsServiceResponse,
         )
     })
 
@@ -59,11 +64,8 @@ describe('GetTransactionsByUserIdController', () => {
     })
 
     describe('success cases', () => {
-        it('should return 200 when finding transactions by user id', async () => {
-            // arrange
-            getTransactionsByUserIdService.execute.mockResolvedValueOnce(
-                getTransactionsByUserIdControllerResponse,
-            )
+        it('should return 200 when finding paginated transactions by user id', async () => {
+            // arrange - using default setup from beforeEach
 
             // act
             const response = await sut.execute(baseHttpRequest)
@@ -73,15 +75,10 @@ describe('GetTransactionsByUserIdController', () => {
             expect(response.body?.success).toBe(true)
             expect(
                 (response.body as HttpResponseSuccessBody)?.data,
-            ).toStrictEqual(getTransactionsByUserIdControllerResponse)
+            ).toStrictEqual(paginatedTransactionsServiceResponse)
         })
 
-        it('should call GetTransactionsByUserIdService with correct parameters', async () => {
-            // arrange
-            getTransactionsByUserIdService.execute.mockResolvedValueOnce(
-                getTransactionsByUserIdControllerResponse,
-            )
-
+        it('should call GetTransactionsByUserIdService with correct parameters including pagination options', async () => {
             // act
             await sut.execute(baseHttpRequest)
 
@@ -90,6 +87,10 @@ describe('GetTransactionsByUserIdController', () => {
                 baseHttpRequest.headers.userId,
                 baseHttpRequest.query.from,
                 baseHttpRequest.query.to,
+                {
+                    limit: baseHttpRequest.query.limit,
+                    cursor: baseHttpRequest.query.cursor,
+                },
             )
             expect(
                 getTransactionsByUserIdService.execute,

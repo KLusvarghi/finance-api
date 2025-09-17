@@ -54,6 +54,19 @@ export type CreateTransactionRepositoryParams =
         id: string
     }
 
+export interface GetTransactionsByUserIdParams {
+    userId: string
+    // Filters
+    title?: string
+    type?: 'EARNING' | 'EXPENSE' | 'INVESTMENT'
+    startDate?: Date
+
+    endDate?: Date
+    // Pagination
+    limit?: number
+    cursor?: string
+}
+
 // REPOSITORY INTERFACE TYPES
 export interface CreateTransactionRepository {
     execute(
@@ -62,15 +75,7 @@ export interface CreateTransactionRepository {
 }
 
 export interface GetTransactionsByUserIdRepository {
-    execute(
-        userId: string,
-        from: string,
-        to: string,
-        options?: {
-            limit: number
-            cursor?: string
-        },
-    ): Promise<{
+    execute(params: GetTransactionsByUserIdParams): Promise<{
         transactions: TransactionRepositoryResponse[]
         nextCursor: string | null
     }>
@@ -106,13 +111,7 @@ export interface CreateTransactionService {
 
 export interface GetTransactionsByUserIdService {
     execute(
-        userId: string,
-        from: string,
-        to: string,
-        options?: {
-            limit: number
-            cursor?: string
-        },
+        params: GetTransactionsByUserIdParams,
     ): Promise<PaginatedTransactionsResponse>
 }
 

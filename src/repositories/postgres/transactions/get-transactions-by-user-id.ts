@@ -1,33 +1,77 @@
 import { prisma } from '../../../../prisma/prisma'
 
 import {
+    GetTransactionsByUserIdParams,
     GetTransactionsByUserIdRepository,
     TransactionRepositoryResponse,
 } from '@/shared'
+import { Prisma } from '@prisma/client'
 
 export class PostgresGetTransactionsByUserIdRepository
     implements GetTransactionsByUserIdRepository
 {
-    // TODO: ver se é mais válido receber um objeto com os valores ou receber separados do jeito que está
-    async execute(
-        userId: string,
-        from: string,
-        to: string,
-    ): Promise<TransactionRepositoryResponse[]> {
-        return prisma.transaction.findMany({
-            where: {
-                userId: userId,
-                date: {
-                    // gte = greater than or equal to
-                    // lte = less than or equal to
-                    // por serem strings, temos que converter para Date
-                    gte: new Date(from),
-                    lte: new Date(to),
-                },
-            },
+    async execute(params: GetTransactionsByUserIdParams): Promise<{
+        transactions: TransactionRepositoryResponse[]
+        nextCursor: string | null
+    }> {
+        const {
+            userId,
+            title,
+            type,
+            startDate,
+            endDate,
+            limit = 20, // Default limit
+            cursor,
+        } = params
+
+        const itemsToFetch = limit + 1
+
+        // Build the 'where' clause dynamically
+        const where: Prisma.TransactionWhereInput = {
+            userId,
+        }
+
+        if (title) {
+            where.name = {
+                contains: title,
+                mode: 'insensitive',
+            }
+        }
+
+        if (type) {
+            where.type = type
+        }
+
+        if (startDate || endDate) {
+            where.date = {}
+            if (startDate) {
+                where.date.gte = startDate
+            }
+            if (endDate) {
+                where.date.lte = endDate
+            }
+        }
+
+        const items = await prisma.transaction.findMany({
+            where,
+            take: itemsToFetch,
+            orderBy: [{ date: 'desc' }, { id: 'asc' }],
+            ...(cursor && { cursor: { id: cursor }, skip: 1 }),
         })
+
+        let nextCursor: string | null = null
+
+        // If we got more items than requested, there's a next page
+        if (items.length > limit) {
+            // The nextCursor is the ID of the last item in the current page
+            nextCursor = items[limit - 1].id
+        }
+
+        const transactions = items.slice(0, limit)
+
+        return {
+            transactions,
+            nextCursor,
+        }
     }
 }
-
-// Alias para manter compatibilidade com as importações
-export { PostgresGetTransactionsByUserIdRepository as GetTransactionsByUserIdRepository }
