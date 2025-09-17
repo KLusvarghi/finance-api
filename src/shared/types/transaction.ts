@@ -15,6 +15,11 @@ export interface TransactionPublicResponse {
     updatedAt: Date
 }
 
+export interface PaginatedTransactionsResponse {
+    transactions: TransactionPublicResponse[]
+    nextCursor: string | null
+}
+
 export interface CreateTransactionParams {
     name: string
     amount: number
@@ -61,7 +66,14 @@ export interface GetTransactionsByUserIdRepository {
         userId: string,
         from: string,
         to: string,
-    ): Promise<TransactionRepositoryResponse[]>
+        options?: {
+            limit: number
+            cursor?: string
+        },
+    ): Promise<{
+        transactions: TransactionRepositoryResponse[]
+        nextCursor: string | null
+    }>
 }
 
 export interface GetTransactionByIdRepository {
@@ -97,7 +109,11 @@ export interface GetTransactionsByUserIdService {
         userId: string,
         from: string,
         to: string,
-    ): Promise<TransactionPublicResponse[]>
+        options?: {
+            limit: number
+            cursor?: string
+        },
+    ): Promise<PaginatedTransactionsResponse>
 }
 
 export interface UpdateTransactionService {
