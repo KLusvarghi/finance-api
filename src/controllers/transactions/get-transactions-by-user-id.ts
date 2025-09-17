@@ -9,6 +9,20 @@ import {
     UserIdRequestParams,
 } from '@/shared'
 
+interface GetTransactionsByUserIdQuery {
+    title?: string
+    type?: 'EARNING' | 'EXPENSE' | 'INVESTMENT'
+    from: string
+    to: string
+    limit: number
+    cursor?: string
+}
+
+interface GetTransactionsByUserIdRequest extends HttpRequest {
+    headers: UserIdRequestParams
+    query: GetTransactionsByUserIdQuery
+}
+
 export class GetTransactionsByUserIdController
     implements
         HeadersController<UserIdRequestParams, PaginatedTransactionsResponse>
@@ -18,20 +32,19 @@ export class GetTransactionsByUserIdController
     ) {}
 
     async execute(
-        httpRequest: HttpRequest,
+        httpRequest: GetTransactionsByUserIdRequest,
     ): Promise<HttpResponse<PaginatedTransactionsResponse>> {
         // Validation and type coercion are handled by Zod middleware
         const { userId } = httpRequest.headers
-        const { title, type, startDate, endDate, limit, cursor } =
-            httpRequest.query
+        const { title, type, from, to, limit, cursor } = httpRequest.query
 
         // Execute business logic - errors will be caught by error middleware
         const result = await this.getTransactionByUserIdService.execute({
             userId,
             title,
             type,
-            startDate,
-            endDate,
+            from: new Date(from),
+            to: new Date(to),
             limit,
             cursor,
         })
