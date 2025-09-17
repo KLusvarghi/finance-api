@@ -162,6 +162,8 @@ export const getTransactionsByUserIdHttpRequest = {
     query: {
         from: '2025-08-01',
         to: '2025-08-08',
+        limit: 20,
+        cursor: undefined,
     },
 }
 
@@ -189,4 +191,38 @@ export const createTestTransaction = async (
             ...customData,
         },
     })
+}
+
+// ============================================================================
+// PAGINATED RESPONSES
+// ============================================================================
+
+export const paginatedTransactionsRepositoryResponse = {
+    transactions: [
+        {
+            ...getTransactionByUserIdRepositoryResponse[0],
+            deletedAt: null,
+        },
+    ],
+    nextCursor: null,
+}
+
+export const paginatedTransactionsWithNextCursorRepositoryResponse = {
+    transactions: [
+        {
+            ...getTransactionByUserIdRepositoryResponse[0],
+            deletedAt: null,
+        },
+    ],
+    nextCursor: faker.string.uuid(),
+}
+
+export const paginatedTransactionsServiceResponse = {
+    transactions: getTransactionsByUserIdResponse,
+    nextCursor: null,
+}
+
+export const paginatedTransactionsWithNextCursorServiceResponse = {
+    transactions: getTransactionsByUserIdResponse,
+    nextCursor: faker.string.uuid(),
 }
