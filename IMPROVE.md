@@ -1,4 +1,3 @@
-
 [] padronizar as variáveis dos tests no repository
 
 [] ver com AI tipos de erros genericos que podemos criar e quais outros custom erros para podermos criar
@@ -27,11 +26,13 @@
 O foco desta fase é padronizar o código, melhorar a consistência da API e corrigir pequenos problemas que têm um grande impacto na qualidade e na experiência do desenvolvedor.
 
 <!-- TODO: -->
+
 1.  **[ ] Padronizar Variáveis de Testes nos Repositórios**
     - **Tarefa Original**: `padronizar as variáveis dos tests no repository`.
     - **Justificativa**: Manter um padrão de nomenclatura e estrutura nas variáveis de teste (e.g., `sut`, `mockedUser`) torna os testes mais fáceis de ler e manter.
 
 <!-- TODO: -->
+
 2.  **[ ] Melhorar Mensagens de Erro para Entidades Não Encontradas**
     - **Tarefa Original**: `ver com a ai se é válido retornar "Transaction with id {id} not found"`.
     - **Resposta e Justificativa**: Sim, é uma excelente prática. Incluir o ID na mensagem de erro `"{Entidade} with id {id} not found"` ajuda muito na depuração (debugging) do frontend e na análise de logs, pois você sabe exatamente qual registro estava sendo procurado. Recomendo aplicar este padrão para todas as mensagens de "não encontrado".
@@ -39,6 +40,7 @@ O foco desta fase é padronizar o código, melhorar a consistência da API e cor
 ---
 
 <!-- TODO: -->
+
 4.  **[ ] Implementar Middleware de Tratamento de Erros Centralizado**
     - **Tarefa Original**: `implementar midwarre ... que centraliza o tratamento dos erros`.
     - **Justificativa**: Esta é uma das melhorias mais importantes. Um middleware de erro centralizado (Error Handling Middleware) remove a lógica de `try/catch` dos controllers, limpa o código e garante que todos os erros sejam tratados de forma consistente, retornando respostas HTTP padronizadas.
@@ -122,7 +124,7 @@ Melhorias focadas na lógica de negócio específica da aplicação.
 
 ---
 
-- 
+-
 
 - [ ] COMO EU POSSO MELHORAR A TIPAGEM DO MEU SERVICE?
 
@@ -130,45 +132,4 @@ Ver se a maioria das minhas interface eu coloco elas uso elas em mais de dois ar
 
 - [ ] ver se é válido passar os fixtures em um arquivo separado (que tem o propósito de centralizar a criação deles), ou é mia sválido deixar eles dentro do próprio arquivo
 
-
-
-
-
-7.  
-
----
-
-# Ordem do que estou fazendo no momento:
-
-[x] implementar o middlware de error handling
-
-[x] testes no middleware de auth
-
-[] melhorar a tipagem dos meus: httpRequest: HttpRequest, poruqem dessa maneira eu não tenho o auto complite se é body, params ou querys que eu tenho
-
-[] ver com a AI como eu farei com a distribuição das interfaces, quais eu coloco prŕoprio arquivo e quais eu deixo no arquivo de types
-
-[] mudar o arquivo de types para "@types" igual o projeto da rocketseat: https://github.com/rocketseat-education/ignite-nodejs-03-api-solid-nodejs/tree/main/src/%40types
-
-[]  Dentro da rota de login user, preciso validar se os adapter não lançam erros (ver se é valido, é uma task antiga que não sei se faz sentido ainda)
-
-[]  Posso melhorar todos os meu outros adapters afim de tratarem o erro da melhor forma independente de quem chama eles (ver com a AI se é válido, isso gera complexidade e temos que ter em mente de não cair no over engineer)
-
-[] implementar paginação no get transactions (talvez o scroll infinito seja melhor nesse caso para exibir as transações)
-  [] fiquei com duvida de como eu faço e utilizo filtros utilizando paginação (entra naquele problema que o gabriel tinha na mamba, a diferença é que a minha paginação talvez seja de cursor (scroll infinito))
-
-[] implementar cache na rota de get transaction (fica a duvida de como fazer isso usando com a rota que tem paginação)
-
-[] ver possibildiade de implementar middleware de rate limiting, ou se faço isso com alguma lib ou metodos nativos do node. Acredito que a algumas rotas apenas possam ter essa necessidade (ver quais com a AI)
-  Bom, o que eu achei interessante foram alguns middles como, por exemplo, o de segurança e headers HTTP, pra gente lidar com o hate limiting. Eu acho muito legal a gente utilizar isso porque, por exemplo, alguém que esteja tentando ter uma conta, mas tentar quebrar o nosso servidor, o nosso banco de dados enchendo de requisições, com injeção de Javascript, por exemplo, a gente pode limitar isso. Se diz que dá pra gente fazer com, geralmente, esse tipo de coisa de hate limit, a gente faz com o middler mesmo, no Express, porque eu sei que, por exemplo, quando a gente utiliza algumas ferramentas e etc, a gente consegue, as ferramentas mesmas tem esses benefícios, mas no middler, no Express, a gente lidaria dessa forma, então?
-
-
-[] Ver de implementar observabilidade com algum software ou como a AI sugeriu com middleware, porem, com middleware pode ser mais complexo snedo que tem softwares que podem facilitar isso (talvez não tenha necssidade de usar mcp de algum software de observailidade porque no final não terá um impacto, sendo que é um projeto para de estudos)
-  Bom, você também mencionou de login e requisições, que é para a gente conseguir monitorar de onde veio o método, a URL, status da resposta, tempo de execução, API do cliente e afins. A gente fazendo isso, não seria a mesma coisa que a gente adicionar observabilidade no nosso projeto? Porque isso me gera uma dúvida, porque é uma coisa que eu vou fazer posteriormente e eu não quero ter retrabalho. Se eu adicionando observabilidade, eu já vou ter acesso a todos esses recursos? Então não faz sentido para mim adicionar um meter, entendeu?
-
-
-[] Melhorar a composição e organização dos meus testes, acredito que estou fazendo over engineer, aplicando várias coisas em todos os testes, sendo que talvez eles não precisem
-  [] 1. nos tests, o quye é convencional, crir um stub mais realista, que recebe os params mesmo que não iremos utilizar, ou fazemos do modo mais simples e necessário?
-
-  [] 2. EU sinto que nos meus tests nem sempre é necessário eu ter a estrutura que eu tenho em todos os tasts, tenho que ver melhor o que é necessaŕio, e como usar o beforeEach, beforeEachAll, afterEach, afterEachAll da melhor forma
-    [] Será que aplicando direito esses métodos, eu consigo melhorar a questão que quando a gente roda os testes, a gente tem algumas opções. Uma, por exemplo, rodar com o teste container, que é uma biblioteca que a gente consegue a cada teste subir um container, então subir um banco de dados, fazer o teste, matar esse banco de dados e ir para o próximo, de forma que todos os testes podem rodar de forma assíncrona, então ao mesmo tempo, mas com banco de dados diferentes. Ou a gente continua executando da mesma forma que a gente faz, que cada teste ele é executado sequencialmente, então eles não são executados de forma aleatória e ao mesmo tempo, porque a gente faz com que a cada teste ele limpe o banco de dados. Então o teste vai rodar e para o próximo ele tem que esperar o anterior acabar, limpar o banco de dados para ele prosseguir. Mas será que se a gente usar melhor o before all ou after it, ou qualquer que seja, a gente não consiga superar essa necessidade de juntar esses dois mundos, de conseguir rodar tudo ao mesmo tempo, da melhor forma, e a gente tem que ter o banco mais limpo possível. Eu não sei exatamente porque você existe o teste container para superar essa necessidade, é porque deve ter algum empecilho nesse meio do caminho, de não conseguir fazer isso, mas é válido a gente tentar fazer e ver da melhor forma que pode funcionar.
+-
