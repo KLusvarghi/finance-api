@@ -18,8 +18,8 @@ export class PostgresGetTransactionsByUserIdRepository
             userId,
             title,
             type,
-            startDate,
-            endDate,
+            from,
+            to,
             limit = 20, // Default limit
             cursor,
         } = params
@@ -42,13 +42,13 @@ export class PostgresGetTransactionsByUserIdRepository
             where.type = type
         }
 
-        if (startDate || endDate) {
+        if (from || to) {
             where.date = {}
-            if (startDate) {
-                where.date.gte = startDate
+            if (from) {
+                where.date.gte = from
             }
-            if (endDate) {
-                where.date.lte = endDate
+            if (to) {
+                where.date.lte = to
             }
         }
 
