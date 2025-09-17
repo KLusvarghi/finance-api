@@ -86,8 +86,10 @@ export const getTransactionsByUserIdQuerySchema = z.object({
     // Filters
     title: z.string().optional(),
     type: z.enum(['EARNING', 'EXPENSE', 'INVESTMENT']).optional(),
-    startDate: z.coerce.date().optional(),
-    endDate: z.coerce.date().optional(),
+    from: z.coerce.date().optional(),
+    to: z.coerce.date().optional(),
+    minAmount: z.coerce.number().optional(),
+    maxAmount: z.coerce.number().optional(),
 
     // Pagination
     limit: z.coerce.number().int().positive().max(100).optional().default(20),

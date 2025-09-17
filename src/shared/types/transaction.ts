@@ -55,13 +55,15 @@ export type CreateTransactionRepositoryParams =
     }
 
 export interface GetTransactionsByUserIdParams {
+    // headers
     userId: string
     // Filters
     title?: string
     type?: 'EARNING' | 'EXPENSE' | 'INVESTMENT'
-    startDate?: Date
-
-    endDate?: Date
+    from?: Date
+    to?: Date
+    minAmount?: number
+    maxAmount?: number
     // Pagination
     limit?: number
     cursor?: string

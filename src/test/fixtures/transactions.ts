@@ -160,6 +160,8 @@ export const deleteTransactionHttpRequest = {
 export const getTransactionsByUserIdHttpRequest = {
     headers: { userId },
     query: {
+        title: undefined,
+        type: undefined,
         from: '2025-08-01',
         to: '2025-08-08',
         limit: 20,
