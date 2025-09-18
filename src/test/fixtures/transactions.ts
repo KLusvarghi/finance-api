@@ -162,8 +162,8 @@ export const getTransactionsByUserIdHttpRequest = {
     query: {
         title: undefined,
         type: undefined,
-        from: '2025-08-01',
-        to: '2025-08-08',
+        from: new Date('2025-08-01'),
+        to: new Date('2025-08-08'),
         limit: 20,
         cursor: undefined,
     },
