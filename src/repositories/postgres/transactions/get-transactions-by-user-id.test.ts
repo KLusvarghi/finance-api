@@ -8,8 +8,12 @@ import { createTestTransaction, createTestUser } from '@/test'
 describe('PostgresGetTransactionsByUserIdRepository', () => {
     const sut = new PostgresGetTransactionsByUserIdRepository()
 
-    const from = '2025-01-01'
-    const to = '2025-01-31'
+    const baseParams = {
+        userId: 'any_user_id',
+        from: new Date('2025-01-01'),
+        to: new Date('2025-01-31'),
+        limit: 20,
+    }
 
     describe('error handling', () => {
         it('should throw an error if Prisma throws', async () => {
@@ -18,7 +22,7 @@ describe('PostgresGetTransactionsByUserIdRepository', () => {
                 new Error('Prisma error'),
             )
             // act
-            const promise = sut.execute('any_user_id', from, to)
+            const promise = sut.execute(baseParams)
             expect(promise).rejects.toThrow(new Error('Prisma error'))
         })
     })
@@ -30,10 +34,14 @@ describe('PostgresGetTransactionsByUserIdRepository', () => {
                 userId: user.id,
             })
 
-            const from = transaction.date.toISOString().split('T')[0]
-            const to = transaction.date.toISOString().split('T')[0]
+            const params = {
+                userId: user.id,
+                from: new Date(transaction.date.toISOString().split('T')[0]),
+                to: new Date(transaction.date.toISOString().split('T')[0]),
+                limit: 20,
+            }
 
-            const response = await sut.execute(user.id, from, to)
+            const response = await sut.execute(params)
 
             expect(response.transactions.length).toBe(1)
             expect(response.nextCursor).toBeNull()
@@ -63,15 +71,21 @@ describe('PostgresGetTransactionsByUserIdRepository', () => {
             const prismaSpy = jest.spyOn(prisma.transaction, 'findMany')
 
             // act
-            await sut.execute(user.id, from, to)
+            const params = {
+                userId: user.id,
+                from: baseParams.from,
+                to: baseParams.to,
+                limit: 20,
+            }
+            await sut.execute(params)
 
             // assert
             expect(prismaSpy).toHaveBeenCalledWith({
                 where: {
                     userId: user.id,
                     date: {
-                        gte: new Date(from),
-                        lte: new Date(to),
+                        gte: baseParams.from,
+                        lte: baseParams.to,
                     },
                 },
                 take: 21,
@@ -84,7 +98,13 @@ describe('PostgresGetTransactionsByUserIdRepository', () => {
             const user = await createTestUser()
 
             // act
-            const response = await sut.execute(user.id, from, to)
+            const params = {
+                userId: user.id,
+                from: baseParams.from,
+                to: baseParams.to,
+                limit: 20,
+            }
+            const response = await sut.execute(params)
 
             // assert
             expect(response).toEqual({

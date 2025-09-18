@@ -45,10 +45,13 @@ export class PostgresGetTransactionsByUserIdRepository
         if (from || to) {
             where.date = {}
             if (from) {
-                where.date.gte = from
+                where.date.gte = from instanceof Date ? from : new Date(from)
             }
             if (to) {
-                where.date.lte = to
+                // For "to" date, we want to include the entire day, so we set it to end of day
+                const toDate = to instanceof Date ? to : new Date(to)
+                toDate.setHours(23, 59, 59, 999)
+                where.date.lte = toDate
             }
         }
 

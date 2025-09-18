@@ -88,15 +88,14 @@ export const getTransactionsByUserIdQuerySchema = z.object({
     type: z.enum(['EARNING', 'EXPENSE', 'INVESTMENT']).optional(),
     from: z.coerce.date().optional(),
     to: z.coerce.date().optional(),
-    minAmount: z.coerce.number().optional(),
-    maxAmount: z.coerce.number().optional(),
-
     // Pagination
     limit: z.coerce.number().int().positive().max(100).optional().default(20),
     cursor: z.string().optional(),
 })
 
 export const getTransactionsByUserIdSchema = z.object({
+    body: z.object({}).optional(),
+    params: z.object({}).optional(),
     query: getTransactionsByUserIdQuerySchema,
 })
 

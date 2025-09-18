@@ -12,8 +12,8 @@ import {
 interface GetTransactionsByUserIdQuery {
     title?: string
     type?: 'EARNING' | 'EXPENSE' | 'INVESTMENT'
-    from: string
-    to: string
+    from?: Date
+    to?: Date
     limit: number
     cursor?: string
 }
@@ -43,8 +43,8 @@ export class GetTransactionsByUserIdController
             userId,
             title,
             type,
-            from: new Date(from),
-            to: new Date(to),
+            from,
+            to,
             limit,
             cursor,
         })

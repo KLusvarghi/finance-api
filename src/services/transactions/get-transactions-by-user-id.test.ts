@@ -20,9 +20,15 @@ describe('GetTransactionsByUserIdService', () => {
     let getUserByIdRepository: MockProxy<GetUserByIdRepository>
     let getTransactionByUserIdRepository: MockProxy<GetTransactionsByUserIdRepository>
 
-    const from = '2025-01-01'
-    const to = '2025-01-31'
-    const options = { limit: 20, cursor: undefined }
+    const params = {
+        userId,
+        title: undefined,
+        type: undefined,
+        from: new Date('2025-01-01'),
+        to: new Date('2025-01-31'),
+        limit: 20,
+        cursor: undefined,
+    }
 
     beforeEach(() => {
         getUserByIdRepository = mock<GetUserByIdRepository>()
@@ -55,7 +61,7 @@ describe('GetTransactionsByUserIdService', () => {
             getUserByIdRepository.execute.mockResolvedValueOnce(null)
 
             // act
-            const promise = sut.execute({ userId, from, to, options })
+            const promise = sut.execute(params)
 
             // assert
             await expect(promise).rejects.toThrow(new UserNotFoundError(userId))
@@ -68,7 +74,7 @@ describe('GetTransactionsByUserIdService', () => {
             )
 
             // act
-            const promise = sut.execute(userId, from, to, options)
+            const promise = sut.execute(params)
 
             // assert
             await expect(promise).rejects.toThrow(
@@ -83,7 +89,7 @@ describe('GetTransactionsByUserIdService', () => {
             )
 
             // act
-            const promise = sut.execute(userId, from, to, options)
+            const promise = sut.execute(params)
 
             // assert
             await expect(promise).rejects.toThrow(
@@ -97,7 +103,7 @@ describe('GetTransactionsByUserIdService', () => {
             // arrange - using the default setup from beforeEach
 
             // act
-            const response = await sut.execute(userId, from, to, options)
+            const response = await sut.execute(params)
 
             // assert
             expect(response).toEqual(paginatedTransactionsServiceResponse)
@@ -110,7 +116,7 @@ describe('GetTransactionsByUserIdService', () => {
             )
 
             // act
-            const response = await sut.execute(userId, from, to, options)
+            const response = await sut.execute(params)
 
             // assert
             expect(response).toHaveProperty('transactions')
@@ -122,9 +128,12 @@ describe('GetTransactionsByUserIdService', () => {
             expect(typeof response.nextCursor).toBe('string')
         })
 
-        it('should handle pagination without options (use defaults)', async () => {
+        it('should handle filtering with minimal params', async () => {
+            // arrange
+            const minimalParams = { userId }
+
             // act
-            const response = await sut.execute(userId, from, to)
+            const response = await sut.execute(minimalParams)
 
             // assert
             expect(response).toEqual(paginatedTransactionsServiceResponse)
@@ -134,34 +143,39 @@ describe('GetTransactionsByUserIdService', () => {
     describe('validations', () => {
         it('should call GetUserByIdRepository with correct params', async () => {
             // act
-            await sut.execute(userId, from, to, options)
+            await sut.execute(params)
 
             // assert
-            expect(getUserByIdRepository.execute).toHaveBeenCalledWith(userId)
+            expect(getUserByIdRepository.execute).toHaveBeenCalledWith(
+                params.userId,
+            )
             expect(getUserByIdRepository.execute).toHaveBeenCalledTimes(1)
         })
 
         it('should call GetTransactionByUserIdRepository with correct params', async () => {
             // act
-            await sut.execute(userId, from, to, options)
+            await sut.execute(params)
 
             // assert
             expect(
                 getTransactionByUserIdRepository.execute,
-            ).toHaveBeenCalledWith(userId, from, to, options)
+            ).toHaveBeenCalledWith(params)
             expect(
                 getTransactionByUserIdRepository.execute,
             ).toHaveBeenCalledTimes(1)
         })
 
-        it('should call GetTransactionByUserIdRepository with default options when not provided', async () => {
+        it('should call GetTransactionByUserIdRepository with minimal params when filters not provided', async () => {
+            // arrange
+            const minimalParams = { userId }
+
             // act
-            await sut.execute(userId, from, to)
+            await sut.execute(minimalParams)
 
             // assert
             expect(
                 getTransactionByUserIdRepository.execute,
-            ).toHaveBeenCalledWith(userId, from, to, undefined)
+            ).toHaveBeenCalledWith(minimalParams)
             expect(
                 getTransactionByUserIdRepository.execute,
             ).toHaveBeenCalledTimes(1)

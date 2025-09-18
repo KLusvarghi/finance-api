@@ -78,16 +78,18 @@ describe('GetTransactionsByUserIdController', () => {
             ).toStrictEqual(paginatedTransactionsServiceResponse)
         })
 
-        it('should call GetTransactionsByUserIdService with correct parameters including pagination options', async () => {
+        it('should call GetTransactionsByUserIdService with correct parameters including filters and pagination', async () => {
             // act
             await sut.execute(baseHttpRequest)
 
             // assert
             expect(getTransactionsByUserIdService.execute).toHaveBeenCalledWith(
-                baseHttpRequest.headers.userId,
-                baseHttpRequest.query.from,
-                baseHttpRequest.query.to,
                 {
+                    userId: baseHttpRequest.headers.userId,
+                    title: baseHttpRequest.query.title,
+                    type: baseHttpRequest.query.type,
+                    from: baseHttpRequest.query.from,
+                    to: baseHttpRequest.query.to,
                     limit: baseHttpRequest.query.limit,
                     cursor: baseHttpRequest.query.cursor,
                 },

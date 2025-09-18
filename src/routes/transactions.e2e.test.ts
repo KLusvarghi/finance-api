@@ -259,20 +259,20 @@ describe('Transactions Routes E2E Tests', () => {
                 )
             })
 
-            it('should filter by startDate', async () => {
+            it('should filter by from date', async () => {
                 const { body: responseBody } = await request(app)
                     .get('/api/transactions/me')
-                    .query({ startDate: '2025-09-10' })
+                    .query({ from: '2025-09-10' })
                     .set('authorization', `Bearer ${user.tokens.accessToken}`)
                     .expect(200)
 
                 expect(responseBody.data.transactions.length).toBe(3)
             })
 
-            it('should filter by endDate', async () => {
+            it('should filter by to date', async () => {
                 const { body: responseBody } = await request(app)
                     .get('/api/transactions/me')
-                    .query({ endDate: '2025-09-05' })
+                    .query({ to: '2025-09-05' })
                     .set('authorization', `Bearer ${user.tokens.accessToken}`)
                     .expect(200)
 
@@ -282,17 +282,17 @@ describe('Transactions Routes E2E Tests', () => {
             it('should filter by date range', async () => {
                 const { body: responseBody } = await request(app)
                     .get('/api/transactions/me')
-                    .query({ startDate: '2025-09-01', endDate: '2025-09-11' })
+                    .query({ from: '2025-09-01', to: '2025-09-11' })
                     .set('authorization', `Bearer ${user.tokens.accessToken}`)
                     .expect(200)
 
                 expect(responseBody.data.transactions.length).toBe(3)
             })
 
-            it('should combine filters (type and startDate)', async () => {
+            it('should combine filters (type and from date)', async () => {
                 const { body: responseBody } = await request(app)
                     .get('/api/transactions/me')
-                    .query({ type: 'EXPENSE', startDate: '2025-09-06' })
+                    .query({ type: 'EXPENSE', from: '2025-09-06' })
                     .set('authorization', `Bearer ${user.tokens.accessToken}`)
                     .expect(200)
 
