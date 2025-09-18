@@ -2,7 +2,7 @@ services:
     postgres:
         image: postgres:16
         container_name: finance-app-postgres
-        restart: unless-stopped # reinicia em caso de falha
+        restart: unless-stopped
         environment:
             POSTGRES_PASSWORD: password
             POSTGRES_USER: root
@@ -15,7 +15,7 @@ services:
     postgres-test:
         image: postgres:16
         container_name: finance-app-postgres-test
-        restart: unless-stopped # reinicia em caso de falha
+        restart: unless-stopped
         environment:
             POSTGRES_PASSWORD: password
             POSTGRES_USER: root
@@ -27,3 +27,16 @@ services:
             interval: 10s
             timeout: 5s
             retries: 5
+
+    redis:
+        image: redis:7-alpine
+        container_name: finance-app-redis
+        restart: unless-stopped
+        ports:
+            - '6379:6379'
+        volumes:
+            - redis-data:/data
+
+volumes:
+    redis-data:
+        driver: local
