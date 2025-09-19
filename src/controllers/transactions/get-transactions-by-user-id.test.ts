@@ -10,6 +10,19 @@ import {
     userId,
 } from '@/test'
 
+// Mock the cache module
+jest.mock('@/adapters', () => ({
+    ...jest.requireActual('@/adapters'),
+    cache: {
+        get: jest.fn(),
+        set: jest.fn(),
+        del: jest.fn(),
+    },
+}))
+
+import { cache } from '@/adapters'
+const mockedCache = jest.mocked(cache)
+
 describe('GetTransactionsByUserIdController', () => {
     let sut: GetTransactionsByUserIdController
     let getTransactionsByUserIdService: MockProxy<GetTransactionsByUserIdService>
@@ -25,6 +38,11 @@ describe('GetTransactionsByUserIdController', () => {
         getTransactionsByUserIdService.execute.mockResolvedValue(
             paginatedTransactionsServiceResponse,
         )
+
+        // Setup cache mocks - default to cache miss
+        mockedCache.get.mockResolvedValue(null)
+        mockedCache.set.mockResolvedValue()
+        mockedCache.del.mockResolvedValue()
     })
 
     afterEach(() => {
@@ -64,8 +82,8 @@ describe('GetTransactionsByUserIdController', () => {
     })
 
     describe('success cases', () => {
-        it('should return 200 when finding paginated transactions by user id', async () => {
-            // arrange - using default setup from beforeEach
+        it('should return 200 when finding paginated transactions by user id (cache miss)', async () => {
+            // arrange - using default setup from beforeEach (cache miss)
 
             // act
             const response = await sut.execute(baseHttpRequest)
@@ -76,9 +94,40 @@ describe('GetTransactionsByUserIdController', () => {
             expect(
                 (response.body as HttpResponseSuccessBody)?.data,
             ).toStrictEqual(paginatedTransactionsServiceResponse)
+
+            // Verify cache was checked and then set
+            expect(mockedCache.get).toHaveBeenCalledTimes(1)
+            expect(mockedCache.set).toHaveBeenCalledWith(
+                expect.stringContaining(`transactions:user:${userId}:`),
+                paginatedTransactionsServiceResponse,
+            )
         })
 
-        it('should call GetTransactionsByUserIdService with correct parameters including filters and pagination', async () => {
+        it('should return cached data when cache hit occurs', async () => {
+            // arrange - setup cache hit
+            mockedCache.get.mockResolvedValueOnce(
+                paginatedTransactionsServiceResponse,
+            )
+
+            // act
+            const response = await sut.execute(baseHttpRequest)
+
+            // assert
+            expect(response.statusCode).toBe(200)
+            expect(response.body?.success).toBe(true)
+            expect(
+                (response.body as HttpResponseSuccessBody)?.data,
+            ).toStrictEqual(paginatedTransactionsServiceResponse)
+
+            // Verify service was NOT called when cache hit
+            expect(
+                getTransactionsByUserIdService.execute,
+            ).not.toHaveBeenCalled()
+            expect(mockedCache.get).toHaveBeenCalledTimes(1)
+            expect(mockedCache.set).not.toHaveBeenCalled()
+        })
+
+        it('should call GetTransactionsByUserIdService with correct parameters when cache miss', async () => {
             // act
             await sut.execute(baseHttpRequest)
 
@@ -97,6 +146,18 @@ describe('GetTransactionsByUserIdController', () => {
             expect(
                 getTransactionsByUserIdService.execute,
             ).toHaveBeenCalledTimes(1)
+        })
+
+        it('should generate correct cache key based on userId and query parameters', async () => {
+            // act
+            await sut.execute(baseHttpRequest)
+
+            // assert - verify cache key format
+            expect(mockedCache.get).toHaveBeenCalledWith(
+                expect.stringMatching(
+                    /^transactions:user:[^:]+:[A-Za-z0-9+/=]+$/,
+                ),
+            )
         })
     })
 })

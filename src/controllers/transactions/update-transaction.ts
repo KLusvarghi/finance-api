@@ -1,5 +1,6 @@
 import { ok } from '../_helpers'
 
+import { ITransactionCacheManager } from '@/adapters'
 import { UpdateTransactionService } from '@/services'
 import {
     BodyParamsHeadersController,
@@ -40,6 +41,7 @@ export class UpdateTransactionController
 {
     constructor(
         private readonly updateTransactionService: UpdateTransactionService,
+        private readonly transactionCacheManager: ITransactionCacheManager,
     ) {}
 
     async execute(
@@ -60,6 +62,9 @@ export class UpdateTransactionController
             transactionId,
             serviceParams,
         )
+
+        // Invalidate cache for this user's transactions
+        await this.transactionCacheManager.invalidate(userId)
 
         return ok(updatedTransaction, ResponseMessage.TRANSACTION_UPDATED)
     }

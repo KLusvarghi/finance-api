@@ -1,5 +1,6 @@
 import { mock, MockProxy } from 'jest-mock-extended'
 
+import { ITransactionCacheManager } from '@/adapters'
 import { DeleteTransactionController } from '@/controllers'
 import { TransactionNotFoundError } from '@/errors'
 import { DeleteTransactionService } from '@/services'
@@ -13,11 +14,16 @@ import {
 describe('DeleteTransactionController', () => {
     let sut: DeleteTransactionController
     let deleteTransactionService: MockProxy<DeleteTransactionService>
+    let transactionCacheManager: MockProxy<ITransactionCacheManager>
 
     beforeEach(() => {
         // Setup executado antes de cada teste
         deleteTransactionService = mock<DeleteTransactionService>()
-        sut = new DeleteTransactionController(deleteTransactionService)
+        transactionCacheManager = mock<ITransactionCacheManager>()
+        sut = new DeleteTransactionController(
+            deleteTransactionService,
+            transactionCacheManager,
+        )
     })
 
     afterEach(() => {
@@ -92,6 +98,22 @@ describe('DeleteTransactionController', () => {
                 userId: baseHttpRequest.headers.userId,
             })
             expect(deleteTransactionService.execute).toHaveBeenCalledTimes(1)
+        })
+
+        it('should invalidate cache after successful transaction deletion', async () => {
+            // arrange
+            deleteTransactionService.execute.mockResolvedValueOnce(
+                deleteTransactionControllerResponse,
+            )
+
+            // act
+            await sut.execute(baseHttpRequest)
+
+            // assert
+            expect(transactionCacheManager.invalidate).toHaveBeenCalledWith(
+                baseHttpRequest.headers.userId,
+            )
+            expect(transactionCacheManager.invalidate).toHaveBeenCalledTimes(1)
         })
     })
 })

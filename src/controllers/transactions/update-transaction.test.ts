@@ -1,5 +1,6 @@
 import { mock, MockProxy } from 'jest-mock-extended'
 
+import { ITransactionCacheManager } from '@/adapters'
 import { UpdateTransactionController } from '@/controllers'
 import { UpdateTransactionService } from '@/services'
 import { HttpResponseSuccessBody } from '@/shared'
@@ -11,11 +12,16 @@ import {
 describe('UpdateTransactionController', () => {
     let sut: UpdateTransactionController
     let updateTransactionService: MockProxy<UpdateTransactionService>
+    let transactionCacheManager: MockProxy<ITransactionCacheManager>
 
     beforeEach(() => {
         // Setup executado antes de cada teste
         updateTransactionService = mock<UpdateTransactionService>()
-        sut = new UpdateTransactionController(updateTransactionService)
+        transactionCacheManager = mock<ITransactionCacheManager>()
+        sut = new UpdateTransactionController(
+            updateTransactionService,
+            transactionCacheManager,
+        )
     })
 
     afterEach(() => {
@@ -72,6 +78,22 @@ describe('UpdateTransactionController', () => {
                 },
             )
             expect(updateTransactionService.execute).toHaveBeenCalledTimes(1)
+        })
+
+        it('should invalidate cache after successful transaction update', async () => {
+            // arrange
+            updateTransactionService.execute.mockResolvedValueOnce(
+                updateTransactionControllerResponse,
+            )
+
+            // act
+            await sut.execute(baseHttpRequest)
+
+            // assert
+            expect(transactionCacheManager.invalidate).toHaveBeenCalledWith(
+                baseHttpRequest.headers.userId,
+            )
+            expect(transactionCacheManager.invalidate).toHaveBeenCalledTimes(1)
         })
     })
 })

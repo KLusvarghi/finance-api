@@ -1,5 +1,6 @@
 import { created } from '../_helpers'
 
+import { ITransactionCacheManager } from '@/adapters'
 import { CreateTransactionService } from '@/services'
 import {
     BodyHeadersController,
@@ -34,6 +35,7 @@ export class CreateTransactionController
 {
     constructor(
         private readonly createTransactionService: CreateTransactionService,
+        private readonly transactionCacheManager: ITransactionCacheManager,
     ) {}
 
     async execute(
@@ -51,6 +53,9 @@ export class CreateTransactionController
         // Execute business logic - errors will be caught by error middleware
         const createdTransaction =
             await this.createTransactionService.execute(serviceParams)
+
+        // Invalidate cache for this user's transactions
+        await this.transactionCacheManager.invalidate(userId)
 
         return created(createdTransaction, ResponseMessage.TRANSACTION_CREATED)
     }
