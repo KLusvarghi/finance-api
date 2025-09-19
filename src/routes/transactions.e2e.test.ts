@@ -179,7 +179,7 @@ describe('Transactions Routes E2E Tests', () => {
                 ReturnType<typeof prisma.transaction.create>
             >[] = []
 
-            beforeAll(async () => {
+            beforeEach(async () => {
                 user = await makeUser()
                 // Create a diverse set of transactions
                 transactions = await Promise.all([
