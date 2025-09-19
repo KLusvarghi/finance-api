@@ -1,5 +1,16 @@
 import { prisma } from './prisma/prisma'
 
+// Mock Redis globally for all tests
+jest.mock('./src/config/redis', () => ({
+    redis: {
+        get: jest.fn().mockResolvedValue(null),
+        set: jest.fn().mockResolvedValue('OK'),
+        del: jest.fn().mockResolvedValue(1),
+        keys: jest.fn().mockResolvedValue([]),
+        on: jest.fn(),
+    },
+}))
+
 // antes de cada teste, deletamos todos os usuários e transações, afim de nenhum dado fique no banco e interfira nos testes
 beforeEach(async () => {
     // limpa as tabelas do nosso banco de dados antes de cada teste
