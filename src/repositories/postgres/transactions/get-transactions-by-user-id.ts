@@ -20,10 +20,11 @@ export class PostgresGetTransactionsByUserIdRepository
             type,
             from,
             to,
-            limit = 20, // Default limit
+            limit: limitParam = 20, // Default limit
             cursor,
         } = params
 
+        const limit = Number(limitParam)
         const itemsToFetch = limit + 1
 
         // Build the 'where' clause dynamically
