@@ -10,12 +10,17 @@ export const validate =
     (schema: z.ZodObject<Record<string, any>>) =>
         async (req: Request, res: Response, next: NextFunction) => {
             try {
-                // Valida o body, params e query da requisição de uma vez
-                await schema.parseAsync({
+                const validatedData = await schema.parseAsync({
                     body: req.body,
                     params: req.params,
                     query: req.query,
                 })
+
+                // Reatribui os dados validados e transformados à requisição
+                req.body = validatedData.body
+                Object.assign(req.params, validatedData.params)
+                Object.assign(req.query, validatedData.query)
+
                 return next() // Se a validação passar, continua
             } catch (error) {
                 if (error instanceof ZodError) {
