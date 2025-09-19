@@ -1,4 +1,4 @@
-import { IdGeneratorAdapter } from '@/adapters'
+import { IdGeneratorAdapter, RedisTransactionCacheManager } from '@/adapters'
 import {
     CreateTransactionController,
     DeleteTransactionController,
@@ -31,8 +31,10 @@ export const makeCreateTransactionController = () => {
         idGenerator,
     )
 
+    const transactionCacheManager = new RedisTransactionCacheManager()
     const createTransactionController = new CreateTransactionController(
         createTransactionService,
+        transactionCacheManager,
     )
 
     return createTransactionController
@@ -65,8 +67,10 @@ export const makeUpdateTransactionController = () => {
         getTransactionByIdRepository,
     )
 
+    const transactionCacheManager = new RedisTransactionCacheManager()
     const updateTransactionController = new UpdateTransactionController(
         updateTransactionService,
+        transactionCacheManager,
     )
 
     return updateTransactionController
@@ -83,8 +87,10 @@ export const makeDeleteTransactionController = () => {
         getTransactionByIdRepository,
     )
 
+    const transactionCacheManager = new RedisTransactionCacheManager()
     const deleteTransactionController = new DeleteTransactionController(
         deleteTransactionService,
+        transactionCacheManager,
     )
 
     return deleteTransactionController
