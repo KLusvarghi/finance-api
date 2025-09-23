@@ -16,6 +16,54 @@ alwaysApply: true
 
 ---
 
+## Arquitetura & Injeção de Dependência (Arquitetura Hexagonal)
+
+- **ALWAYS** utilize a **Arquitetura Hexagonal** (Ports & Adapters) para garantir o desacoplamento e a testabilidade.
+- **ALWAYS** implemente a **Injeção de Dependência (DI)** via construtor. As classes (Controllers, Services) **NUNCA** devem instanciar suas dependências diretamente (ex: `new MyService()`), mas sim recebê-las prontas.
+- **PREFER** que `Controllers` recebam `Services`.
+- **PREFER** que `Services` recebam `Repositories` e `Adapters`.
+- **NEVER** um `Controller` deve injetar um `Repository` ou `Adapter` diretamente.
+
+### ✅ Correto (Injeção de Dependência)
+
+**Controller injetando Service:**
+
+```typescript
+// Extraído de: src/controllers/users/create-user.ts
+export class CreateUserController
+    implements Controller<CreateUserParams, UserPublicResponse>
+{
+    constructor(private readonly createUserService: CreateUserService) {}
+    // ... execute method ...
+}
+```
+
+**Service injetando Repository:**
+
+```typescript
+// Extraído de: src/services/users/delete-user.ts
+export class DeleteUserService implements IDeleteUserService {
+    constructor(private readonly deletedUserRepository: DeleteUserRepository) {}
+    // ... execute method ...
+}
+```
+
+**Service injetando Adapter:**
+
+```typescript
+// Extraído de: src/services/users/create-user.ts
+export class CreateUserService implements ICreateUserService {
+    constructor(
+        private readonly createUserRepository: CreateUserRepository,
+        private readonly passwordHasher: PasswordHasherAdapter,
+        // ... outras dependências ...
+    ) {}
+    // ... execute method ...
+}
+```
+
+---
+
 ## Stack de Tecnologia & Escopo
 
 - **Node.js** v20+
