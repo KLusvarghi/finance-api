@@ -38,9 +38,9 @@ export const adaptRoute = (controller: GenericController) => {
                 query: req.query,
                 headers: {
                     ...req.headers,
-                    userId: req.userId, // Set by auth middleware
+                    userId: (req as Request & { userId?: string }).userId, // Set by auth middleware
                 },
-                userId: req.userId, // Set by auth middleware
+                userId: (req as Request & { userId?: string }).userId, // Set by auth middleware
             }
 
             // Execute the controller
