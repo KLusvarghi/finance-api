@@ -4,6 +4,7 @@ import path from 'path'
 import swaggerUi from 'swagger-ui-express'
 
 import { errorHandler } from './middlewares/error-handler'
+import { rateLimiter } from './middlewares/rate-limiter'
 import { routeNotFound } from './middlewares/route-not-found'
 import { authRouter, transactionsRouter, usersRouter } from './routes'
 
@@ -13,9 +14,15 @@ import { authRouter, transactionsRouter, usersRouter } from './routes'
 
 export const app = express()
 
+// configurar trust proxy para obter o IP real do cliente quando atrás de um proxy
+app.set('trust proxy', 1)
+
 // por padrão, o express não suporta json, então temos que especificar aqui que toda requisição
 // que recebe um req que contem um content-type do tipo JSON, ele adapte para receber
 app.use(express.json())
+
+// aplicar rate limiting global com preset default
+app.use(rateLimiter('default'))
 
 // toda vez que uma requisição for feita para a rota /api/users, o express vai usar o usersRouter para lidar com a requisição
 app.use('/api/auth', authRouter)
