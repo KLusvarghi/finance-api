@@ -10,6 +10,7 @@ import {
     makeUpdateUserController,
 } from '@/factories/controllers/'
 import { auth } from '@/middlewares/auth'
+import { rateLimiter } from '@/middlewares/rate-limiter'
 import { validate } from '@/middlewares/validate'
 import {
     createUserSchema,
@@ -40,6 +41,7 @@ usersRouter.get(
 // Rota para criar um novo usuário
 usersRouter.post(
     '/',
+    rateLimiter('public'),
     validate(createUserSchema),
     adaptRoute(makeCreateUserController()),
 )
