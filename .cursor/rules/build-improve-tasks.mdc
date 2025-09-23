@@ -2,7 +2,7 @@
 alwaysApply: false
 ---
 
-**ESTRUTURE** tasks técnicas em Markdown para a IA, detalhando contexto, um plano de execução passo a passo e critérios de aceite claros.
+**ESTRUTURE** tasks técnicas em Markdown para a IA, detalhando contexto, um plano de execução passo a passo, critérios de aceite claros e referências às regras do projeto.
 
 ## Princípios (Core)
 
@@ -12,13 +12,13 @@ alwaysApply: false
 - **ALWAYS** forneça um **plano passo a passo** com ações específicas.
 - **ALWAYS** liste os **arquivos-alvo** que serão modificados.
 - **ALWAYS** defina **critérios de aceite** testáveis para validar a conclusão.
-- **ALWAYS** inclua a execução dos scripts de lint e prettier como parte dos critérios de aceite.
 - **ALWAYS** realize uma análise prévia do código com `grep` e `codebase_search` para embasar o plano.
+- **ALWAYS** referencie as `RULES` do projeto (ex: `project.mdc`, `typescript.mdc`, `testing.mdc`) na seção "Diretrizes" para guiar a IA executora.
 - **PREFER** citar exemplos de código existentes no repositório como referência.
 - **AVOID** tasks vagas ou genéricas. Seja explícito sobre o que precisa ser feito.
 - **NEVER** inclua `diffs` de código no markdown; descreva a mudança que deve ser feita.
 - **NEVER** solicite alterações destrutivas (ex: `drop table`) sem uma seção de **Riscos & Rollback**.
-- **SEMPRE** deixe explícito na task que é **PROIBIDO** introduzir ou manter o tipo `any` no código — o ESLint configurado no projeto falhará se esse tipo aparecer.
+- **ALWAYS** deixe explícito na task que é **PROIBIDO** introduzir ou manter o tipo `any` no código — o ESLint configurado no projeto falhará se esse tipo aparecer.
 
 ## Padrão de Task (Modelo Sugerido)
 
@@ -55,10 +55,20 @@ tipo: feat|fix|refactor|chore
 
 - [ ] O endpoint `GET /users` agora retorna o novo campo `Z`.
 - [ ] Todos os testes (`pnpm test`) passam.
+- [ ] O código passa no type-check (`pnpm ts:check`).
 - [ ] O código passa no linter (`pnpm eslint:check`).
 - [ ] O código está formatado corretamente (`pnpm prettier:check`).
 
-### 5. Riscos & Plano de Rollback (Opcional)
+### 5. Diretrizes & Regras
+
+<!-- Instruções e referências às regras do projeto para guiar a IA -->
+
+- **Visão Geral do Projeto**: Consulte `project.mdc` para entender a arquitetura, stack e convenções de nomenclatura.
+- **Padrões de Código**: Siga as diretrizes de `typescript.mdc` para um código robusto e consistente.
+- **Testes**: Utilize os padrões definidos em `testing.mdc` para escrever os testes unitários e de integração.
+- **(Opcional) Padrão de Controller**: Se estiver trabalhando em um controller, siga o padrão de `controllers-standard.mdc`.
+
+### 6. Riscos & Plano de Rollback (Opcional)
 
 <!-- Apenas para mudanças complexas ou arriscadas -->
 
@@ -96,8 +106,15 @@ O campo `data` em respostas de erro (`4xx`, `5xx`) é sempre `null`, tornando a 
 - [ ] Uma requisição que resulta em erro 400 ou 500 retorna um JSON sem o campo `data`.
 - [ ] Os tipos TypeScript relacionados a `HttpResponse` estão consistentes.
 - [ ] A suíte de testes completa passa com sucesso (`pnpm test`).
+- [ ] O código passa no type-check (`pnpm ts:check`).
 - [ ] O código passa no linter (`pnpm eslint:check`).
 - [ ] O código está formatado corretamente (`pnpm prettier:check`).
+
+### 5. Diretrizes & Regras
+
+- **Visão Geral**: Para entender o fluxo de `controller -> helper`, consulte `project.mdc` e `controllers-standard.mdc`.
+- **Padrões de Código**: A tipagem em `src/shared/types.ts` deve seguir as melhores práticas de `typescript.mdc`.
+- **Testes**: As asserções nos testes E2E devem ser atualizadas conforme os padrões em `testing.mdc`.
 ```
 
 ## Escopo & Particularidades
