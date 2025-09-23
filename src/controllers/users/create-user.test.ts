@@ -15,15 +15,13 @@ describe('CreateUserController', () => {
     let createUserService: MockProxy<CreateUserService>
 
     beforeEach(() => {
-        // Setup executado antes de cada teste
         createUserService = mock<CreateUserService>()
         sut = new CreateUserController(createUserService)
-    })
 
-    afterEach(() => {
-        // Limpeza após cada teste
-        jest.clearAllMocks()
-        jest.restoreAllMocks()
+        // Happy path setup - configure success scenario by default
+        createUserService.execute.mockResolvedValue(
+            createUserControllerResponse,
+        )
     })
 
     describe('error handling', () => {
@@ -55,11 +53,6 @@ describe('CreateUserController', () => {
 
     describe('success cases', () => {
         it('should create a new user successfully and return 201', async () => {
-            // arrange
-            createUserService.execute.mockResolvedValueOnce(
-                createUserControllerResponse,
-            )
-
             // act
             const response = await sut.execute(baseHttpRequest)
 
@@ -70,13 +63,10 @@ describe('CreateUserController', () => {
                 (response.body as HttpResponseSuccessBody)?.data,
             ).toMatchObject(createUserControllerResponse)
         })
+    })
 
+    describe('service integration', () => {
         it('should call CreateUserService with correct parameters', async () => {
-            // arrange
-            createUserService.execute.mockResolvedValueOnce(
-                createUserControllerResponse,
-            )
-
             // act
             await sut.execute(baseHttpRequest)
 

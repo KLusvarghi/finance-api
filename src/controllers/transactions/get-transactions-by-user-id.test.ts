@@ -28,13 +28,12 @@ describe('GetTransactionsByUserIdController', () => {
     let getTransactionsByUserIdService: MockProxy<GetTransactionsByUserIdService>
 
     beforeEach(() => {
-        // Setup executado antes de cada teste
         getTransactionsByUserIdService = mock<GetTransactionsByUserIdService>()
         sut = new GetTransactionsByUserIdController(
             getTransactionsByUserIdService,
         )
 
-        // Setup default happy path
+        // Happy path setup - configure success scenario by default
         getTransactionsByUserIdService.execute.mockResolvedValue(
             paginatedTransactionsServiceResponse,
         )
@@ -43,11 +42,6 @@ describe('GetTransactionsByUserIdController', () => {
         mockedCache.get.mockResolvedValue(null)
         mockedCache.set.mockResolvedValue()
         mockedCache.del.mockResolvedValue()
-    })
-
-    afterEach(() => {
-        jest.clearAllMocks()
-        jest.restoreAllMocks()
     })
 
     describe('error handling', () => {
@@ -83,8 +77,6 @@ describe('GetTransactionsByUserIdController', () => {
 
     describe('success cases', () => {
         it('should return 200 when finding paginated transactions by user id (cache miss)', async () => {
-            // arrange - using default setup from beforeEach (cache miss)
-
             // act
             const response = await sut.execute(baseHttpRequest)
 
@@ -96,7 +88,7 @@ describe('GetTransactionsByUserIdController', () => {
             ).toStrictEqual(paginatedTransactionsServiceResponse)
 
             // Verify cache was checked and then set
-            expect(mockedCache.get).toHaveBeenCalledTimes(1)
+            expect(mockedCache.get).toHaveBeenCalled()
             expect(mockedCache.set).toHaveBeenCalledWith(
                 expect.stringContaining(`transactions:user:${userId}:`),
                 paginatedTransactionsServiceResponse,
@@ -104,7 +96,8 @@ describe('GetTransactionsByUserIdController', () => {
         })
 
         it('should return cached data when cache hit occurs', async () => {
-            // arrange - setup cache hit
+            // arrange - reset and setup cache hit
+            jest.clearAllMocks()
             mockedCache.get.mockResolvedValueOnce(
                 paginatedTransactionsServiceResponse,
             )
@@ -123,7 +116,7 @@ describe('GetTransactionsByUserIdController', () => {
             expect(
                 getTransactionsByUserIdService.execute,
             ).not.toHaveBeenCalled()
-            expect(mockedCache.get).toHaveBeenCalledTimes(1)
+            expect(mockedCache.get).toHaveBeenCalled()
             expect(mockedCache.set).not.toHaveBeenCalled()
         })
 

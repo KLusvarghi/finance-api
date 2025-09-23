@@ -36,12 +36,19 @@ describe('CreateUserService', () => {
             passwordHasherAdapter,
             tokensGeneratorAdapter,
         )
-    })
 
-    afterEach(() => {
-        jest.clearAllMocks()
-        jest.restoreAllMocks()
-        jest.resetAllMocks()
+        // Happy path setup - configure success scenario by default
+        getUserByEmailRepository.execute.mockResolvedValue(null)
+        idGeneratorAdapter.execute.mockReturnValue(createUserServiceResponse.id)
+        passwordHasherAdapter.execute.mockResolvedValue(
+            createUserRepositoryResponse.password,
+        )
+        createUserRepository.execute.mockResolvedValue(
+            createUserRepositoryResponse,
+        )
+        tokensGeneratorAdapter.execute.mockResolvedValue(
+            tokensGeneratorAdapterResponse,
+        )
     })
 
     describe('error handling', () => {
@@ -142,21 +149,6 @@ describe('CreateUserService', () => {
 
     describe('success', () => {
         it('should create a user successfully', async () => {
-            // arrange
-            getUserByEmailRepository.execute.mockResolvedValue(null)
-            idGeneratorAdapter.execute.mockReturnValue(
-                createUserServiceResponse.id,
-            )
-            passwordHasherAdapter.execute.mockResolvedValue(
-                createUserRepositoryResponse.password,
-            )
-            createUserRepository.execute.mockResolvedValue(
-                createUserRepositoryResponse,
-            )
-            tokensGeneratorAdapter.execute.mockResolvedValue(
-                tokensGeneratorAdapterResponse,
-            )
-
             // act
             const response = await sut.execute(createUserParams)
 
@@ -171,23 +163,8 @@ describe('CreateUserService', () => {
         })
     })
 
-    describe('validations', () => {
+    describe('repository integration', () => {
         it('should call CreateUserRepository with correct params', async () => {
-            // arrange
-            getUserByEmailRepository.execute.mockResolvedValue(null)
-            idGeneratorAdapter.execute.mockReturnValue(
-                createUserServiceResponse.id,
-            )
-            passwordHasherAdapter.execute.mockResolvedValue(
-                createUserRepositoryResponse.password,
-            )
-            createUserRepository.execute.mockResolvedValue(
-                createUserRepositoryResponse,
-            )
-            tokensGeneratorAdapter.execute.mockResolvedValue(
-                tokensGeneratorAdapterResponse,
-            )
-
             // act
             await sut.execute(createUserParams)
 
@@ -199,53 +176,19 @@ describe('CreateUserService', () => {
             })
             expect(createUserRepository.execute).toHaveBeenCalledTimes(1)
         })
+    })
 
+    describe('adapter integration', () => {
         it('should call idGeneratorAdapter to generate a random uuid', async () => {
-            // arrange
-            getUserByEmailRepository.execute.mockResolvedValue(null)
-            idGeneratorAdapter.execute.mockReturnValue(
-                createUserServiceResponse.id,
-            )
-            passwordHasherAdapter.execute.mockResolvedValue(
-                createUserRepositoryResponse.password,
-            )
-            createUserRepository.execute.mockResolvedValue(
-                createUserRepositoryResponse,
-            )
-            tokensGeneratorAdapter.execute.mockResolvedValue(
-                tokensGeneratorAdapterResponse,
-            )
-
             // act
             await sut.execute(createUserParams)
 
             // assert
             expect(idGeneratorAdapter.execute).toHaveBeenCalled()
             expect(idGeneratorAdapter.execute).toHaveBeenCalledTimes(1)
-            expect(createUserRepository.execute).toHaveBeenCalledWith({
-                ...createUserParams,
-                id: createUserServiceResponse.id,
-                password: createUserRepositoryResponse.password,
-            })
-            expect(createUserRepository.execute).toHaveBeenCalledTimes(1)
         })
 
         it('should call passwordHasherAdapter to hash the password', async () => {
-            // arrange
-            getUserByEmailRepository.execute.mockResolvedValue(null)
-            idGeneratorAdapter.execute.mockReturnValue(
-                createUserServiceResponse.id,
-            )
-            passwordHasherAdapter.execute.mockResolvedValue(
-                createUserRepositoryResponse.password,
-            )
-            createUserRepository.execute.mockResolvedValue(
-                createUserRepositoryResponse,
-            )
-            tokensGeneratorAdapter.execute.mockResolvedValue(
-                tokensGeneratorAdapterResponse,
-            )
-
             // act
             await sut.execute(createUserParams)
 
@@ -254,12 +197,6 @@ describe('CreateUserService', () => {
                 createUserParams.password,
             )
             expect(passwordHasherAdapter.execute).toHaveBeenCalledTimes(1)
-            expect(createUserRepository.execute).toHaveBeenCalledWith({
-                ...createUserParams,
-                id: createUserServiceResponse.id,
-                password: createUserRepositoryResponse.password,
-            })
-            expect(createUserRepository.execute).toHaveBeenCalledTimes(1)
         })
     })
 })

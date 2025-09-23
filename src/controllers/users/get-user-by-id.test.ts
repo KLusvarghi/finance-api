@@ -15,15 +15,11 @@ describe('GetUserByIdController', () => {
     let getUserByIdService: MockProxy<GetUserByIdService>
 
     beforeEach(() => {
-        // Setup executado antes de cada teste
         getUserByIdService = mock<GetUserByIdService>()
         sut = new GetUserByIdController(getUserByIdService)
-    })
 
-    afterEach(() => {
-        // Limpeza após cada teste
-        jest.clearAllMocks()
-        jest.restoreAllMocks()
+        // Happy path setup - configure success scenario by default
+        getUserByIdService.execute.mockResolvedValue(getUserByIdServiceResponse)
     })
 
     describe('error handling', () => {
@@ -55,11 +51,6 @@ describe('GetUserByIdController', () => {
 
     describe('success cases', () => {
         it('should return 200 if user is found successfully', async () => {
-            // arrange
-            getUserByIdService.execute.mockResolvedValueOnce(
-                getUserByIdServiceResponse,
-            )
-
             // act
             const response = await sut.execute({
                 headers: { userId },
@@ -92,13 +83,10 @@ describe('GetUserByIdController', () => {
                 (response.body as HttpResponseSuccessBody)?.data,
             ).not.toHaveProperty('password')
         })
+    })
 
+    describe('service integration', () => {
         it('should call GetUserByIdService with correct parameters', async () => {
-            // arrange
-            getUserByIdService.execute.mockResolvedValueOnce(
-                getUserByIdServiceResponse,
-            )
-
             // act
             await sut.execute(baseHttpRequest)
 

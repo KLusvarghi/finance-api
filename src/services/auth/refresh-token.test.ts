@@ -19,12 +19,13 @@ describe('RefreshTokenService', () => {
             tokensGeneratorAdapter,
             tokenVerifierAdapter,
         )
-    })
 
-    afterEach(() => {
-        jest.clearAllMocks()
-        jest.restoreAllMocks()
-        jest.resetAllMocks()
+        // Happy path setup - configure success scenario by default
+        const decodedToken = { userId: 'valid_user_id' }
+        tokenVerifierAdapter.execute.mockResolvedValue(decodedToken)
+        tokensGeneratorAdapter.execute.mockResolvedValue(
+            tokensGeneratorAdapterResponse,
+        )
     })
 
     describe('error handling', () => {
@@ -44,18 +45,20 @@ describe('RefreshTokenService', () => {
 
     describe('success', () => {
         it('should return tokensGeneratorAdapterResponse if tokenVerifierAdapter returns object', async () => {
-            // arrange
-            const decodedToken = { userId: 'valid_user_id' }
-            tokenVerifierAdapter.execute.mockResolvedValueOnce(decodedToken)
-            tokensGeneratorAdapter.execute.mockResolvedValueOnce(
-                tokensGeneratorAdapterResponse,
-            )
-
             // act
             const result = await sut.execute('valid_refresh_token')
 
             // assert
             expect(result).toEqual(tokensGeneratorAdapterResponse)
+        })
+    })
+
+    describe('adapter integration', () => {
+        it('should call tokensGeneratorAdapter with correct userId', async () => {
+            // act
+            await sut.execute('valid_refresh_token')
+
+            // assert
             expect(tokensGeneratorAdapter.execute).toHaveBeenCalledWith(
                 'valid_user_id',
             )

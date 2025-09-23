@@ -17,6 +17,11 @@ describe('AuthenticateUserService', () => {
     let passwordComparator: MockProxy<PasswordComparatorAdapter>
     let tokensGeneratorAdapter: MockProxy<TokensGeneratorAdapter>
 
+    const tokensResponse: TokensGeneratorAdapterResponse = {
+        accessToken: 'any_access_token',
+        refreshToken: 'any_refresh_token',
+    }
+
     beforeEach(() => {
         getUserByEmailRepository = mock<GetUserByEmailRepository>()
         passwordComparator = mock<PasswordComparatorAdapter>()
@@ -27,11 +32,13 @@ describe('AuthenticateUserService', () => {
             passwordComparator,
             tokensGeneratorAdapter,
         )
-    })
 
-    afterEach(() => {
-        jest.clearAllMocks()
-        jest.restoreAllMocks()
+        // Happy path setup - configure success scenario by default
+        getUserByEmailRepository.execute.mockResolvedValue(
+            createUserRepositoryResponse,
+        )
+        passwordComparator.execute.mockResolvedValue(true)
+        tokensGeneratorAdapter.execute.mockResolvedValue(tokensResponse)
     })
 
     describe('Error handling', () => {
@@ -61,20 +68,8 @@ describe('AuthenticateUserService', () => {
         })
     })
 
-    describe('Success', () => {
+    describe('success', () => {
         it('should return user and tokens', async () => {
-            // arrange
-            const tokensResponse: TokensGeneratorAdapterResponse = {
-                accessToken: 'any_access_token',
-                refreshToken: 'any_refresh_token',
-            }
-
-            getUserByEmailRepository.execute.mockResolvedValueOnce(
-                createUserRepositoryResponse,
-            )
-            passwordComparator.execute.mockResolvedValueOnce(true)
-            tokensGeneratorAdapter.execute.mockResolvedValueOnce(tokensResponse)
-
             // act
             const response = await sut.execute('any_email', 'any_password')
 
@@ -87,18 +82,8 @@ describe('AuthenticateUserService', () => {
         })
     })
 
-    describe('validations', () => {
+    describe('repository integration', () => {
         it('should call GetUserByEmailRepository with correct email', async () => {
-            // arrange
-            getUserByEmailRepository.execute.mockResolvedValueOnce(
-                createUserRepositoryResponse,
-            )
-            passwordComparator.execute.mockResolvedValueOnce(true)
-            tokensGeneratorAdapter.execute.mockResolvedValueOnce({
-                accessToken: 'any_access_token',
-                refreshToken: 'any_refresh_token',
-            })
-
             // act
             await sut.execute('any_email', 'any_password')
 
@@ -108,18 +93,10 @@ describe('AuthenticateUserService', () => {
             )
             expect(getUserByEmailRepository.execute).toHaveBeenCalledTimes(1)
         })
+    })
 
+    describe('adapter integration', () => {
         it('should call PasswordComparator with correct password', async () => {
-            // arrange
-            getUserByEmailRepository.execute.mockResolvedValueOnce(
-                createUserRepositoryResponse,
-            )
-            passwordComparator.execute.mockResolvedValueOnce(true)
-            tokensGeneratorAdapter.execute.mockResolvedValueOnce({
-                accessToken: 'any_access_token',
-                refreshToken: 'any_refresh_token',
-            })
-
             // act
             await sut.execute('any_email', 'any_password')
 
@@ -132,16 +109,6 @@ describe('AuthenticateUserService', () => {
         })
 
         it('should call TokensGeneratorAdapter with correct userId', async () => {
-            // arrange
-            getUserByEmailRepository.execute.mockResolvedValueOnce(
-                createUserRepositoryResponse,
-            )
-            passwordComparator.execute.mockResolvedValueOnce(true)
-            tokensGeneratorAdapter.execute.mockResolvedValueOnce({
-                accessToken: 'any_access_token',
-                refreshToken: 'any_refresh_token',
-            })
-
             // act
             await sut.execute('any_email', 'any_password')
 

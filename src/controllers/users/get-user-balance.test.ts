@@ -18,15 +18,11 @@ describe('GetUserBalanceController', () => {
     let getUserBalanceService: MockProxy<GetUserBalanceService>
 
     beforeEach(() => {
-        // Setup executado antes de cada teste
         getUserBalanceService = mock<GetUserBalanceService>()
         sut = new GetUserBalanceController(getUserBalanceService)
-    })
 
-    afterEach(() => {
-        // Limpeza após cada teste
-        jest.clearAllMocks()
-        jest.restoreAllMocks()
+        // Happy path setup - configure success scenario by default
+        getUserBalanceService.execute.mockResolvedValue(userBalanceResponse)
     })
 
     describe('error handling', () => {
@@ -58,11 +54,6 @@ describe('GetUserBalanceController', () => {
 
     describe('success cases', () => {
         it('should return 200 when getting user balance successfully', async () => {
-            // arrange
-            getUserBalanceService.execute.mockResolvedValueOnce(
-                userBalanceResponse,
-            )
-
             // act
             const response = await sut.execute(baseHttpRequest)
 
@@ -114,13 +105,10 @@ describe('GetUserBalanceController', () => {
                 )?.data?.balance,
             ).toBe('string')
         })
+    })
 
+    describe('service integration', () => {
         it('should call GetUserBalanceService with correct parameters', async () => {
-            // arrange
-            getUserBalanceService.execute.mockResolvedValueOnce(
-                userBalanceResponse,
-            )
-
             // act
             await sut.execute(baseHttpRequest)
 

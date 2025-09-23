@@ -15,15 +15,13 @@ describe('DeleteUserController', () => {
     let deleteUserService: MockProxy<DeleteUserService>
 
     beforeEach(() => {
-        // Setup executado antes de cada teste
         deleteUserService = mock<DeleteUserService>()
         sut = new DeleteUserController(deleteUserService)
-    })
 
-    afterEach(() => {
-        // Limpeza após cada teste
-        jest.clearAllMocks()
-        jest.restoreAllMocks()
+        // Happy path setup - configure success scenario by default
+        deleteUserService.execute.mockResolvedValue(
+            deleteUserRepositoryResponse,
+        )
     })
 
     describe('error handling', () => {
@@ -55,12 +53,10 @@ describe('DeleteUserController', () => {
 
     describe('success cases', () => {
         it('should return 200 if user is deleted successfully', async () => {
-            deleteUserService.execute.mockResolvedValueOnce(
-                deleteUserRepositoryResponse,
-            )
-
+            // act
             const response = await sut.execute(baseHttpRequest)
 
+            // assert
             expect(response.statusCode).toBe(200)
             expect(response.body?.success).toBe(true)
             expect(response.body?.message).toBe(ResponseMessage.USER_DELETED)
@@ -68,9 +64,10 @@ describe('DeleteUserController', () => {
                 deleteUserRepositoryResponse,
             )
         })
+    })
 
+    describe('service integration', () => {
         it('should call DeleteUserService with correct parameters', async () => {
-            // arrange
             // act
             await sut.execute(baseHttpRequest)
 

@@ -20,15 +20,13 @@ describe('RefreshTokenController', () => {
     }
 
     beforeEach(() => {
-        // Setup executado antes de cada teste
         refreshTokenService = mock<RefreshTokenService>()
         sut = new RefreshTokenController(refreshTokenService)
-    })
 
-    afterEach(() => {
-        jest.clearAllMocks()
-        jest.restoreAllMocks()
-        jest.resetAllMocks()
+        // Happy path setup - configure success scenario by default
+        refreshTokenService.execute.mockResolvedValue(
+            tokensGeneratorAdapterResponse,
+        )
     })
 
     describe('error handling', () => {
@@ -99,11 +97,6 @@ describe('RefreshTokenController', () => {
 
     describe('success cases', () => {
         it('should return 200 with new tokens when refresh is successful', async () => {
-            // arrange
-            refreshTokenService.execute.mockResolvedValueOnce(
-                tokensGeneratorAdapterResponse,
-            )
-
             // act
             const response = await sut.execute(baseHttpRequest)
 
@@ -132,13 +125,10 @@ describe('RefreshTokenController', () => {
                 )?.data?.refreshToken,
             ).toBe('string')
         })
+    })
 
+    describe('service integration', () => {
         it('should call RefreshTokenService with correct parameters', async () => {
-            // arrange
-            refreshTokenService.execute.mockResolvedValueOnce(
-                tokensGeneratorAdapterResponse,
-            )
-
             // act
             await sut.execute(baseHttpRequest)
 

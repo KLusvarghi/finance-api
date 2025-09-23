@@ -16,15 +16,18 @@ describe('AuthenticateUserController', () => {
     let sut: AuthenticateUserController
     let authenticateUserService: MockProxy<AuthenticateUserService>
 
+    const expectedUserData = {
+        ...createUserServiceResponse,
+        password: createUserRepositoryResponse.password,
+        tokens: tokensGeneratorAdapterResponse,
+    }
+
     beforeEach(() => {
-        // Setup executado antes de cada teste
         authenticateUserService = mock<AuthenticateUserService>()
         sut = new AuthenticateUserController(authenticateUserService)
-    })
 
-    afterEach(() => {
-        jest.clearAllMocks()
-        jest.restoreAllMocks()
+        // Happy path setup - configure success scenario by default
+        authenticateUserService.execute.mockResolvedValue(expectedUserData)
     })
 
     describe('error handling', () => {
@@ -59,16 +62,6 @@ describe('AuthenticateUserController', () => {
 
     describe('success cases', () => {
         it('should return 200 and the user when login is successful', async () => {
-            // arrange
-            const expectedUserData = {
-                ...createUserServiceResponse,
-                password: createUserRepositoryResponse.password,
-                tokens: tokensGeneratorAdapterResponse,
-            }
-            authenticateUserService.execute.mockResolvedValueOnce(
-                expectedUserData,
-            )
-
             // act
             const response = await sut.execute(baseHttpRequest)
 
@@ -82,18 +75,10 @@ describe('AuthenticateUserController', () => {
                 ResponseMessage.USER_LOGIN_SUCCESS,
             )
         })
+    })
 
+    describe('service integration', () => {
         it('should call AuthenticateUserService with correct parameters', async () => {
-            // arrange
-            const expectedUserData = {
-                ...createUserServiceResponse,
-                password: createUserRepositoryResponse.password,
-                tokens: tokensGeneratorAdapterResponse,
-            }
-            authenticateUserService.execute.mockResolvedValueOnce(
-                expectedUserData,
-            )
-
             // act
             await sut.execute(baseHttpRequest)
 

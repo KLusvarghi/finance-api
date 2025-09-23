@@ -17,18 +17,17 @@ describe('DeleteTransactionController', () => {
     let transactionCacheManager: MockProxy<ITransactionCacheManager>
 
     beforeEach(() => {
-        // Setup executado antes de cada teste
         deleteTransactionService = mock<DeleteTransactionService>()
         transactionCacheManager = mock<ITransactionCacheManager>()
         sut = new DeleteTransactionController(
             deleteTransactionService,
             transactionCacheManager,
         )
-    })
 
-    afterEach(() => {
-        jest.clearAllMocks()
-        jest.restoreAllMocks()
+        // Happy path setup - configure success scenario by default
+        deleteTransactionService.execute.mockResolvedValue(
+            deleteTransactionControllerResponse,
+        )
     })
 
     describe('error handling', () => {
@@ -64,11 +63,6 @@ describe('DeleteTransactionController', () => {
 
     describe('success cases', () => {
         it('should return 200 when deleting transaction successfully', async () => {
-            // arrange
-            deleteTransactionService.execute.mockResolvedValueOnce(
-                deleteTransactionControllerResponse,
-            )
-
             // act
             const response = await sut.execute(baseHttpRequest)
 
@@ -82,13 +76,10 @@ describe('DeleteTransactionController', () => {
                 deleteTransactionControllerResponse,
             )
         })
+    })
 
+    describe('service integration', () => {
         it('should call DeleteTransactionService with correct parameters', async () => {
-            // arrange
-            deleteTransactionService.execute.mockResolvedValueOnce(
-                deleteTransactionControllerResponse,
-            )
-
             // act
             await sut.execute(baseHttpRequest)
 
@@ -99,13 +90,10 @@ describe('DeleteTransactionController', () => {
             })
             expect(deleteTransactionService.execute).toHaveBeenCalledTimes(1)
         })
+    })
 
+    describe('cache management', () => {
         it('should invalidate cache after successful transaction deletion', async () => {
-            // arrange
-            deleteTransactionService.execute.mockResolvedValueOnce(
-                deleteTransactionControllerResponse,
-            )
-
             // act
             await sut.execute(baseHttpRequest)
 

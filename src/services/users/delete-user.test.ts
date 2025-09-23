@@ -16,12 +16,11 @@ describe('DeleteUserService', () => {
     beforeEach(() => {
         deleteUserRepository = mock<PostgresDeleteUserRepository>()
         sut = new DeleteUserService(deleteUserRepository)
-    })
 
-    afterEach(() => {
-        jest.clearAllMocks()
-        jest.restoreAllMocks()
-        jest.resetAllMocks()
+        // Happy path setup - configure success scenario by default
+        deleteUserRepository.execute.mockResolvedValue(
+            deleteUserRepositoryResponse,
+        )
     })
 
     describe('error handling', () => {
@@ -54,11 +53,6 @@ describe('DeleteUserService', () => {
 
     describe('success', () => {
         it('should successefully delete an user', async () => {
-            // arrange
-            deleteUserRepository.execute.mockResolvedValue(
-                deleteUserRepositoryResponse,
-            )
-
             // act
             const response = await sut.execute(userId)
 
@@ -68,13 +62,8 @@ describe('DeleteUserService', () => {
         })
     })
 
-    describe('validations', () => {
+    describe('repository integration', () => {
         it('should call deleteUserRepository with correct params', async () => {
-            // arrange
-            deleteUserRepository.execute.mockResolvedValue(
-                deleteUserRepositoryResponse,
-            )
-
             // act
             await sut.execute(userId)
 

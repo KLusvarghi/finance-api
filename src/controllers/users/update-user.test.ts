@@ -18,15 +18,13 @@ describe('UpdateUserController', () => {
     let updateUserService: MockProxy<UpdateUserService>
 
     beforeEach(() => {
-        // Setup executado antes de cada teste
         updateUserService = mock<UpdateUserService>()
         sut = new UpdateUserController(updateUserService)
-    })
 
-    afterEach(() => {
-        // Limpeza após cada teste
-        jest.clearAllMocks()
-        jest.restoreAllMocks()
+        // Happy path setup - configure success scenario by default
+        updateUserService.execute.mockResolvedValue(
+            updateUserRepositoryResponse,
+        )
     })
 
     describe('error handling', () => {
@@ -87,11 +85,6 @@ describe('UpdateUserController', () => {
 
     describe('success cases', () => {
         it('should return 200 when updating user successfully', async () => {
-            // arrange
-            updateUserService.execute.mockResolvedValueOnce(
-                updateUserRepositoryResponse,
-            )
-
             // act
             const response = await sut.execute(baseHttpRequest)
 
@@ -103,13 +96,10 @@ describe('UpdateUserController', () => {
                 updateUserRepositoryResponse,
             )
         })
+    })
 
+    describe('service integration', () => {
         it('should call UpdateUserService with correct parameters', async () => {
-            // arrange
-            updateUserService.execute.mockResolvedValueOnce(
-                updateUserRepositoryResponse,
-            )
-
             // act
             await sut.execute(baseHttpRequest)
 

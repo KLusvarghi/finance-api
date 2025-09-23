@@ -15,18 +15,17 @@ describe('CreateTransactionController', () => {
     let transactionCacheManager: MockProxy<ITransactionCacheManager>
 
     beforeEach(() => {
-        // Setup executado antes de cada teste
         createTransactionService = mock<CreateTransactionService>()
         transactionCacheManager = mock<ITransactionCacheManager>()
         sut = new CreateTransactionController(
             createTransactionService,
             transactionCacheManager,
         )
-    })
 
-    afterEach(() => {
-        jest.clearAllMocks()
-        jest.restoreAllMocks()
+        // Happy path setup - configure success scenario by default
+        createTransactionService.execute.mockResolvedValue(
+            createTransactionControllerResponse,
+        )
     })
 
     describe('error handling', () => {
@@ -44,11 +43,6 @@ describe('CreateTransactionController', () => {
 
     describe('success cases', () => {
         it('should return 201 when creating transaction successfully', async () => {
-            // arrange
-            createTransactionService.execute.mockResolvedValueOnce(
-                createTransactionControllerResponse,
-            )
-
             // act
             const response = await sut.execute(baseHttpRequest)
 
@@ -59,13 +53,10 @@ describe('CreateTransactionController', () => {
                 createTransactionControllerResponse,
             )
         })
+    })
 
+    describe('service integration', () => {
         it('should call CreateTransactionService with correct parameters', async () => {
-            // arrange
-            createTransactionService.execute.mockResolvedValueOnce(
-                createTransactionControllerResponse,
-            )
-
             // act
             await sut.execute(baseHttpRequest)
 
@@ -76,13 +67,10 @@ describe('CreateTransactionController', () => {
             })
             expect(createTransactionService.execute).toHaveBeenCalledTimes(1)
         })
+    })
 
+    describe('cache management', () => {
         it('should invalidate cache after successful transaction creation', async () => {
-            // arrange
-            createTransactionService.execute.mockResolvedValueOnce(
-                createTransactionControllerResponse,
-            )
-
             // act
             await sut.execute(baseHttpRequest)
 

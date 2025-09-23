@@ -15,18 +15,17 @@ describe('UpdateTransactionController', () => {
     let transactionCacheManager: MockProxy<ITransactionCacheManager>
 
     beforeEach(() => {
-        // Setup executado antes de cada teste
         updateTransactionService = mock<UpdateTransactionService>()
         transactionCacheManager = mock<ITransactionCacheManager>()
         sut = new UpdateTransactionController(
             updateTransactionService,
             transactionCacheManager,
         )
-    })
 
-    afterEach(() => {
-        jest.clearAllMocks()
-        jest.restoreAllMocks()
+        // Happy path setup - configure success scenario by default
+        updateTransactionService.execute.mockResolvedValue(
+            updateTransactionControllerResponse,
+        )
     })
 
     describe('error handling', () => {
@@ -44,11 +43,6 @@ describe('UpdateTransactionController', () => {
 
     describe('success cases', () => {
         it('should return 200 when updating transaction successfully', async () => {
-            // arrange
-            updateTransactionService.execute.mockResolvedValueOnce(
-                updateTransactionControllerResponse,
-            )
-
             // act
             const response = await sut.execute(baseHttpRequest)
 
@@ -59,13 +53,10 @@ describe('UpdateTransactionController', () => {
                 (response.body as HttpResponseSuccessBody)?.data,
             ).toMatchObject(updateTransactionControllerResponse)
         })
+    })
 
+    describe('service integration', () => {
         it('should call UpdateTransactionService with correct params', async () => {
-            // arrange
-            updateTransactionService.execute.mockResolvedValueOnce(
-                updateTransactionControllerResponse,
-            )
-
             // act
             await sut.execute(baseHttpRequest)
 
@@ -79,13 +70,10 @@ describe('UpdateTransactionController', () => {
             )
             expect(updateTransactionService.execute).toHaveBeenCalledTimes(1)
         })
+    })
 
+    describe('cache management', () => {
         it('should invalidate cache after successful transaction update', async () => {
-            // arrange
-            updateTransactionService.execute.mockResolvedValueOnce(
-                updateTransactionControllerResponse,
-            )
-
             // act
             await sut.execute(baseHttpRequest)
 
