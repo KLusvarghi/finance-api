@@ -11,14 +11,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm test` - Run tests using Jest with .env.test configuration
 - `npm run test:watch` - Run tests in watch mode
 - `npm run test:coverage` - Run tests with coverage report
+- `npm run ts:check` - TypeScript type checking without emit
+- `npm run eslint:check` - Run ESLint checks
+- `npm run eslint:fix` - Fix ESLint issues automatically
+- `npm run prettier:check` - Check code formatting
+- `npm run prettier:fix` - Fix code formatting
 
 ### Database Commands
 
-- `npx prisma migrate deploy` - Run database migrations
-- `npx prisma generate` - Generate Prisma client
-- `npx prisma studio` - Open Prisma Studio database GUI
+- `npm run db:migrate` - Run database migrations in development (interactive)
+- `npm run db:migrate:deploy` - Deploy migrations (production/CI)
+- `npm run db:generate` - Generate Prisma client
+- `npm run db:studio` - Open Prisma Studio database GUI
 - `docker compose up -d postgres` - Start PostgreSQL development database
 - `docker compose up -d postgres-test` - Start PostgreSQL test database
+
+### Package Manager
+
+This project uses **pnpm** as the package manager. Use `pnpm install` instead of `npm install` for dependency management.
 
 ## Architecture Overview
 
@@ -48,10 +58,13 @@ This is a Node.js REST API for personal finance management built with a clean ar
 ## Testing Strategy
 
 - Tests are co-located with source files (`.test.ts` files)
-- Uses Jest with custom configuration for ESM support
+- Uses Jest with custom configuration for ESM support and TypeScript
+- Jest runs in band (`--runInBand`) with test database isolation
+- Global setup and teardown configured in `jest.global-setup.ts` and `jest.setup-after-env.ts`
 - Test fixtures in `src/test/fixtures/` for common test data
-- Separate test database using Docker Compose
+- Separate test database using Docker Compose with `.env.test` configuration
 - Coverage reports generated in `coverage/` directory
+- Module path mapping configured with `@/` alias pointing to `src/`
 
 ## Environment Setup
 
