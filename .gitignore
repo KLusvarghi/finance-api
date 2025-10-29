@@ -36,7 +36,7 @@ coverage
 # IDE and tooling
 .backup
 .cursor
-.vscode
+.vscode/*
 .idea
 
 # Logs
@@ -49,3 +49,5 @@ yarn-error.log*
 # OS
 .DS_Store
 Thumbs.db
+
+pnpm-lock.yaml
