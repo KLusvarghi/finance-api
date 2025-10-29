@@ -6,7 +6,7 @@ import unusedImports from 'eslint-plugin-unused-imports';
 import globals from 'globals';
 
 /** @type {import("eslint").Linter.Config[]} */
-export default tseslint.config(
+export default [
   {
     // Base configuration for all files
     linterOptions: {
@@ -65,6 +65,6 @@ export default tseslint.config(
 
   // Ignore patterns
   {
-    ignores: ['node_modules/', 'dist/', '.turbo/', '.backup/'],
-  }
-);
+    ignores: ['node_modules/', 'generated/', '.backup/', 'dist/', '.turbo/', '.postgres-data/', '*.log', '*.d.ts'],
+  },
+];

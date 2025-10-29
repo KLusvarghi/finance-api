@@ -2,7 +2,7 @@
 /**
  * @type {import("prettier").Config}
  */
-export default config = {
+const config = {
     plugins: ['prettier-plugin-tailwindcss'],
     printWidth: 80, // largura máxima da linha
     tabWidth: 2, // largura da tab
@@ -18,3 +18,5 @@ export default config = {
     proseWrap: 'preserve', // não quebra o texto
     endOfLine: 'auto', // auto detecta o tipo de quebra de linha
 }
+
+export default config
