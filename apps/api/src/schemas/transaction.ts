@@ -34,6 +34,10 @@ export const createTransactionBodySchema = z
             .min(1, {
                 message: 'Amount must be greater than 0',
             })
+            // Database Decimal(10, 2) allows max 99999999.99 (8 digits + 2 decimals)
+            .max(99999999.99, {
+                message: 'Amount must be a valid currency (2 decimal places)',
+            })
             // quando temos que fazer validações que o zod não nos fornece, podemos usar o refine e se o que a gente colocar retornar false/null/undefined ele gera erro, caso contrário ele valida
             .refine(
                 (value) => {
