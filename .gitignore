@@ -1,6 +1,7 @@
 # Dependências
 node_modules
 **/node_modules
+pnpm-lock.yaml
 
 # Enviroment variables
 .env
@@ -49,5 +50,3 @@ yarn-error.log*
 # OS
 .DS_Store
 Thumbs.db
-
-pnpm-lock.yaml
