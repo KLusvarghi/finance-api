@@ -1,9 +1,0 @@
-{
-    "apps/api/**/*.{ts,tsx}": [
-        "./scripts/lint-staged-eslint.sh",
-        "prettier --write"
-    ],
-    "config/**/*.{js,jsx,ts,tsx}": ["prettier --write"],
-    "**/*.{json,md,yml,yaml}": "prettier --write"
-}
-

@@ -1,4 +1,10 @@
 {
-    "*ts": ["prettier --write", "eslint --fix --max-warnings 0"],
-    "*tsx": ["prettier --write", "eslint --fix --max-warnings 0"]
+    "apps/api/**/*.ts": ["prettier --write", "./scripts/lint-staged-eslint.sh"],
+    "apps/web/**/*.{ts,tsx}": [
+        "prettier --write",
+        "./scripts/lint-staged-eslint.sh"
+    ],
+    "*.{ts,tsx}": ["prettier --write"],
+    "config/**/*.{js,jsx,ts,tsx}": ["prettier --write"],
+    "**/*.{json,md,yml,yaml}": "prettier --write"
 }
