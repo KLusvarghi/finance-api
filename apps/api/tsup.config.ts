@@ -1,0 +1,32 @@
+import { defineConfig } from 'tsup'
+
+export default defineConfig({
+    entry: ['src/server.ts'],
+    format: ['esm'],
+    target: 'es2022',
+    outDir: 'dist',
+    clean: true,
+    sourcemap: true,
+    splitting: false,
+    bundle: true,
+    dts: false,
+    tsconfig: './tsconfig.json',
+    shims: true,
+    noExternal: [/.*/],
+    external: [
+        'express',
+        '@prisma/client',
+        'bcrypt',
+        'jsonwebtoken',
+        'dotenv',
+        'uuid',
+        'validator',
+        'zod',
+        'ioredis',
+        'rate-limiter-flexible',
+        'swagger-ui-express',
+        'dayjs',
+        'pg',
+        'dotenv-cli',
+    ],
+})

@@ -1,0 +1,24 @@
+{
+    "extends": "@finance-app/tsconfig/node.json",
+    "compilerOptions": {
+        "outDir": "./dist",
+        "incremental": true,
+        "paths": {
+            "@/*": ["./src/*"]
+        },
+        "resolveJsonModule": true,
+        "sourceMap": true
+    },
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.d.ts",
+        "index.ts",
+        "src/infra/db/postgres/migrations/exec.ts",
+        "tsup.config.ts",
+        "eslint.config.ts",
+        "jest.config.ts",
+        "jest.global-setup.ts",
+        "jest.setup-after-env.ts"
+    ],
+    "exclude": ["node_modules", "dist"]
+}

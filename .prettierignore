@@ -1,0 +1,41 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build outputs
+dist
+build
+.turbo
+.next
+out
+
+# Generated files
+generated
+coverage
+*.tsbuildinfo
+
+# Config files that use special syntax
+config/eslint-config/*.js
+config/eslint-config/package.json
+**/eslint.config.*
+
+# Prisma
+**/prisma/migrations
+
+# Logs
+*.log
+pnpm-debug.log*
+
+# Environment files
+.env*
+!.env.example
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

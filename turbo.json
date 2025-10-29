@@ -1,0 +1,40 @@
+{
+    "$schema": "https://turbo.build/schema.json",
+    "ui": "tui",
+    "tasks": {
+        "build": {
+            "dependsOn": ["^build", "db:generate"],
+            "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+        },
+        "dev": {
+            "cache": false,
+            "persistent": true
+        },
+        "test": {
+            "dependsOn": ["db:generate"],
+            "outputs": ["coverage/**"]
+        },
+        "test:coverage": {
+            "dependsOn": ["db:generate"],
+            "outputs": ["coverage/**"]
+        },
+        "lint": {
+            "dependsOn": ["^lint"]
+        },
+        "ts:check": {
+            "dependsOn": ["^ts:check"]
+        },
+        "prettier:check": {},
+        "prettier:fix": {},
+        "db:generate": {
+            "cache": false
+        },
+        "db:migrate": {
+            "cache": false
+        },
+        "db:studio": {
+            "cache": false,
+            "persistent": true
+        }
+    }
+}
