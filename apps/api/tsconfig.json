@@ -15,7 +15,7 @@
         "index.ts",
         "src/infra/db/postgres/migrations/exec.ts",
         "tsup.config.ts",
-        "eslint.config.ts",
+        "eslint.config.js",
         "jest.config.ts",
         "jest.global-setup.ts",
         "jest.setup-after-env.ts"
